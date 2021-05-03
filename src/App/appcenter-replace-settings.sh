@@ -12,6 +12,7 @@ fi
 
 sed -i "s/{ApiUrlBase}/$API_BASE_URL/g" $settingsPath
 
+sed -i "s/{ApiKeyBrands}/$API_KEY_BRANDS/g" $settingsPath
 sed -i "s/{ApiKeyFuels}/$API_KEY_FUELS/g" $settingsPath
 sed -i "s/{ApiKeySites}/$API_KEY_SITES/g" $settingsPath
 sed -i "s/{ApiKeySitePrices}/$API_KEY_SITE_PRICES/g" $settingsPath

@@ -17,5 +17,5 @@ chmod u+x $scriptPath
 $scriptPath $settingsPath
 
 sed -i "s/{AppCenterIosSecret}/$APPCENTER_IOS_SECRET/g" $settingsPath
-sed -i "s/{AdMobPricesIosUnitId}/$ADMOB_FUELS_UNIT_ID/g" $settingsPath
+sed -i "s/{AdMobPricesIosUnitId}/$ADMOB_PRICES_UNIT_ID/g" $settingsPath
 sed -i "s/{AdMobMapIosUnitId}/$ADMOB_MAP_UNIT_ID/g" $settingsPath

@@ -57,7 +57,7 @@ chmod u+x $scriptPath
 $scriptPath $settingsPath
 
 sed -i "s/{AppCenterAndroidSecret}/$APPCENTER_ANDROID_SECRET/g" $settingsPath
-sed -i "s/{AdMobPricesAndroidUnitId}/$ADMOB_FUELS_UNIT_ID/g" $settingsPath
+sed -i "s/{AdMobPricesAndroidUnitId}/$ADMOB_PRICES_UNIT_ID/g" $settingsPath
 sed -i "s/{AdMobMapAndroidUnitId}/$ADMOB_MAP_UNIT_ID/g" $settingsPath
 
 
