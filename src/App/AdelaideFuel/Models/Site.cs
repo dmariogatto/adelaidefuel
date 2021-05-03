@@ -3,10 +3,11 @@ using AdelaideFuel.Shared;
 using MvvmHelpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
+    [DebuggerDisplay("{Name}")]
     public class Site : ObservableObject, IMapPin
     {
         public Site(SiteDto site)

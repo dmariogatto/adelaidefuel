@@ -1,8 +1,10 @@
 ﻿using MvvmHelpers;
 using System;
+using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
+    [DebuggerDisplay("{Name}")]
     public class UserFuel : ObservableObject, IUserSortableEntity
     {
         private int _id;

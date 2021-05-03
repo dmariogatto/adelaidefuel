@@ -1,9 +1,11 @@
 ﻿using AdelaideFuel.Shared;
 using MvvmHelpers;
 using System;
+using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
+    [DebuggerDisplay("{FuelName} - {PriceInCents}")]
     public class SiteFuelPrice : ObservableObject
     {
         public SiteFuelPrice() { }
