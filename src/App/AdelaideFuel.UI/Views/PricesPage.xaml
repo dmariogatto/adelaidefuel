@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseAdPage
+    x:Class="AdelaideFuel.UI.Views.PricesPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:converters="clr-namespace:AdelaideFuel.UI.Converters"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:local="clr-namespace:AdelaideFuel.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+    Title="{Binding Title}"
+    x:DataType="viewModels:PricesViewModel"
+    x:TypeArguments="viewModels:PricesViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Icon="{StaticResource FuelImg}"
+    mc:Ignorable="d">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:KmToStringConverter x:Key="kmToStringConverter" />
+            <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
+
+            <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:SiteFuelPriceItemGroup">
+                <StackLayout Margin="{StaticResource XSmallTopThickness}" Spacing="0">
+                    <Label Style="{DynamicResource LabelTitleStyle}" Text="{Binding Key.Name}" />
+                    <yummy:PancakeView Style="{DynamicResource CardStyle}">
+                        <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceTemplate}" BindableLayout.ItemsSource="{Binding Items}" />
+                    </yummy:PancakeView>
+                </StackLayout>
+            </DataTemplate>
+
+            <DataTemplate x:Key="FuelPriceTemplate" x:DataType="models:SiteFuelPriceItem">
+                <Grid
+                    ColumnDefinitions="Auto,*,Auto"
+                    IsVisible="{Binding IsClear, Converter={StaticResource InverseBoolConverter}}"
+                    RowDefinitions="Auto,Auto,Auto,Auto"
+                    RowSpacing="{StaticResource XSmallSpacing}">
+                    <View.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding FuelPriceTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:PricesViewModel}}}" CommandParameter="{Binding}" />
+                    </View.GestureRecognizers>
+                    <yummy:PancakeView
+                        Grid.RowSpan="3"
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        WidthRequest="44">
+                        <ffimg:CachedImage
+                            LoadingDelay="200"
+                            LoadingPlaceholder="{StaticResource FuelImg}"
+                            Source="{Binding BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
+                    </yummy:PancakeView>
+                    <Label
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        FontFamily="{StaticResource BoldFontFamily}"
+                        LineBreakMode="TailTruncation"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{Binding SiteName}" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        FontSize="Small"
+                        LineBreakMode="TailTruncation"
+                        Style="{DynamicResource LabelTitleStyle}"
+                        Text="{Binding SiteAddress}" />
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        FontSize="Micro"
+                        Style="{DynamicResource LabelTitleStyle}"
+                        Text="{Binding Description}" />
+
+                    <Label
+                        Grid.RowSpan="4"
+                        Grid.Column="2"
+                        FontSize="Large"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                        VerticalTextAlignment="Center" />
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        FontSize="Micro"
+                        HorizontalOptions="End"
+                        Style="{DynamicResource LabelTitleStyle}"
+                        Text="{Binding LastKnowDistanceKm, Converter={StaticResource kmToStringConverter}}"
+                        VerticalOptions="End" />
+
+                    <BoxView
+                        Grid.Row="3"
+                        Grid.ColumnSpan="3"
+                        Margin="{StaticResource MediumLeftThickness}"
+                        BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand" />
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <views:BaseAdPage.MainContent>
+        <Grid>
+            <ScrollView Padding="{StaticResource SmallThickness}">
+                <StackLayout IsVisible="{Binding HasPrices}">
+                    <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
+                    <Label
+                        Margin="{StaticResource LargeRightThickness}"
+                        FontFamily="{StaticResource ItalicFontFamily}"
+                        FontSize="Small"
+                        HorizontalTextAlignment="End"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat={local:Translate UpdatedItem}}" />
+                </StackLayout>
+            </ScrollView>
+
+            <StackLayout
+                HorizontalOptions="FillAndExpand"
+                IsVisible="{Binding HasPrices, Converter={StaticResource InverseBoolConverter}}"
+                VerticalOptions="Center">
+                <controls:AppIconView IsBouncing="{Binding IsBusy}" />
+                <Label
+                    HorizontalTextAlignment="Center"
+                    IsVisible="{Binding HasError}"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate UnableToLoadPrices}" />
+                <Button
+                    Command="{Binding LoadFuelPriceGroupsCommand}"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding HasError}"
+                    Style="{DynamicResource ButtonStyle}"
+                    Text="{local:Translate TryAgain}" />
+            </StackLayout>
+
+            <ContentView
+                HorizontalOptions="Center"
+                IsVisible="{Binding HasPrices}"
+                VerticalOptions="Start">
+                <controls:LoadingIndicator />
+            </ContentView>
+        </Grid>
+    </views:BaseAdPage.MainContent>
+</views:BaseAdPage>

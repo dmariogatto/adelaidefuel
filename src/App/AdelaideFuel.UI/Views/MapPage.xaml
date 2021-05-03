@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseAdPage
+    x:Class="AdelaideFuel.UI.Views.MapPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:converters="clr-namespace:AdelaideFuel.UI.Converters"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:effects="clr-namespace:AdelaideFuel.UI.Effects"
+    xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:local="clr-namespace:AdelaideFuel.UI"
+    xmlns:maps="clr-namespace:Xamarin.Forms.Maps"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+    Title="{Binding Title}"
+    x:DataType="viewModels:MapViewModel"
+    x:TypeArguments="viewModels:MapViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Icon="{StaticResource MapImg}"
+    NavigationPage.HasNavigationBar="False"
+    mc:Ignorable="d">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:KmToStringConverter x:Key="kmToStringConverter" />
+            <converters:PriceCategoryToColorConverter x:Key="priceCategoryToColorConverter" />
+            <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
+            <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
+            <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
+
+            <views:MapPinDataTemplateSelector x:Key="mapPinDataSelector" />
+
+            <ConstraintExpression
+                x:Key="ConstraintFullHeight"
+                Constant="0"
+                Factor="1"
+                Type="RelativeToParent"
+                Property="Height" />
+            <ConstraintExpression
+                x:Key="ConstraintFullWidth"
+                Constant="0"
+                Factor="1"
+                Type="RelativeToParent"
+                Property="Width" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <views:BaseAdPage.MainContent>
+        <RelativeLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <maps:Map
+                x:Name="SiteMap"
+                ItemTemplateSelector="{StaticResource mapPinDataSelector}"
+                ItemsSource="{Binding FilteredSites}"
+                PropertyChanged="SiteMapPropertyChanged"
+                RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
+                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}"
+                ShowUserLocation="{Binding EnableMyLocation}"
+                ShowUserLocationButton="{Binding EnableMyLocation}" />
+
+            <Grid
+                Margin="{StaticResource XSmallTopThickness}"
+                Padding="{StaticResource XLargeTopThickness}"
+                effects:SafeAreaInsetEffect.Insets="Left,Top,Right"
+                CascadeInputTransparent="False"
+                InputTransparent="True"
+                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}"
+                RowDefinitions="Auto,Auto">
+                <yummy:PancakeView
+                    x:Name="FuelPickerView"
+                    Margin="0"
+                    Padding="{StaticResource SmallThickness}"
+                    CornerRadius="{Binding Height, Converter={StaticResource MultiplyByConverter}, ConverterParameter={StaticResource Half}, Source={x:Reference FuelPickerView}}"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding InitialLoadComplete}"
+                    Style="{DynamicResource CardStyle}">
+                    <View.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ChangeFuelCommand}" />
+                    </View.GestureRecognizers>
+                    <StackLayout Orientation="Horizontal">
+                        <controls:TintImage
+                            Margin="{StaticResource SmallLeftThickness}"
+                            HeightRequest="24"
+                            Source="{StaticResource FuelImg}"
+                            TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}"
+                            VerticalOptions="Center"
+                            WidthRequest="24" />
+                        <Label
+                            Margin="{StaticResource SmallRightThickness}"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding Fuel.Name}"
+                            VerticalTextAlignment="Center" />
+                    </StackLayout>
+                </yummy:PancakeView>
+                <controls:LoadingIndicator
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center" />
+            </Grid>
+
+            <controls:BottomDrawer
+                x:Name="BottomDrawerControl"
+                Padding="{StaticResource SmallThickness}"
+                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColorTransparent}}"
+                CornerRadius="18"
+                IsVisible="{Binding InitialLoadComplete}"
+                RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
+                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}">
+                <StackLayout
+                    SizeChanged="BottomSheetLayoutSizeChanged"
+                    Spacing="0"
+                    VerticalOptions="Start">
+
+                    <BoxView
+                        x:Name="BottomDrawerHandle"
+                        Margin="0,8,0,10"
+                        BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
+                        CornerRadius="2"
+                        HeightRequest="4"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}"
+                        WidthRequest="60" />
+
+                    <Label
+                        Margin="{StaticResource SmallBottomThickness}"
+                        FontFamily="{StaticResource BoldFontFamily}"
+                        HorizontalTextAlignment="Center"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{local:Translate Prices}" />
+
+                    <controls:FuelCategoriesView FuelCategories="{Binding FuelCategories}" IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}" />
+
+                    <Grid
+                        ColumnDefinitions="Auto,*,Auto"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}"
+                        RowDefinitions="Auto,Auto">
+                        <yummy:PancakeView
+                            Grid.RowSpan="3"
+                            CornerRadius="22"
+                            HeightRequest="44"
+                            VerticalOptions="Center"
+                            WidthRequest="44">
+                            <ffimg:CachedImage
+                                LoadingDelay="200"
+                                LoadingPlaceholder="{StaticResource FuelImg}"
+                                Source="{Binding SelectedSite.BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
+                        </yummy:PancakeView>
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource BoldFontFamily}"
+                            LineBreakMode="TailTruncation"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SelectedSite.Label}" />
+                        <Label
+                            Grid.Column="2"
+                            FontFamily="{StaticResource BoldItalicFontFamily}"
+                            FontSize="Micro"
+                            HorizontalTextAlignment="Start"
+                            Style="{DynamicResource LabelTitleStyle}"
+                            Text="{Binding SelectedSite.OpeningHours, Converter={StaticResource openingHoursToStringConverter}}"
+                            VerticalTextAlignment="Center" />
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            FontFamily="{StaticResource BoldItalicFontFamily}"
+                            FontSize="Small"
+                            HorizontalOptions="Start"
+                            LineBreakMode="TailTruncation"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SelectedSite.Address}"
+                            TextColor="{DynamicResource {x:Static styles:Keys.LinkColor}}">
+                            <View.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LaunchMapCommand}" CommandParameter="{Binding SelectedSite}" />
+                            </View.GestureRecognizers>
+                        </Label>
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            FontSize="Micro"
+                            HorizontalTextAlignment="End"
+                            Style="{DynamicResource LabelTitleStyle}"
+                            Text="{Binding SelectedSite.LastKnownDistanceKm, Converter={StaticResource kmToStringConverter}}"
+                            VerticalTextAlignment="Center" />
+                    </Grid>
+
+                    <BoxView
+                        x:Name="BottomSheetDivider"
+                        Margin="{StaticResource MediumLeftTopThickness}"
+                        BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <StackLayout
+                        Padding="{StaticResource MediumLeftTopThickness}"
+                        BindableLayout.ItemsSource="{Binding SelectedSite.Prices}"
+                        Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:SiteFuelPrice">
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        FontFamily="{StaticResource BoldFontFamily}"
+                                        FontSize="Medium"
+                                        Style="{DynamicResource LabelStyle}"
+                                        Text="{Binding FuelName}"
+                                        VerticalTextAlignment="Center" />
+                                    <Label
+                                        FontSize="Large"
+                                        HorizontalOptions="End"
+                                        Style="{DynamicResource LabelStyle}"
+                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                        VerticalTextAlignment="Center" />
+                                </StackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+
+                    <Label
+                        Margin="{StaticResource SmallTopThickness}"
+                        FontFamily="{StaticResource ItalicFontFamily}"
+                        FontSize="Micro"
+                        HorizontalOptions="End"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{Binding SelectedSite.LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}" />
+                </StackLayout>
+            </controls:BottomDrawer>
+        </RelativeLayout>
+    </views:BaseAdPage.MainContent>
+
+</views:BaseAdPage>

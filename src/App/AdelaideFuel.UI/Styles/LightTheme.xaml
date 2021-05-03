@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    x:Class="AdelaideFuel.UI.Styles.LightTheme"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView">
+    <!--  Blue  -->
+    <Color x:Key="PrimaryColor">#2E7D32</Color>
+
+    <!--  Dark Blue  -->
+    <Color x:Key="PrimaryDarkColor">#005005</Color>
+
+    <!--  Orange  -->
+    <Color x:Key="PrimaryAccentColor">#2E7D32</Color>
+
+    <OnPlatform
+        x:Key="NavigationBarColor"
+        x:TypeArguments="Color"
+        Android="#2E7D32"
+        iOS="#F8F8F8" />
+
+    <OnPlatform
+        x:Key="NavigationBarTextColor"
+        x:TypeArguments="Color"
+        Android="#FFFFFF" />
+
+    <!--  Dark Grey  -->
+    <Color x:Key="UnselectedTabColor">#808080</Color>
+
+    <!--  White  -->
+    <Color x:Key="PageBackgroundColor">#F8F8F8</Color>
+    <Color x:Key="PageBackgroundColorTransparent">#E5F8F8F8</Color>
+
+    <!--  Dark Grey  -->
+    <Color x:Key="PrimaryTextColor">#191919</Color>
+
+    <!--  Mid Grey  -->
+    <Color x:Key="SecondaryTextColor">#323232</Color>
+
+    <!--  Grey  -->
+    <Color x:Key="CardBackgroundColor">#EEEEEE</Color>
+
+    <yummy:Border
+        x:Key="CardYummyBorder"
+        Thickness="0"
+        Color="#D8D8D8" />
+
+    <!--  Black  -->
+    <Color x:Key="TintColor">#000000</Color>
+
+    <!--  Blue  -->
+    <Color x:Key="LinkColor">#007AFF</Color>
+
+    <!--  Black  -->
+    <Color x:Key="ContrastColor">#000000</Color>
+</ResourceDictionary>

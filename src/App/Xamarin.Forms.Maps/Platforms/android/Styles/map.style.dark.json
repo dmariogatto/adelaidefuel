@@ -1,0 +1,55 @@
+[
+  {
+    "stylers": [
+      {
+        "hue": "#435158"
+      },
+      {
+        "saturation": 10
+      },
+      {
+        "invert_lightness": true
+      },
+      {
+        "lightness": 30
+      },
+      {
+        "gamma": 0.5
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+]

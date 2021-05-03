@@ -1,0 +1,3 @@
+# Blacklisted NuGet packages
+Xamarin.Forms
+iTextSharp

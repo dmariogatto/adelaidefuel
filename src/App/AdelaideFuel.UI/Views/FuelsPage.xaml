@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage
+    x:Class="AdelaideFuel.UI.Views.FuelsPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:local="clr-namespace:AdelaideFuel.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sho="http://sharpnado.com"
+    xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
+    Title="{Binding Title}"
+    x:DataType="viewModels:FuelsViewModel"
+    x:TypeArguments="viewModels:FuelsViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Icon="{StaticResource FuelImg}"
+    mc:Ignorable="d">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <views:UserEntityDataTemplateSelector x:Key="userEntityDataTemplateSelector" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <Grid>
+            <sho:HorizontalListView
+                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+                EnableDragAndDrop="True"
+                IsVisible="{Binding HasError, Converter={StaticResource InverseBoolConverter}}"
+                ItemHeight="{x:Static views:UserEntityDataTemplateSelector.FuelHeight}"
+                ItemSpacing="0"
+                ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
+                ItemsSource="{Binding Fuels, Mode=OneWay}"
+                ListLayout="Vertical"
+                TapCommand="{Binding FuelTappedCommand}" />
+
+            <StackLayout
+                HorizontalOptions="FillAndExpand"
+                IsVisible="{Binding HasError}"
+                VerticalOptions="Center">
+                <Label
+                    HorizontalTextAlignment="Center"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate UnableToLoadFuels}" />
+                <Button
+                    Command="{Binding LoadFuelsCommand}"
+                    HorizontalOptions="Center"
+                    Style="{DynamicResource ButtonStyle}"
+                    Text="{local:Translate TryAgain}" />
+            </StackLayout>
+
+            <controls:LoadingIndicator HorizontalOptions="Center" VerticalOptions="Start" />
+        </Grid>
+    </ContentPage.Content>
+
+</views:BasePage>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sho:DraggableViewCell
+    x:Class="AdelaideFuel.UI.Views.UserFuelTemplate"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sho="http://sharpnado.com"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:contros="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+    x:DataType="models:UserFuel"
+    mc:Ignorable="d">
+    <ContentView>
+        <yummy:PancakeView Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+            <View.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsActive}"
+                    TargetType="View"
+                    Value="false">
+                    <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                </DataTrigger>
+            </View.Triggers>
+            <Grid ColumnDefinitions="36,*,48">
+
+                <CheckBox IsChecked="{Binding IsActive}" />
+
+                <Label
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    Style="{DynamicResource LabelTitleStyle}"
+                    Text="{Binding Name}"
+                    VerticalTextAlignment="Center" />
+
+                <contros:TintImage
+                    Grid.Column="2"
+                    HeightRequest="40"
+                    HorizontalOptions="Center"
+                    Source="{StaticResource DragIndicator}"
+                    TintColor="{StaticResource PrimaryAccentColor}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </yummy:PancakeView>
+    </ContentView>
+</sho:DraggableViewCell>

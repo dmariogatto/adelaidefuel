@@ -1,0 +1,18 @@
+{
+  "ApiUrlBase": "{ApiUrlBase}",
+
+  "ApiKeyBrands": "{ApiKeyBrands}",
+  "ApiKeyFuels": "{ApiKeyFuels}",
+  "ApiKeySites": "{ApiKeySites}",
+  "ApiKeySitePrices": "{ApiKeySitePrices}",
+  "ApiKeyBrandImg": "{ApiKeyBrandImg}",
+
+  "AppCenterAndroidSecret": "{AppCenterAndroid}",
+  "AppCenterIosSecret": "{AppCenteriOS}",
+
+  "AdMobPublisherId": "{AdMobPublisherId}",
+  "AdMobPricesAndroidUnitId": "{AdMobPricesAndroidUnitId}",
+  "AdMobPricesIosUnitId": "{AdMobPricesIosUnitId}",
+  "AdMobMapAndroidUnitId": "{AdMobMapAndroidUnitId}",
+  "AdMobMapIosUnitId": "{AdMobMapIosUnitId}"
+}
