@@ -60,6 +60,7 @@ sed -i.bak "s#{AppCenterAndroidSecret}#$APPCENTER_ANDROID_SECRET#g" $settingsPat
 sed -i.bak "s#{AdMobPricesAndroidUnitId}#$ADMOB_PRICES_UNIT_ID#g" $settingsPath
 sed -i.bak "s#{AdMobMapAndroidUnitId}#$ADMOB_MAP_UNIT_ID#g" $settingsPath
 
+cat $manifestPath
 cat $settingsPath
 
 constantsPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel/Constants/Constants.cs"

@@ -20,4 +20,5 @@ sed -i.bak "s#{AppCenterIosSecret}#$APPCENTER_IOS_SECRET#g" $settingsPath
 sed -i.bak "s#{AdMobPricesIosUnitId}#$ADMOB_PRICES_UNIT_ID#g" $settingsPath
 sed -i.bak "s#{AdMobMapIosUnitId}#$ADMOB_MAP_UNIT_ID#g" $settingsPath
 
+cat $appPlistPath
 cat $settingsPath
