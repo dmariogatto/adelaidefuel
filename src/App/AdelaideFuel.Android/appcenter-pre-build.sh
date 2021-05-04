@@ -46,8 +46,8 @@ eval $verNameCmd
 
 # ==> Manifest Version Code and Name changed
 
-sed -i.bak "s/{GoogleMapsApiKey}/$GOOGLE_MAPS_API_KEY/g" $manifestPath
-sed -i.bak "s/{AdMobApplicationId}/$ADMOB_APPLICATION_ID/g" $manifestPath
+sed -i.bak "s#{GoogleMapsApiKey}#$GOOGLE_MAPS_API_KEY#g" $manifestPath
+sed -i.bak "s#{AdMobApplicationId}#$ADMOB_APPLICATION_ID#g" $manifestPath
 
 scriptPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/appcenter-replace-settings.sh"
 settingsPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel/settings.json"
@@ -56,10 +56,11 @@ chmod u+x $scriptPath
 
 $scriptPath $settingsPath
 
-sed -i.bak "s/{AppCenterAndroidSecret}/$APPCENTER_ANDROID_SECRET/g" $settingsPath
-sed -i.bak "s/{AdMobPricesAndroidUnitId}/$ADMOB_PRICES_UNIT_ID/g" $settingsPath
-sed -i.bak "s/{AdMobMapAndroidUnitId}/$ADMOB_MAP_UNIT_ID/g" $settingsPath
+sed -i.bak "s#{AppCenterAndroidSecret}#$APPCENTER_ANDROID_SECRET#g" $settingsPath
+sed -i.bak "s#{AdMobPricesAndroidUnitId}#$ADMOB_PRICES_UNIT_ID#g" $settingsPath
+sed -i.bak "s#{AdMobMapAndroidUnitId}#$ADMOB_MAP_UNIT_ID#g" $settingsPath
 
+cat $settingsPath
 
 constantsPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel/Constants/Constants.cs"
 
