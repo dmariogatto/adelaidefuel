@@ -57,8 +57,8 @@ namespace AdelaideFuel.UI.Services
                 {
                     navigatedPage = mainPage;
                     navFunc = navigatedPage == MainPage.RootPage
-                        ? () => MainPage.PopToRootAsync(animated)
-                        : () => MainPage.PushAsync(navigatedPage, animated);
+                        ? (Func<Task>)(() => MainPage.PopToRootAsync(animated))
+                        : (Func<Task>)(() => MainPage.PushAsync(navigatedPage, animated));
                 }
                 else
                 {
