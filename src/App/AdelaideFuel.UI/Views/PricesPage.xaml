@@ -106,8 +106,8 @@
     </ContentPage.Resources>
 
     <views:BaseAdPage.MainContent>
-        <Grid>
-            <ScrollView Padding="{StaticResource SmallThickness}">
+        <Grid RowDefinitions="Auto,*" RowSpacing="0">
+            <ScrollView Grid.Row="1" Padding="{StaticResource SmallThickness}">
                 <StackLayout IsVisible="{Binding HasPrices}">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
                     <Label
@@ -121,6 +121,7 @@
             </ScrollView>
 
             <StackLayout
+                Grid.Row="1"
                 HorizontalOptions="FillAndExpand"
                 IsVisible="{Binding HasPrices, Converter={StaticResource InverseBoolConverter}}"
                 VerticalOptions="Center">
@@ -139,6 +140,21 @@
             </StackLayout>
 
             <ContentView
+                Padding="{StaticResource SmallThickness}"
+                BackgroundColor="{DynamicResource {x:Static styles:Keys.ContrastColor}}"
+                HorizontalOptions="FillAndExpand"
+                InputTransparent="True"
+                IsVisible="{Binding HasInternet, Converter={StaticResource InverseBoolConverter}}"
+                VerticalOptions="Start">
+                <Label
+                    HorizontalTextAlignment="Center"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate NoInternet}"
+                    TextColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}" />
+            </ContentView>
+
+            <ContentView
+                Grid.Row="1"
                 HorizontalOptions="Center"
                 IsVisible="{Binding HasPrices}"
                 VerticalOptions="Start">

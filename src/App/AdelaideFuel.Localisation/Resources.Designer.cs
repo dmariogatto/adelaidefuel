@@ -466,6 +466,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No internet, prices may be incorrect.
+        /// </summary>
+        public static string NoInternet {
+            get {
+                return ResourceManager.GetString("NoInternet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
@@ -538,7 +547,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SA Bowser: Should I Fuel?.
+        ///   Looks up a localized string similar to SA Bowser.
         /// </summary>
         public static string SaBowser {
             get {

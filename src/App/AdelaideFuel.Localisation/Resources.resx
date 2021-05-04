@@ -334,6 +334,9 @@
     <value>Accessibility</value>
   </data>
   <data name="SaBowser" xml:space="preserve">
-    <value>SA Bowser: Should I Fuel?</value>
+    <value>SA Bowser</value>
+  </data>
+  <data name="NoInternet" xml:space="preserve">
+    <value>No internet, prices may be incorrect</value>
   </data>
 </root>

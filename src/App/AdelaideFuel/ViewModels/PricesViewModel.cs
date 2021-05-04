@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
+using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
@@ -14,9 +16,14 @@ namespace AdelaideFuel.ViewModels
     {
         private readonly int[] _radii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
 
+        private readonly IConnectivity _connectivity;
+
         public PricesViewModel(
+            IConnectivity connectivity,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
+            _connectivity = connectivity;
+
             Title = Resources.Prices;
 
             FuelPriceGroups = new ObservableRangeCollection<SiteFuelPriceItemGroup>();
@@ -38,9 +45,26 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
+            HasInternet = _connectivity.NetworkAccess == NetworkAccess.Internet;
+            _connectivity.ConnectivityChanged += ConnectivityChanged;
+
             TrackEvent(AppCenterEvents.PageView.HomeView);
         }
+
+        public override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            _connectivity.ConnectivityChanged -= ConnectivityChanged;
+        }
         #endregion
+
+        private bool _hasInternet = true;
+        public bool HasInternet
+        {
+            get => _hasInternet;
+            set => SetProperty(ref _hasInternet, value);
+        }
 
         private DateTime _lastUpdatedUtc = DateTime.MinValue;
         public DateTime LastUpdatedUtc
@@ -178,6 +202,11 @@ namespace AdelaideFuel.ViewModels
             HasError = true;
             FuelPriceGroups.ForEach(g => g.ForEach(i => i.Clear()));
             OnPropertyChanged(nameof(HasPrices));
+        }
+
+        private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
+        {
+            HasInternet = _connectivity.NetworkAccess == NetworkAccess.Internet;
         }
     }
 }

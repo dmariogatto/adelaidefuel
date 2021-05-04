@@ -246,7 +246,7 @@ namespace AdelaideFuel.Services
             if (fuelIds.Count > 0)
                 keys.Add($"fIds={string.Join(",", fuelIds)}");
 
-            var cacheKey = CacheKey(string.Join("&", keys));
+            var cacheKey = CacheKey(string.Join("&", keys), nameof(GetPricesAsync));
             var sitePrices = default(IList<SiteFuelPrice>);
 
             if (!MemoryCache.TryGetValue(cacheKey, out sitePrices))
