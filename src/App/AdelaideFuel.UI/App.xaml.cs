@@ -73,9 +73,6 @@ namespace AdelaideFuel.UI
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();
 
             sw.Stop();
-
-            if (Device.RuntimePlatform == Device.iOS)
-                IoC.Resolve<INavigationService>().TopViewModel?.OnDisappearing();
         }
 
         protected override void OnResume()
@@ -83,9 +80,6 @@ namespace AdelaideFuel.UI
             // Handle when your app resumes
 
             UpdateDayCount();
-
-            if (Device.RuntimePlatform == Device.iOS)
-                IoC.Resolve<INavigationService>().TopViewModel?.OnAppearing();
         }
 
         private void UpdateDayCount()
