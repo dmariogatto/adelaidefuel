@@ -31,8 +31,6 @@ namespace AdelaideFuel.UI.Views
             {
                 if (cts.IsCancellationRequested)
                 {
-                    cts.Cancel();
-
                     if (cts == _timerCancellation)
                         _timerCancellation = null;
 
@@ -50,6 +48,7 @@ namespace AdelaideFuel.UI.Views
             base.OnDisappearing();
 
             _timerCancellation?.Cancel();
+            _timerCancellation = null;
         }
     }
 }

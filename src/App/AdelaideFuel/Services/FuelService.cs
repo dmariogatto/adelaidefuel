@@ -268,33 +268,36 @@ namespace AdelaideFuel.Services
 
                         await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
 
-                        var fuelPriceGroups =
-                            (from sp in pricesTask.Result
-                             join s in sitesTask.Result on sp.SiteId equals s.SiteId
-                             join b in userBrandsTask.Result on s.BrandId equals b.Id
-                             join f in userFuelsTask.Result on sp.FuelId equals f.Id
-                             where b.IsActive && f.IsActive
-                             orderby f.SortOrder, sp.Price, b.SortOrder
-                             let sfp = new SiteFuelPrice(b, f, s, sp)
-                             group sfp by sfp.FuelId into fpg
-                             select fpg).ToList();
-
-                        foreach (var fpg in fuelPriceGroups)
+                        if (!cancellationToken.IsCancellationRequested)
                         {
-                            var fns = Statistics.FiveNumberSummary(fpg.Select(i => i.PriceInCents).ToArray());
-                            var median = fns[2];
+                            var fuelPriceGroups =
+                                (from sp in pricesTask.Result
+                                 join s in sitesTask.Result on sp.SiteId equals s.SiteId
+                                 join b in userBrandsTask.Result on s.BrandId equals b.Id
+                                 join f in userFuelsTask.Result on sp.FuelId equals f.Id
+                                 where b.IsActive && f.IsActive
+                                 orderby f.SortOrder, sp.Price, b.SortOrder
+                                 let sfp = new SiteFuelPrice(b, f, s, sp)
+                                 group sfp by sfp.FuelId into fpg
+                                 select fpg).ToList();
 
-                            var outliers = fpg
-                                .Where(i => median - i.PriceInCents >= 100)
+                            foreach (var fpg in fuelPriceGroups)
+                            {
+                                var fns = Statistics.FiveNumberSummary(fpg.Select(i => i.PriceInCents).ToArray());
+                                var median = fns[2];
+
+                                var outliers = fpg
+                                    .Where(i => median - i.PriceInCents >= 100)
+                                    .ToList();
+
+                                foreach (var o in outliers)
+                                    o.PriceInCents *= 10;
+                            }
+
+                            sitePrices = fuelPriceGroups
+                                .SelectMany(fpg => fpg.Select(i => i))
                                 .ToList();
-
-                            foreach (var o in outliers)
-                                o.PriceInCents *= 10;
                         }
-
-                        sitePrices = fuelPriceGroups
-                            .SelectMany(fpg => fpg.Select(i => i))
-                            .ToList();
                     }
                     catch (Exception ex)
                     {
@@ -303,7 +306,7 @@ namespace AdelaideFuel.Services
 
                     if (sitePrices?.Any() == true)
                     {
-                        MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(2.5));
+                        MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
                         _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
                     }
                 }
@@ -397,7 +400,7 @@ namespace AdelaideFuel.Services
                 }
 
                 if (response != default)
-                    MemoryCache.SetSliding(cacheKey, response, TimeSpan.FromMinutes(5));
+                    MemoryCache.SetSliding(cacheKey, response, TimeSpan.FromMinutes(30));
             }
 
             return response;
