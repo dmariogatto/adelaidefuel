@@ -328,7 +328,7 @@ namespace AdelaideFuel.Services
                  {
                      Id = ae.Id,
                      Name = ae.Name,
-                     SortOrder = int.MaxValue,
+                     SortOrder = mue?.SortOrder ?? (userEntities.Count + apiEntities.IndexOf(ae)),
                      IsActive = true,
                  }).ToList();
 
@@ -339,10 +339,6 @@ namespace AdelaideFuel.Services
                  where mae == null
                  select ue).ToList();
 
-            await Task.WhenAll(
-                UpsertUserEntitiesAsync(updatedEntities, cancellationToken),
-                RemoveUserEntitiesAsync(removedEntities, cancellationToken)).ConfigureAwait(false);
-
             var unmodified = userEntities
                 .Except(removedEntities)
                 .Where(e => updatedEntities.All(ue => ue.Id != e.Id));
@@ -350,6 +346,17 @@ namespace AdelaideFuel.Services
             var result = updatedEntities
                 .Concat(unmodified)
                 .OrderBy(e => e.SortOrder).ToList();
+
+            if (removedEntities.Any())
+            {
+                // fix up sort order
+                for (var i = 0; i < result.Count; i++)
+                    result[i].SortOrder = i;
+            }
+
+            await Task.WhenAll(
+                UpsertUserEntitiesAsync(updatedEntities, cancellationToken),
+                RemoveUserEntitiesAsync(removedEntities, cancellationToken)).ConfigureAwait(false);
 
             return result;
         }

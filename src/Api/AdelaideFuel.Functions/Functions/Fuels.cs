@@ -32,6 +32,7 @@ namespace AdelaideFuel.Functions
             return fuels
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.SortOrder)
+                .ThenBy(s => s.Name)
                 .ThenBy(s => s.FuelId)
                 .Select(s => s.ToFuel()).ToList();
         }

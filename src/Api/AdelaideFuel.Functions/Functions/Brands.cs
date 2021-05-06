@@ -44,6 +44,7 @@ namespace AdelaideFuel.Functions
             return brands
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.SortOrder)
+                .ThenBy(s => s.Name)
                 .ThenBy(s => s.BrandId)
                 .Select(s => s.ToBrand()).ToList();
         }
