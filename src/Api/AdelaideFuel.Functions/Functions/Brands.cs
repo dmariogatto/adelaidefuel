@@ -7,6 +7,7 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -21,7 +22,7 @@ namespace AdelaideFuel.Functions
         private const string BrandFuncName = nameof(Brands);
         private const string BrandImgFuncName = "BrandImg";
 
-        private readonly static string[] ValidSizes = new[] { "2x", "3x" };
+        private readonly static string[] ValidPostfix = new[] { "2x.png", "3x.png" };
 
         private readonly ITableRepository<BrandEntity> _brandRepository;
         private readonly CloudBlobClient _cloudBlobClient;
@@ -51,38 +52,41 @@ namespace AdelaideFuel.Functions
 
         [FunctionName(BrandImgFuncName)]
         public async Task<IActionResult> GetBrandImg(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Brand/Img/{brandId}/{size?}")] HttpRequest req,
-            long brandId,
-            string size,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Brand/Img/{fileName}")] HttpRequest req,
+            string fileName,
             ILogger log,
             CancellationToken ct)
         {
-            var brands = brandId > 0
-                ? await _brandRepository.GetPartitionAsync(brandId.ToString(CultureInfo.InvariantCulture), ct)
-                : default;
+            fileName = fileName?.ToLowerInvariant();
 
-            if (brands?.Any() == true)
+            if (!string.IsNullOrEmpty(fileName) &&
+                ValidPostfix.Any(i => fileName.EndsWith(i)) &&
+                int.TryParse(fileName.Substring(0, fileName.IndexOf("@")), out var brandId))
             {
-                var containerRef = _cloudBlobClient.GetContainerReference(Startup.BlobContainerName);
-                size = !string.IsNullOrEmpty(size) && ValidSizes.Contains(size) ? size : ValidSizes.First();
+                var brands = brandId > 0
+                                ? await _brandRepository.GetPartitionAsync(brandId.ToString(CultureInfo.InvariantCulture), ct)
+                                : default;
 
-                var fileName = $"{brandId}@{size}.png";
-                var brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
-
-                if (!await brandImgBlob.ExistsAsync(ct))
+                if (brands?.Any() == true)
                 {
-                    fileName = $"default@{size}.png";
-                    brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", $"default@{size}.png"));
+                    var containerRef = _cloudBlobClient.GetContainerReference(Startup.BlobContainerName);
+                    var brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
+
+                    if (!await brandImgBlob.ExistsAsync(ct))
+                    {
+                        fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
+                        brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
+                    }
+
+                    using var stream = await brandImgBlob.OpenReadAsync(ct);
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream, ct);
+
+                    return new CachedFileContentResult(memoryStream.ToArray(), "image/png", TimeSpan.FromDays(5))
+                    {
+                        FileDownloadName = fileName
+                    };
                 }
-
-                using var stream = await brandImgBlob.OpenReadAsync(ct);
-                using var memoryStream = new MemoryStream();
-                await stream.CopyToAsync(memoryStream, ct);
-
-                return new FileContentResult(memoryStream.ToArray(), "image/png")
-                {
-                    FileDownloadName = fileName
-                };
             }
 
             return new NotFoundResult();
