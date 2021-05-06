@@ -18,6 +18,9 @@ namespace AdelaideFuel.ViewModels
     {
         public readonly double InitialRadiusMetres;
 
+        private readonly SemaphoreSlim _sitesSemaphore = new SemaphoreSlim(1, 1);
+        private CancellationTokenSource _sitesCancellation;
+
         private readonly IPermissions _permissions;
         private readonly IGeolocation _geolocation;
         private readonly IMap _map;
@@ -51,8 +54,8 @@ namespace AdelaideFuel.ViewModels
             Fuels = new ObservableRangeCollection<UserFuel>();
             FuelCategories = new ObservableRangeCollection<FuelCategory>();
 
+            LoadSitesCommand = new AsyncCommand<UserFuel>(LoadSitesAsync);
             LoadFuelsCommand = new AsyncCommand(LoadFuelsAsync);
-            LoadSitesCommand = new AsyncCommand(LoadSitesAsync);
             ChangeFuelCommand = new AsyncCommand(ChangeFuelAsync);
             LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
 
@@ -105,9 +108,7 @@ namespace AdelaideFuel.ViewModels
             set
             {
                 if (SetProperty(ref _fuel, value))
-                {
-                    LoadSitesCommand.ExecuteAsync();
-                }
+                    LoadSitesCommand.ExecuteAsync(value);
             }
         }
 
@@ -151,8 +152,8 @@ namespace AdelaideFuel.ViewModels
         public ObservableRangeCollection<UserFuel> Fuels { get; private set; }
         public ObservableRangeCollection<FuelCategory> FuelCategories { get; private set; }
 
-        public AsyncCommand LoadSitesCommand { get; private set; }
         public AsyncCommand LoadFuelsCommand { get; private set; }
+        public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
         public AsyncCommand ChangeFuelCommand { get; private set; }
         public AsyncCommand<Site> LaunchMapCommand { get; private set; }
 
@@ -160,152 +161,143 @@ namespace AdelaideFuel.ViewModels
 
         private async Task LoadFuelsAsync()
         {
-            if (IsBusy)
-                return;
-
-            IsBusy = true;
-
             try
             {
                 var fuels = (await FuelService.GetUserFuelsAsync(default))
                         ?.Where(i => i.IsActive)?.ToList();
+
                 if (!Fuels.SequenceEqual(fuels))
                     Fuels.ReplaceRange(fuels);
+
+                if (!Fuels.Contains(Fuel))
+                    Fuel = Fuels.FirstOrDefault();
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
             }
-            finally
-            {
-                IsBusy = false;
-            }
-
-            if (!Fuels.Contains(Fuel))
-                Fuel = Fuels.FirstOrDefault();
-            else if (RefreshRequired)
-                _ = LoadSitesCommand.ExecuteAsync();
         }
 
-        private async Task LoadSitesAsync()
+        private async Task LoadSitesAsync(UserFuel fuel)
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-
-            _cts = new CancellationTokenSource();
-            var tok = _cts.Token;
-            await LoadSitesAsync(tok);
-        }
-
-        private async Task LoadSitesAsync(CancellationToken ct)
-        {
-            if (IsBusy || Fuel == null)
+            if (fuel == null)
                 return;
 
-            IsBusy = true;
+            var localCancelCopy = _sitesCancellation;
+            _sitesCancellation = new CancellationTokenSource();
+            var ct = _sitesCancellation.Token;
+            localCancelCopy?.Cancel();
 
-            try
+            await _sitesSemaphore.WaitAsync();
+
+            if (!ct.IsCancellationRequested && Fuel == fuel)
             {
-                var locationTask = _geolocation.GetLocationAsync(ct);
-                var pricesTask = FuelService.GetSitePricesAsync(ct);
+                IsBusy = true;
 
-                if (!Sites.Any())
+                try
                 {
-                    var sites = await FuelService.GetSitesAsync(ct);
-                    Sites.ReplaceRange(sites.Select(i => new Site(i)));
-                }
+                    var locationTask = _geolocation.GetLocationAsync(ct);
+                    var pricesTask = FuelService.GetSitePricesAsync(ct);
 
-                await Task.WhenAll(locationTask, pricesTask);
+#if DEBUG
+                    //await Task.Delay(2500);
+#endif
 
-                if (!ct.IsCancellationRequested && pricesTask.Result?.Any() == true)
-                {
-                    var priceLookup = pricesTask.Result
-                        .GroupBy(i => i.SiteId)
-                        .ToDictionary(g => g.Key, g => g.ToList());
-                    var fuelPrices = pricesTask.Result
-                        .Where(i => i.FuelId == Fuel.Id)
-                        .Select(i => i.PriceInCents).ToArray();
-
-                    var fns = Statistics.FiveNumberSummary(fuelPrices);
-
-                    var q1 = fns[1];
-                    var q2 = fns[2];
-                    var q3 = fns[3];
-
-                    var q375 = (q1 + q2) / 2d;
-                    var q625 = (q2 + q3) / 2d;
-
-                    var validCategories = default(IList<FuelCategory>);
-
-                    if (q1.FuzzyEquals(q3, 0.1))
+                    if (!Sites.Any())
                     {
-                        _fuelCategories[PriceCategory.Lowest].LowerBound = (int)q1;
-                        _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
-
-                        validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
-                    }
-                    else
-                    {
-                        _fuelCategories[PriceCategory.Lowest].LowerBound = 0;
-                        _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
-
-                        _fuelCategories[PriceCategory.Low].LowerBound = (int)q1;
-                        _fuelCategories[PriceCategory.Low].UpperBound = (int)q375;
-
-                        _fuelCategories[PriceCategory.Average].LowerBound = (int)q375;
-                        _fuelCategories[PriceCategory.Average].UpperBound = (int)q625;
-
-                        _fuelCategories[PriceCategory.High].LowerBound = (int)q625;
-                        _fuelCategories[PriceCategory.High].UpperBound = (int)q3;
-
-                        _fuelCategories[PriceCategory.Highest].LowerBound = (int)q3;
-                        _fuelCategories[PriceCategory.Highest].UpperBound = 0;
-
-                        validCategories = _fuelCategories
-                            .Values
-                            .Where(i => i.LowerBound != i.UpperBound).ToList();
+                        var sites = await FuelService.GetSitesAsync(ct);
+                        Sites.ReplaceRange(sites.Select(i => new Site(i)));
                     }
 
-                    FuelCategories.ReplaceRange(validCategories);
+                    await Task.WhenAll(locationTask, pricesTask);
 
-                    foreach (var s in Sites)
+                    if (!ct.IsCancellationRequested && pricesTask.Result?.Any() == true)
                     {
-                        s.LastKnownDistanceKm =
-                            locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
+                        var priceLookup = pricesTask.Result
+                            .GroupBy(i => i.SiteId)
+                            .ToDictionary(g => g.Key, g => g.ToList());
+                        var fuelPrices = pricesTask.Result
+                            .Where(i => i.FuelId == Fuel.Id)
+                            .Select(i => i.PriceInCents).ToArray();
 
-                        if (priceLookup.TryGetValue(s.Id, out var sitePrices))
+                        var fns = Statistics.FiveNumberSummary(fuelPrices);
+
+                        var q1 = fns[1];
+                        var q2 = fns[2];
+                        var q3 = fns[3];
+
+                        var q375 = (q1 + q2) / 2d;
+                        var q625 = (q2 + q3) / 2d;
+
+                        var validCategories = default(IList<FuelCategory>);
+
+                        if (q1.FuzzyEquals(q3, 0.1))
                         {
-                            s.Prices.ReplaceRange(sitePrices);
-                            s.SelectedFuelPrice = s.Prices.FirstOrDefault(p => p.FuelId == Fuel.Id);
-                            s.LastUpdatedUtc = sitePrices.Max(p => p.ModifiedUtc);
+                            _fuelCategories[PriceCategory.Lowest].LowerBound = (int)q1;
+                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
+
+                            validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
                         }
                         else
                         {
-                            s.SelectedFuelPrice = null;
-                            s.Prices.Clear();
+                            _fuelCategories[PriceCategory.Lowest].LowerBound = 0;
+                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
+
+                            _fuelCategories[PriceCategory.Low].LowerBound = (int)q1;
+                            _fuelCategories[PriceCategory.Low].UpperBound = (int)q375;
+
+                            _fuelCategories[PriceCategory.Average].LowerBound = (int)q375;
+                            _fuelCategories[PriceCategory.Average].UpperBound = (int)q625;
+
+                            _fuelCategories[PriceCategory.High].LowerBound = (int)q625;
+                            _fuelCategories[PriceCategory.High].UpperBound = (int)q3;
+
+                            _fuelCategories[PriceCategory.Highest].LowerBound = (int)q3;
+                            _fuelCategories[PriceCategory.Highest].UpperBound = 0;
+
+                            validCategories = _fuelCategories
+                                .Values
+                                .Where(i => i.LowerBound != i.UpperBound).ToList();
                         }
 
-                        if (s.SelectedFuelPrice is SiteFuelPrice fp)
+                        FuelCategories.ReplaceRange(validCategories);
+
+                        foreach (var s in Sites)
                         {
-                            if (fp.PriceInCents <= q1)
-                                s.PriceCategory = PriceCategory.Lowest;
-                            else if (fp.PriceInCents > q1 && fp.PriceInCents < q375)
-                                s.PriceCategory = PriceCategory.Low;
-                            else if (fp.PriceInCents >= q375 && fp.PriceInCents <= q625)
-                                s.PriceCategory = PriceCategory.Average;
-                            else if (fp.PriceInCents > q625 && fp.PriceInCents < q3)
-                                s.PriceCategory = PriceCategory.High;
-                            else if (fp.PriceInCents >= q3)
-                                s.PriceCategory = PriceCategory.Highest;
+                            s.LastKnownDistanceKm =
+                                locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
+
+                            if (priceLookup.TryGetValue(s.Id, out var sitePrices))
+                            {
+                                s.Prices.ReplaceRange(sitePrices);
+                                s.SelectedFuelPrice = s.Prices.FirstOrDefault(p => p.FuelId == Fuel.Id);
+                                s.LastUpdatedUtc = sitePrices.Max(p => p.ModifiedUtc);
+                            }
+                            else
+                            {
+                                s.SelectedFuelPrice = null;
+                                s.Prices.Clear();
+                            }
+
+                            if (s.SelectedFuelPrice is SiteFuelPrice fp)
+                            {
+                                if (fp.PriceInCents <= q1)
+                                    s.PriceCategory = PriceCategory.Lowest;
+                                else if (fp.PriceInCents > q1 && fp.PriceInCents < q375)
+                                    s.PriceCategory = PriceCategory.Low;
+                                else if (fp.PriceInCents >= q375 && fp.PriceInCents <= q625)
+                                    s.PriceCategory = PriceCategory.Average;
+                                else if (fp.PriceInCents > q625 && fp.PriceInCents < q3)
+                                    s.PriceCategory = PriceCategory.High;
+                                else if (fp.PriceInCents >= q3)
+                                    s.PriceCategory = PriceCategory.Highest;
+                                else
+                                    s.PriceCategory = PriceCategory.Unknown;
+                            }
                             else
                                 s.PriceCategory = PriceCategory.Unknown;
                         }
-                        else
-                            s.PriceCategory = PriceCategory.Unknown;
-                    }
 
-                    if (!ct.IsCancellationRequested)
-                    {
                         var newFiltered = Sites.Where(s => s.SelectedFuelPrice?.FuelId == Fuel.Id).ToList();
                         var toRemove = FilteredSites.Except(newFiltered).ToList();
                         var toAdd = newFiltered.Except(FilteredSites).ToList();
@@ -324,36 +316,22 @@ namespace AdelaideFuel.ViewModels
                         InitialLoadComplete = true;
                     }
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-            finally
+
+            _sitesSemaphore.Release();
+            localCancelCopy?.Dispose();
+
+            if (!ct.IsCancellationRequested && !_sitesCancellation.IsCancellationRequested)
             {
                 IsBusy = false;
-            }
-        }
-
-        private async Task LaunchMapAsync(Site site)
-        {
-            if (string.IsNullOrEmpty(site?.Name))
-                return;
-
-            try
-            {
-                var location = new Location(site.Latitude, site.Longitude);
-                var options = new MapLaunchOptions()
-                {
-                    Name = site.Name,
-                    NavigationMode = NavigationMode.Driving
-                };
-
-                await _map.OpenAsync(location, options);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
             }
         }
 
@@ -373,6 +351,28 @@ namespace AdelaideFuel.ViewModels
                     Array.IndexOf(fuelNames, result) is int idx &&
                     idx >= 0)
                     Fuel = Fuels[idx];
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+        }
+
+        private async Task LaunchMapAsync(Site site)
+        {
+            if (string.IsNullOrEmpty(site?.Name))
+                return;
+
+            try
+            {
+                var location = new Location(site.Latitude, site.Longitude);
+                var options = new MapLaunchOptions()
+                {
+                    Name = site.Name,
+                    NavigationMode = NavigationMode.Driving
+                };
+
+                await _map.OpenAsync(location, options);
             }
             catch (Exception ex)
             {

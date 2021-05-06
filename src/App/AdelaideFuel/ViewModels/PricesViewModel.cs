@@ -76,14 +76,6 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _lastUpdatedUtc, value);
         }
 
-        private DateTime _lastLoadedUtc = DateTime.MinValue;
-        public DateTime LastLoadedUtc
-        {
-            get => _lastLoadedUtc;
-            set => SetProperty(ref _lastLoadedUtc, value);
-        }
-
-        public bool RefreshRequired => LastLoadedUtc < DateTime.UtcNow.AddMinutes(-5);
         public bool HasPrices => FuelPriceGroups.Any(g => g.Items.Any(i => !i.IsClear));
 
         public ObservableRangeCollection<SiteFuelPriceItemGroup> FuelPriceGroups { get; private set; }
@@ -95,16 +87,7 @@ namespace AdelaideFuel.ViewModels
 
         private async Task LoadFuelPriceGroupsAsync(CancellationToken ct)
         {
-            var refreshRequired = RefreshRequired;
-
-            if (FuelPriceGroups.Any())
-            {
-                // has user fuels changed
-                try { refreshRequired |= await LoadGroupsAsync(ct); }
-                catch (Exception ex) { Logger.Error(ex); }
-            }
-
-            if (IsBusy || !refreshRequired)
+            if (IsBusy)
                 return;
 
             IsBusy = true;
@@ -113,8 +96,7 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                if (!FuelPriceGroups.Any())
-                    await LoadGroupsAsync(ct);
+                await LoadGroupsAsync(ct);
                 await UpdatePricesAsync(ct);
             }
             catch (Exception ex)
@@ -214,8 +196,6 @@ namespace AdelaideFuel.ViewModels
                         }
                     }
                 }
-
-                LastLoadedUtc = DateTime.UtcNow;
 
                 return true;
             }

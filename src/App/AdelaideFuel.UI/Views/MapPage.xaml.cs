@@ -66,13 +66,13 @@ namespace AdelaideFuel.UI.Views
             var cts = _timerCancellation;
 
             ViewModel.LoadFuelsCommand.ExecuteAsync();
+            if (ViewModel.InitialLoadComplete)
+                ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
 
             Device.StartTimer(TimeSpan.FromSeconds(60), () =>
             {
                 if (cts.IsCancellationRequested)
                 {
-                    cts.Cancel();
-
                     if (cts == _timerCancellation)
                         _timerCancellation = null;
 
@@ -80,8 +80,7 @@ namespace AdelaideFuel.UI.Views
                     return false;
                 }
 
-                if (ViewModel.RefreshRequired)
-                    ViewModel.LoadSitesCommand.ExecuteAsync();
+                ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
                 return true;
             });
         }
@@ -89,6 +88,9 @@ namespace AdelaideFuel.UI.Views
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
+
+            SiteId = string.Empty;
+            FuelId = string.Empty;
 
             _timerCancellation?.Cancel();
         }

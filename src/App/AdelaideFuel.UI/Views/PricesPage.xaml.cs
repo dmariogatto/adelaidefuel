@@ -55,6 +55,7 @@ namespace AdelaideFuel.UI.Views
             base.OnDisappearing();
 
             _timerCancellation?.Cancel();
+            _timerCancellation = null;
         }
     }
 }
