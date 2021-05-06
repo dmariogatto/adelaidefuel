@@ -127,7 +127,16 @@
                         HorizontalTextAlignment="Center"
                         IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}"
                         Style="{DynamicResource LabelStyle}"
-                        Text="{local:Translate Prices}" />
+                        Text="{local:Translate Prices}">
+                        <View.Triggers>
+                            <DataTrigger
+                                Binding="{Binding FuelCategories.Count}"
+                                TargetType="Label"
+                                Value="0">
+                                <Setter Property="Text" Value="{local:Translate NoStationsFound}" />
+                            </DataTrigger>
+                        </View.Triggers>
+                    </Label>
 
                     <controls:FuelCategoriesView FuelCategories="{Binding FuelCategories}" IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}" />
 

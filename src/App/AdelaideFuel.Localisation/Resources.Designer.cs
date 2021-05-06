@@ -488,11 +488,39 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are no prices for your combination of Brands &amp; Fuels.
+        ///You can update your preferences in Settings..
+        /// </summary>
+        public static string NoPricesDescription {
+            get {
+                return ResourceManager.GetString("NoPricesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No stations found.
+        /// </summary>
+        public static string NoStationsFound {
+            get {
+                return ResourceManager.GetString("NoStationsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oops.
+        /// </summary>
+        public static string Oops {
+            get {
+                return ResourceManager.GetString("Oops", resourceCulture);
             }
         }
         

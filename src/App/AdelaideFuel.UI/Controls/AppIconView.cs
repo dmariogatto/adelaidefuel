@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using System.Threading;
+using Xamarin.Forms;
 using Xamarin.Forms.PancakeView;
 
 namespace AdelaideFuel.UI.Controls
@@ -17,6 +18,8 @@ namespace AdelaideFuel.UI.Controls
 
         private readonly Animation _bounceAnimation;
 
+        private CancellationTokenSource _animationCts;
+
         public AppIconView()
         {
             _bounceAnimation = new Animation();
@@ -26,13 +29,13 @@ namespace AdelaideFuel.UI.Controls
             BackgroundColor = Color.FromHex("#4CAF50");
             CornerRadius = 8;
             HeightRequest = WidthRequest = 60;
-            HorizontalOptions = VerticalOptions = LayoutOptions.Center;           
+            HorizontalOptions = VerticalOptions = LayoutOptions.Center;
 
             var icon = new Image() { Source = Application.Current.Resources[Styles.Keys.TwoToneFuelImg] as string };
             icon.HeightRequest = icon.WidthRequest = 48;
             icon.HorizontalOptions = icon.VerticalOptions = LayoutOptions.CenterAndExpand;
 
-            Content = icon;            
+            Content = icon;
         }
 
         public bool IsBouncing
@@ -45,11 +48,20 @@ namespace AdelaideFuel.UI.Controls
         {
             if (view != null)
             {
-                if (view.AnimationIsRunning(AnimationHandle))
-                    view.AbortAnimation(AnimationHandle);
-
                 if (newVal)
-                    view.Animate(AnimationHandle, view._bounceAnimation, length: 1000, repeat: () => true);
+                {
+                    if (view.AnimationIsRunning(AnimationHandle))
+                        view.AbortAnimation(AnimationHandle);
+
+                    view._animationCts = new CancellationTokenSource();
+                    var tok = view._animationCts.Token;
+
+                    view.Animate(AnimationHandle, view._bounceAnimation, length: 1000, repeat: () => !tok.IsCancellationRequested);
+                }
+                else
+                {
+                    view._animationCts?.Cancel();
+                }
             }
         }
     }

@@ -1,5 +1,7 @@
 ﻿using MvvmHelpers;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace AdelaideFuel.Models
 {
@@ -8,5 +10,8 @@ namespace AdelaideFuel.Models
         public SiteFuelPriceItemGroup(UserFuel key, IEnumerable<SiteFuelPriceItem> items) : base(key, items)
         {
         }
+
+        public bool HasPrices => Items.Any(i => !i.IsClear);
+        public void RefreshHasPrices() => OnPropertyChanged(new PropertyChangedEventArgs(nameof(HasPrices)));
     }
 }

@@ -346,4 +346,14 @@ Do you want to setup the fuels you care about?
 
 This can be done at any time in Settings.</value>
   </data>
+  <data name="Oops" xml:space="preserve">
+    <value>Oops</value>
+  </data>
+  <data name="NoPricesDescription" xml:space="preserve">
+    <value>There are no prices for your combination of Brands &amp; Fuels.
+You can update your preferences in Settings.</value>
+  </data>
+  <data name="NoStationsFound" xml:space="preserve">
+    <value>No stations found</value>
+  </data>
 </root>

@@ -55,7 +55,6 @@ namespace AdelaideFuel.Functions
                 prices =
                     (from sp in await GetSitePriceEntitiesAsync(siteId, ct)
                      where sp.IsActive &&
-                           sp.TransactionDateUtc > DateTime.UtcNow.AddDays(-2) &&
                            (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
                            (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
                      orderby sp.TransactionDateUtc descending

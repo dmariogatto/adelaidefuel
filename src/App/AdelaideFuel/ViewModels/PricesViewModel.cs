@@ -76,7 +76,7 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _lastUpdatedUtc, value);
         }
 
-        public bool HasPrices => FuelPriceGroups.Any(g => g.Items.Any(i => !i.IsClear));
+        public bool HasPrices => FuelPriceGroups.Any(g => g.HasPrices);
 
         public ObservableRangeCollection<SiteFuelPriceItemGroup> FuelPriceGroups { get; private set; }
 
@@ -113,7 +113,7 @@ namespace AdelaideFuel.ViewModels
 
             if (firstLoad && (
 #if DEBUG
-                true ||
+                //true ||
 #endif
                 _versionTracking.IsFirstLaunchEver))
             {
@@ -195,6 +195,8 @@ namespace AdelaideFuel.ViewModels
                             fpg.Items[i].Clear();
                         }
                     }
+
+                    fpg.RefreshHasPrices();
                 }
 
                 return true;

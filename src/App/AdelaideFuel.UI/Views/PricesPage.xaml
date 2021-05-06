@@ -27,7 +27,10 @@
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
 
             <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:SiteFuelPriceItemGroup">
-                <StackLayout Margin="{StaticResource XSmallTopThickness}" Spacing="0">
+                <StackLayout
+                    Margin="{StaticResource XSmallTopThickness}"
+                    IsVisible="{Binding HasPrices}"
+                    Spacing="0">
                     <Label Style="{DynamicResource LabelTitleStyle}" Text="{Binding Key.Name}" />
                     <yummy:PancakeView Style="{DynamicResource CardStyle}">
                         <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceTemplate}" BindableLayout.ItemsSource="{Binding Items}" />
@@ -120,24 +123,41 @@
                 </StackLayout>
             </ScrollView>
 
-            <StackLayout
+            <Grid
                 Grid.Row="1"
-                HorizontalOptions="FillAndExpand"
                 IsVisible="{Binding HasPrices, Converter={StaticResource InverseBoolConverter}}"
-                VerticalOptions="Center">
-                <controls:AppIconView IsBouncing="{Binding IsBusy}" />
-                <Label
-                    HorizontalTextAlignment="Center"
-                    IsVisible="{Binding HasError}"
-                    Style="{DynamicResource LabelStyle}"
-                    Text="{local:Translate UnableToLoadPrices}" />
-                <Button
-                    Command="{Binding LoadFuelPriceGroupsCommand}"
-                    HorizontalOptions="Center"
-                    IsVisible="{Binding HasError}"
-                    Style="{DynamicResource ButtonStyle}"
-                    Text="{local:Translate TryAgain}" />
-            </StackLayout>
+                RowDefinitions="1.2*,*">
+                <controls:AppIconView IsBouncing="{Binding IsBusy}" VerticalOptions="End" />
+                <StackLayout Grid.Row="1" VerticalOptions="Start">
+                    <Label
+                        HorizontalTextAlignment="Center"
+                        IsVisible="False"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{local:Translate NoPricesDescription}">
+                        <View.Triggers>
+                            <MultiTrigger TargetType="View">
+                                <MultiTrigger.Conditions>
+                                    <BindingCondition Binding="{Binding IsBusy}" Value="False" />
+                                    <BindingCondition Binding="{Binding HasPrices}" Value="False" />
+                                    <BindingCondition Binding="{Binding HasError}" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter Property="IsVisible" Value="True" />
+                            </MultiTrigger>
+                        </View.Triggers>
+                    </Label>
+                    <Label
+                        HorizontalTextAlignment="Center"
+                        IsVisible="{Binding HasError}"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{local:Translate UnableToLoadPrices}" />
+                    <Button
+                        Command="{Binding LoadFuelPriceGroupsCommand}"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasError}"
+                        Style="{DynamicResource ButtonStyle}"
+                        Text="{local:Translate TryAgain}" />
+                </StackLayout>
+            </Grid>
 
             <ContentView
                 Padding="{StaticResource SmallThickness}"

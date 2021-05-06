@@ -108,7 +108,7 @@ namespace AdelaideFuel.ViewModels
                 {
                     await UserDialogs.AlertAsync(
                         string.Format(Resources.MustHaveAtLeastOneActiveItem, Resources.Brand.ToLower()),
-                        Resources.Error,
+                        Resources.Oops,
                         Resources.OK);
                 }
                 else
