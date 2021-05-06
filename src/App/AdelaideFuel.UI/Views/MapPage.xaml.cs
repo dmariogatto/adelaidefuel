@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 
@@ -60,39 +61,57 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            _timerCancellation = new CancellationTokenSource();
-
-            // safe copy
-            var cts = _timerCancellation;
-
-            ViewModel.LoadFuelsCommand.ExecuteAsync();
-            if (ViewModel.InitialLoadComplete)
-                ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
-
-            Device.StartTimer(TimeSpan.FromSeconds(60), () =>
-            {
-                if (cts.IsCancellationRequested)
-                {
-                    if (cts == _timerCancellation)
-                        _timerCancellation = null;
-
-                    cts.Dispose();
-                    return false;
-                }
-
-                ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
-                return true;
-            });
+            SetupAutoRefresh();
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
 
+            TearDownAutoRefresh();
+
             SiteId = string.Empty;
             FuelId = string.Empty;
+        }
 
+        private void SetupAutoRefresh()
+        {
+            _timerCancellation = new CancellationTokenSource();
+
+            // safe copy
+            var cts = _timerCancellation;
+
+            // delay until navigation completes
+            Task.Delay(!ViewModel.InitialLoadComplete ? 0 : 350).ContinueWith(r =>
+            {
+                if (cts.IsCancellationRequested)
+                    return;
+
+                ViewModel.LoadFuelsCommand.ExecuteAsync();
+                if (ViewModel.InitialLoadComplete)
+                    ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
+
+                Device.StartTimer(TimeSpan.FromSeconds(60), () =>
+                {
+                    if (cts.IsCancellationRequested)
+                    {
+                        if (cts == _timerCancellation)
+                            _timerCancellation = null;
+
+                        cts.Dispose();
+                        return false;
+                    }
+
+                    ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
+                    return true;
+                });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void TearDownAutoRefresh()
+        {
             _timerCancellation?.Cancel();
+            _timerCancellation = null;
         }
 
         private void UpdateSelectedSite()

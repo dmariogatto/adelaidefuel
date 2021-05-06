@@ -25,6 +25,7 @@
         <ResourceDictionary>
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
+            <converters:IntToBoolConverter x:Key="intToBoolConverter" />
 
             <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:SiteFuelPriceItemGroup">
                 <StackLayout
@@ -140,6 +141,8 @@
                                     <BindingCondition Binding="{Binding IsBusy}" Value="False" />
                                     <BindingCondition Binding="{Binding HasPrices}" Value="False" />
                                     <BindingCondition Binding="{Binding HasError}" Value="False" />
+                                    <!--  Hide on first load  -->
+                                    <BindingCondition Binding="{Binding FuelPriceGroups.Count, Converter={StaticResource intToBoolConverter}}" Value="True" />
                                 </MultiTrigger.Conditions>
                                 <Setter Property="IsVisible" Value="True" />
                             </MultiTrigger>
