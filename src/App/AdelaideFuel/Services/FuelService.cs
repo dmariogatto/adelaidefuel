@@ -329,7 +329,7 @@ namespace AdelaideFuel.Services
                      Id = ae.Id,
                      Name = ae.Name,
                      SortOrder = mue?.SortOrder ?? (userEntities.Count + apiEntities.IndexOf(ae)),
-                     IsActive = true,
+                     IsActive = mue?.IsActive ?? true,
                  }).ToList();
 
             var removedEntities =
