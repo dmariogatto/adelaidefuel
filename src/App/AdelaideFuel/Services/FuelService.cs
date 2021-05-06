@@ -334,26 +334,34 @@ namespace AdelaideFuel.Services
                      IsActive = mue?.IsActive ?? true,
                  }).ToList();
 
-            var removedEntities =
-                (from ue in userEntities
-                 join ae in apiEntities on ue.Id equals ae.Id into j
-                 from mae in j.DefaultIfEmpty()
-                 where mae == null
-                 select ue).ToList();
+            var removedEntities = userEntities
+                .Where(e => apiEntities.All(ae => ae.Id != e.Id))
+                .ToList();
 
             var unmodified = userEntities
                 .Except(removedEntities)
-                .Where(e => updatedEntities.All(ue => ue.Id != e.Id));
+                .Where(e => !updatedEntities.Any(ue => ue.Id == e.Id))
+                .ToList();
 
             var result = updatedEntities
                 .Concat(unmodified)
-                .OrderBy(e => e.SortOrder).ToList();
+                .OrderBy(e => e.SortOrder)
+                .ToList();
 
-            if (removedEntities.Any())
+            if (updatedEntities.Any() || removedEntities.Any())
             {
                 // fix up sort order
                 for (var i = 0; i < result.Count; i++)
-                    result[i].SortOrder = i;
+                {
+                    var e = result[i];
+                    if (e.SortOrder != i)
+                    {
+                        // make sure we update the order
+                        if (unmodified.Contains(e))
+                            updatedEntities.Add(e);
+                        result[i].SortOrder = i;
+                    }
+                }
             }
 
             await Task.WhenAll(
