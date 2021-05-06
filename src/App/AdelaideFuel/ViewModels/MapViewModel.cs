@@ -31,8 +31,6 @@ namespace AdelaideFuel.ViewModels
             { PriceCategory.Highest, new FuelCategory(PriceCategory.Highest) }
         };
 
-        private CancellationTokenSource _cts;
-
         public MapViewModel(
             IDeviceInfo deviceInfo,
             IPermissions permissions,
@@ -42,7 +40,7 @@ namespace AdelaideFuel.ViewModels
         {
             Title = Resources.Map;
 
-            InitialRadiusMetres = deviceInfo.Idiom == DeviceIdiom.Tablet ? 4500d : 2250d;
+            InitialRadiusMetres = deviceInfo.Idiom == DeviceIdiom.Tablet ? 4800d : 2600d;
 
             _permissions = permissions;
             _geolocation = geolocation;
@@ -89,7 +87,7 @@ namespace AdelaideFuel.ViewModels
         private Coords? _initialCameraUpdate;
         public Coords InitialCameraUpdate
         {
-            get => _initialCameraUpdate ?? Constants.AdlCoords.WithRadius(InitialRadiusMetres);
+            get => _initialCameraUpdate ?? Constants.AdelaideCenter.WithRadius(InitialRadiusMetres);
             set => SetProperty(ref _initialCameraUpdate, value);
         }
 
@@ -394,7 +392,9 @@ namespace AdelaideFuel.ViewModels
 
                     if (!_initialCameraUpdate.HasValue && loc != default)
                     {
-                        InitialCameraUpdate = new Coords(loc.Latitude, loc.Longitude, InitialRadiusMetres);
+                        var distanceFromCenter = loc.CalculateDistance(Constants.SaCenter.Latitude, Constants.SaCenter.Longitude, DistanceUnits.Kilometers);
+                        if (distanceFromCenter * 1000d <= Constants.SaCenter.RadiusMetres)
+                            InitialCameraUpdate = new Coords(loc.Latitude, loc.Longitude, InitialRadiusMetres);
                     }
 
                     EnableMyLocation = true;

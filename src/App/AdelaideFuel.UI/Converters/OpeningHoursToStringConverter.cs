@@ -16,7 +16,7 @@ namespace AdelaideFuel.UI.Converters
 
             if (value is IDictionary<DayOfWeek, OpeningHour> openingHours)
             {
-                var adlNow = Constants.AdlNow;
+                var adlNow = Constants.AdelaideNow;
 
                 if (openingHours.All(kv => kv.Value.OpenAllDay()))
                     result = Resources.TwentyFourHours;

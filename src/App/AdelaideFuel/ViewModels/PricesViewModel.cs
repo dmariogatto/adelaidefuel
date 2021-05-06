@@ -17,12 +17,15 @@ namespace AdelaideFuel.ViewModels
         private readonly int[] _radii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
 
         private readonly IConnectivity _connectivity;
+        private readonly IVersionTracking _versionTracking;
 
         public PricesViewModel(
             IConnectivity connectivity,
+            IVersionTracking versionTracking,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             _connectivity = connectivity;
+            _versionTracking = versionTracking;
 
             Title = Resources.Prices;
 
@@ -106,6 +109,8 @@ namespace AdelaideFuel.ViewModels
 
             IsBusy = true;
 
+            var firstLoad = !FuelPriceGroups.Any();
+
             try
             {
                 if (!FuelPriceGroups.Any())
@@ -123,6 +128,27 @@ namespace AdelaideFuel.ViewModels
             }
 
             OnPropertyChanged(nameof(HasPrices));
+
+            if (firstLoad && (
+#if DEBUG
+                true ||
+#endif
+                _versionTracking.IsFirstLaunchEver))
+            {
+                var config = await UserDialogs.ConfirmAsync(
+                                    Resources.FuelSetup,
+                                    Resources.SaBowser,
+                                    Resources.OK,
+                                    Resources.Cancel);
+
+                if (config)
+                    await NavigationService.NavigateToAsync<FuelsViewModel>();
+
+                Logger.Event(AppCenterEvents.Action.FuelSetup, new Dictionary<string, string>()
+                {
+                    { nameof(config), config.ToString() }
+                });
+            }
         }
 
         private async Task<bool> LoadGroupsAsync(CancellationToken ct)

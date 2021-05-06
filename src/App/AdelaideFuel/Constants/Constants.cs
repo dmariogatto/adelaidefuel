@@ -45,10 +45,12 @@ namespace AdelaideFuel
 
         public const string AuthHeader = "x-functions-key";
 
-        public static readonly TimeZoneInfo AdlTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Australia/Adelaide");
-        public static DateTime AdlNow => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AdlTimeZone);
+        public static readonly TimeZoneInfo AdelaideTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Australia/Adelaide");
+        public static DateTime AdelaideNow => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AdelaideTimeZone);
 
-        public readonly static Coords AdlCoords = new Coords(-34.9241446714455, 138.599550649524);
+        public readonly static Coords AdelaideCenter = new Coords(-34.9241446714455, 138.599550649524);
+        public readonly static Coords SaCenter = new Coords(-30.058333, 135.763333, 1025 * 1000);
+
         public readonly static TimeSpan AdPoolTime = TimeSpan.FromMinutes(5);
 
         public readonly static string ApiUrlBase;

@@ -29,7 +29,6 @@
 
     <!--  White  -->
     <Color x:Key="PageBackgroundColor">#F8F8F8</Color>
-    <Color x:Key="PageBackgroundColorTransparent">#E5F8F8F8</Color>
 
     <!--  Dark Grey  -->
     <Color x:Key="PrimaryTextColor">#191919</Color>

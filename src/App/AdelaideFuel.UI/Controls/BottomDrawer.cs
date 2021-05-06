@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Controls
@@ -58,8 +57,8 @@ namespace AdelaideFuel.UI.Controls
         public BottomDrawer()
         {
             // Set the default values for this control
-            SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColorTransparent);
-            CornerRadius = 8;
+            SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
+            CornerRadius = 18;
             HasShadow = true;
 
             // Set the pan gesture listeners

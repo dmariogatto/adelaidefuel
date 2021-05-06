@@ -20,11 +20,8 @@ namespace AdelaideFuel
 
         public static class Action
         {
+            public const string FuelSetup = "fuel_setup";
             public const string ReviewRequested = "review_requested";
-        }
-
-        public static class Data
-        {
         }
 
         public static class Property

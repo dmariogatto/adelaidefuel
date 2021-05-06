@@ -1,6 +1,9 @@
 ﻿using AdelaideFuel.ViewModels;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+using Xamarin.Essentials;
+using Xamarin.Essentials.Interfaces;
 using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
@@ -20,29 +23,31 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            _timerCancellation = new CancellationTokenSource();
-
-            // safe copy
-            var cts = _timerCancellation;
-
-            ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
-
-            Device.StartTimer(TimeSpan.FromSeconds(60), () =>
-            {
-                if (cts.IsCancellationRequested)
+            IoC.Resolve<IPermissions>().CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+                .ContinueWith(r =>
                 {
-                    cts.Cancel();
+                    _timerCancellation = new CancellationTokenSource();
 
-                    if (cts == _timerCancellation)
-                        _timerCancellation = null;
+                    // safe copy
+                    var cts = _timerCancellation;
 
-                    cts.Dispose();
-                    return false;
-                }
+                    ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
 
-                ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
-                return true;
-            });
+                    Device.StartTimer(TimeSpan.FromSeconds(60), () =>
+                    {
+                        if (cts.IsCancellationRequested)
+                        {
+                            if (cts == _timerCancellation)
+                                _timerCancellation = null;
+
+                            cts.Dispose();
+                            return false;
+                        }
+
+                        ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
+                        return true;
+                    });
+                }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         protected override void OnDisappearing()

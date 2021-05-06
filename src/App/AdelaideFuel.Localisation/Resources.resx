@@ -334,9 +334,16 @@
     <value>Accessibility</value>
   </data>
   <data name="SaBowser" xml:space="preserve">
-    <value>SA Bowser</value>
+    <value>SA Bowser: Should I Fuel?</value>
   </data>
   <data name="NoInternet" xml:space="preserve">
     <value>No internet, prices may be incorrect</value>
+  </data>
+  <data name="FuelSetup" xml:space="preserve">
+    <value>Hi there!
+
+Do you want to setup the fuels you care about?
+
+This can be done at any time in Settings.</value>
   </data>
 </root>

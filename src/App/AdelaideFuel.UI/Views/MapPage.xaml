@@ -50,7 +50,7 @@
     </ContentPage.Resources>
 
     <views:BaseAdPage.MainContent>
-        <RelativeLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <RelativeLayout x:Name="MainContentLayout" SizeChanged="MainContentSizeChanged">
             <maps:Map
                 x:Name="SiteMap"
                 ItemTemplateSelector="{StaticResource mapPinDataSelector}"
@@ -104,16 +104,13 @@
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
                 Padding="{StaticResource SmallThickness}"
-                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColorTransparent}}"
-                CornerRadius="18"
                 IsVisible="{Binding InitialLoadComplete}"
                 RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
                 RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}">
                 <StackLayout
-                    SizeChanged="BottomSheetLayoutSizeChanged"
+                    SizeChanged="BottomSheetContentSizeChanged"
                     Spacing="0"
                     VerticalOptions="Start">
-
                     <BoxView
                         x:Name="BottomDrawerHandle"
                         Margin="0,8,0,10"

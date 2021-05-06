@@ -25,8 +25,13 @@ namespace AdelaideFuel.UI.Views
             _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
 
             var bannerContainer = new Grid();
+
+            var background = new ContentView();
+            background.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
+
             var adSkeleton = new SkeletonView();
 
+            bannerContainer.Children.Add(background);
             bannerContainer.Children.Add(adSkeleton);
             bannerContainer.Children.Add(_adBannerView);
 

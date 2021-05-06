@@ -183,46 +183,57 @@ namespace AdelaideFuel.UI.Views
             }
         }
 
-        private void BottomSheetLayoutSizeChanged(object sender, EventArgs e)
+        private void MainContentSizeChanged(object sender, EventArgs e)
         {
-            if (sender is StackLayout layout)
+            CalculateLockStates();
+        }
+
+        private void BottomSheetContentSizeChanged(object sender, EventArgs e)
+        {
+            CalculateLockStates();
+        }
+
+        private void CalculateLockStates()
+        {
+            if (!BottomDrawerControl.IsVisible)
+                return;
+
+            var drawer = BottomDrawerControl;
+            var layout = (StackLayout)BottomDrawerControl.Content;
+            var offset = double.MaxValue;
+
+            double getControlHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
+
+            var lockStates = new List<double>() { 0 };
+            var heightAcc = drawer.Padding.Top;
+
+            foreach (var c in layout.Children)
             {
-                var drawer = BottomDrawerControl;
-                var offset = double.MaxValue;
+                if (!c.IsVisible) continue;
 
-                double getControlHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
+                heightAcc += getControlHeight(c);
 
-                var lockStates = new List<double>() { 0 };
-                var heightAcc = drawer.Padding.Top;
-
-                foreach (var c in layout.Children)
+                if (c == BottomSheetDivider)
                 {
-                    if (!c.IsVisible) continue;
-
-                    heightAcc += getControlHeight(c);
-
-                    if (c == BottomSheetDivider)
-                    {
-                        offset = heightAcc;
-                        RelativeLayout.SetYConstraint(drawer,
-                            Constraint.RelativeToParent(p => p.Height - offset));
-                    }
+                    offset = heightAcc;
+                    RelativeLayout.SetYConstraint(drawer,
+                        Constraint.RelativeToParent(p => p.Height - offset));
                 }
-
-                heightAcc += drawer.Padding.Bottom;
-
-                if (ViewModel.SelectedSite != null)
-                    lockStates.Add((heightAcc - offset) / Height);
-
-                var expIdx = drawer.LockStates.Length == lockStates.Count
-                    ? Array.IndexOf(drawer.LockStates, drawer.ExpandedPercentage)
-                    : 0;
-
-                drawer.LockStates = lockStates.ToArray();
-                drawer.ExpandedPercentage = expIdx >= 0 && expIdx < lockStates.Count
-                    ? lockStates[expIdx]
-                    : 0;
             }
+
+            heightAcc += drawer.Padding.Bottom;
+
+            if (ViewModel.SelectedSite != null)
+                lockStates.Add((heightAcc - offset) / MainContentLayout.Height);
+
+            var expIdx = drawer.LockStates.Length == lockStates.Count
+                ? Array.IndexOf(drawer.LockStates, drawer.ExpandedPercentage)
+                : 0;
+
+            drawer.LockStates = lockStates.ToArray();
+            drawer.ExpandedPercentage = expIdx >= 0 && expIdx < lockStates.Count
+                ? lockStates[expIdx]
+                : 0;
         }
 
         private void UpdateMapTheme()

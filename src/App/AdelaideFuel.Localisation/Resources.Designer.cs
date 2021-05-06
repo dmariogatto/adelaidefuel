@@ -331,6 +331,19 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hi there!
+        ///
+        ///Do you want to setup the fuels you care about?
+        ///
+        ///This can be done at any time in Settings..
+        /// </summary>
+        public static string FuelSetup {
+            get {
+                return ResourceManager.GetString("FuelSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generate Test Crash.
         /// </summary>
         public static string GenerateTestCrash {
@@ -547,7 +560,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SA Bowser.
+        ///   Looks up a localized string similar to SA Bowser: Should I Fuel?.
         /// </summary>
         public static string SaBowser {
             get {

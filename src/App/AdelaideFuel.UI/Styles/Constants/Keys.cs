@@ -13,7 +13,6 @@ namespace AdelaideFuel.UI.Styles
         public const string UnselectedTabColor = nameof(UnselectedTabColor);
 
         public const string PageBackgroundColor = nameof(PageBackgroundColor);
-        public const string PageBackgroundColorTransparent = nameof(PageBackgroundColorTransparent);
 
         public const string PrimaryTextColor = nameof(PrimaryTextColor);
         public const string SecondaryTextColor = nameof(SecondaryTextColor);

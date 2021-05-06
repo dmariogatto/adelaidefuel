@@ -114,11 +114,11 @@ namespace AdelaideFuel.UI.Services
 
                 if (_tabViewModels.Contains(vmType))
                 {
-                    var tab = (NavigationPage)TabbedPage.Children[_tabViewModels.IndexOf(vmType)];
-                    navigatedPage = tab.RootPage;
+                    var navTab = (NavigationPage)TabbedPage.Children[_tabViewModels.IndexOf(vmType)];
+                    navigatedPage = navTab.RootPage ?? LoadTab(TabbedPage, navTab);
                     navFunc = () =>
                     {
-                        TabbedPage.CurrentPage = tab;
+                        TabbedPage.CurrentPage = navTab;
                         return Task.CompletedTask;
                     };
                 }
@@ -180,17 +180,17 @@ namespace AdelaideFuel.UI.Services
         private void CurrentPageChanged(object sender, EventArgs e)
         {
             if (sender is TabbedPage tabbedPage &&
-                tabbedPage.CurrentPage is NavigationPage navPage &&
-                navPage.RootPage == null)
+                tabbedPage.CurrentPage is NavigationPage navPage)
             {
-                LoadTab(tabbedPage, navPage);
+                if (navPage.RootPage == null)
+                    LoadTab(tabbedPage, navPage);
 
                 if (tabbedPage.Children.OfType<NavigationPage>().All(np => np.RootPage != null))
                     tabbedPage.CurrentPageChanged -= CurrentPageChanged;
             }
         }
 
-        private void LoadTab(TabbedPage tabbedPage, NavigationPage navPage)
+        private Page LoadTab(TabbedPage tabbedPage, NavigationPage navPage)
         {
             if (navPage.RootPage == null && tabbedPage.Children.Count == _tabViewModels.Length)
             {
@@ -204,8 +204,11 @@ namespace AdelaideFuel.UI.Services
                         NavigationPage.SetHasNavigationBar(page, false);
 
                     navPage.PushAsync(page, false);
+                    return page;
                 }
             }
+
+            return null;
         }
 
         private static void ApplyNavigationPageStyle(Page page)
