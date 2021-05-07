@@ -443,6 +443,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Later.
+        /// </summary>
+        public static string Later {
+            get {
+                return ResourceManager.GetString("Later", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         public static string Loading {
@@ -503,6 +512,15 @@ namespace AdelaideFuel.Localisation {
         public static string NoStationsFound {
             get {
                 return ResourceManager.GetString("NoStationsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Now.
+        /// </summary>
+        public static string Now {
+            get {
+                return ResourceManager.GetString("Now", resourceCulture);
             }
         }
         

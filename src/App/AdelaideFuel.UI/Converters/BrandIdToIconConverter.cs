@@ -9,7 +9,7 @@ namespace AdelaideFuel.UI.Converters
     public class BrandIdToIconConverter : IValueConverter
     {
         private readonly Lazy<bool> _2x = new Lazy<bool>(() => IoC.Resolve<IDeviceDisplay>().MainDisplayInfo.Density < 3);
-        private readonly string _iconUrlFormat = Path.Combine(Constants.ApiUrlBase, "Brand/Img/{0}@{1}.png?code=" + Constants.ApiKeyBrandImg);
+        private readonly string _iconUrlFormat = Path.Combine(Constants.ApiUrlBase, "Brand/Img/{0}%40{1}.png?code=" + Constants.ApiKeyBrandImg);
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

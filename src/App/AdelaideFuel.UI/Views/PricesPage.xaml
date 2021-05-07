@@ -132,22 +132,9 @@
                 <StackLayout Grid.Row="1" VerticalOptions="Start">
                     <Label
                         HorizontalTextAlignment="Center"
-                        IsVisible="False"
+                        IsVisible="{Binding NoPricesFound}"
                         Style="{DynamicResource LabelStyle}"
-                        Text="{local:Translate NoPricesDescription}">
-                        <View.Triggers>
-                            <MultiTrigger TargetType="View">
-                                <MultiTrigger.Conditions>
-                                    <BindingCondition Binding="{Binding IsBusy}" Value="False" />
-                                    <BindingCondition Binding="{Binding HasPrices}" Value="False" />
-                                    <BindingCondition Binding="{Binding HasError}" Value="False" />
-                                    <!--  Hide on first load  -->
-                                    <BindingCondition Binding="{Binding FuelPriceGroups.Count, Converter={StaticResource intToBoolConverter}}" Value="True" />
-                                </MultiTrigger.Conditions>
-                                <Setter Property="IsVisible" Value="True" />
-                            </MultiTrigger>
-                        </View.Triggers>
-                    </Label>
+                        Text="{local:Translate NoPricesDescription}" />
                     <Label
                         HorizontalTextAlignment="Center"
                         IsVisible="{Binding HasError}"

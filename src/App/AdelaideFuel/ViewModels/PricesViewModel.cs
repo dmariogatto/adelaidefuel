@@ -76,7 +76,19 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _lastUpdatedUtc, value);
         }
 
-        public bool HasPrices => FuelPriceGroups.Any(g => g.HasPrices);
+        private bool _hasPrices = false;
+        public bool HasPrices
+        {
+            get => _hasPrices;
+            set => SetProperty(ref _hasPrices, value);
+        }
+
+        private bool _noPricesFound = false;
+        public bool NoPricesFound
+        {
+            get => _noPricesFound;
+            set => SetProperty(ref _noPricesFound, value);
+        }
 
         public ObservableRangeCollection<SiteFuelPriceItemGroup> FuelPriceGroups { get; private set; }
 
@@ -98,6 +110,9 @@ namespace AdelaideFuel.ViewModels
             {
                 await LoadGroupsAsync(ct);
                 await UpdatePricesAsync(ct);
+
+                HasPrices = FuelPriceGroups.Any(g => g.HasPrices);
+                NoPricesFound = !HasPrices;
             }
             catch (Exception ex)
             {
@@ -109,8 +124,6 @@ namespace AdelaideFuel.ViewModels
                 IsBusy = false;
             }
 
-            OnPropertyChanged(nameof(HasPrices));
-
             if (firstLoad && (
 #if DEBUG
                 //true ||
@@ -120,8 +133,8 @@ namespace AdelaideFuel.ViewModels
                 var config = await UserDialogs.ConfirmAsync(
                                     Resources.FuelSetup,
                                     Resources.SaBowser,
-                                    Resources.OK,
-                                    Resources.Cancel);
+                                    Resources.Now,
+                                    Resources.Later);
 
                 if (config)
                     await NavigationService.NavigateToAsync<FuelsViewModel>();
@@ -152,9 +165,9 @@ namespace AdelaideFuel.ViewModels
                         fuelPriceGroups.Add(new SiteFuelPriceItemGroup(f, fuelPrices));
                     }
 
+                    HasPrices = false;
                     FuelPriceGroups.Clear();
                     FuelPriceGroups.AddRange(fuelPriceGroups);
-                    OnPropertyChanged(nameof(HasPrices));
 
                     return true;
                 }
@@ -171,11 +184,12 @@ namespace AdelaideFuel.ViewModels
             var priceLookup = (await FuelService.GetFuelPricesByRadiusAsync(_radii, ct))
                         ?.ToDictionary(p => p.Key.Id, p => p.Items);
 
-            if (!ct.IsCancellationRequested && priceLookup?.Any() == true)
+            if (!ct.IsCancellationRequested)
             {
                 foreach (var fpg in FuelPriceGroups)
                 {
-                    priceLookup.TryGetValue(fpg.Key.Id, out var prices);
+                    var prices = default(IList<SiteFuelPriceItem>);
+                    priceLookup?.TryGetValue(fpg.Key.Id, out prices);
                     prices ??= Array.Empty<SiteFuelPriceItem>();
 
                     var groupItems = fpg.Items.ToList();
@@ -208,8 +222,9 @@ namespace AdelaideFuel.ViewModels
         private void ClearGroupsAndSetError()
         {
             HasError = true;
+            HasPrices = false;
+            NoPricesFound = false;
             FuelPriceGroups.ForEach(g => g.ForEach(i => i.Clear()));
-            OnPropertyChanged(nameof(HasPrices));
         }
 
         private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)

@@ -144,8 +144,6 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _lastLoadedUtc, value);
         }
 
-        public bool RefreshRequired => LastLoadedUtc < DateTime.UtcNow.AddMinutes(-5);
-
         public ObservableRangeCollection<Site> Sites { get; private set; }
         public ObservableRangeCollection<Site> FilteredSites { get; private set; }
 

@@ -287,7 +287,8 @@ namespace AdelaideFuel.Services
                                 var fns = Statistics.FiveNumberSummary(fpg.Select(i => i.PriceInCents).ToArray());
                                 var median = fns[2];
 
-                                // some sites are reporting in dollars
+                                // some sites are reporting in cents this undoes
+                                // the divide 10 done earlier in the processing
                                 var outliers = fpg
                                     .Where(i => median - i.PriceInCents >= 100)
                                     .ToList();

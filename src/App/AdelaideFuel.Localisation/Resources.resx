@@ -356,4 +356,10 @@ You can update your preferences in Settings.</value>
   <data name="NoStationsFound" xml:space="preserve">
     <value>No stations found</value>
   </data>
+  <data name="Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="Now" xml:space="preserve">
+    <value>Now</value>
+  </data>
 </root>
