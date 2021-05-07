@@ -27,6 +27,8 @@ namespace AdelaideFuel.iOS
         {
             IoC.RegisterSingleton<ILocalise, LocaliseService_iOS>();
             IoC.RegisterSingleton<IEnvironmentService, EnvironmentService_iOS>();
+            IoC.RegisterSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyService_iOS>();
+            IoC.RegisterSingleton<IUserNativeService, UserNativeService_iOS>();
             IoC.RegisterSingleton<IRendererService, RendererService_iOS>();
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_iOS>();
 

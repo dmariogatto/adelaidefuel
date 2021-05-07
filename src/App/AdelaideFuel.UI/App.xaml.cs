@@ -69,6 +69,10 @@ namespace AdelaideFuel.UI
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
+            // insurance policy
+            IoC.Resolve<IUserNativeService>().SyncUserBrandsAsync().Wait();
+            IoC.Resolve<IUserNativeService>().SyncUserFuelsAsync().Wait();
+
             IoC.Resolve<IStoreFactory>().UserCheckpoint();
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();
 

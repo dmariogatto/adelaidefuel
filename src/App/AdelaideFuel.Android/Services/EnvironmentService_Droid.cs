@@ -9,11 +9,14 @@ namespace AdelaideFuel.Services
     [Preserve(AllMembers = true)]
     public class EnvironmentService_Droid : IEnvironmentService
     {
+        private readonly IStoreFactory _storeFactory;
         private readonly ILogger _logger;
 
         public EnvironmentService_Droid(
+            IStoreFactory storeFactory,
             ILogger logger)
         {
+            _storeFactory = storeFactory;
             _logger = logger;
         }
 

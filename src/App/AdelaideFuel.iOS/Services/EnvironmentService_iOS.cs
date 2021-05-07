@@ -2,7 +2,6 @@
 using Foundation;
 using System;
 using UIKit;
-using Xamarin.Essentials;
 
 namespace AdelaideFuel.iOS.Services
 {
@@ -11,8 +10,7 @@ namespace AdelaideFuel.iOS.Services
     {
         private readonly ILogger _logger;
 
-        public EnvironmentService_iOS(
-            ILogger logger)
+        public EnvironmentService_iOS(ILogger logger)
         {
             _logger = logger;
         }

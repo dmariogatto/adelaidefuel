@@ -140,6 +140,8 @@
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />
     <Compile Include="Renderers\TintImageRenderer.cs" />
+    <Compile Include="Services\UserNativeService_Droid.cs" />
+    <Compile Include="Services\UserNativeReadOnlyService_Droid.cs" />
     <Compile Include="Services\RetryPolicyService_Droid.cs" />
     <Compile Include="Services\RendererService_Droid.cs" />
     <Compile Include="Services\EnvironmentService_Droid.cs" />

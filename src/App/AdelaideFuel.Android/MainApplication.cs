@@ -25,6 +25,8 @@ namespace AdelaideFuel.Droid
 
             IoC.RegisterSingleton<ILocalise, LocaliseService_Droid>();
             IoC.RegisterSingleton<IEnvironmentService, EnvironmentService_Droid>();
+            IoC.RegisterSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyService_Droid>();
+            IoC.RegisterSingleton<IUserNativeService, UserNativeService_Droid>();
             IoC.RegisterSingleton<IRendererService, RendererService_Droid>();
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_Droid>();
         }

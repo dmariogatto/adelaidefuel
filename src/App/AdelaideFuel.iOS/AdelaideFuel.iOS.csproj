@@ -116,6 +116,8 @@
     <Compile Include="Renderers\PageCustomRenderer.cs" />
     <Compile Include="Renderers\ViewCellCustomRenderer.cs" />
     <Compile Include="Renderers\TintImageRenderer.cs" />
+    <Compile Include="Services\UserNativeService_iOS.cs" />
+    <Compile Include="Services\UserNativeReadOnlyService_iOS.cs" />
     <Compile Include="Services\RetryPolicyService_iOS.cs" />
     <Compile Include="Services\RendererService_iOS.cs" />
     <Compile Include="Services\EnvironmentService_iOS.cs" />
