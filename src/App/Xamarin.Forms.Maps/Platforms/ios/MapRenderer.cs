@@ -405,7 +405,7 @@ namespace Xamarin.Forms.Maps.iOS
                 var margins = MapNative.LayoutMarginsGuide;
                 NSLayoutConstraint.ActivateConstraints(new[]
                 {
-                    _userTrackingButton.BottomAnchor.ConstraintEqualTo(margins.TopAnchor, 48),
+                    _userTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, 48),
                     _userTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -3),
                     _userTrackingButton.WidthAnchor.ConstraintEqualTo(utSize),
                     _userTrackingButton.HeightAnchor.ConstraintEqualTo(_userTrackingButton.WidthAnchor),
