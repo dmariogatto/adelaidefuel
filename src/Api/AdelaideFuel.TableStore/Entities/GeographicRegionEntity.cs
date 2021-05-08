@@ -34,7 +34,7 @@ namespace AdelaideFuel.TableStore.Entities
         public int? GeoRegionParentId { get; set; }
 
         public bool IsActive { get; set; }
-        
+
         public bool IsDifferent(IEntity entity)
         {
             if (entity is GeographicRegionEntity other && Equals(other))

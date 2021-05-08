@@ -26,14 +26,14 @@ namespace AdelaideFuel.Functions
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-             builder.Services.AddSingleton(serviceProvider =>
-            {
-                return new ConfigurationBuilder()
-                   .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                   .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                   .AddEnvironmentVariables()
-                   .Build();
-            });
+            builder.Services.AddSingleton(serviceProvider =>
+           {
+               return new ConfigurationBuilder()
+                  .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                  .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                  .AddEnvironmentVariables()
+                  .Build();
+           });
 
             builder.Services.AddRefitClient<ISaFuelPricingApi>(
                     new RefitSettings(new NewtonsoftJsonContentSerializer(new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Utc })))

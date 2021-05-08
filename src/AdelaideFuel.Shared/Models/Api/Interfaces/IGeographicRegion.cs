@@ -9,7 +9,7 @@ namespace AdelaideFuel.Shared
         int GeoRegionId { get; set; }
 
         string Name { get; set; }
-                
+
         string Abbrev { get; set; }
 
         int? GeoRegionParentId { get; set; }
