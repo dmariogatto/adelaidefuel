@@ -4,9 +4,11 @@ namespace AdelaideFuel
 {
     public static class Statistics
     {
+        public const int MinLengthForFns = 2;
+
         public static double[] FiveNumberSummary(double[] array, bool sorted = true)
         {
-            if (array.Length < 2) return new[] { 0d, 0d, 0d, 0d, 0d };
+            if (array.Length < MinLengthForFns) return new[] { 0d, 0d, 0d, 0d, 0d };
             if (!sorted) Array.Sort(array);
 
             var percentages = new[] { 0d, 25d, 50d, 75d, 100d };

@@ -281,22 +281,6 @@ namespace AdelaideFuel.Services
                                  group sfp by sfp.FuelId into fpg
                                  select fpg).ToList();
 
-                            // skip over groups where we can't get a valid FNS
-                            foreach (var fpg in fuelPriceGroups.Where(g => g.Count() >= 2))
-                            {
-                                var fns = Statistics.FiveNumberSummary(fpg.Select(i => i.PriceInCents).ToArray());
-                                var median = fns[2];
-
-                                // some sites are reporting in cents this undoes
-                                // the divide 10 done earlier in the processing
-                                var outliers = fpg
-                                    .Where(i => median - i.PriceInCents >= 100)
-                                    .ToList();
-
-                                foreach (var o in outliers)
-                                    o.PriceInCents *= 10;
-                            }
-
                             sitePrices = fuelPriceGroups
                                 .SelectMany(fpg => fpg.Select(i => i))
                                 .ToList();

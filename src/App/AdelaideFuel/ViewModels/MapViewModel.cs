@@ -233,7 +233,7 @@ namespace AdelaideFuel.ViewModels
                         {
                             validCategories = Array.Empty<FuelCategory>();
                         }
-                        else if (fuelPrices.Length > 0 && fuelPrices.Length < 2)
+                        else if (fuelPrices.Length < Statistics.MinLengthForFns)
                         {
                             // set this for the categorisation below
                             q1 = fuelPrices.Max();
