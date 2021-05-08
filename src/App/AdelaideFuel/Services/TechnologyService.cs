@@ -5,7 +5,7 @@ namespace AdelaideFuel.Services
 {
     public class TechnologyService : BaseService, ITechnologyService
     {
-        private readonly IList<Technology> _technologies = new []
+        private readonly IList<Technology> _technologies = new[]
         {
             new Technology("AiForms.SettingsView",
                 "1.3.18",

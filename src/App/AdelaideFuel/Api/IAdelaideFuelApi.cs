@@ -18,6 +18,6 @@ namespace AdelaideFuel.Api
         Task<List<SiteDto>> GetSitesAsync([Header(Constants.AuthHeader)] string code, CancellationToken cancellationToken, long? brandId = null);
 
         [Get("/SitePrices/{siteId}")]
-        Task<List<SitePriceDto>> GetSitePricesAsync([Header(Constants.AuthHeader)] string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds,  CancellationToken cancellationToken, long? siteId = null);
+        Task<List<SitePriceDto>> GetSitePricesAsync([Header(Constants.AuthHeader)] string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds, CancellationToken cancellationToken, long? siteId = null);
     }
 }
