@@ -63,15 +63,19 @@ namespace AdelaideFuel.Functions
                  select g)
                 .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
 
-            // The Smoky Bay Exception, reporting in cents
+            // The Smoky Bay & Mt Ive Exception, reporting in cents
             if (priceEntities.TryGetValue("12", out var independants))
             {
-                var smokey = independants.Where(i => i.SiteId == 61577275).ToList();
-                foreach (var p in smokey)
+                var exceptions = new[]
                 {
-                    if (p.Price < 500)
-                        p.Price *= 10;
-                }
+                    // Smoky Bay
+                    61577275,
+                    // Mt Ive
+                    61577323
+                };
+
+                foreach (var i in independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId)))
+                    i.Price *= 10;
             }
 
             await _sitePriceRepository.CreateIfNotExistsAsync(ct);
