@@ -362,4 +362,7 @@ You can update your preferences in Settings.</value>
   <data name="Now" xml:space="preserve">
     <value>Now</value>
   </data>
+  <data name="ReportPriceError" xml:space="preserve">
+    <value>Report Price Error</value>
+  </data>
 </root>

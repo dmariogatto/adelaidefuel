@@ -597,6 +597,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Report Price Error.
+        /// </summary>
+        public static string ReportPriceError {
+            get {
+                return ResourceManager.GetString("ReportPriceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SA.
         /// </summary>
         public static string SA {
