@@ -24,6 +24,7 @@ namespace AdelaideFuel.UI.Views
             pin.SetBinding(Pin.PositionProperty, new Binding(nameof(IMapPin.Position), converter: PositionConverter));
             pin.SetBinding(Pin.TintColorProperty, new Binding(nameof(Site.PriceCategory), converter: PriceCategoryConverter));
 
+            pin.Anchor = new Point(0.5, 0.5);
             pin.FileImage = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
 
             return pin;
