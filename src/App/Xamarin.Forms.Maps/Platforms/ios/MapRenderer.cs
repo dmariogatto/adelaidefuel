@@ -626,7 +626,7 @@ namespace Xamarin.Forms.Maps.iOS
 
             if (!string.IsNullOrEmpty(fileImage))
             {
-                if (tint != Color.Transparent.ToUIColor())
+                if (tint.IsEqual(UIColor.Clear))
                 {
                     var cacheKey = $"TintedImage_{HashCode.Combine(fileImage, tint)}";
 
