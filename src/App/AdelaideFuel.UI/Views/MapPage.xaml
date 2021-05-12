@@ -225,7 +225,11 @@
                         </BindableLayout.ItemTemplate>
                     </StackLayout>
 
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="0">
+                    <Grid
+                        Padding="{StaticResource MediumLeftThickness}"
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="0"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}">
                         <Button
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
