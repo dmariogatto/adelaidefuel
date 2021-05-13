@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
@@ -112,15 +113,28 @@
     <views:BaseAdPage.MainContent>
         <Grid RowDefinitions="Auto,*" RowSpacing="0">
             <ScrollView Grid.Row="1" Padding="{StaticResource SmallThickness}">
-                <StackLayout IsVisible="{Binding HasPrices}">
+                <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
-                    <Label
-                        Margin="{StaticResource LargeRightThickness}"
-                        FontFamily="{StaticResource ItalicFontFamily}"
-                        FontSize="Small"
-                        HorizontalTextAlignment="End"
-                        Style="{DynamicResource LabelStyle}"
-                        Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat={local:Translate UpdatedItem}}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="0">
+                        <Button
+                            Margin="{StaticResource SmallLeftThickness}"
+                            Command="{Binding OpenUrlCommand}"
+                            CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
+                            FontSize="Small"
+                            HorizontalOptions="Start"
+                            Style="{DynamicResource ButtonStyle}"
+                            Text="{local:Translate ReportPriceError}"
+                            VerticalOptions="Center" />
+                        <Label
+                            Grid.Column="1"
+                            Margin="{StaticResource SmallRightThickness}"
+                            FontFamily="{StaticResource ItalicFontFamily}"
+                            FontSize="Small"
+                            HorizontalOptions="End"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
+                            VerticalOptions="Center" />
+                    </Grid>
                 </StackLayout>
             </ScrollView>
 
