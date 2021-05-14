@@ -759,15 +759,6 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Updated {0:g}.
-        /// </summary>
-        public static string UpdatedItem {
-            get {
-                return ResourceManager.GetString("UpdatedItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to User Data.
         /// </summary>
         public static string UserData {
