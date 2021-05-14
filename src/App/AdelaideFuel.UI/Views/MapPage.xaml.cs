@@ -23,7 +23,7 @@ namespace AdelaideFuel.UI.Views
         {
             InitializeComponent();
 
-            AdUnitId = $"{Constants.AdMobPublisherId}/{Constants.AdMobPricesUnitId}";
+            AdUnitId = $"{Constants.AdMobPublisherId}/{Constants.AdMobMapUnitId}";
 
             UpdateMapTheme();
             ThemeManager.CurrentThemeChanged += (sender, args) => UpdateMapTheme();
