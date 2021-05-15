@@ -76,6 +76,7 @@ namespace AdelaideFuel.UI.Views
 
         private void SetupAutoRefresh()
         {
+            _timerCancellation?.Cancel();
             _timerCancellation = new CancellationTokenSource();
 
             // safe copy
