@@ -21,6 +21,8 @@ namespace Xamarin.Forms.Maps.iOS
         private readonly Dictionary<IMKAnnotation, Pin> _pinLookup = new Dictionary<IMKAnnotation, Pin>();
         private readonly Dictionary<IMKOverlay, MapElement> _elementLookup = new Dictionary<IMKOverlay, MapElement>();
 
+        private readonly UIColor _transparent = Color.Transparent.ToUIColor();
+
         private CLLocationManager _locationManager;
         private bool _shouldUpdateRegion;
         private bool _disposed;
@@ -626,7 +628,7 @@ namespace Xamarin.Forms.Maps.iOS
 
             if (!string.IsNullOrEmpty(fileImage))
             {
-                if (!tint.IsEqual(UIColor.Clear))
+                if (!tint.IsEqual(_transparent))
                 {
                     var cacheKey = $"TintedImage_{HashCode.Combine(fileImage, tint)}";
 
