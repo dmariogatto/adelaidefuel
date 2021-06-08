@@ -63,19 +63,30 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                switch (typeof(T))
+                async Task loadEntitiesAsync()
                 {
-                    case Type t when t == typeof(UserBrand):
-                        Entities.ReplaceRange(await FuelService.GetUserBrandsAsync(default));
-                        break;
-                    case Type t when t == typeof(UserFuel):
-                        Entities.ReplaceRange(await FuelService.GetUserFuelsAsync(default));
-                        break;
-                    case Type t when t == typeof(UserRadius):
-                        Entities.ReplaceRange(await FuelService.GetUserRadiiAsync(default));
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unsupported type {typeof(T).Name}");
+                    switch (typeof(T))
+                    {
+                        case Type t when t == typeof(UserBrand):
+                            Entities.ReplaceRange(await FuelService.GetUserBrandsAsync(default));
+                            break;
+                        case Type t when t == typeof(UserFuel):
+                            Entities.ReplaceRange(await FuelService.GetUserFuelsAsync(default));
+                            break;
+                        case Type t when t == typeof(UserRadius):
+                            Entities.ReplaceRange(await FuelService.GetUserRadiiAsync(default));
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unsupported type {typeof(T).Name}");
+                    }
+                };
+
+                await loadEntitiesAsync();
+
+                if (!Entities.Any())
+                {
+                    await FuelService.SyncAllAsync(default);
+                    await loadEntitiesAsync();
                 }
 
                 _originalEntities.ReplaceRange(Entities.Select(i => i.Clone()));

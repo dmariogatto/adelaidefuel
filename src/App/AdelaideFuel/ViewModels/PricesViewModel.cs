@@ -113,6 +113,13 @@ namespace AdelaideFuel.ViewModels
             try
             {
                 await LoadGroupsAsync(ct);
+
+                if (!FuelPriceGroups.Any())
+                {
+                    await FuelService.SyncAllAsync(default);
+                    await LoadGroupsAsync(ct);
+                }
+
                 await UpdatePricesAsync(ct);
 
                 HasPrices = FuelPriceGroups.Any(g => g.HasPrices);
@@ -132,7 +139,8 @@ namespace AdelaideFuel.ViewModels
 #if DEBUG
                 //true ||
 #endif
-                _versionTracking.IsFirstLaunchEver))
+                _versionTracking.IsFirstLaunchEver &&
+                HasInternet))
             {
                 var config = await UserDialogs.ConfirmAsync(
                                     Resources.FuelSetup,
@@ -243,7 +251,11 @@ namespace AdelaideFuel.ViewModels
 
         private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
         {
+            var hadInternet = HasInternet;
             HasInternet = _connectivity.NetworkAccess == NetworkAccess.Internet;
+
+            if (!hadInternet && HasInternet)
+                LoadFuelPriceGroupsCommand.ExecuteAsync(default);
         }
     }
 }
