@@ -35,6 +35,14 @@ namespace AdelaideFuel.Models
             set => SetProperty(ref _isActive, value);
         }
 
+        public IUserEntity Clone() => new UserBrand()
+        {
+            Id = this.Id,
+            Name = this.Name,
+            SortOrder = this.SortOrder,
+            IsActive = this.IsActive
+        };
+
         public override bool Equals(object obj)
             => obj is UserBrand brand &&
                Id == brand.Id &&

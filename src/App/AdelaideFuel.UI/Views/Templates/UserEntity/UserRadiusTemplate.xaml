@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <sho:DraggableViewCell
-    x:Class="AdelaideFuel.UI.Views.UserFuelTemplate"
+    x:Class="AdelaideFuel.UI.Views.UserRadiusTemplate"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
@@ -8,8 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:sho="http://sharpnado.com"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
-    x:DataType="models:UserFuel"
+    x:DataType="models:UserRadius"
     mc:Ignorable="d">
     <ContentView>
         <yummy:PancakeView Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
@@ -32,13 +33,26 @@
                     Text="{Binding Name}"
                     VerticalTextAlignment="Center" />
 
-                <controls:TintImage
-                    Grid.Column="2"
-                    HeightRequest="40"
-                    HorizontalOptions="Center"
-                    Source="{StaticResource DragIndicatorImg}"
-                    TintColor="{StaticResource PrimaryAccentColor}"
-                    VerticalOptions="Center" />
+                <ContentView Grid.Column="2">
+                    <View.Triggers>
+                        <DataTrigger
+                            Binding="{Binding Id}"
+                            TargetType="View"
+                            Value="{x:Static x:Int32.MaxValue}">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </View.Triggers>
+                    <View.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding EntityRemoveCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:RadiiViewModel}}}" CommandParameter="{Binding .}" />
+                    </View.GestureRecognizers>
+                    <controls:TintImage
+                        HeightRequest="28"
+                        HorizontalOptions="Center"
+                        Source="{StaticResource DeleteImg}"
+                        TintColor="Red"
+                        VerticalOptions="Center" />
+                </ContentView>
+
             </Grid>
         </yummy:PancakeView>
     </ContentView>

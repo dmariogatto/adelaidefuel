@@ -25,5 +25,18 @@ namespace AdelaideFuel
                 idx++;
             }
         }
+
+        public static int FirstIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
+        {
+            var items = enumerable.ToList();
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                if (predicate(items[i]))
+                    return i;
+            }
+
+            return -1;
+        }
     }
 }

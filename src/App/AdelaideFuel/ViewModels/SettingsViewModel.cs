@@ -60,6 +60,7 @@ namespace AdelaideFuel.ViewModels
             OpenAppSettingsCommand = new Command(_appInfo.ShowSettingsUI);
             GoToBrandsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
             GoToFuelsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<FuelsViewModel>());
+            GoToRadiiCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
             GenerateTestCrashCommand = new Command(() =>
             {
                 try { Crashes.GenerateTestCrash(); }
@@ -113,6 +114,7 @@ namespace AdelaideFuel.ViewModels
         public Command OpenAppSettingsCommand { get; private set; }
         public AsyncCommand GoToBrandsCommand { get; private set; }
         public AsyncCommand GoToFuelsCommand { get; private set; }
+        public AsyncCommand GoToRadiiCommand { get; private set; }
         public Command GenerateTestCrashCommand { get; private set; }
         public AsyncCommand ViewLogCommand { get; private set; }
         public Command DeleteLogCommand { get; private set; }

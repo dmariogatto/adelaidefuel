@@ -14,16 +14,20 @@ namespace AdelaideFuel.ViewModels
 {
     public class PricesViewModel : BaseViewModel
     {
-        private readonly int[] _radii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
-
         private readonly IConnectivity _connectivity;
         private readonly IVersionTracking _versionTracking;
+
+        private readonly ObservableRangeCollection<UserFuel> _userFuels;
+        private readonly ObservableRangeCollection<UserRadius> _userRadii;
 
         public PricesViewModel(
             IConnectivity connectivity,
             IVersionTracking versionTracking,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
+            _userFuels = new ObservableRangeCollection<UserFuel>();
+            _userRadii = new ObservableRangeCollection<UserRadius>();
+
             _connectivity = connectivity;
             _versionTracking = versionTracking;
 
@@ -148,26 +152,33 @@ namespace AdelaideFuel.ViewModels
 
         private async Task<bool> LoadGroupsAsync(CancellationToken ct)
         {
-            var fuels = (await FuelService.GetUserFuelsAsync(ct))
-                    ?.Where(i => i.IsActive)?.ToList();
+            var fuelsTask = FuelService.GetUserFuelsAsync(ct);
+            var radiiTask = FuelService.GetUserRadiiAsync(ct);
 
-            if (!ct.IsCancellationRequested && fuels?.Any() == true)
+            await Task.WhenAll(fuelsTask, radiiTask);
+
+            var fuels = fuelsTask.Result.Where(i => i.IsActive).ToList();
+            var radii = radiiTask.Result.Where(i => i.IsActive).ToList();
+
+            if (!ct.IsCancellationRequested && fuels.Any() && radii.Any())
             {
-                if (!FuelPriceGroups.Select(g => g.Key).SequenceEqual(fuels))
+                if (!_userFuels.SequenceEqual(fuels) || !_userRadii.SequenceEqual(radii))
                 {
                     var fuelPriceGroups = new List<SiteFuelPriceItemGroup>();
+                    var range = Enumerable.Range(0, radii.Count);
 
                     foreach (var f in fuels)
                     {
-                        var fuelPrices = new SiteFuelPriceItem[_radii.Length];
-                        for (var i = 0; i < _radii.Length; i++)
-                            fuelPrices[i] = new SiteFuelPriceItem();
+                        var fuelPrices = range.Select(_ => new SiteFuelPriceItem()).ToList();
                         fuelPriceGroups.Add(new SiteFuelPriceItemGroup(f, fuelPrices));
                     }
 
                     HasPrices = false;
                     FuelPriceGroups.Clear();
                     FuelPriceGroups.AddRange(fuelPriceGroups);
+
+                    _userFuels.ReplaceRange(fuels);
+                    _userRadii.ReplaceRange(radii);
 
                     return true;
                 }
@@ -181,8 +192,8 @@ namespace AdelaideFuel.ViewModels
             if (ct.IsCancellationRequested || !FuelPriceGroups.Any())
                 return false;
 
-            var priceLookup = (await FuelService.GetFuelPricesByRadiusAsync(_radii, ct))
-                        ?.ToDictionary(p => p.Key.Id, p => p.Items);
+            var priceLookup = (await FuelService.GetFuelPricesByRadiusAsync(ct))
+                ?.ToDictionary(p => p.Key.Id, p => p.Items);
 
             if (!ct.IsCancellationRequested)
             {
@@ -198,7 +209,10 @@ namespace AdelaideFuel.ViewModels
                         if (i < prices.Count)
                         {
                             fpg.Items[i].SetFuelPrice(prices[i]);
-                            fpg.Items[i].Closest = i == 0 && prices[i].LastKnowDistanceKm >= 0;
+                            fpg.Items[i].Closest =
+                                i == 0 && // must be the first (ordered by distance)
+                                prices[i].LastKnowDistanceKm >= 0 && // have a valid distance
+                                fpg.Count > 1; // more than one valid user radius
                             fpg.Items[i].CheapestInSa = i == prices.Count - 1;
 
                             if (prices[i].ModifiedUtc > LastUpdatedUtc)

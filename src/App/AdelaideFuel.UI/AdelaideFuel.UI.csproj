@@ -68,6 +68,9 @@
     <Compile Update="Views\BrandsPage.xaml.cs">
       <DependentUpon>BrandsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\RadiiPage.xaml.cs">
+      <DependentUpon>RadiiPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\FuelsPage.xaml.cs">
       <DependentUpon>FuelsPage.xaml</DependentUpon>
     </Compile>
@@ -83,6 +86,9 @@
     <Compile Update="Views\Templates\UserEntity\UserBrandTemplate.xaml.cs">
       <DependentUpon>UserBrandTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\Templates\UserEntity\UserRadiusTemplate.xaml.cs">
+      <DependentUpon>UserRadiusTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Templates\UserEntity\UserFuelTemplate.xaml.cs">
       <DependentUpon>UserFuelTemplate.xaml</DependentUpon>
     </Compile>
@@ -93,6 +99,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\BrandsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\RadiiPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\FuelsPage.xaml">
@@ -108,6 +117,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\Templates\UserEntity\UserBrandTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Templates\UserEntity\UserRadiusTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\Templates\UserEntity\UserFuelTemplate.xaml">

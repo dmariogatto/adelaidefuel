@@ -5,27 +5,32 @@ using System.Diagnostics;
 namespace AdelaideFuel.Models
 {
     [DebuggerDisplay("{Name}")]
-    public class UserFuel : ObservableObject, IUserSortableEntity
+    public class UserRadius : ObservableObject, IUserSortableEntity
     {
         private int _id;
         public int Id
         {
             get => _id;
-            set => SetProperty(ref _id, value);
+            set
+            {
+                SetProperty(ref _id, value);
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(SortOrder));
+            }
         }
 
-        private string _name;
         public string Name
         {
-            get => _name;
-            set => SetProperty(ref _name, value);
+            get => Id != int.MaxValue
+                ? string.Format(Localisation.Resources.ItemKm, Id)
+                : string.Format(Localisation.Resources.CheapestInItem, Localisation.Resources.SA);
+            set { }
         }
 
-        private int _sortOrder;
         public int SortOrder
         {
-            get => _sortOrder;
-            set => SetProperty(ref _sortOrder, value);
+            get => Id;
+            set { }
         }
 
         private bool _isActive;
@@ -35,22 +40,18 @@ namespace AdelaideFuel.Models
             set => SetProperty(ref _isActive, value);
         }
 
-        public IUserEntity Clone() => new UserFuel()
+        public IUserEntity Clone() => new UserRadius()
         {
             Id = this.Id,
-            Name = this.Name,
-            SortOrder = this.SortOrder,
             IsActive = this.IsActive
         };
 
         public override bool Equals(object obj)
-            => obj is UserFuel fuel &&
+            => obj is UserRadius fuel &&
                Id == fuel.Id &&
-               Name == fuel.Name &&
-               SortOrder == fuel.SortOrder &&
                IsActive == fuel.IsActive;
 
         public override int GetHashCode()
-            => HashCode.Combine(Id, Name, SortOrder, IsActive);
+            => HashCode.Combine(Id, IsActive);
     }
 }

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage
-    x:Class="AdelaideFuel.UI.Views.BrandsPage"
+    x:Class="AdelaideFuel.UI.Views.RadiiPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
@@ -12,9 +12,10 @@
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
     Title="{Binding Title}"
-    x:DataType="viewModels:BrandsViewModel"
-    x:TypeArguments="viewModels:BrandsViewModel"
+    x:DataType="viewModels:RadiiViewModel"
+    x:TypeArguments="viewModels:RadiiViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Icon="{StaticResource FuelImg}"
     mc:Ignorable="d">
 
     <ContentPage.Resources>
@@ -23,33 +24,22 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding ResetRadiiCommand}" Text="{local:Translate Reset}" />
+        <ToolbarItem Command="{Binding AddRadiusCommand}" Text="{local:Translate Add}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
         <Grid>
             <sho:HorizontalListView
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-                EnableDragAndDrop="True"
-                IsVisible="{Binding HasError, Converter={StaticResource InverseBoolConverter}}"
-                ItemHeight="{x:Static views:UserEntityDataTemplateSelector.BrandHeight}"
+                EnableDragAndDrop="False"
+                ItemHeight="{x:Static views:UserEntityDataTemplateSelector.FuelHeight}"
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
                 ItemsSource="{Binding Entities, Mode=OneWay}"
                 ListLayout="Vertical"
                 TapCommand="{Binding EntityTappedCommand}" />
-
-            <StackLayout
-                HorizontalOptions="FillAndExpand"
-                IsVisible="{Binding HasError}"
-                VerticalOptions="Center">
-                <Label
-                    HorizontalTextAlignment="Center"
-                    Style="{DynamicResource LabelStyle}"
-                    Text="{local:Translate UnableToLoadBrands}" />
-                <Button
-                    Command="{Binding LoadEntitiesCommand}"
-                    HorizontalOptions="Center"
-                    Style="{DynamicResource ButtonStyle}"
-                    Text="{local:Translate TryAgain}" />
-            </StackLayout>
 
             <controls:LoadingIndicator HorizontalOptions="Center" VerticalOptions="Start" />
         </Grid>

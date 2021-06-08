@@ -15,10 +15,11 @@
             <x:String x:Key="MapImg">map.png</x:String>
             <x:String x:Key="FuelImg">fuel.png</x:String>
             <x:String x:Key="CogImg">settings.png</x:String>
-            <x:String x:Key="DragIndicator">drag_indicator.png</x:String>
+            <x:String x:Key="DragIndicatorImg">drag_indicator.png</x:String>
             <x:String x:Key="NextImg">next.png</x:String>
             <x:String x:Key="TwoToneCircleImg">twotone_circle.png</x:String>
             <x:String x:Key="TwoToneFuelImg">twotone_fuel.png</x:String>
+            <x:String x:Key="DeleteImg">delete.png</x:String>
 
             <Color x:Key="OtherColor">#FAAF2C</Color>
             <Color x:Key="TitleColor">#18335D</Color>

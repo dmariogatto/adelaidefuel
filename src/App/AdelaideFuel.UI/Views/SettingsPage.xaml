@@ -37,6 +37,10 @@
                     Command="{Binding GoToFuelsCommand}"
                     Description="{local:Translate FuelsDescription}" />
                 <sv:CommandCell
+                    Title="{local:Translate Radii}"
+                    Command="{Binding GoToRadiiCommand}"
+                    Description="{local:Translate RadiiDescription}" />
+                <sv:CommandCell
                     Title="{local:Translate OpenAppSettings}"
                     Command="{Binding OpenAppSettingsCommand}"
                     Description="{local:Translate OpenAppSettingsDescription}" />

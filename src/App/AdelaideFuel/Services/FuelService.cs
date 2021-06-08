@@ -19,6 +19,8 @@ namespace AdelaideFuel.Services
     {
         private TimeSpan CacheExpireTimeSpan => TimeSpan.FromHours(12);
 
+        private readonly int[] _defaultRadii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
+
         private readonly IConnectivity _connectivity;
         private readonly IGeolocation _geolocation;
 
@@ -27,11 +29,13 @@ namespace AdelaideFuel.Services
 
         private readonly IStore<UserBrand> _brandUserStore;
         private readonly IStore<UserFuel> _fuelUserStore;
+        private readonly IStore<UserRadius> _radiusUserStore;
 
         private readonly AsyncRetryPolicy _retryPolicy;
 
-        private readonly SemaphoreSlim _userBrandsSemaphore = new SemaphoreSlim(1, 1);
-        private readonly SemaphoreSlim _userFuelsSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _syncBrandsSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _syncFuelsSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _syncRadiiSemaphore = new SemaphoreSlim(1, 1);
 
         public FuelService(
             IConnectivity connectivity,
@@ -50,6 +54,7 @@ namespace AdelaideFuel.Services
 
             _brandUserStore = _storeFactory.GetUserStore<UserBrand>();
             _fuelUserStore = _storeFactory.GetUserStore<UserFuel>();
+            _radiusUserStore = _storeFactory.GetUserStore<UserRadius>();
 
             _retryPolicy =
                 retryPolicyFactory.GetNetRetryPolicy()
@@ -95,13 +100,17 @@ namespace AdelaideFuel.Services
             return GetPricesAsync(siteId, cancellationToken);
         }
 
-        public async Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(int[] radiiKm, CancellationToken cancellationToken)
+        public async Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
             var locTask = _geolocation.GetLocationAsync(cancellationToken);
-            var userFuels = GetUserFuelsAsync(cancellationToken);
+            var userFuelsTask = GetUserFuelsAsync(cancellationToken);
+            var userRadiiTask = GetUserRadiiAsync(cancellationToken);
             var pricesTask = GetSitePricesAsync(cancellationToken);
 
-            await Task.WhenAll(locTask, userFuels, pricesTask).ConfigureAwait(false);
+            await Task.WhenAll(locTask, userFuelsTask, userRadiiTask, pricesTask).ConfigureAwait(false);
+
+            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToList();
+            var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
 
             var loc = locTask.Result;
 
@@ -109,10 +118,12 @@ namespace AdelaideFuel.Services
             {
                 if (distanceKm < 0) return int.MaxValue;
 
-                foreach (var rkm in radiiKm)
+                foreach (var rkm in userRadii)
                 {
-                    if (distanceKm <= rkm) return rkm;
-                    if ((distanceKm - rkm) <= 0.05d) return rkm;
+                    var km = rkm.Id;
+
+                    if (distanceKm <= km) return km;
+                    if ((distanceKm - km) <= 0.05d) return km;
                 }
 
                 return int.MaxValue;
@@ -125,7 +136,7 @@ namespace AdelaideFuel.Services
                  let fuelPrice = (fp, distanceKm, radiusKm)
                  orderby fp.FuelSortOrder, radiusKm, fp.PriceInCents, distanceKm
                  group fuelPrice by fp.FuelId into fg
-                 join f in userFuels.Result on fg.Key equals f.Id
+                 join f in userFuels on fg.Key equals f.Id
                  let prices = fg
                         .GroupBy(i => i.radiusKm)
                         .Select(g => g.First())
@@ -151,28 +162,17 @@ namespace AdelaideFuel.Services
             return fuelGroups;
         }
 
-        public async Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken)
+        public async Task SyncBrandsAsync(CancellationToken cancellationToken)
         {
-            var userBrands = default(IList<UserBrand>);
-
-            await _userBrandsSemaphore.WaitAsync().ConfigureAwait(false);
+            await _syncBrandsSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
             {
                 var apiBrandsTask = GetBrandsAsync(cancellationToken);
                 var userBrandsTask = _brandUserStore.AllAsync(true, cancellationToken);
 
-                if (apiBrandsTask.Result?.Any() == true)
-                {
-                    await Task.WhenAll(apiBrandsTask, userBrandsTask).ConfigureAwait(false);
-                    userBrands = await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    userBrands = userBrandsTask.Result
-                        ?.OrderBy(i => i.SortOrder)
-                        ?.ToList();
-                }
+                await Task.WhenAll(apiBrandsTask, userBrandsTask).ConfigureAwait(false);
+                await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -180,20 +180,13 @@ namespace AdelaideFuel.Services
             }
             finally
             {
-                _userBrandsSemaphore.Release();
+                _syncBrandsSemaphore.Release();
             }
-
-            return userBrands ?? Array.Empty<UserBrand>();
         }
 
-        public Task UpdateUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken)
-            => UpsertUserEntitiesAsync(brands, cancellationToken);
-
-        public async Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken)
+        public async Task SyncFuelsAsync(CancellationToken cancellationToken)
         {
-            var userFuels = default(IList<UserFuel>);
-
-            await _userFuelsSemaphore.WaitAsync().ConfigureAwait(false);
+            await _syncFuelsSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
             {
@@ -201,16 +194,34 @@ namespace AdelaideFuel.Services
                 var userFuelsTask = _fuelUserStore.AllAsync(true, cancellationToken);
 
                 await Task.WhenAll(apiFuelsTask, userFuelsTask).ConfigureAwait(false);
+                await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _syncFuelsSemaphore.Release();
+            }
+        }
 
-                if (apiFuelsTask.Result?.Any() == true)
+        public async Task SyncRadiiAsync(CancellationToken cancellationToken)
+        {
+            await _syncRadiiSemaphore.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                var radii = await _radiusUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
+                if (radii == null || !radii.Any())
                 {
-                    userFuels = await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    userFuels = userFuelsTask.Result
-                        ?.OrderBy(i => i.SortOrder)
-                        ?.ToList();
+                    radii = _defaultRadii.Select(i => new UserRadius()
+                    {
+                        Id = i,
+                        IsActive = true
+                    }).ToList();
+
+                    await UpsertUserRadiiAsync(radii, cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -219,14 +230,102 @@ namespace AdelaideFuel.Services
             }
             finally
             {
-                _userFuelsSemaphore.Release();
+                _syncRadiiSemaphore.Release();
             }
-
-            return userFuels ?? Array.Empty<UserFuel>();
         }
 
-        public Task UpdateUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken)
+        public Task SyncAllAsync(CancellationToken cancellationToken)
+            => Task.WhenAll(
+                SyncBrandsAsync(cancellationToken),
+                SyncFuelsAsync(cancellationToken),
+                SyncRadiiAsync(cancellationToken));
+
+        public async Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken)
+        {
+            var result = default(IList<UserBrand>);
+
+            await _syncBrandsSemaphore.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                var brands = await _brandUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
+                result = brands
+                    ?.OrderBy(i => i.SortOrder)
+                    ?.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _syncBrandsSemaphore.Release();
+            }
+
+            return result ?? Array.Empty<UserBrand>();
+        }
+
+        public Task UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken)
+            => UpsertUserEntitiesAsync(brands, cancellationToken);
+
+        public async Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken)
+        {
+            var result = default(IList<UserFuel>);
+
+            await _syncFuelsSemaphore.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                var fuels = await _fuelUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
+                result = fuels
+                    ?.OrderBy(i => i.SortOrder)
+                    ?.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _syncFuelsSemaphore.Release();
+            }
+
+            return result ?? Array.Empty<UserFuel>();
+        }
+
+        public Task UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken)
             => UpsertUserEntitiesAsync(fuels, cancellationToken);
+
+        public async Task<IList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken)
+        {
+            var result = default(IList<UserRadius>);
+
+            await _syncRadiiSemaphore.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                var radii = await _radiusUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
+                result = radii
+                    ?.OrderBy(i => i.SortOrder)
+                    ?.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _syncRadiiSemaphore.Release();
+            }
+
+            return result ?? Array.Empty<UserRadius>();
+        }
+
+        public Task UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+            => UpsertUserEntitiesAsync(radii, cancellationToken);
+
+        public Task RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+            => RemoveUserEntitiesAsync(radii, cancellationToken);
 
         private async Task<IList<SiteFuelPrice>> GetPricesAsync(long? siteId, CancellationToken cancellationToken)
         {

@@ -33,9 +33,9 @@
                 ItemHeight="{x:Static views:UserEntityDataTemplateSelector.FuelHeight}"
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
-                ItemsSource="{Binding Fuels, Mode=OneWay}"
+                ItemsSource="{Binding Entities, Mode=OneWay}"
                 ListLayout="Vertical"
-                TapCommand="{Binding FuelTappedCommand}" />
+                TapCommand="{Binding EntityTappedCommand}" />
 
             <StackLayout
                 HorizontalOptions="FillAndExpand"
@@ -46,7 +46,7 @@
                     Style="{DynamicResource LabelStyle}"
                     Text="{local:Translate UnableToLoadFuels}" />
                 <Button
-                    Command="{Binding LoadFuelsCommand}"
+                    Command="{Binding LoadEntitiesCommand}"
                     HorizontalOptions="Center"
                     Style="{DynamicResource ButtonStyle}"
                     Text="{local:Translate TryAgain}" />

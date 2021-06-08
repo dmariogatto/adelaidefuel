@@ -88,6 +88,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please add your message below.
         /// </summary>
         public static string AddYourMessageBelow {
@@ -237,6 +246,15 @@ namespace AdelaideFuel.Localisation {
         public static string EmailDirectly {
             get {
                 return ResourceManager.GetString("EmailDirectly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter new radius.
+        /// </summary>
+        public static string EnterNewRadius {
+            get {
+                return ResourceManager.GetString("EnterNewRadius", resourceCulture);
             }
         }
         
@@ -443,6 +461,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Kilometres.
+        /// </summary>
+        public static string Kilometres {
+            get {
+                return ResourceManager.GetString("Kilometres", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Later.
         /// </summary>
         public static string Later {
@@ -597,11 +624,56 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Radii.
+        /// </summary>
+        public static string Radii {
+            get {
+                return ResourceManager.GetString("Radii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure fuel price radii.
+        /// </summary>
+        public static string RadiiDescription {
+            get {
+                return ResourceManager.GetString("RadiiDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Radius.
+        /// </summary>
+        public static string Radius {
+            get {
+                return ResourceManager.GetString("Radius", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Report Price Error.
         /// </summary>
         public static string ReportPriceError {
             get {
                 return ResourceManager.GetString("ReportPriceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string Reset {
+            get {
+                return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore default settings?.
+        /// </summary>
+        public static string RestoreDefaultSettings {
+            get {
+                return ResourceManager.GetString("RestoreDefaultSettings", resourceCulture);
             }
         }
         

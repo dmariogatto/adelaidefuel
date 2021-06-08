@@ -3,7 +3,7 @@
     x:Class="AdelaideFuel.UI.Views.UserBrandTemplate"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:contros="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -50,11 +50,11 @@
                     Text="{Binding Name}"
                     VerticalTextAlignment="Center" />
 
-                <contros:TintImage
+                <controls:TintImage
                     Grid.Column="3"
                     HeightRequest="40"
                     HorizontalOptions="Center"
-                    Source="{StaticResource DragIndicator}"
+                    Source="{StaticResource DragIndicatorImg}"
                     TintColor="{StaticResource PrimaryAccentColor}"
                     VerticalOptions="Center" />
             </Grid>

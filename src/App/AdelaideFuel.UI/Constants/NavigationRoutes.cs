@@ -10,6 +10,7 @@ namespace AdelaideFuel.UI
         public const string Sites = "sites";
         public const string Brands = "brands";
         public const string Fuels = "fuels";
+        public const string Radii = "radii";
         public const string Settings = "settings";
         public const string About = "settings/about";
 

@@ -51,6 +51,8 @@ namespace AdelaideFuel.UI
             culture.DateTimeFormat.SetTimePatterns(localise.Is24Hour);
             localise.SetLocale(culture);
 
+            Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
+
             IoC.Resolve<INavigationService>().Init();
             _ = AppReviewRequestAsync();
         }
