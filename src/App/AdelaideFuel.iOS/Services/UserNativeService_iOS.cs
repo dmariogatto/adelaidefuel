@@ -22,6 +22,8 @@ namespace AdelaideFuel.iOS.Services
 
         public Task<bool> SyncUserFuelsAsync() => SyncUserDataAsync<UserFuel>();
 
+        public Task<bool> SyncUserRadiiAsync() => SyncUserDataAsync<UserRadius>();
+
         public async Task<bool> SyncUserDataAsync<T>() where T : class, IUserEntity
         {
             var success = false;

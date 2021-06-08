@@ -105,6 +105,11 @@ namespace AdelaideFuel.ViewModels
 
         private async Task SaveEntitiesAsync()
         {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
             try
             {
                 if (typeof(T) == typeof(UserRadius))
@@ -137,11 +142,14 @@ namespace AdelaideFuel.ViewModels
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

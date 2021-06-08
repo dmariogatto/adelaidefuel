@@ -6,5 +6,6 @@ namespace AdelaideFuel.Services
     {
         Task<bool> SyncUserBrandsAsync();
         Task<bool> SyncUserFuelsAsync();
+        Task<bool> SyncUserRadiiAsync();
     }
 }

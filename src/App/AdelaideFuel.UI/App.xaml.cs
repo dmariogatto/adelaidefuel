@@ -51,7 +51,7 @@ namespace AdelaideFuel.UI
             culture.DateTimeFormat.SetTimePatterns(localise.Is24Hour);
             localise.SetLocale(culture);
 
-            Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
+            _ = Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
 
             IoC.Resolve<INavigationService>().Init();
             _ = AppReviewRequestAsync();
@@ -74,6 +74,7 @@ namespace AdelaideFuel.UI
             // insurance policy
             IoC.Resolve<IUserNativeService>().SyncUserBrandsAsync().Wait();
             IoC.Resolve<IUserNativeService>().SyncUserFuelsAsync().Wait();
+            IoC.Resolve<IUserNativeService>().SyncUserRadiiAsync().Wait();
 
             IoC.Resolve<IStoreFactory>().UserCheckpoint();
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();

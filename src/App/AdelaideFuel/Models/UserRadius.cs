@@ -47,9 +47,9 @@ namespace AdelaideFuel.Models
         };
 
         public override bool Equals(object obj)
-            => obj is UserRadius fuel &&
-               Id == fuel.Id &&
-               IsActive == fuel.IsActive;
+            => obj is UserRadius radius &&
+               Id == radius.Id &&
+               IsActive == radius.IsActive;
 
         public override int GetHashCode()
             => HashCode.Combine(Id, IsActive);
