@@ -50,27 +50,27 @@ namespace AdelaideFuel
         public static readonly TimeZoneInfo AdelaideTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Australia/Adelaide");
         public static DateTime AdelaideNow => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AdelaideTimeZone);
 
-        public readonly static Coords AdelaideCenter = new Coords(-34.9241446714455, 138.599550649524);
-        public readonly static Coords SaCenter = new Coords(-30.058333, 135.763333, 1025 * 1000);
+        public static readonly Coords AdelaideCenter = new Coords(-34.9241446714455, 138.599550649524);
+        public static readonly Coords SaCenter = new Coords(-30.058333, 135.763333, 1025 * 1000);
 
-        public readonly static TimeSpan AdPoolTime = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan AdPoolTime = TimeSpan.FromMinutes(5);
 
-        public readonly static string ApiUrlBase;
+        public static readonly string ApiUrlBase;
 
-        public readonly static string ApiKeyBrands;
-        public readonly static string ApiKeyFuels;
-        public readonly static string ApiKeySites;
-        public readonly static string ApiKeySitePrices;
-        public readonly static string ApiKeyBrandImg;
+        public static readonly string ApiKeyBrands;
+        public static readonly string ApiKeyFuels;
+        public static readonly string ApiKeySites;
+        public static readonly string ApiKeySitePrices;
+        public static readonly string ApiKeyBrandImg;
 
-        public readonly static string AppCenterAndroidSecret;
-        public readonly static string AppCenterIosSecret;
+        public static readonly string AppCenterAndroidSecret;
+        public static readonly string AppCenterIosSecret;
 
-        public readonly static string AdMobPublisherId;
-        public readonly static string AdMobPricesAndroidUnitId;
-        public readonly static string AdMobPricesIosUnitId;
-        public readonly static string AdMobMapAndroidUnitId;
-        public readonly static string AdMobMapIosUnitId;
+        public static readonly string AdMobPublisherId;
+        public static readonly string AdMobPricesAndroidUnitId;
+        public static readonly string AdMobPricesIosUnitId;
+        public static readonly string AdMobMapAndroidUnitId;
+        public static readonly string AdMobMapIosUnitId;
 
         public static string AppId => ValueForPlatform(AndroidId, AppleId);
 
