@@ -369,7 +369,7 @@ You can update your preferences in Settings.</value>
     <value>Radius</value>
   </data>
   <data name="RadiiDescription" xml:space="preserve">
-    <value>Configure fuel price radii</value>
+    <value>Configure fuel price search radii</value>
   </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>

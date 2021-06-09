@@ -633,7 +633,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configure fuel price radii.
+        ///   Looks up a localized string similar to Configure fuel price search radii.
         /// </summary>
         public static string RadiiDescription {
             get {
