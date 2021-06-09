@@ -22,7 +22,7 @@ namespace AdelaideFuel.Functions
         private const string BrandFuncName = nameof(Brands);
         private const string BrandImgFuncName = "BrandImg";
 
-        private readonly static string[] ValidPostfix = new[] { "2x.png", "3x.png" };
+        private static readonly string[] ValidPostfix = new[] { "2x.png", "3x.png" };
 
         private readonly ITableRepository<BrandEntity> _brandRepository;
         private readonly CloudBlobClient _cloudBlobClient;

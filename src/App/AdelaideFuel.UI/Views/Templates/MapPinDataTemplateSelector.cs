@@ -8,8 +8,8 @@ namespace AdelaideFuel.UI.Views
 {
     public class MapPinDataTemplateSelector : DataTemplateSelector
     {
-        private readonly static CoordsToPositionConverter PositionConverter = new CoordsToPositionConverter();
-        private readonly static PriceCategoryToColorConverter PriceCategoryConverter = new PriceCategoryToColorConverter();
+        private static readonly CoordsToPositionConverter PositionConverter = new CoordsToPositionConverter();
+        private static readonly PriceCategoryToColorConverter PriceCategoryConverter = new PriceCategoryToColorConverter();
 
         private static Pin CreatePinTemplate(Type t)
         {
