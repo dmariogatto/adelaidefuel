@@ -7,5 +7,6 @@ namespace AdelaideFuel.Services
     {
         IList<UserBrand> GetUserBrands();
         IList<UserFuel> GetUserFuels();
+        IList<UserRadius> GetUserRadii();
     }
 }
