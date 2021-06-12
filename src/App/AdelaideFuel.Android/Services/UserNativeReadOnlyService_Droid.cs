@@ -20,7 +20,7 @@ namespace AdelaideFuel.Services
 
         public IList<UserFuel> GetUserFuels() => GetList<UserFuel>();
 
-        public IList<UserFuel> GetUserRadii() => GetList<UserRadius>();
+        public IList<UserRadius> GetUserRadii() => GetList<UserRadius>();
 
         private IList<T> GetList<T>() where T : IUserEntity
         {
