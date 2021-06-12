@@ -29,10 +29,6 @@
         <sv:SettingsView HasUnevenRows="True">
             <sv:Section Title="{local:Translate SaBowser}">
                 <sv:CommandCell
-                    Title="{local:Translate Brands}"
-                    Command="{Binding GoToBrandsCommand}"
-                    Description="{local:Translate BrandsDescription}" />
-                <sv:CommandCell
                     Title="{local:Translate Fuels}"
                     Command="{Binding GoToFuelsCommand}"
                     Description="{local:Translate FuelsDescription}" />
@@ -40,6 +36,10 @@
                     Title="{local:Translate Radii}"
                     Command="{Binding GoToRadiiCommand}"
                     Description="{local:Translate RadiiDescription}" />
+                <sv:CommandCell
+                    Title="{local:Translate Brands}"
+                    Command="{Binding GoToBrandsCommand}"
+                    Description="{local:Translate BrandsDescription}" />
                 <sv:CommandCell
                     Title="{local:Translate OpenAppSettings}"
                     Command="{Binding OpenAppSettingsCommand}"
