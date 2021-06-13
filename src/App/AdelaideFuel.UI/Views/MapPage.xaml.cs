@@ -130,7 +130,7 @@ namespace AdelaideFuel.UI.Views
                     if (site != null && fuel != null)
                     {
                         ViewModel.Fuel = fuel;
-                        ViewModel.When(vm => !vm.IsBusy, () =>
+                        ViewModel.When(vm => !vm.IsBusy && vm.LoadedFuel == fuel, () =>
                         {
                             var sitePin = SiteMap.Pins
                                 .FirstOrDefault(p => p.BindingContext is Site s && s.Id == siteId);
@@ -139,9 +139,9 @@ namespace AdelaideFuel.UI.Views
                                 SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(sitePin.Position, Distance.FromKilometers(1)));
                                 SiteMap.SelectedPin = sitePin;
                             }
-                        }, 10000);
+                        }, 7500);
                     }
-                }, 10000);
+                }, 7500);
             }
         }
 

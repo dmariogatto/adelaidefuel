@@ -112,6 +112,13 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
+        private UserFuel _loadedFuel;
+        public UserFuel LoadedFuel
+        {
+            get => _loadedFuel;
+            private set => SetProperty(ref _loadedFuel, value);
+        }
+
         private Site _selectedSite;
         public Site SelectedSite
         {
@@ -324,6 +331,8 @@ namespace AdelaideFuel.ViewModels
                         LastUpdatedUtc = FilteredSites.Any()
                             ? FilteredSites.Max(s => s.LastUpdatedUtc)
                             : DateTime.MinValue;
+
+                        LoadedFuel = fuel;
                     }
 
                     if (!ct.IsCancellationRequested)
