@@ -331,12 +331,13 @@ namespace AdelaideFuel.ViewModels
                         LastUpdatedUtc = FilteredSites.Any()
                             ? FilteredSites.Max(s => s.LastUpdatedUtc)
                             : DateTime.MinValue;
-
-                        LoadedFuel = fuel;
                     }
 
                     if (!ct.IsCancellationRequested)
+                    {
                         InitialLoadComplete = true;
+                        LoadedFuel = fuel;
+                    }
                 }
                 catch (Exception ex)
                 {
