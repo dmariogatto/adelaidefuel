@@ -63,30 +63,23 @@ namespace AdelaideFuel.Functions
                 ValidPostfix.Any(i => fileName.EndsWith(i)) &&
                 int.TryParse(fileName.Substring(0, fileName.IndexOf("@")), out var brandId))
             {
-                var brands = brandId > 0
-                                ? await _brandRepository.GetPartitionAsync(brandId.ToString(CultureInfo.InvariantCulture), ct)
-                                : default;
+                var containerRef = _cloudBlobClient.GetContainerReference(Startup.BlobContainerName);
+                var brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
 
-                if (brands?.Any() == true)
+                if (!await brandImgBlob.ExistsAsync(ct))
                 {
-                    var containerRef = _cloudBlobClient.GetContainerReference(Startup.BlobContainerName);
-                    var brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
-
-                    if (!await brandImgBlob.ExistsAsync(ct))
-                    {
-                        fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
-                        brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
-                    }
-
-                    using var stream = await brandImgBlob.OpenReadAsync(ct);
-                    using var memoryStream = new MemoryStream();
-                    await stream.CopyToAsync(memoryStream, ct);
-
-                    return new CachedFileContentResult(memoryStream.ToArray(), "image/png", TimeSpan.FromDays(5))
-                    {
-                        FileDownloadName = fileName
-                    };
+                    fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
+                    brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
                 }
+
+                using var stream = await brandImgBlob.OpenReadAsync(ct);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream, ct);
+
+                return new CachedFileContentResult(memoryStream.ToArray(), "image/png", TimeSpan.FromDays(5))
+                {
+                    FileDownloadName = fileName
+                };
             }
 
             return new NotFoundResult();
