@@ -983,12 +983,18 @@ namespace Xamarin.Forms.Maps.Android
 
         private void AddMapToView()
         {
+            if (_disposed)
+                return;
+
             if (_mapView != null && ChildCount == 0)
                 AddView(_mapView, -1);
         }
 
         private void RemoveMapFromView()
         {
+            if (_disposed)
+                return;
+
             // multiple attached map views cause weird visual gitches
             // e.g. pins that dance around
             if (_mapView != null && ChildCount == 1)
