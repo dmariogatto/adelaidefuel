@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 
-namespace Xamarin.Forms.Maps
+namespace Xamarin.Forms.BetterMaps
 {
     public class MapCache : IMapCache
     {

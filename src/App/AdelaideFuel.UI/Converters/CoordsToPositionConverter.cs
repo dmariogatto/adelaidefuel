@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 using Xamarin.Forms;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace AdelaideFuel.UI.Converters
 {

@@ -109,6 +109,9 @@
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
+    <PackageReference Include="Xamarin.Forms.BetterMaps">
+      <Version>0.0.1-pre</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms.PancakeView">
       <Version>2.3.0.759</Version>
     </PackageReference>
@@ -118,27 +121,16 @@
     <PackageReference Include="Xamarin.GooglePlayServices.Basement">
       <Version>117.6.0</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps">
-      <Version>117.0.0</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProguardConfiguration Include="proguard.cfg" />
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\android\FormsMaps.cs">
-      <Link>Maps\FormsMaps.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\android\GeocoderBackend.cs">
-      <Link>Maps\GeocoderBackend.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\android\MapRenderer.cs">
-      <Link>Maps\MapRenderer.cs</Link>
-    </Compile>
     <Compile Include="Effects\PressedEffect_Droid.cs" />
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />
+    <Compile Include="Renderers\MapCustomRenderer.cs" />
     <Compile Include="Renderers\TintImageRenderer.cs" />
     <Compile Include="Services\UserNativeService_Droid.cs" />
     <Compile Include="Services\UserNativeReadOnlyService_Droid.cs" />
@@ -153,13 +145,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Xamarin.Forms.Maps\Platforms\android\Styles\map.style.dark.json">
-      <Link>Maps\Styles\map.style.dark.json</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Xamarin.Forms.Maps\Platforms\android\Styles\map.style.light.json">
-      <Link>Maps\Styles\map.style.light.json</Link>
-    </EmbeddedResource>
     <None Include="appcenter-pre-build.sh" />
+    <AndroidAsset Include="Assets\map.style.dark.json" />
+    <AndroidAsset Include="Assets\map.style.light.json" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />

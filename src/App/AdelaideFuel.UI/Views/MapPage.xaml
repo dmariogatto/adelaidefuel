@@ -9,7 +9,6 @@
     xmlns:effects="clr-namespace:AdelaideFuel.UI.Effects"
     xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
     xmlns:local="clr-namespace:AdelaideFuel.UI"
-    xmlns:maps="clr-namespace:Xamarin.Forms.Maps"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
@@ -52,14 +51,14 @@
 
     <views:BaseAdPage.MainContent>
         <RelativeLayout x:Name="MainContentLayout" SizeChanged="MainContentSizeChanged">
-            <maps:Map
+            <controls:FuelMap
                 x:Name="SiteMap"
+                IsShowingUser="{Binding EnableMyLocation}"
                 ItemTemplateSelector="{StaticResource mapPinDataSelector}"
                 ItemsSource="{Binding FilteredSites}"
                 PropertyChanged="SiteMapPropertyChanged"
                 RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
                 RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}"
-                ShowUserLocation="{Binding EnableMyLocation}"
                 ShowUserLocationButton="{Binding EnableMyLocation}" />
 
             <Grid

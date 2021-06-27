@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace AdelaideFuel.UI.Views
 {

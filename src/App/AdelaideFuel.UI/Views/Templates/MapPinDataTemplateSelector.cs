@@ -2,7 +2,7 @@
 using AdelaideFuel.UI.Converters;
 using System;
 using Xamarin.Forms;
-using Xamarin.Forms.Maps;
+using Xamarin.Forms.BetterMaps;
 
 namespace AdelaideFuel.UI.Views
 {
@@ -25,7 +25,7 @@ namespace AdelaideFuel.UI.Views
             pin.SetBinding(Pin.TintColorProperty, new Binding(nameof(Site.PriceCategory), converter: PriceCategoryConverter));
 
             pin.Anchor = new Point(0.5, 0.5);
-            pin.FileImage = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
+            pin.ImageSource = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
 
             return pin;
         }

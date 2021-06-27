@@ -31,7 +31,7 @@ namespace AdelaideFuel.Droid
             Sharpnado.HorizontalListView.Droid.SharpnadoInitializer.Initialize();
             Acr.UserDialogs.UserDialogs.Init(this);
             AiForms.Renderers.Droid.SettingsViewInit.Init();
-            Xamarin.FormsMaps.Init(this, savedInstanceState, new Xamarin.Forms.Maps.MapCache());
+            Xamarin.FormsBetterMaps.Init(this, savedInstanceState, new Xamarin.Forms.BetterMaps.MapCache());
             Android.Gms.Ads.MobileAds.Initialize(ApplicationContext);
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
@@ -47,6 +47,9 @@ namespace AdelaideFuel.Droid
                 .SetTestDeviceIds(testDevices)
                 .Build();
 #endif
+
+            Xamarin.FormsBetterMaps.SetLightThemeAsset("map.style.light.json");
+            Xamarin.FormsBetterMaps.SetDarkThemeAsset("map.style.dark.json");
 
             var formsApp = new App();
             LoadApplication(formsApp);

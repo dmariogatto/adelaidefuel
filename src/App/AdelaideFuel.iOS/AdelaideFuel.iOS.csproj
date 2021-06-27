@@ -92,18 +92,6 @@
     <MtouchFastDev>false</MtouchFastDev>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\ios\FormsMaps.cs">
-      <Link>Maps\FormsMaps.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\ios\FormsMKPointAnnotation.cs">
-      <Link>Maps\FormsMKPointAnnotation.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\ios\GeocoderBackend.cs">
-      <Link>Maps\GeocoderBackend.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Forms.Maps\Platforms\ios\MapRenderer.cs">
-      <Link>Maps\MapRenderer.cs</Link>
-    </Compile>
     <Compile Include="Effects\SafeAreaInsetEffect_iOS.cs" />
     <Compile Include="Effects\PressedEffect_iOS.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
@@ -111,6 +99,7 @@
     <Compile Include="Helpers\TraitCollectionExtensions.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Renderers\MapCustomRenderer.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\CustomNavigationPageRenderer.cs" />
     <Compile Include="Renderers\PageCustomRenderer.cs" />
@@ -199,6 +188,9 @@
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
+    <PackageReference Include="Xamarin.Forms.BetterMaps">
+      <Version>0.0.1-pre</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms.PancakeView">
       <Version>2.3.0.759</Version>
     </PackageReference>

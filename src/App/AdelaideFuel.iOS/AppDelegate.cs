@@ -35,7 +35,7 @@ namespace AdelaideFuel.iOS
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
             Sharpnado.HorizontalListView.iOS.SharpnadoInitializer.Initialize();
             AiForms.Renderers.iOS.SettingsViewInit.Init();
-            Xamarin.FormsMaps.Init(new Xamarin.Forms.Maps.MapCache());
+            Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
             Google.MobileAds.MobileAds.SharedInstance.Init();
 
             global::Xamarin.Forms.Forms.Init();
