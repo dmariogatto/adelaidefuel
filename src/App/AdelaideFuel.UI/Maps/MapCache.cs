@@ -36,7 +36,7 @@ namespace Xamarin.Forms.BetterMaps
 
         private static void EvictedCallback(object key, object item, EvictionReason reason, object state)
         {
-            System.Diagnostics.Debug.WriteLine($"MapCache: Evicted '{key}'");
+            System.Diagnostics.Debug.WriteLine($"MapCache: Evicted '{key}', '{reason}'");
         }
     }
 }
