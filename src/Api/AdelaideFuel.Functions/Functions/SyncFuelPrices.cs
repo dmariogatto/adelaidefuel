@@ -71,7 +71,9 @@ namespace AdelaideFuel.Functions
                     // Smoky Bay
                     61577275,
                     // Mt Ive
-                    61577323
+                    61577323,
+                    // Minnipa Community Store
+                    61577296,
                 };
 
                 foreach (var i in independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId)))
