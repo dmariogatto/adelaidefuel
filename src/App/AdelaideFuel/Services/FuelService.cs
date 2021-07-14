@@ -114,11 +114,11 @@ namespace AdelaideFuel.Services
 
             var loc = locTask.Result;
 
-            int getRadiusKm(double distanceKm)
+            static int getRadiusKm(double distanceKm, List<UserRadius> radii)
             {
                 if (distanceKm < 0) return int.MaxValue;
 
-                foreach (var rkm in userRadii)
+                foreach (var rkm in radii)
                 {
                     var km = rkm.Id;
 
@@ -132,7 +132,7 @@ namespace AdelaideFuel.Services
             var fuelGroups =
                 (from fp in pricesTask.Result
                  let distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1
-                 let radiusKm = getRadiusKm(distanceKm)
+                 let radiusKm = getRadiusKm(distanceKm, userRadii)
                  let fuelPrice = (fp, distanceKm, radiusKm)
                  orderby fp.FuelSortOrder, radiusKm, fp.PriceInCents, distanceKm
                  group fuelPrice by fp.FuelId into fg
