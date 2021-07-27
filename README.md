@@ -11,7 +11,7 @@ Built with [Xamarin.Forms](https://xamarin.com), Azure Functions and Table Stora
 
 ## Built with
 
-The native [map renderers](/src/App/Xamarin.Forms.Maps) are based on those found in the Xamarin.Forms repo, but have been modified to support custom pin images, themes and enhanced user interactivity!
+The [maps package](https://www.nuget.org/packages/Xamarin.Forms.BetterMaps/) is based on the default Xamarin.Forms.Maps, but has been modified to support custom pin images, themes and enhanced user interactivity!
 
 ### UI
 
