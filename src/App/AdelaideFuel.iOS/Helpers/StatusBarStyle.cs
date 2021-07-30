@@ -36,7 +36,7 @@ namespace AdelaideFuel.iOS
 
         private static void UpdateStatusBarAppearance(UIWindow window)
         {
-            if (window == null)
+            if (window?.RootViewController == null)
                 return;
 
             var vc = window.RootViewController;
