@@ -62,6 +62,8 @@ namespace AdelaideFuel.iOS.Renderers
                     _ => UIUserInterfaceStyle.Unspecified
                 };
             }
+
+            StatusBarStyle.SetTheme(ThemeManager.CurrentTheme);
         }
     }
 }
