@@ -11,15 +11,13 @@ namespace AdelaideFuel.iOS.Effects
     [Preserve(AllMembers = true)]
     public class PressedEffect_iOS : PlatformEffect
     {
-        private readonly UITapGestureRecognizer _tapRecognizer;
-        private readonly UILongPressGestureRecognizer _longPressRecognizer;
+        private UITapGestureRecognizer _tapRecognizer;
+        private UILongPressGestureRecognizer _longPressRecognizer;
 
         private bool _attached;
 
         public PressedEffect_iOS()
         {
-            _tapRecognizer = new UITapGestureRecognizer(HandleClick);
-            _longPressRecognizer = new UILongPressGestureRecognizer(HandleLongClick);
         }
 
         protected override void OnAttached()
@@ -28,9 +26,13 @@ namespace AdelaideFuel.iOS.Effects
             // only attach the handler one time
             if (!_attached)
             {
+                _attached = true;
+
+                _tapRecognizer = new UITapGestureRecognizer(HandleClick);
+                _longPressRecognizer = new UILongPressGestureRecognizer(HandleLongClick);
+
                 Container.AddGestureRecognizer(_tapRecognizer);
                 Container.AddGestureRecognizer(_longPressRecognizer);
-                _attached = true;
             }
         }
 
@@ -45,14 +47,21 @@ namespace AdelaideFuel.iOS.Effects
             var command = PressedEffect.GetCommandLong(Element);
             command?.Execute(PressedEffect.GetCommandLongParameter(Element));
         }
-        
+
         protected override void OnDetached()
         {
             if (_attached)
             {
+                _attached = false;
+
                 Container.RemoveGestureRecognizer(_tapRecognizer);
                 Container.RemoveGestureRecognizer(_longPressRecognizer);
-                _attached = false;
+
+                _tapRecognizer.Dispose();
+                _longPressRecognizer.Dispose();
+
+                _tapRecognizer = null;
+                _longPressRecognizer = null;
             }
         }
     }

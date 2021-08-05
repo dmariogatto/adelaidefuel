@@ -11,6 +11,8 @@ namespace AdelaideFuel.Droid.Effects
     public class PressedEffect_Droid : PlatformEffect
     {
         private bool _attached;
+        private Android.Views.View _view;
+        private bool _preClickable, _preLongClickable;
 
         public PressedEffect_Droid()
         {
@@ -22,23 +24,21 @@ namespace AdelaideFuel.Droid.Effects
             // only attach the handler one time.
             if (!_attached)
             {
-                if (Control != null)
-                {
-                    Control.Clickable = true;
-                    Control.Click += Control_Click;
+                _view = Control ?? Container;
 
-                    Control.LongClickable = true;
-                    Control.LongClick += Control_LongClick;
-                }
-                else
+                if (_view != null)
                 {
-                    Container.Clickable = true;
-                    Container.Click += Control_Click;
+                    _attached = true;
 
-                    Container.LongClickable = true;
-                    Container.LongClick += Control_LongClick;
+                    _preClickable = _view.Clickable;
+                    _preLongClickable = _view.LongClickable;
+
+                    _view.Clickable = true;
+                    _view.Click += Control_Click;
+
+                    _view.LongClickable = true;
+                    _view.LongClick += Control_LongClick;
                 }
-                _attached = true;
             }
         }
 
@@ -58,23 +58,15 @@ namespace AdelaideFuel.Droid.Effects
         {
             if (_attached)
             {
-                if (Control != null)
-                {
-                    Control.Clickable = false;
-                    Control.Click -= Control_Click;
-
-                    Control.LongClickable = false;
-                    Control.LongClick -= Control_LongClick;
-                }
-                else
-                {
-                    Container.Clickable = false;
-                    Container.Click -= Control_Click;
-
-                    Container.LongClickable = true;
-                    Container.LongClick -= Control_LongClick;
-                }
                 _attached = false;
+
+                _view.Click -= Control_Click;
+                _view.LongClick -= Control_LongClick;
+
+                _view.Clickable = _preClickable;
+                _view.LongClickable = _preLongClickable;
+
+                _view = null;
             }
         }
     }
