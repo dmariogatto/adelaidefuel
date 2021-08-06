@@ -186,7 +186,10 @@ namespace AdelaideFuel.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.Error(ex, new Dictionary<string, string>()
+                {
+                    { "connection_string", connectionString }
+                });
 
                 db?.Dispose();
                 db = null;
