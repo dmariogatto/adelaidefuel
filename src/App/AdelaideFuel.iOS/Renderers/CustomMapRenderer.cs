@@ -7,11 +7,11 @@ using Xamarin.Forms;
 using Xamarin.Forms.BetterMaps.iOS;
 using Xamarin.Forms.Internals;
 
-[assembly: ExportRenderer(typeof(FuelMap), typeof(MapCustomRenderer))]
+[assembly: ExportRenderer(typeof(FuelMap), typeof(CustomMapRenderer))]
 namespace AdelaideFuel.iOS.Renderers
 {
     [Preserve(AllMembers = true)]
-    public class MapCustomRenderer : MapRenderer
+    public class CustomMapRenderer : MapRenderer
     {
         protected override void UpdateShowUserLocationButton()
         {

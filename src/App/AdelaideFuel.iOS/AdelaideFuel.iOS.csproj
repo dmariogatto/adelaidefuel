@@ -99,10 +99,10 @@
     <Compile Include="Helpers\TraitCollectionExtensions.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="Renderers\MapCustomRenderer.cs" />
+    <Compile Include="Renderers\CustomMapRenderer.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\CustomNavigationPageRenderer.cs" />
-    <Compile Include="Renderers\PageCustomRenderer.cs" />
+    <Compile Include="Renderers\CustomPageRenderer.cs" />
     <Compile Include="Renderers\ViewCellCustomRenderer.cs" />
     <Compile Include="Renderers\TintImageRenderer.cs" />
     <Compile Include="Services\UserNativeService_iOS.cs" />
