@@ -1,9 +1,11 @@
-﻿using AdelaideFuel.Storage;
+﻿using AdelaideFuel.Models;
+using AdelaideFuel.Storage;
 using LiteDB;
 using Polly;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Xamarin.Essentials.Interfaces;
@@ -20,6 +22,8 @@ namespace AdelaideFuel.Services
         private readonly object _dbLock = new object();
 
         private readonly IVersionTracking _versionTracking;
+        private readonly IUserNativeReadOnlyService _userReadService;
+        private readonly IAppPreferences _appPrefs;
         private readonly ILogger _logger;
 
         private readonly string _userPath;
@@ -34,13 +38,25 @@ namespace AdelaideFuel.Services
         public StoreFactory(
             IFileSystem fileSystem,
             IVersionTracking versionTracking,
+            IUserNativeReadOnlyService userReadService,
+            IAppPreferences appPrefs,
             ILogger logger)
         {
             _versionTracking = versionTracking;
+            _userReadService = userReadService;
+            _appPrefs = appPrefs;
             _logger = logger;
 
             _userPath = Path.Combine(fileSystem.AppDataDirectory, $"{UserDbName}.db");
             _cachePath = Path.Combine(fileSystem.CacheDirectory, $"{CacheDbName}.db");
+
+#if DEBUG
+            var rand = new Random();
+            if (rand.Next(0, 9) == 4)
+                File.WriteAllText(_userPath, "CORRUPT USER");
+            if (rand.Next(0, 4) == 2)
+                File.WriteAllText(_cachePath, "CORRUPT CACHE");
+#endif
 
             InitUserDb();
             InitCacheDb();
@@ -131,8 +147,9 @@ namespace AdelaideFuel.Services
 
                     if (_userDb == null)
                     {
-                        DeleteLiteDatabase(_userPath);
-                        _userDb = GetLiteDatabase(connectionString);
+                        // Oh boy... user database is corrupt
+                        // try to recreate
+                        RecreateUserDb(connectionString);
                     }
                 }
             }
@@ -219,6 +236,55 @@ namespace AdelaideFuel.Services
             }
 
             return success;
+        }
+
+        private void RecreateUserDb(string connectionString)
+        {
+            _appPrefs.LastDateSynced = DateTime.MinValue;
+
+            DeleteLiteDatabase(_userPath);
+            _userDb = GetLiteDatabase(connectionString);
+
+            if (_userDb != null)
+            {
+                try
+                {
+                    var userBrands = _userReadService.GetUserBrands();
+                    var userFuels = _userReadService.GetUserFuels();
+                    var userRadii = _userReadService.GetUserRadii();
+
+                    if (userBrands?.Any() == true)
+                    {
+                        var brandStore = GetUserStore<UserBrand>();
+                        brandStore.UpsertRangeAsync(userBrands.Select(i => (i.Id.ToString(CultureInfo.InvariantCulture), i)), TimeSpan.MaxValue, default).Wait();
+                    }
+
+                    if (userFuels?.Any() == true)
+                    {
+                        var fuelStore = GetUserStore<UserFuel>();
+                        fuelStore.UpsertRangeAsync(userFuels.Select(i => (i.Id.ToString(CultureInfo.InvariantCulture), i)), TimeSpan.MaxValue, default).Wait();
+                    }
+
+                    if (userRadii?.Any() == true)
+                    {
+                        var radiusStore = GetUserStore<UserRadius>();
+                        radiusStore.UpsertRangeAsync(userRadii.Select(i => (i.Id.ToString(CultureInfo.InvariantCulture), i)), TimeSpan.MaxValue, default).Wait();
+                    }
+
+                    _userDb.UserVersion = UserDbVersion;
+
+                    _logger.Event(AppCenterEvents.Data.UserDbReconstruction, new Dictionary<string, string>()
+                    {
+                        { "brands", (userBrands?.Count ?? -1).ToString() },
+                        { "fuels", (userFuels?.Count ?? -1).ToString() },
+                        { "radii", (userRadii?.Count ?? -1).ToString() }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                }
+            }
         }
         #endregion
 

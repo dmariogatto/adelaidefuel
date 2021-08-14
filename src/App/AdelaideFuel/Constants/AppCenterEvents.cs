@@ -25,6 +25,11 @@ namespace AdelaideFuel
             public const string ReviewRequested = "review_requested";
         }
 
+        public static class Data
+        {
+            public const string UserDbReconstruction = "user_db_reconstruction";
+        }
+
         public static class Property
         {
             public const string Value = "value";
