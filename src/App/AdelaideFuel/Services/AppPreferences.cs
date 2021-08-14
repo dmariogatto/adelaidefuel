@@ -18,12 +18,24 @@ namespace AdelaideFuel.Services
             get => (Theme)_preferences.Get(nameof(AppTheme), (int)Theme.System);
             set
             {
-                var oldVal = AppTheme;
-
-                _preferences.Set(nameof(AppTheme), (int)value);
-
-                if (oldVal != AppTheme)
+                if (AppTheme != value)
+                {
+                    _preferences.Set(nameof(AppTheme), (int)value);
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        public DateTime LastDateSynced
+        {
+            get => _preferences.Get(nameof(LastDateSynced), DateTime.MinValue);
+            set
+            {
+                if (LastDateSynced != value.Date)
+                {
+                    _preferences.Set(nameof(LastDateSynced), value.Date);
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -32,12 +44,11 @@ namespace AdelaideFuel.Services
             get => _preferences.Get(nameof(LastDateOpened), DateTime.Now.Date.AddDays(-1));
             set
             {
-                var oldVal = LastDateOpened;
-
-                _preferences.Set(nameof(LastDateOpened), value.Date);
-
-                if (oldVal != LastDateOpened)
+                if (LastDateOpened != value.Date)
+                {
+                    _preferences.Set(nameof(LastDateOpened), value.Date);
                     OnPropertyChanged();
+                }
             }
         }
 
@@ -46,12 +57,11 @@ namespace AdelaideFuel.Services
             get => _preferences.Get(nameof(DayCount), 0);
             set
             {
-                var oldVal = DayCount;
-
-                _preferences.Set(nameof(DayCount), value);
-
-                if (oldVal != DayCount)
+                if (DayCount != value)
+                {
+                    _preferences.Set(nameof(DayCount), value);
                     OnPropertyChanged();
+                }
             }
         }
 
@@ -60,12 +70,11 @@ namespace AdelaideFuel.Services
             get => _preferences.Get(nameof(ReviewRequested), false);
             set
             {
-                var oldVal = ReviewRequested;
-
-                _preferences.Set(nameof(ReviewRequested), value);
-
-                if (oldVal != ReviewRequested)
+                if (ReviewRequested != value)
+                {
+                    _preferences.Set(nameof(ReviewRequested), value);
                     OnPropertyChanged();
+                }
             }
         }
     }

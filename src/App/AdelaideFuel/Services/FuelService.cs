@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
@@ -26,6 +27,8 @@ namespace AdelaideFuel.Services
         private readonly IConnectivity _connectivity;
         private readonly IGeolocation _geolocation;
 
+        private readonly IAppPreferences _appPrefs;
+
         private readonly IAdelaideFuelApi _fuelApi;
         private readonly IStoreFactory _storeFactory;
 
@@ -38,10 +41,12 @@ namespace AdelaideFuel.Services
         private readonly SemaphoreSlim _syncBrandsSemaphore = new SemaphoreSlim(1, 1);
         private readonly SemaphoreSlim _syncFuelsSemaphore = new SemaphoreSlim(1, 1);
         private readonly SemaphoreSlim _syncRadiiSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _syncAllSemaphore = new SemaphoreSlim(1, 1);
 
         public FuelService(
             IConnectivity connectivity,
             IGeolocation geolocation,
+            IAppPreferences appPrefs,
             IAdelaideFuelApi adelaideFuelApi,
             IStoreFactory storeFactory,
             ICacheService cacheService,
@@ -50,6 +55,8 @@ namespace AdelaideFuel.Services
         {
             _connectivity = connectivity;
             _geolocation = geolocation;
+
+            _appPrefs = appPrefs;
 
             _fuelApi = adelaideFuelApi;
             _storeFactory = storeFactory;
@@ -103,14 +110,22 @@ namespace AdelaideFuel.Services
             var brandIds = userBrandsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
             var fuelIds = userFuelsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
 
-            var keys = new List<string>();
+            var keyBuilder = new StringBuilder();
 
             if (brandIds.Count > 0)
-                keys.Add($"brandIds={string.Join(",", brandIds)}");
-            if (fuelIds.Count > 0)
-                keys.Add($"fuelIds={string.Join(",", fuelIds)}");
+            {
+                keyBuilder.Append("brandIds=");
+                keyBuilder.AppendJoin(",", brandIds);
+            }
 
-            var queryString = string.Join("&", keys);
+            if (fuelIds.Count > 0)
+            {
+                if (keyBuilder.Length > 0) keyBuilder.Append("&");
+                keyBuilder.Append("fuelIds=");
+                keyBuilder.AppendJoin(",", fuelIds);
+            }
+
+            var queryString = keyBuilder.ToString();
 
             var cacheKey = CacheKey(queryString, nameof(GetSitePricesAsync));
             var sitePrices = default(IList<SiteFuelPrice>);
@@ -225,8 +240,10 @@ namespace AdelaideFuel.Services
             return fuelGroups;
         }
 
-        public async Task SyncBrandsAsync(CancellationToken cancellationToken)
+        public async Task<bool> SyncBrandsAsync(CancellationToken cancellationToken)
         {
+            var success = false;
+
             await _syncBrandsSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
@@ -236,6 +253,8 @@ namespace AdelaideFuel.Services
 
                 await Task.WhenAll(apiBrandsTask, userBrandsTask).ConfigureAwait(false);
                 await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
+
+                success = true;
             }
             catch (Exception ex)
             {
@@ -245,10 +264,14 @@ namespace AdelaideFuel.Services
             {
                 _syncBrandsSemaphore.Release();
             }
+
+            return success;
         }
 
-        public async Task SyncFuelsAsync(CancellationToken cancellationToken)
+        public async Task<bool> SyncFuelsAsync(CancellationToken cancellationToken)
         {
+            var success = false;
+
             await _syncFuelsSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
@@ -258,6 +281,8 @@ namespace AdelaideFuel.Services
 
                 await Task.WhenAll(apiFuelsTask, userFuelsTask).ConfigureAwait(false);
                 await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
+
+                success = true;
             }
             catch (Exception ex)
             {
@@ -267,10 +292,14 @@ namespace AdelaideFuel.Services
             {
                 _syncFuelsSemaphore.Release();
             }
+
+            return success;
         }
 
-        public async Task SyncRadiiAsync(CancellationToken cancellationToken)
+        public async Task<bool> SyncRadiiAsync(CancellationToken cancellationToken)
         {
+            var success = false;
+
             await _syncRadiiSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
@@ -286,6 +315,8 @@ namespace AdelaideFuel.Services
 
                     await UpsertUserRadiiAsync(radii, cancellationToken).ConfigureAwait(false);
                 }
+
+                success = true;
             }
             catch (Exception ex)
             {
@@ -295,13 +326,52 @@ namespace AdelaideFuel.Services
             {
                 _syncRadiiSemaphore.Release();
             }
+
+            return success;
         }
 
-        public Task SyncAllAsync(CancellationToken cancellationToken)
-            => Task.WhenAll(
-                SyncBrandsAsync(cancellationToken),
-                SyncFuelsAsync(cancellationToken),
-                SyncRadiiAsync(cancellationToken));
+        public async Task<bool> SyncAllAsync(CancellationToken cancellationToken)
+        {
+            var success = false;
+
+            await _syncAllSemaphore.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                var today = DateTime.Now.Date;
+                if (today > _appPrefs.LastDateSynced)
+                {
+                    _appPrefs.LastDateSynced = today;
+
+                    var tasks = new[]
+                    {
+                        SyncBrandsAsync(cancellationToken),
+                        SyncFuelsAsync(cancellationToken),
+                        SyncRadiiAsync(cancellationToken)
+                    };
+
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                    success = tasks.All(t => t.Result);
+
+                    if (success)
+                        _appPrefs.LastDateSynced = today;
+                }
+                else
+                {
+                    success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                _syncAllSemaphore.Release();
+            }
+
+            return success;
+        }
 
         public async Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken)
         {

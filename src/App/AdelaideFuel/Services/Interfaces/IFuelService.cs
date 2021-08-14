@@ -18,11 +18,11 @@ namespace AdelaideFuel.Services
 
         Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 
-        Task SyncBrandsAsync(CancellationToken cancellationToken);
-        Task SyncFuelsAsync(CancellationToken cancellationToken);
-        Task SyncRadiiAsync(CancellationToken cancellationToken);
+        Task<bool> SyncBrandsAsync(CancellationToken cancellationToken);
+        Task<bool> SyncFuelsAsync(CancellationToken cancellationToken);
+        Task<bool> SyncRadiiAsync(CancellationToken cancellationToken);
 
-        Task SyncAllAsync(CancellationToken cancellationToken);
+        Task<bool> SyncAllAsync(CancellationToken cancellationToken);
 
         Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken);
         Task UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken);
