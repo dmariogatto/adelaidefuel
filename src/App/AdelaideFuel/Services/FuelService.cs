@@ -7,7 +7,9 @@ using Polly.Retry;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
@@ -15,7 +17,7 @@ using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.Services
 {
-    public class FuelService : BaseService, IFuelService
+    public class FuelService : BaseHttpService, IFuelService
     {
         private TimeSpan CacheExpireTimeSpan => TimeSpan.FromHours(12);
 
@@ -91,13 +93,74 @@ namespace AdelaideFuel.Services
             return sites ?? Array.Empty<SiteDto>();
         }
 
-        public Task<IList<SiteFuelPrice>> GetSitePricesAsync(CancellationToken cancellationToken)
-            => GetPricesAsync(null, cancellationToken);
-
-        public Task<IList<SiteFuelPrice>> GetSitePricesAsync(int siteId, CancellationToken cancellationToken)
+        public async Task<IList<SiteFuelPrice>> GetSitePricesAsync(CancellationToken cancellationToken)
         {
-            if (siteId <= 0) throw new ArgumentOutOfRangeException(nameof(siteId));
-            return GetPricesAsync(siteId, cancellationToken);
+            var userBrandsTask = GetUserBrandsAsync(cancellationToken);
+            var userFuelsTask = GetUserFuelsAsync(cancellationToken);
+
+            await Task.WhenAll(userBrandsTask, userFuelsTask).ConfigureAwait(false);
+
+            var brandIds = userBrandsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
+            var fuelIds = userFuelsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
+
+            var keys = new List<string>();
+
+            if (brandIds.Count > 0)
+                keys.Add($"brandIds={string.Join(",", brandIds)}");
+            if (fuelIds.Count > 0)
+                keys.Add($"fuelIds={string.Join(",", fuelIds)}");
+
+            var queryString = string.Join("&", keys);
+
+            var cacheKey = CacheKey(queryString, nameof(GetSitePricesAsync));
+            var sitePrices = default(IList<SiteFuelPrice>);
+
+            if (!MemoryCache.TryGetValue(cacheKey, out sitePrices))
+            {
+                var diskCache = _storeFactory.GetCacheStore<IList<SiteFuelPrice>>();
+
+                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
+                {
+                    sitePrices = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    try
+                    {
+                        var sitesTask = GetSitesAsync(cancellationToken);
+                        var pricesTask = _retryPolicy.ExecuteAsync(
+                            (ct) => GetSitePriceDtosAsync(queryString, ct),
+                            cancellationToken);
+
+                        await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
+
+                        if (!cancellationToken.IsCancellationRequested)
+                        {
+                            sitePrices =
+                                (from sp in pricesTask.Result
+                                 join s in sitesTask.Result on sp.SiteId equals s.SiteId
+                                 join b in userBrandsTask.Result on s.BrandId equals b.Id
+                                 join f in userFuelsTask.Result on sp.FuelId equals f.Id
+                                 where b.IsActive && f.IsActive
+                                 orderby f.SortOrder, sp.Price, b.SortOrder
+                                 let sfp = new SiteFuelPrice(b, f, s, sp)
+                                 select sfp).ToList();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                    }
+
+                    if (sitePrices?.Any() == true)
+                    {
+                        MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
+                        _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
+                    }
+                }
+            }
+
+            return sitePrices ?? Array.Empty<SiteFuelPrice>();
         }
 
         public async Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
@@ -327,80 +390,6 @@ namespace AdelaideFuel.Services
         public Task RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
             => RemoveUserEntitiesAsync(radii, cancellationToken);
 
-        private async Task<IList<SiteFuelPrice>> GetPricesAsync(long? siteId, CancellationToken cancellationToken)
-        {
-            var userBrandsTask = GetUserBrandsAsync(cancellationToken);
-            var userFuelsTask = GetUserFuelsAsync(cancellationToken);
-
-            await Task.WhenAll(userBrandsTask, userFuelsTask).ConfigureAwait(false);
-
-            var brandIds = userBrandsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
-            var fuelIds = userFuelsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
-
-            var keys = new List<string>();
-            if (siteId > 0)
-                keys.Add($"sId={siteId}");
-            if (brandIds.Count > 0)
-                keys.Add($"bIds={string.Join(",", brandIds)}");
-            if (fuelIds.Count > 0)
-                keys.Add($"fIds={string.Join(",", fuelIds)}");
-
-            var cacheKey = CacheKey(string.Join("&", keys), nameof(GetPricesAsync));
-            var sitePrices = default(IList<SiteFuelPrice>);
-
-            if (!MemoryCache.TryGetValue(cacheKey, out sitePrices))
-            {
-                var diskCache = _storeFactory.GetCacheStore<IList<SiteFuelPrice>>();
-
-                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
-                {
-                    sitePrices = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    try
-                    {
-                        var sitesTask = GetSitesAsync(cancellationToken);
-                        var pricesTask = _retryPolicy.ExecuteAsync(
-                            (ct) => _fuelApi.GetSitePricesAsync(Constants.ApiKeySitePrices, brandIds, fuelIds, ct, siteId),
-                            cancellationToken);
-
-                        await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
-
-                        if (!cancellationToken.IsCancellationRequested)
-                        {
-                            var fuelPriceGroups =
-                                (from sp in pricesTask.Result
-                                 join s in sitesTask.Result on sp.SiteId equals s.SiteId
-                                 join b in userBrandsTask.Result on s.BrandId equals b.Id
-                                 join f in userFuelsTask.Result on sp.FuelId equals f.Id
-                                 where b.IsActive && f.IsActive
-                                 orderby f.SortOrder, sp.Price, b.SortOrder
-                                 let sfp = new SiteFuelPrice(b, f, s, sp)
-                                 group sfp by sfp.FuelId into fpg
-                                 select fpg).ToList();
-
-                            sitePrices = fuelPriceGroups
-                                .SelectMany(fpg => fpg.Select(i => i))
-                                .ToList();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex);
-                    }
-
-                    if (sitePrices?.Any() == true)
-                    {
-                        MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
-                        _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
-                    }
-                }
-            }
-
-            return sitePrices ?? Array.Empty<SiteFuelPrice>();
-        }
-
         private async Task<IList<T>> SyncSortableEntitiesWithApiAsync<T, V>(IList<V> apiEntities, IList<T> userEntities, CancellationToken cancellationToken)
             where V : class, IFuelLookup
             where T : class, IUserSortableEntity, new()
@@ -505,6 +494,21 @@ namespace AdelaideFuel.Services
             }
 
             return response;
+        }
+
+        private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(string queryString, CancellationToken cancellationToken)
+        {
+            const string sitePrices = "SitePrices";
+
+            var uri = Path.Combine(Constants.ApiUrlBase, !string.IsNullOrEmpty(queryString) ? $"{sitePrices}?{queryString}" : sitePrices);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add(Constants.AuthHeader, Constants.ApiKeySitePrices);
+            using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = DeserializeJsonFromStream<List<SitePriceDto>>(s);
+
+            return result;
         }
     }
 }

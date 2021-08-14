@@ -15,7 +15,6 @@ namespace AdelaideFuel.Services
         Task<IList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken);
 
         Task<IList<SiteFuelPrice>> GetSitePricesAsync(CancellationToken cancellationToken);
-        Task<IList<SiteFuelPrice>> GetSitePricesAsync(int siteId, CancellationToken cancellationToken);
 
         Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 

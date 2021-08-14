@@ -17,7 +17,7 @@ namespace AdelaideFuel.Functions
     public class SitePrices
     {
         private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
-        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3);
+        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3.5);
 
         private readonly ITableRepository<SitePriceEntity> _sitePricesRepository;
 
@@ -29,13 +29,10 @@ namespace AdelaideFuel.Functions
 
         [FunctionName(nameof(SitePrices))]
         public async Task<IList<SitePriceDto>> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "SitePrices/{siteId?}")] HttpRequest req,
-            string siteId,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log,
             CancellationToken ct)
         {
-            const string pricesKey = "SitePrices_DTOs";
-
             const string brandIdsKey = "brandIds";
             const string fuelIdsKey = "fuelIds";
 
@@ -49,38 +46,29 @@ namespace AdelaideFuel.Functions
                 foreach (var i in req.Query[fuelIdsKey].ToString().Split(','))
                     if (int.TryParse(i, out var id)) fuelIds.Add(id);
 
-            var dtoCacheEnabled = !brandIds.Any() && !fuelIds.Any();
-            if (!dtoCacheEnabled || !Cache.TryGetValue(pricesKey, out IList<SitePriceDto> prices))
-            {
-                prices =
-                    (from sp in await GetSitePriceEntitiesAsync(siteId, ct)
-                     where sp.IsActive &&
-                           (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
-                           (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
-                     orderby sp.TransactionDateUtc descending
-                     group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                     select fuelGroup.First().ToSitePrice()).ToList();
+            var prices =
+                (from sp in await GetSitePriceEntitiesAsync(ct)
+                 where (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
+                       (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
+                 select sp.ToSitePrice()).ToList();
 
-                if (dtoCacheEnabled && prices?.Any() == true)
-                    Cache.Set(pricesKey, prices, CacheDuration);
-            }
-
-            return prices ?? Array.Empty<SitePriceDto>();
+            return prices ?? new List<SitePriceDto>(0);
         }
 
-        private async Task<IList<SitePriceEntity>> GetSitePriceEntitiesAsync(string siteId, CancellationToken ct)
+        private async Task<IList<SitePriceEntity>> GetSitePriceEntitiesAsync(CancellationToken ct)
         {
             const string entitiesKey = "SitePrices_Entities";
 
-            var entitiesCacheKey = string.IsNullOrWhiteSpace(siteId) ? entitiesKey : $"{entitiesKey}_{siteId}";
-            if (!Cache.TryGetValue(entitiesCacheKey, out IList<SitePriceEntity> entities))
+            if (!Cache.TryGetValue(entitiesKey, out IList<SitePriceEntity> entities))
             {
-                entities = string.IsNullOrWhiteSpace(siteId)
-                    ? await _sitePricesRepository.GetAllEntitiesAsync(ct)
-                    : await _sitePricesRepository.GetPartitionAsync(siteId, ct);
-
+                entities =
+                    (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
+                     where sp.IsActive
+                     orderby sp.TransactionDateUtc descending
+                     group sp by (sp.SiteId, sp.FuelId) into fuelGroup
+                     select fuelGroup.First()).ToList();
                 if (entities?.Any() == true)
-                    Cache.Set(entitiesCacheKey, entities, CacheDuration);
+                    Cache.Set(entitiesKey, entities, CacheDuration);
             }
 
             return entities ?? Array.Empty<SitePriceEntity>();
