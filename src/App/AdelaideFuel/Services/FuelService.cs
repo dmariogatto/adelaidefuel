@@ -341,8 +341,6 @@ namespace AdelaideFuel.Services
                 var today = DateTime.Now.Date;
                 if (today > _appPrefs.LastDateSynced)
                 {
-                    _appPrefs.LastDateSynced = today;
-
                     var tasks = new[]
                     {
                         SyncBrandsAsync(cancellationToken),
