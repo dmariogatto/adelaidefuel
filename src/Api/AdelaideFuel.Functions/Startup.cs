@@ -26,17 +26,27 @@ namespace AdelaideFuel.Functions
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                NullValueHandling = NullValueHandling.Ignore
+            };
+
             builder.Services.AddSingleton(serviceProvider =>
-           {
-               return new ConfigurationBuilder()
-                  .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                  .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                  .AddEnvironmentVariables()
-                  .Build();
-           });
+            {
+                return new ConfigurationBuilder()
+                   .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                   .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                   .AddEnvironmentVariables()
+                   .Build();
+            });
 
             builder.Services.AddRefitClient<ISaFuelPricingApi>(
-                    new RefitSettings(new NewtonsoftJsonContentSerializer(new JsonSerializerSettings() { DateTimeZoneHandling = DateTimeZoneHandling.Utc })))
+                    new RefitSettings(new NewtonsoftJsonContentSerializer(new JsonSerializerSettings()
+                    {
+                        DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                        NullValueHandling = NullValueHandling.Ignore
+                    })))
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(FuelApiUrl))
                 .AddHttpMessageHandler(() => new FuelPriceAuthHeaderHandler(SubscriberToken))
                 .AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(3, n => TimeSpan.FromSeconds(Math.Pow(2, n))));

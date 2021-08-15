@@ -3,7 +3,6 @@ using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

@@ -2,12 +2,16 @@ using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,10 +25,15 @@ namespace AdelaideFuel.Functions
 
         private readonly ITableRepository<SitePriceEntity> _sitePricesRepository;
 
+        private readonly CloudStorageAccount _cloudStorageAccount;
+
         public SitePrices(
-            ITableRepository<SitePriceEntity> sitePriceRepository)
+            ITableRepository<SitePriceEntity> sitePriceRepository,
+            CloudStorageAccount cloudStorageAccount)
         {
             _sitePricesRepository = sitePriceRepository;
+
+            _cloudStorageAccount = cloudStorageAccount;
         }
 
         [FunctionName(nameof(SitePrices))]
@@ -47,31 +56,52 @@ namespace AdelaideFuel.Functions
                     if (int.TryParse(i, out var id)) fuelIds.Add(id);
 
             var prices =
-                (from sp in await GetSitePriceEntitiesAsync(ct)
+                (from sp in await GetSitePriceDtosAsync(log, ct)
                  where (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
                        (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
-                 select sp.ToSitePrice()).ToList();
+                 select sp).ToList();
 
             return prices ?? new List<SitePriceDto>(0);
         }
 
-        private async Task<IList<SitePriceEntity>> GetSitePriceEntitiesAsync(CancellationToken ct)
+        private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(ILogger log, CancellationToken ct)
         {
-            const string entitiesKey = "SitePrices_Entities";
+            const string dtosKey = "SitePrices_Entities";
 
-            if (!Cache.TryGetValue(entitiesKey, out IList<SitePriceEntity> entities))
+            if (!Cache.TryGetValue(dtosKey, out IList<SitePriceDto> dtos))
             {
-                entities =
-                    (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
-                     where sp.IsActive
-                     orderby sp.TransactionDateUtc descending
-                     group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                     select fuelGroup.First()).ToList();
-                if (entities?.Any() == true)
-                    Cache.Set(entitiesKey, entities, CacheDuration);
+                try
+                {
+                    var blobClient = _cloudStorageAccount.CreateCloudBlobClient();
+                    var blobContainer = blobClient.GetContainerReference(Startup.BlobContainerName);
+                    var blobSitePrices = blobContainer.GetBlockBlobReference("site_prices.json");
+                    if (await blobSitePrices.ExistsAsync())
+                    {
+                        using var reader = new StreamReader(await blobSitePrices.OpenReadAsync());
+                        using var jtr = new JsonTextReader(reader);
+                        dtos = JsonSerializer.CreateDefault().Deserialize<List<SitePriceDto>>(jtr);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Error reading 'adelaidefuel/site_prices.json'");
+                }
+
+                if (dtos == null || !dtos.Any())
+                {
+                    dtos =
+                        (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
+                         where sp.IsActive
+                         orderby sp.TransactionDateUtc descending
+                         group sp by (sp.SiteId, sp.FuelId) into fuelGroup
+                         select fuelGroup.First().ToSitePrice()).ToList();
+                }
+
+                if (dtos?.Any() == true)
+                    Cache.Set(dtosKey, dtos, CacheDuration);
             }
 
-            return entities ?? Array.Empty<SitePriceEntity>();
+            return dtos ?? Array.Empty<SitePriceDto>();
         }
     }
 }

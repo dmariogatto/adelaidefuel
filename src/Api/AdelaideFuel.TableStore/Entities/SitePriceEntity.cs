@@ -78,6 +78,7 @@ namespace AdelaideFuel.TableStore.Entities
 
         public SitePriceDto ToSitePrice() => new SitePriceDto()
         {
+            BrandId = BrandId,
             SiteId = SiteId,
             FuelId = FuelId,
             CollectionMethod = CollectionMethod,

@@ -5,6 +5,9 @@ namespace AdelaideFuel.Shared
 {
     public class SitePriceDto : ISitePrice
     {
+        [JsonProperty("BrandId")]
+        public int BrandId { get; set; }
+
         [JsonProperty("SiteId")]
         public int SiteId { get; set; }
 

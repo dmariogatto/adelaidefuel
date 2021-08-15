@@ -1,8 +1,13 @@
 ﻿using AdelaideFuel.Api;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,17 +22,22 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
         private readonly ITableRepository<SitePriceArchiveEntity> _sitePriceArchiveRepository;
 
+        private readonly CloudStorageAccount _cloudStorageAccount;
+
         public SyncFuelPrices(
             ISaFuelPricingApi saFuelPricingApi,
             ITableRepository<SiteEntity> siteRepository,
             ITableRepository<SitePriceEntity> sitePriceRepository,
-            ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository)
+            ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository,
+            CloudStorageAccount cloudStorageAccount)
         {
             _saFuelPricingApi = saFuelPricingApi;
 
             _siteRepository = siteRepository;
             _sitePriceRepository = sitePriceRepository;
             _sitePriceArchiveRepository = sitePriceArchiveRepository;
+
+            _cloudStorageAccount = cloudStorageAccount;
         }
 
         [FunctionName(nameof(SyncFuelPrices))]
@@ -78,6 +88,30 @@ namespace AdelaideFuel.Functions
 
                 foreach (var i in independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId)))
                     i.Price *= 10;
+            }
+
+            var sitePriceDtos =
+                (from vals in priceEntities.Values
+                 from sp in vals
+                 orderby sp.TransactionDateUtc descending
+                 group sp by (sp.SiteId, sp.FuelId) into fuelGroup
+                 select fuelGroup.First().ToSitePrice()).ToList();
+
+            try
+            {
+                log.LogInformation("Updating site prices JSON file...");
+                var blobClient = _cloudStorageAccount.CreateCloudBlobClient();
+                var blobContainer = blobClient.GetContainerReference(Startup.BlobContainerName);
+                await blobContainer.CreateIfNotExistsAsync();
+                var blobSitePrices = blobContainer.GetBlockBlobReference("site_prices.json");
+                using var writer = new StreamWriter(await blobSitePrices.OpenWriteAsync());
+                using var jtw = new JsonTextWriter(writer);
+                JsonSerializer.CreateDefault().Serialize(jtw, sitePriceDtos);
+                log.LogInformation("Updated site prices JSON file");
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Error writing 'adelaidefuel/site_prices.json'");
             }
 
             await _sitePriceRepository.CreateIfNotExistsAsync(ct);
