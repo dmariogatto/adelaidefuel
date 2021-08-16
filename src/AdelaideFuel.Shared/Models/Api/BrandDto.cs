@@ -4,6 +4,7 @@ namespace AdelaideFuel.Shared
 {
     public class BrandDto : IBrand, IFuelLookup
     {
+        [JsonIgnore]
         public int Id => BrandId;
 
         [JsonProperty("BrandId")]
