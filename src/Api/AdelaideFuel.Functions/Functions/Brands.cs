@@ -1,15 +1,14 @@
+using AdelaideFuel.Functions.Services;
 using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -25,14 +24,16 @@ namespace AdelaideFuel.Functions
         private static readonly string[] ValidPostfix = new[] { "2x.png", "3x.png" };
 
         private readonly ITableRepository<BrandEntity> _brandRepository;
-        private readonly CloudBlobClient _cloudBlobClient;
+
+        private readonly IBlobService _blobService;
 
         public Brands(
             ITableRepository<BrandEntity> brandRepository,
-            CloudBlobClient cloudBlobClient)
+            IBlobService blobService)
         {
             _brandRepository = brandRepository;
-            _cloudBlobClient = cloudBlobClient;
+
+            _blobService = blobService;
         }
 
         [FunctionName(BrandFuncName)]
@@ -63,16 +64,14 @@ namespace AdelaideFuel.Functions
                 ValidPostfix.Any(i => fileName.EndsWith(i)) &&
                 int.TryParse(fileName.Substring(0, fileName.IndexOf("@")), out var brandId))
             {
-                var containerRef = _cloudBlobClient.GetContainerReference(Startup.BlobContainerName);
-                var brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
-
-                if (!await brandImgBlob.ExistsAsync(ct))
+                var blobImgPath = Path.Combine("brands", "imgs", fileName);
+                if (!await _blobService.ExistsAsync(blobImgPath, ct))
                 {
                     fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
-                    brandImgBlob = containerRef.GetBlobReference(Path.Combine("brands", "imgs", fileName));
+                    blobImgPath = Path.Combine("brands", "imgs", fileName);
                 }
 
-                using var stream = await brandImgBlob.OpenReadAsync(ct);
+                using var stream = await _blobService.OpenReadAsync(blobImgPath, ct);
                 using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream, ct);
 

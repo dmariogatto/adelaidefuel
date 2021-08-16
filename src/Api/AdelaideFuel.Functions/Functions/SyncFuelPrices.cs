@@ -1,13 +1,10 @@
 ﻿using AdelaideFuel.Api;
+using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,14 +19,14 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
         private readonly ITableRepository<SitePriceArchiveEntity> _sitePriceArchiveRepository;
 
-        private readonly CloudStorageAccount _cloudStorageAccount;
+        private readonly IBlobService _blobService;
 
         public SyncFuelPrices(
             ISaFuelPricingApi saFuelPricingApi,
             ITableRepository<SiteEntity> siteRepository,
             ITableRepository<SitePriceEntity> sitePriceRepository,
             ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository,
-            CloudStorageAccount cloudStorageAccount)
+            IBlobService blobService)
         {
             _saFuelPricingApi = saFuelPricingApi;
 
@@ -37,7 +34,7 @@ namespace AdelaideFuel.Functions
             _sitePriceRepository = sitePriceRepository;
             _sitePriceArchiveRepository = sitePriceArchiveRepository;
 
-            _cloudStorageAccount = cloudStorageAccount;
+            _blobService = blobService;
         }
 
         [FunctionName(nameof(SyncFuelPrices))]
@@ -86,7 +83,8 @@ namespace AdelaideFuel.Functions
                     61577296,
                 };
 
-                foreach (var i in independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId)))
+                var toUpdate = independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId));
+                foreach (var i in toUpdate)
                     i.Price *= 10;
             }
 
@@ -100,13 +98,7 @@ namespace AdelaideFuel.Functions
             try
             {
                 log.LogInformation("Updating site prices JSON file...");
-                var blobClient = _cloudStorageAccount.CreateCloudBlobClient();
-                var blobContainer = blobClient.GetContainerReference(Startup.BlobContainerName);
-                await blobContainer.CreateIfNotExistsAsync();
-                var blobSitePrices = blobContainer.GetBlockBlobReference("site_prices.json");
-                using var writer = new StreamWriter(await blobSitePrices.OpenWriteAsync());
-                using var jtw = new JsonTextWriter(writer);
-                JsonSerializer.CreateDefault().Serialize(jtw, sitePriceDtos);
+                await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.SitePricesJson, ct);
                 log.LogInformation("Updated site prices JSON file");
             }
             catch (Exception ex)

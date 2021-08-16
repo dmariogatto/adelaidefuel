@@ -1,16 +1,15 @@
 using AdelaideFuel.Api;
+using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Polly;
 using Refit;
 using System;
-using CloudBlobStorageAccount = Microsoft.Azure.Storage.CloudStorageAccount;
 using CloudTableStorageAccount = Microsoft.Azure.Cosmos.Table.CloudStorageAccount;
 
 [assembly: FunctionsStartup(typeof(AdelaideFuel.Functions.Startup))]
@@ -19,8 +18,6 @@ namespace AdelaideFuel.Functions
 {
     public class Startup : FunctionsStartup
     {
-        public const string BlobContainerName = "adelaidefuel";
-
         private readonly static string FuelApiUrl = Environment.GetEnvironmentVariable(nameof(FuelApiUrl)) ?? string.Empty;
         private readonly static string SubscriberToken = Environment.GetEnvironmentVariable(nameof(SubscriberToken)) ?? string.Empty;
 
@@ -66,20 +63,12 @@ namespace AdelaideFuel.Functions
                 CloudTableStorageAccount.Parse(getConnectionString(serviceProvider)));
 
             builder.Services.AddSingleton(serviceProvider =>
-                CloudBlobStorageAccount.Parse(getConnectionString(serviceProvider)));
-
-            builder.Services.AddSingleton(serviceProvider =>
             {
                 var storageAccount = serviceProvider.GetService<CloudTableStorageAccount>();
                 return storageAccount.CreateCloudTableClient();
             });
 
-            builder.Services.AddSingleton(serviceProvider =>
-            {
-                var storageAccount = serviceProvider.GetService<CloudBlobStorageAccount>();
-                return storageAccount.CreateCloudBlobClient();
-            });
-
+            builder.Services.AddSingleton<IBlobService>(sp => new BlobService(getConnectionString(sp)));
             builder.Services.AddSingleton<ITableRepository<BrandEntity>, TableRepository<BrandEntity>>();
             builder.Services.AddSingleton<ITableRepository<FuelEntity>, TableRepository<FuelEntity>>();
             builder.Services.AddSingleton<ITableRepository<GeographicRegionEntity>, TableRepository<GeographicRegionEntity>>();

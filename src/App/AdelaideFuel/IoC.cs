@@ -41,7 +41,6 @@ namespace AdelaideFuel
             Container.Register<IStoreFactory, StoreFactory>(Lifestyle.Singleton);
             Container.Register<IFuelService, FuelService>(Lifestyle.Singleton);
             Container.Register<IAppPreferences, AppPreferences>(Lifestyle.Singleton);
-            Container.Register<ITechnologyService, TechnologyService>(Lifestyle.Singleton);
             Container.Register<IRetryPolicyFactory, RetryPolicyFactory>(Lifestyle.Singleton);
             Container.Register<IBvmConstructor, BvmConstructor>(Lifestyle.Singleton);
 

@@ -1,17 +1,14 @@
+using AdelaideFuel.Functions.Services;
 using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,20 +17,22 @@ namespace AdelaideFuel.Functions
 {
     public class SitePrices
     {
+        public const string SitePricesJson = "site_prices.json";
+
         private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3.5);
 
         private readonly ITableRepository<SitePriceEntity> _sitePricesRepository;
 
-        private readonly CloudStorageAccount _cloudStorageAccount;
+        private readonly IBlobService _blobService;
 
         public SitePrices(
             ITableRepository<SitePriceEntity> sitePriceRepository,
-            CloudStorageAccount cloudStorageAccount)
+            IBlobService blobService)
         {
             _sitePricesRepository = sitePriceRepository;
 
-            _cloudStorageAccount = cloudStorageAccount;
+            _blobService = blobService;
         }
 
         [FunctionName(nameof(SitePrices))]
@@ -72,15 +71,7 @@ namespace AdelaideFuel.Functions
             {
                 try
                 {
-                    var blobClient = _cloudStorageAccount.CreateCloudBlobClient();
-                    var blobContainer = blobClient.GetContainerReference(Startup.BlobContainerName);
-                    var blobSitePrices = blobContainer.GetBlockBlobReference("site_prices.json");
-                    if (await blobSitePrices.ExistsAsync())
-                    {
-                        using var reader = new StreamReader(await blobSitePrices.OpenReadAsync());
-                        using var jtr = new JsonTextReader(reader);
-                        dtos = JsonSerializer.CreateDefault().Deserialize<List<SitePriceDto>>(jtr);
-                    }
+                    dtos = await _blobService.DeserialiseAsync<List<SitePriceDto>>(SitePricesJson, ct);
                 }
                 catch (Exception ex)
                 {
