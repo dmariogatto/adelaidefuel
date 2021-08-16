@@ -64,11 +64,13 @@ namespace AdelaideFuel.Functions
                 ValidPostfix.Any(i => fileName.EndsWith(i)) &&
                 int.TryParse(fileName.Substring(0, fileName.IndexOf("@")), out var brandId))
             {
-                var blobImgPath = Path.Combine("brands", "imgs", fileName);
+                var basePath = Path.Combine("brands", "imgs");
+
+                var blobImgPath = Path.Combine(basePath, fileName);
                 if (!await _blobService.ExistsAsync(blobImgPath, ct))
                 {
                     fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
-                    blobImgPath = Path.Combine("brands", "imgs", fileName);
+                    blobImgPath = Path.Combine(basePath, fileName);
                 }
 
                 using var stream = await _blobService.OpenReadAsync(blobImgPath, ct);
