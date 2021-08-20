@@ -17,7 +17,7 @@ namespace AdelaideFuel.UI.Views
         {
             InitializeComponent();
 
-            AdUnitId = $"{Constants.AdMobPublisherId}/{Constants.AdMobPricesUnitId}";
+            AdUnitId = Constants.AdMobPricesUnitId;
         }
 
         protected override void OnAppearing()

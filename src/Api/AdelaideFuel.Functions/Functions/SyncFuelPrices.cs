@@ -99,7 +99,7 @@ namespace AdelaideFuel.Functions
             {
                 log.LogInformation("Updating site prices JSON file...");
                 await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.SitePricesJson, ct);
-                log.LogInformation("Updated site prices JSON file");
+                log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
             }
             catch (Exception ex)
             {

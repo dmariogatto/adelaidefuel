@@ -76,11 +76,10 @@ namespace AdelaideFuel
 
         public static string AppCenterSecret => ValueForPlatform(AppCenterAndroidSecret, AppCenterIosSecret);
 
-        public static string AdMobPricesUnitId => ValueForPlatform(AdMobPricesAndroidUnitId, AdMobPricesIosUnitId);
-        public static string AdMobMapUnitId => ValueForPlatform(AdMobMapAndroidUnitId, AdMobMapIosUnitId);
+        public static string AdMobPricesUnitId => AdUnitId(ValueForPlatform(AdMobPricesAndroidUnitId, AdMobPricesIosUnitId));
+        public static string AdMobMapUnitId => AdUnitId(ValueForPlatform(AdMobMapAndroidUnitId, AdMobMapIosUnitId));
 
         private static Lazy<DevicePlatform> Platform => new Lazy<DevicePlatform>(() => IoC.Resolve<IDeviceInfo>().Platform);
-
         private static string ValueForPlatform(string android, string ios)
         {
             if (Platform.Value == DevicePlatform.Android)
@@ -90,5 +89,8 @@ namespace AdelaideFuel
 
             return string.Empty;
         }
+
+        private static string AdUnitId(string adUnitId)
+            => $"{AdMobPublisherId}/{adUnitId}";
     }
 }
