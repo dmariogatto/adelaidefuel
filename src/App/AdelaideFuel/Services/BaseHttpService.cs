@@ -9,11 +9,6 @@ namespace AdelaideFuel.Services
 {
     public class BaseHttpService : BaseService
     {
-        private readonly static JsonSerializer JsonSerializer = JsonSerializer.Create(new JsonSerializerSettings()
-        {
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc
-        });
-
         public BaseHttpService(ICacheService cacheService, ILogger logger) : base(cacheService, logger)
         {
         }
@@ -46,7 +41,7 @@ namespace AdelaideFuel.Services
             using var sr = new StreamReader(stream);
             using var jtr = new JsonTextReader(sr);
 
-            var result = JsonSerializer.Deserialize<T>(jtr);
+            var result = JsonSerializer.CreateDefault().Deserialize<T>(jtr);
             return result;
         }
     }
