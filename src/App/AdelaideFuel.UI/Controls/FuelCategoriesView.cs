@@ -91,7 +91,7 @@ namespace AdelaideFuel.UI.Controls
         private void FuelCategoriesSourceChanged(ObservableRangeCollection<FuelCategory> oldValue, ObservableRangeCollection<FuelCategory> newValue)
         {
             if (oldValue != null)
-                newValue.CollectionChanged -= CollectionChanged;
+                oldValue.CollectionChanged -= CollectionChanged;
 
             if (newValue != null)
                 newValue.CollectionChanged += CollectionChanged;
