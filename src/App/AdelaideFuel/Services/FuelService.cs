@@ -140,6 +140,9 @@ namespace AdelaideFuel.Services
                 }
                 else
                 {
+                    var sites = default(IList<SiteDto>);
+                    var prices = default(IList<SitePriceDto>);
+
                     try
                     {
                         var sitesTask = GetSitesAsync(cancellationToken);
@@ -149,28 +152,30 @@ namespace AdelaideFuel.Services
 
                         await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
 
-                        if (!cancellationToken.IsCancellationRequested)
-                        {
-                            sitePrices =
-                                (from sp in pricesTask.Result
-                                 join s in sitesTask.Result on sp.SiteId equals s.SiteId
-                                 join b in userBrandsTask.Result on s.BrandId equals b.Id
-                                 join f in userFuelsTask.Result on sp.FuelId equals f.Id
-                                 where b.IsActive && f.IsActive
-                                 orderby f.SortOrder, sp.Price, b.SortOrder
-                                 let sfp = new SiteFuelPrice(b, f, s, sp)
-                                 select sfp).ToList();
-                        }
+                        sites = sitesTask.Result;
+                        prices = pricesTask.Result;
                     }
                     catch (Exception ex)
                     {
                         Logger.Error(ex);
                     }
 
-                    if (sitePrices?.Any() == true)
+                    if (!cancellationToken.IsCancellationRequested && sites?.Any() == true && prices?.Any() == true)
                     {
-                        MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
-                        _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
+                        sitePrices =
+                            (from sp in prices
+                             join s in sites on sp.SiteId equals s.SiteId
+                             join b in userBrandsTask.Result on s.BrandId equals b.Id
+                             join f in userFuelsTask.Result on sp.FuelId equals f.Id
+                             where b.IsActive && f.IsActive
+                             orderby f.SortOrder, sp.Price, b.SortOrder
+                             select new SiteFuelPrice(b, f, s, sp)).ToList();
+
+                        if (sitePrices?.Any() == true)
+                        {
+                            MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
+                            _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
+                        }
                     }
                 }
             }
@@ -207,34 +212,47 @@ namespace AdelaideFuel.Services
                 return int.MaxValue;
             }
 
+            var fuelPriceData = new List<(SiteFuelPrice fp, double distanceKm, int radiusKm)>(pricesTask.Result.Count);
+            foreach (var fp in pricesTask.Result)
+            {
+                var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
+                var radiusKm = getRadiusKm(distanceKm, userRadii);
+                fuelPriceData.Add((fp, distanceKm, radiusKm));
+            }
+
             var fuelGroups =
-                (from fp in pricesTask.Result
-                 let distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1
-                 let radiusKm = getRadiusKm(distanceKm, userRadii)
-                 let fuelPrice = (fp, distanceKm, radiusKm)
-                 orderby fp.FuelSortOrder, radiusKm, fp.PriceInCents, distanceKm
-                 group fuelPrice by fp.FuelId into fg
+                (from fpd in fuelPriceData
+                 orderby fpd.fp.FuelSortOrder, fpd.radiusKm, fpd.fp.PriceInCents, fpd.distanceKm
+                 group fpd by fpd.fp.FuelId into fg
                  join f in userFuels on fg.Key equals f.Id
-                 let prices = fg
-                        .GroupBy(i => i.radiusKm)
-                        .Select(g => g.First())
-                        .Select(i => new SiteFuelPriceItem(i.fp)
-                        {
-                            LastKnowDistanceKm = i.distanceKm,
-                            RadiusKm = i.radiusKm
-                        })
-                 select new SiteFuelPriceItemGroup(f, prices)).ToList();
+                 select new SiteFuelPriceItemGroup(f,
+                    fg.GroupBy(i => i.radiusKm)
+                      .Select(g => g.First())
+                      .Select(i => new SiteFuelPriceItem(i.fp)
+                      {
+                        LastKnowDistanceKm = i.distanceKm,
+                        RadiusKm = i.radiusKm
+                      }).ToList())).ToList();
+
+
+            var toRemove = new List<SiteFuelPriceItem>();
 
             foreach (var g in fuelGroups)
             {
+                toRemove.Clear();
+
                 var cheapest = g.First();
-                foreach (var fp in g.Skip(1).ToList())
+                for (var i = 1; i < g.Count; i++)
                 {
+                    var fp = g[i];
+
                     if (fp.PriceInCents >= cheapest.PriceInCents)
-                        g.Remove(fp);
+                        toRemove.Add(fp);
                     else
                         cheapest = fp;
                 }
+
+                g.RemoveRange(toRemove);
             }
 
             return fuelGroups;

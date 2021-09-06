@@ -211,8 +211,7 @@ namespace AdelaideFuel.ViewModels
                     priceLookup?.TryGetValue(fpg.Key.Id, out prices);
                     prices ??= Array.Empty<SiteFuelPriceItem>();
 
-                    var groupItems = fpg.Items.ToList();
-                    for (var i = 0; i < groupItems.Count; i++)
+                    for (var i = 0; i < fpg.Items.Count; i++)
                     {
                         if (i < prices.Count)
                         {
