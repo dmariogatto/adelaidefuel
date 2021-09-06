@@ -223,7 +223,7 @@ namespace AdelaideFuel.ViewModels
                             .ToDictionary(g => g.Key, g => g.ToList());
                         var fuelPrices = pricesTask.Result
                             .Where(i => i.FuelId == Fuel.Id)
-                            .Select(i => i.PriceInCents).ToArray();
+                            .Select(i => i.PriceInCents).ToList();
 
                         var validCategories = default(IList<FuelCategory>);
 
@@ -236,11 +236,11 @@ namespace AdelaideFuel.ViewModels
                         var q375 = (q1 + q2) / 2d;
                         var q625 = (q2 + q3) / 2d;
 
-                        if (fuelPrices.Length == 0)
+                        if (fuelPrices.Count == 0)
                         {
                             validCategories = Array.Empty<FuelCategory>();
                         }
-                        else if (fuelPrices.Length < Statistics.MinLengthForFns)
+                        else if (fuelPrices.Count < Statistics.MinLengthForFns)
                         {
                             // set this for the categorisation below
                             q1 = fuelPrices.Max();

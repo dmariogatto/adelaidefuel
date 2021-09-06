@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdelaideFuel
 {
@@ -6,10 +8,24 @@ namespace AdelaideFuel
     {
         public const int MinLengthForFns = 2;
 
-        public static double[] FiveNumberSummary(double[] array, bool sorted = true)
+        public static double[] FiveNumberSummary(IList<double> values, bool sorted = true)
         {
-            if (array.Length < MinLengthForFns) return new[] { 0d, 0d, 0d, 0d, 0d };
-            if (!sorted) Array.Sort(array);
+            if (values.Count < MinLengthForFns) return new[] { 0d, 0d, 0d, 0d, 0d };
+            if (!sorted)
+            {
+                switch (values)
+                {
+                    case double[] array:
+                        Array.Sort(array);
+                        break;
+                    case List<double> list:
+                        list.Sort();
+                        break;
+                    default:
+                        values = values.OrderBy(i => i).ToList();
+                        break;
+                }
+            }
 
             var percentages = new[] { 0d, 25d, 50d, 75d, 100d };
             var quatiles = new double[percentages.Length];
@@ -20,25 +36,25 @@ namespace AdelaideFuel
 
                 if (p >= 100)
                 {
-                    quatiles[i] = array[array.Length - 1];
+                    quatiles[i] = values[values.Count - 1];
                     continue;
                 }
 
-                var position = (array.Length + 1) * p / 100d;
+                var position = (values.Count + 1) * p / 100d;
                 var leftNum = 0d;
                 var rightNum = 0d;
 
-                var n = p / 100d * (array.Length - 1) + 1d;
+                var n = p / 100d * (values.Count - 1) + 1d;
 
                 if (position >= 1)
                 {
-                    leftNum = array[(int)Math.Floor(n) - 1];
-                    rightNum = array[(int)Math.Floor(n)];
+                    leftNum = values[(int)Math.Floor(n) - 1];
+                    rightNum = values[(int)Math.Floor(n)];
                 }
                 else
                 {
-                    leftNum = array[0];
-                    rightNum = array[1];
+                    leftNum = values[0];
+                    rightNum = values[1];
                 }
 
                 if (leftNum == rightNum)
