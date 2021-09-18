@@ -4,10 +4,10 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.9.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.18" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.18" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.19" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.19" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
     <PackageReference Include="Refit.HttpClientFactory" Version="6.0.94" />
   </ItemGroup>

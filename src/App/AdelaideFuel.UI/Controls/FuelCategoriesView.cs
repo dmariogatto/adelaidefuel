@@ -55,8 +55,10 @@ namespace AdelaideFuel.UI.Controls
 
             if (FuelCategories?.Any() == true)
             {
-                FuelCategories.ForEach((i, v) =>
+                for (var i = 0; i < FuelCategories.Count; i++)
                 {
+                    var v = FuelCategories[i];
+
                     var tintImg = new TintImage();
                     tintImg.HeightRequest = tintImg.WidthRequest = 24;
                     tintImg.HorizontalOptions = LayoutOptions.Center;
@@ -84,7 +86,7 @@ namespace AdelaideFuel.UI.Controls
                         Children.Add(separator, ColumnDefinitions.Count - 1, 0);
                         SetRowSpan(separator, 2);
                     }
-                });
+                }
             }
         }
 
