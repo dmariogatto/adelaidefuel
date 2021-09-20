@@ -221,10 +221,10 @@ namespace AdelaideFuel.UI.Views
                 return;
 
             var drawer = BottomDrawerControl;
-            var layout = (StackLayout)BottomDrawerControl.Content;
+            var layout = (Layout<View>)BottomDrawerControl.Content;
             var offset = double.MaxValue;
 
-            double getControlHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
+            static double getControlHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
 
             var lockStates = new List<double>() { 0 };
             var heightAcc = drawer.Padding.Top;
