@@ -35,7 +35,7 @@
                     Spacing="0">
                     <Label Style="{DynamicResource LabelTitleStyle}" Text="{Binding Key.Name}" />
                     <yummy:PancakeView Style="{DynamicResource CardStyle}">
-                        <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceTemplate}" BindableLayout.ItemsSource="{Binding Items}" />
+                        <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceTemplate}" BindableLayout.ItemsSource="{Binding .}" />
                     </yummy:PancakeView>
                 </StackLayout>
             </DataTemplate>
