@@ -21,7 +21,7 @@ namespace AdelaideFuel.Services
         public CultureInfo GetCurrentCultureInfo()
         {
             var netLanguage = AndroidToDotnetLanguage(Java.Util.Locale.Default.ToString().Replace("_", "-"));
-           
+
             if (!_cultures.ContainsKey(netLanguage))
             {
                 // this gets called a lot - try/catch can be expensive so consider caching or something
