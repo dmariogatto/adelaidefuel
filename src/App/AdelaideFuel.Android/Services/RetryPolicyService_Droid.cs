@@ -9,7 +9,6 @@ namespace AdelaideFuel.Droid.Services
     {
         public PolicyBuilder GetNativeNetRetryPolicy() =>
             Policy.Handle<Java.Net.SocketException>()
-                  .Or<Java.Net.SocketException>()
                   .Or<Java.IO.IOException>();
     }
 }
