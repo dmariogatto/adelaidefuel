@@ -17,10 +17,10 @@ namespace AdelaideFuel.Storage
         string Name { get; }
 
         Task<bool> RemoveAsync(string key, CancellationToken cancellationToken);
-        Task<bool> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken);
+        Task<int> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken);
 
-        Task<bool> EmptyAllAsync(CancellationToken cancellationToken);
-        Task<bool> EmptyExpiredAsync(CancellationToken cancellationToken);
+        Task<int> EmptyAllAsync(CancellationToken cancellationToken);
+        Task<int> EmptyExpiredAsync(CancellationToken cancellationToken);
 
         Task<bool> ExistsAsync(string key, CancellationToken cancellationToken);
         Task<IList<(string, ItemState)>> GetKeysAsync(CancellationToken cancellationToken);
@@ -34,7 +34,7 @@ namespace AdelaideFuel.Storage
     public interface IStore<T> : IStore where T : class
     {
         Task<bool> UpsertAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken);
-        Task<bool> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken);
+        Task<int> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken);
         Task<bool> UpdateAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken);
         Task<IList<T>> AllAsync(bool includeExpired, CancellationToken cancellationToken);
         Task<T> GetAsync(string key, bool includeExpired, CancellationToken cancellationToken);

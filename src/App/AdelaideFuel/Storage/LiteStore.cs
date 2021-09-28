@@ -207,9 +207,9 @@ namespace AdelaideFuel.Storage
             return success;
         }
 
-        public async Task<bool> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken)
+        public async Task<int> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken)
         {
-            var success = false;
+            var count = -1;
 
             try
             {
@@ -223,18 +223,16 @@ namespace AdelaideFuel.Storage
                         Contents = i.data
                     });
 
-                await _retryPolicy.ExecuteAsync(
+                count = await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.Upsert(storeItems)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
-
-                success = true;
             }
             catch (LiteException ex)
             {
                 LogError(ex, string.Empty);
             }
 
-            return success;
+            return count;
         }
 
         public async Task<bool> UpdateAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken)
@@ -290,67 +288,63 @@ namespace AdelaideFuel.Storage
             return success;
         }
 
-        public async Task<bool> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
+        public async Task<int> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
         {
-            var success = false;
+            var count = -1;
 
             try
             {
                 var bsonKeys = keys.Where(k => !string.IsNullOrEmpty(k))
                                    .Select(k => new BsonValue(k)).ToList();
                 var query = Query.In(IdColumn, bsonKeys);
-                var count = await _retryPolicy.ExecuteAsync(
+                count = await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.DeleteMany(query)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
-
-                success = true;
             }
             catch (LiteException ex)
             {
                 LogError(ex, string.Empty);
             }
 
-            return success;
+            return count;
         }
         #endregion
 
         #region Empty Methods
-        public async Task<bool> EmptyExpiredAsync(CancellationToken cancellationToken)
+        public async Task<int> EmptyExpiredAsync(CancellationToken cancellationToken)
         {
-            var success = false;
+            var count = -1;
 
             try
             {
-                var deleted = await _retryPolicy.ExecuteAsync(
+                count = await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.DeleteMany(i => i.DateExpires < DateTime.UtcNow)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
-                success = true;
             }
             catch (LiteException ex)
             {
                 LogError(ex, string.Empty);
             }
 
-            return success;
+            return count;
         }
 
-        public async Task<bool> EmptyAllAsync(CancellationToken cancellationToken)
+        public async Task<int> EmptyAllAsync(CancellationToken cancellationToken)
         {
-            var success = false;
+            var count = -1;
 
             try
             {
-                var deleted = await _retryPolicy.ExecuteAsync(
+                count = await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.DeleteAll()).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
-                success = true;
             }
             catch (LiteException ex)
             {
                 LogError(ex, string.Empty);
             }
 
-            return success;
+            return count;
         }
         #endregion
 
@@ -388,17 +382,10 @@ namespace AdelaideFuel.Storage
 
         private static DateTime GetExpiration(TimeSpan timeSpan)
         {
-            try
-            {
-                return DateTime.UtcNow.Add(timeSpan);
-            }
-            catch
-            {
-                if (timeSpan.Milliseconds < 0)
-                    return DateTime.MinValue;
-
+            if (timeSpan == TimeSpan.MaxValue)
                 return DateTime.MaxValue;
-            }
+
+            return DateTime.UtcNow.Add(timeSpan);
         }
 
         private static string GetCollectionNameByType()

@@ -414,7 +414,7 @@ namespace AdelaideFuel.Services
             return result ?? Array.Empty<UserBrand>();
         }
 
-        public Task UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken)
+        public Task<int> UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken)
             => UpsertUserEntitiesAsync(brands, cancellationToken);
 
         public async Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken)
@@ -442,7 +442,7 @@ namespace AdelaideFuel.Services
             return result ?? Array.Empty<UserFuel>();
         }
 
-        public Task UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken)
+        public Task<int> UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken)
             => UpsertUserEntitiesAsync(fuels, cancellationToken);
 
         public async Task<IList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken)
@@ -470,10 +470,10 @@ namespace AdelaideFuel.Services
             return result ?? Array.Empty<UserRadius>();
         }
 
-        public Task UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+        public Task<int> UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
             => UpsertUserEntitiesAsync(radii, cancellationToken);
 
-        public Task RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+        public Task<int> RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
             => RemoveUserEntitiesAsync(radii, cancellationToken);
 
         private async Task<IList<T>> SyncSortableEntitiesWithApiAsync<T, V>(IList<V> apiEntities, IList<T> userEntities, CancellationToken cancellationToken)
@@ -530,19 +530,19 @@ namespace AdelaideFuel.Services
             return result;
         }
 
-        private Task UpsertUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
+        private Task<int> UpsertUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
             => entities?.Any() == true
                ? _storeFactory
                     .GetUserStore<T>()
                     .UpsertRangeAsync(entities.Select(e => (e.Id.ToString(CultureInfo.InvariantCulture), e)).ToList(), TimeSpan.MaxValue, cancellationToken)
-               : Task.CompletedTask;
+               : Task.FromResult(0);
 
-        private Task RemoveUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
+        private Task<int> RemoveUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
             => entities?.Any() == true
                ? _storeFactory
                     .GetUserStore<T>()
                     .RemoveRangeAsync(entities.Select(e => e.Id.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken)
-               : Task.CompletedTask;
+               : Task.FromResult(0);
 
         private async Task<TResponse> GetResponseAsync<TResponse>(string cacheKey, Func<CancellationToken, Task<TResponse>> apiRequest, CancellationToken cancellationToken, TimeSpan? cacheTimeSpan = null)
             where TResponse : class
