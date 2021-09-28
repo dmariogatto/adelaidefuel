@@ -25,13 +25,13 @@ namespace AdelaideFuel.Services
         Task<bool> SyncAllAsync(CancellationToken cancellationToken);
 
         Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken);
-        Task UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken);
+        Task<int> UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken);
 
         Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken);
-        Task UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken);
+        Task<int> UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken);
 
         Task<IList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken);
-        Task UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
-        Task RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
+        Task<int> UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
+        Task<int> RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
     }
 }
