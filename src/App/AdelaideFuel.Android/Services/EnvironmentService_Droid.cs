@@ -1,10 +1,11 @@
-﻿using Android.Content.Res;
+﻿using AdelaideFuel.Services;
+using Android.Content.Res;
 using Android.OS;
 using Android.Runtime;
 using System;
 using Xamarin.Essentials;
 
-namespace AdelaideFuel.Services
+namespace AdelaideFuel.Droid.Services
 {
     [Preserve(AllMembers = true)]
     public class EnvironmentService_Droid : IEnvironmentService

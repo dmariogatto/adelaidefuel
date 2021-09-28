@@ -5,7 +5,7 @@ using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
-namespace AdelaideFuel.Services
+namespace AdelaideFuel.Droid.Services
 {
     [Preserve(AllMembers = true)]
     public class RendererService_Droid : IRendererService

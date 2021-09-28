@@ -1,7 +1,8 @@
-﻿using Android.Runtime;
+﻿using AdelaideFuel.Services;
+using Android.Runtime;
 using Polly;
 
-namespace AdelaideFuel.Services
+namespace AdelaideFuel.Droid.Services
 {
     [Preserve(AllMembers = true)]
     public class RetryPolicyService_Droid : IRetryPolicyService

@@ -1,4 +1,5 @@
-﻿using AdelaideFuel.Services;
+﻿using AdelaideFuel.Droid.Services;
+using AdelaideFuel.Services;
 using AdelaideFuel.UI.Services;
 using Android.App;
 using Android.Runtime;

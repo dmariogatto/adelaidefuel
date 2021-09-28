@@ -1,10 +1,11 @@
 ﻿using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using Android.Runtime;
 using System;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
-namespace AdelaideFuel.Services
+namespace AdelaideFuel.Droid.Services
 {
     [Preserve(AllMembers = true)]
     public class UserNativeService_Droid : UserNativeReadOnlyService_Droid, IUserNativeService

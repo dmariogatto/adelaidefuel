@@ -1,11 +1,12 @@
 ﻿using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using Android.Runtime;
 using Android.Text.Format;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 
-namespace AdelaideFuel.Services
+namespace AdelaideFuel.Droid.Services
 {
     [Preserve(AllMembers = true)]
     public class LocaliseService_Droid : ILocalise
