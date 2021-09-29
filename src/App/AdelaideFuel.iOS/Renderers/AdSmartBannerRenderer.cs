@@ -37,9 +37,8 @@ namespace AdelaideFuel.iOS.Renderers
 
                 if (_bannerView == null)
                 {
-                    var adSize = rvc.View?.Frame.Size is CGSize size
-                        ? AdSizeCons.GetCurrentOrientationAnchoredAdaptiveBannerAdSize(size)
-                        : AdSizeCons.SmartBannerPortrait;
+                    var size = rvc.View?.Frame.Size ?? UIScreen.MainScreen.Bounds.Size;
+                    var adSize = AdSizeCons.GetCurrentOrientationAnchoredAdaptiveBannerAdSize(size.Width);
 
                     _bannerView = new BannerAdView(adSize)
                     {
