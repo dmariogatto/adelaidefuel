@@ -82,7 +82,7 @@
             <x:Double x:Key="LargeSpacing">16</x:Double>
             <x:Double x:Key="XLargeSpacing">20</x:Double>
 
-            <Thickness x:Key="ItemMargin">7,3,7,3</Thickness>
+            <Thickness x:Key="ItemMargin">8,4,8,4</Thickness>
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
