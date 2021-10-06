@@ -4,6 +4,7 @@ using AdelaideFuel.Shared;
 using AdelaideFuel.Storage;
 using Polly;
 using Polly.Retry;
+using Refit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -230,8 +231,8 @@ namespace AdelaideFuel.Services
                       .Select(g => g.First())
                       .Select(i => new SiteFuelPriceItem(i.fp)
                       {
-                        LastKnowDistanceKm = i.distanceKm,
-                        RadiusKm = i.radiusKm
+                          LastKnowDistanceKm = i.distanceKm,
+                          RadiusKm = i.radiusKm
                       }).ToList())).ToList();
 
 
@@ -571,7 +572,18 @@ namespace AdelaideFuel.Services
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(ex);
+                        var url = string.Empty;
+
+                        switch (ex)
+                        {
+                            case ApiException apiEx:
+                                url = apiEx.Uri.ToString();
+                                break;
+                        }
+
+                        Logger.Error(ex, !string.IsNullOrEmpty(url)
+                            ? new Dictionary<string, string>() { { nameof(url), url } }
+                            : null);
                     }
                 }
 

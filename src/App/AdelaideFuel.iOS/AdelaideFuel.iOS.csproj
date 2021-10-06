@@ -195,8 +195,8 @@
     <PackageReference Include="Xamarin.Forms.PancakeView">
       <Version>2.3.0.759</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Google.iOS.MobileAds">
-      <Version>7.66.0</Version>
+    <PackageReference Include="Cats.iOS.AdMob">
+      <Version>8.11.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

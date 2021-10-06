@@ -27,9 +27,7 @@ namespace AdelaideFuel.iOS.Services
             {
                 try
                 {
-                    var currentUIViewController = GetVisibleViewController();
-                    var userInterfaceStyle = currentUIViewController.TraitCollection.UserInterfaceStyle;
-
+                    var userInterfaceStyle = UIScreen.MainScreen.TraitCollection.UserInterfaceStyle;
                     switch (userInterfaceStyle)
                     {
                         case UIUserInterfaceStyle.Light:
@@ -49,23 +47,6 @@ namespace AdelaideFuel.iOS.Services
             }
 
             return theme;
-        }
-
-        private static UIViewController GetVisibleViewController()
-        {
-            var rootController = UIApplication.SharedApplication.KeyWindow.RootViewController;
-
-            switch (rootController.PresentedViewController)
-            {
-                case UINavigationController navigationController:
-                    return navigationController.TopViewController;
-                case UITabBarController tabBarController:
-                    return tabBarController.SelectedViewController;
-                case null:
-                    return rootController;
-                default:
-                    return rootController.PresentedViewController;
-            }
         }
     }
 }
