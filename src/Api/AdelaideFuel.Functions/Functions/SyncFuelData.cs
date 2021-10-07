@@ -3,6 +3,7 @@ using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,9 +52,12 @@ namespace AdelaideFuel.Functions
             var fuelsTask = _saFuelPricingApi.GetFuelTypesAsync(ct);
             var geographicRegionsTask = _saFuelPricingApi.GetCountryGeographicRegionsAsync(ct);
             var sitesTask = _saFuelPricingApi.GetFullSiteDetailsAsync(ct);
-            var pricesTask = _sitePriceRepository.GetAllEntitiesAsync(ct);
+            var pricesTask = _saFuelPricingApi.GetPricesAsync(ct);
 
             await Task.WhenAll(brandsTask, fuelsTask, geographicRegionsTask, sitesTask, pricesTask);
+
+            var activeFuelIds = new HashSet<int>(pricesTask.Result.SitePrices.Select(i => i.FuelId));
+            var activeSiteIds = new HashSet<int>(pricesTask.Result.SitePrices.Select(i => i.SiteId));
 
             sw.Stop();
             log.LogInformation($"Finished API calls in {sw.ElapsedMilliseconds}...");
@@ -68,7 +72,7 @@ namespace AdelaideFuel.Functions
                 .ToDictionary(g => g.Key, g => g.Take(1).ToList());
             var fuelEntities =
                 (from f in fuelsTask.Result.Fuels
-                 where pricesTask.Result.Any(p => p.FuelId == f.FuelId)
+                 where activeFuelIds.Contains(f.FuelId)
                  let fe = new FuelEntity(f)
                  group fe by fe.PartitionKey into g
                  select g)
@@ -81,7 +85,7 @@ namespace AdelaideFuel.Functions
                 .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
             var siteEntities =
                 (from s in sitesTask.Result.Sites
-                 where pricesTask.Result.Any(p => p.SiteId == s.SiteId)
+                 where activeSiteIds.Contains(s.SiteId)
                  let se = new SiteEntity(s)
                  group se by se.PartitionKey into g
                  select g)

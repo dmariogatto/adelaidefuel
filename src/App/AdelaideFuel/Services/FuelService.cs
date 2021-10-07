@@ -21,7 +21,7 @@ namespace AdelaideFuel.Services
 {
     public class FuelService : BaseHttpService, IFuelService
     {
-        private TimeSpan CacheExpireTimeSpan => TimeSpan.FromHours(12);
+        private readonly static TimeSpan CacheExpireTimeSpan = TimeSpan.FromHours(12);
 
         private readonly int[] _defaultRadii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
 

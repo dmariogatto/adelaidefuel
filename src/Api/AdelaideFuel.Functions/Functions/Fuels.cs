@@ -15,11 +15,14 @@ namespace AdelaideFuel.Functions
     public class Fuels
     {
         private readonly ITableRepository<FuelEntity> _fuelRepository;
+        private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
 
         public Fuels(
-            ITableRepository<FuelEntity> fuelRepository)
+            ITableRepository<FuelEntity> fuelRepository,
+            ITableRepository<SitePriceEntity> sitePriceRepository)
         {
             _fuelRepository = fuelRepository;
+            _sitePriceRepository = sitePriceRepository;
         }
 
         [FunctionName(nameof(Fuels))]
@@ -35,6 +38,28 @@ namespace AdelaideFuel.Functions
                 .ThenBy(s => s.Name)
                 .ThenBy(s => s.FuelId)
                 .Select(s => s.ToFuel()).ToList();
+        }
+
+        [FunctionName(nameof(EmptyFuels))]
+        public async Task<IList<FuelDto>> EmptyFuels(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Fuels/Empty")] HttpRequest req,
+            ILogger log,
+            CancellationToken ct)
+        {
+            var fuelsTask = _fuelRepository.GetAllEntitiesAsync(ct);
+            var sitePricesTask = _sitePriceRepository.GetAllEntitiesAsync(ct);
+
+            await Task.WhenAll(fuelsTask, sitePricesTask);
+
+            var activeFuelIds = new HashSet<int>(sitePricesTask.Result
+                .Where(i => i.IsActive)
+                .Select(i => i.FuelId));
+
+            var emptyFuels = fuelsTask.Result
+                .Where(i => i.IsActive && !activeFuelIds.Contains(i.FuelId))
+                .ToList();
+
+            return emptyFuels.Select(i => i.ToFuel()).ToList();
         }
     }
 }

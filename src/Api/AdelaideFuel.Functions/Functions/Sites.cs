@@ -15,11 +15,14 @@ namespace AdelaideFuel.Functions
     public class Sites
     {
         private readonly ITableRepository<SiteEntity> _siteRepository;
+        private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
 
         public Sites(
-            ITableRepository<SiteEntity> siteRepository)
+            ITableRepository<SiteEntity> siteRepository,
+            ITableRepository<SitePriceEntity> sitePriceRepository)
         {
             _siteRepository = siteRepository;
+            _sitePriceRepository = sitePriceRepository;
         }
 
         [FunctionName(nameof(Sites))]
@@ -33,6 +36,28 @@ namespace AdelaideFuel.Functions
                 ? await _siteRepository.GetAllEntitiesAsync(ct)
                 : await _siteRepository.GetPartitionAsync(brandId, ct);
             return sites.Where(s => s.IsActive).Select(s => s.ToSite()).ToList();
+        }
+
+        [FunctionName(nameof(EmptySites))]
+        public async Task<IList<SiteDto>> EmptySites(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Sites/Empty")] HttpRequest req,
+            ILogger log,
+            CancellationToken ct)
+        {
+            var sitesTask = _siteRepository.GetAllEntitiesAsync(ct);
+            var sitePricesTask = _sitePriceRepository.GetAllEntitiesAsync(ct);
+
+            await Task.WhenAll(sitesTask, sitePricesTask);
+
+            var activeSiteIds = new HashSet<int>(sitePricesTask.Result
+                .Where(i => i.IsActive)
+                .Select(i => i.SiteId));
+
+            var emptySites = sitesTask.Result
+                .Where(i => i.IsActive && !activeSiteIds.Contains(i.SiteId))
+                .ToList();
+
+            return emptySites.Select(i => i.ToSite()).ToList();
         }
     }
 }
