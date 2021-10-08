@@ -195,9 +195,11 @@ namespace AdelaideFuel.Storage
                     Contents = data
                 };
 
-                success = await _retryPolicy.ExecuteAsync(
+                await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.Upsert(item)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
+
+                success = true;
             }
             catch (LiteException ex)
             {
@@ -243,7 +245,7 @@ namespace AdelaideFuel.Storage
             if (data == null)
                 throw new ArgumentNullException("Data can not be null.", nameof(data));
 
-            var updated = false;
+            var success = false;
 
             try
             {
@@ -255,16 +257,18 @@ namespace AdelaideFuel.Storage
                     Contents = data
                 };
 
-                updated = await _retryPolicy.ExecuteAsync(
+                await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.Update(item)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
+
+                success = true;
             }
             catch (LiteException ex)
             {
                 LogError(ex, key);
             }
 
-            return updated;
+            return success;
         }
 
         public async Task<bool> RemoveAsync(string key, CancellationToken cancellationToken)
@@ -276,9 +280,11 @@ namespace AdelaideFuel.Storage
 
             try
             {
-                success = await _retryPolicy.ExecuteAsync(
+                await _retryPolicy.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.Delete(key)).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
+
+                success = true;
             }
             catch (LiteException ex)
             {
