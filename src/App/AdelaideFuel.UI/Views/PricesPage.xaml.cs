@@ -11,11 +11,15 @@ namespace AdelaideFuel.UI.Views
 {
     public partial class PricesPage : BaseAdPage<PricesViewModel>
     {
+        private readonly IPermissions _permissions;
+
         private CancellationTokenSource _timerCancellation;
 
         public PricesPage() : base()
         {
             InitializeComponent();
+
+            _permissions = IoC.Resolve<IPermissions>();
 
             AdUnitId = Constants.AdMobPricesUnitId;
         }
@@ -24,7 +28,7 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            IoC.Resolve<IPermissions>().CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+            _permissions.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
                 .ContinueWith(
                     r => SetupAutoRefresh(),
                     TaskScheduler.FromCurrentSynchronizationContext());
