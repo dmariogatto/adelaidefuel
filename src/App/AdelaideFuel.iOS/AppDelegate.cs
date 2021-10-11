@@ -25,8 +25,10 @@ namespace AdelaideFuel.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
+            // Linker
             var types = new[]
             {
+                // AdMob
                 typeof(JavaScriptCore.JSContext)
             };
 
@@ -70,13 +72,13 @@ namespace AdelaideFuel.iOS
             // <key>NSUserTrackingUsageDescription</key>
             // <string>Personalised ads for the best experience.</string>
 
-            //if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
-            //{
-            //    var tabAppearance = new UITabBarAppearance();
-            //    tabAppearance.ConfigureWithOpaqueBackground();
-            //    UITabBar.Appearance.StandardAppearance = tabAppearance;
-            //    UITabBar.Appearance.ScrollEdgeAppearance = tabAppearance;
-            //}
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                var tabAppearance = new UITabBarAppearance();
+                tabAppearance.ConfigureWithOpaqueBackground();
+                UITabBar.Appearance.StandardAppearance = tabAppearance;
+                UITabBar.Appearance.ScrollEdgeAppearance = tabAppearance;
+            }
 
             return base.FinishedLaunching(app, options);
         }
