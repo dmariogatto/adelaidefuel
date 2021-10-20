@@ -25,7 +25,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <AndroidLinkMode>Full</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <AndroidKeyStore>false</AndroidKeyStore>
     <AndroidSigningKeyStore>
     </AndroidSigningKeyStore>
@@ -52,7 +52,7 @@
     <MandroidI18n />
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
@@ -69,11 +69,10 @@
     <AotAssemblies>true</AotAssemblies>
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidDexTool>d8</AndroidDexTool>
-    <AndroidSupportedAbis>
-    </AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <EnableLLVM>true</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidPackageFormat>aab</AndroidPackageFormat>
