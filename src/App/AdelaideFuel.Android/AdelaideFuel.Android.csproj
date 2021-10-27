@@ -25,7 +25,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <AndroidLinkMode>Full</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <AndroidKeyStore>false</AndroidKeyStore>
     <AndroidSigningKeyStore>
     </AndroidSigningKeyStore>
@@ -52,7 +52,7 @@
     <MandroidI18n />
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
@@ -69,11 +69,10 @@
     <AotAssemblies>true</AotAssemblies>
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidDexTool>d8</AndroidDexTool>
-    <AndroidSupportedAbis>
-    </AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
     <EnableLLVM>true</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidPackageFormat>aab</AndroidPackageFormat>
@@ -97,11 +96,11 @@
     <PackageReference Include="Plugin.StoreReview" Version="3.1.0" />
     <PackageReference Include="Sharpnado.Forms.HorizontalListView" Version="1.8.2" />
     <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2125" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
-    <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.2.2" />
+    <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.3.0" />
     <PackageReference Include="Xamarin.Forms.PancakeView" Version="2.3.0.759" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.3.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.3.0.1" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.3" />
   </ItemGroup>
   <ItemGroup>

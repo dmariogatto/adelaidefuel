@@ -9,6 +9,8 @@ namespace AdelaideFuel
 {
     public static class EssentialExtensions
     {
+        private static readonly Lazy<IPermissions> Permissions = new Lazy<IPermissions>(() => IoC.Resolve<IPermissions>());
+
         public static double HeightScaled(this IDeviceDisplay deviceDisplay)
             => deviceDisplay.MainDisplayInfo.Height / deviceDisplay.MainDisplayInfo.Density;
         public static double WidthScaled(this IDeviceDisplay deviceDisplay)
@@ -34,14 +36,11 @@ namespace AdelaideFuel
 
             try
             {
-                var status = await IoC.Resolve<IPermissions>().CheckAndRequestAsync<Permissions.LocationWhenInUse>()
-                    .ConfigureAwait(false);
+                var status = await Permissions.Value.CheckAndRequestAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
                 if (status == PermissionStatus.Granted)
                 {
-                    location = await geolocation.GetLastKnownLocationAsync().ConfigureAwait(false) ??
-                        await geolocation.GetLocationAsync(
-                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(2.5)),
-                            cancellationToken).ConfigureAwait(false);
+                    var locRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5));
+                    location = await geolocation.GetLocationAsync(locRequest, cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
