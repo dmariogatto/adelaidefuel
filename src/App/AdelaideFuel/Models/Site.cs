@@ -19,6 +19,8 @@ namespace AdelaideFuel.Models
             Latitude = site.Latitude;
             Longitude = site.Longitude;
 
+            Position = new Coords(Latitude, Longitude);
+
             OpeningHours = site.GetOpeningHours();
             Prices = new ObservableRangeCollection<SiteFuelPrice>();
         }
@@ -29,8 +31,8 @@ namespace AdelaideFuel.Models
             get => _selectedFuelPrice;
             set
             {
-                SetProperty(ref _selectedFuelPrice, value);
-                OnPropertyChanged(nameof(Description));
+                if (SetProperty(ref _selectedFuelPrice, value))
+                    OnPropertyChanged(nameof(Description));
             }
         }
 
@@ -105,8 +107,8 @@ namespace AdelaideFuel.Models
         public string Description => SelectedFuelPrice != null
             ? string.Format(Resources.ItemDashItem, SelectedFuelPrice.FuelName, SelectedFuelPrice.PriceInCents)
             : Address;
-        public Coords Position => new Coords(Latitude, Longitude);
-        public int ZIndex => 1000;
+        public Coords Position { get; private set; }
+        public int ZIndex { get; private set; } = 1000;
         #endregion
     }
 }
