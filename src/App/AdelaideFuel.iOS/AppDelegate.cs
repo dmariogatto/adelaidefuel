@@ -25,6 +25,13 @@ namespace AdelaideFuel.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
+            // Linker
+            var types = new[]
+            {
+                // AdMob
+                typeof(JavaScriptCore.JSContext)
+            };
+
             IoC.RegisterSingleton<ILocalise, LocaliseService_iOS>();
             IoC.RegisterSingleton<IEnvironmentService, EnvironmentService_iOS>();
             IoC.RegisterSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyService_iOS>();
