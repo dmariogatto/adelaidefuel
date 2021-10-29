@@ -116,7 +116,7 @@
                 <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
                     <Grid
-                        Margin="{StaticResource XSmallTopThickness}"
+                        Margin="{StaticResource SmallTopThickness}"
                         ColumnDefinitions="*,*"
                         ColumnSpacing="0">
                         <Button
