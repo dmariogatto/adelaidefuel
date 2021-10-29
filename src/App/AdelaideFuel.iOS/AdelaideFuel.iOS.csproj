@@ -258,6 +258,15 @@
   <ItemGroup>
     <BundleResource Include="Resources\delete%403x.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\fuel_shortcut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\fuel_shortcut%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\fuel_shortcut%403x.png" />
+  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties TriggeredFromHotReload="False" />

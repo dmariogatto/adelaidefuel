@@ -115,7 +115,10 @@
             <ScrollView Grid.Row="1" Padding="{StaticResource SmallThickness}">
                 <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="0">
+                    <Grid
+                        Margin="{StaticResource XSmallTopThickness}"
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="0">
                         <Button
                             Margin="{StaticResource SmallLeftThickness}"
                             Command="{Binding OpenUrlCommand}"

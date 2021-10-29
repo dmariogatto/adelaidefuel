@@ -12,11 +12,13 @@ using Xamarin.Forms.BetterMaps;
 
 namespace AdelaideFuel.UI.Views
 {
-    [NavigationRoute(NavigationRoutes.Map)]
+    [NavigationRoute(NavigationRoutes.Map, true)]
     [QueryProperty(nameof(SiteId), NavigationKeys.SiteIdQueryProperty)]
     [QueryProperty(nameof(FuelId), NavigationKeys.FuelIdQueryProperty)]
     public partial class MapPage : BaseAdPage<MapViewModel>
     {
+        private const string BottomDrawerHandleShake = nameof(BottomDrawerHandleShake);
+
         private CancellationTokenSource _timerCancellation;
 
         public MapPage() : base()
@@ -42,7 +44,7 @@ namespace AdelaideFuel.UI.Views
             set
             {
                 _siteId = value;
-                UpdateSelectedSite();
+                UpdateFromQueryParams();
             }
         }
 
@@ -53,7 +55,7 @@ namespace AdelaideFuel.UI.Views
             set
             {
                 _fuelId = value;
-                UpdateSelectedSite();
+                UpdateFromQueryParams();
             }
         }
 
@@ -70,8 +72,8 @@ namespace AdelaideFuel.UI.Views
 
             TearDownAutoRefresh();
 
-            SiteId = string.Empty;
             FuelId = string.Empty;
+            SiteId = string.Empty;
         }
 
         private void SetupAutoRefresh()
@@ -88,7 +90,7 @@ namespace AdelaideFuel.UI.Views
                 if (cts.IsCancellationRequested)
                     return;
 
-                ViewModel.LoadFuelsCommand.ExecuteAsync();
+                ViewModel.LoadFuelsCommand.ExecuteAsync(int.TryParse(FuelId, out var fuelId) ? fuelId : -1);
                 if (ViewModel.InitialLoadComplete)
                     ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
 
@@ -115,31 +117,30 @@ namespace AdelaideFuel.UI.Views
             _timerCancellation = null;
         }
 
-        private void UpdateSelectedSite()
+        private void UpdateFromQueryParams()
         {
-            if (!string.IsNullOrEmpty(SiteId) &&
-                !string.IsNullOrEmpty(FuelId) &&
-                int.TryParse(SiteId, out var siteId) &&
-                int.TryParse(FuelId, out var fuelId))
+            if (int.TryParse(FuelId, out var fuelId))
             {
-                ViewModel.When(vm => !vm.IsBusy && vm.Sites.Count > 0, () =>
+                ViewModel.When(vm => !vm.IsBusy && vm.Fuels.Count > 0, () =>
                 {
-                    var site = ViewModel.Sites.FirstOrDefault(s => s.Id == siteId);
                     var fuel = ViewModel.Fuels.FirstOrDefault(f => f.Id == fuelId);
-
-                    if (site != null && fuel != null)
+                    if (fuel != null)
                     {
                         ViewModel.Fuel = fuel;
-                        ViewModel.When(vm => !vm.IsBusy && vm.LoadedFuel == fuel, () =>
+
+                        if (int.TryParse(SiteId, out var siteId))
                         {
-                            var sitePin = SiteMap.Pins
-                                .FirstOrDefault(p => p.BindingContext is Site s && s.Id == siteId);
-                            if (sitePin != null)
+                            ViewModel.When(vm => !vm.IsBusy && vm.Sites.Count > 0 && vm.LoadedFuel == fuel, () =>
                             {
-                                SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(sitePin.Position, Distance.FromKilometers(1)));
-                                SiteMap.SelectedPin = sitePin;
-                            }
-                        }, 7500);
+                                var sitePin = SiteMap.Pins
+                                    .FirstOrDefault(p => p.BindingContext is Site s && s.Id == siteId);
+                                if (sitePin != null)
+                                {
+                                    SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(sitePin.Position, Distance.FromKilometers(1)));
+                                    SiteMap.SelectedPin = sitePin;
+                                }
+                            }, 7500);
+                        }
                     }
                 }, 7500);
             }
@@ -195,7 +196,7 @@ namespace AdelaideFuel.UI.Views
                         { 0.750, 0.875, new Animation (v => handle.TranslationX = v,   7,  -5) },
                         { 0.875, 1.000, new Animation (v => handle.TranslationX = v,  -5,   0) }
                     }
-                    .Commit(this, "BottomDrawerHandleShake", length: 450, easing: Easing.Linear);
+                    .Commit(this, BottomDrawerHandleShake, length: 450, easing: Easing.Linear);
                 }
                 else
                 {

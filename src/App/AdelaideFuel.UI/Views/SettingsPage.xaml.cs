@@ -5,7 +5,7 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
 {
-    [NavigationRoute(NavigationRoutes.Settings)]
+    [NavigationRoute(NavigationRoutes.Settings, true)]
     public partial class SettingsPage : BasePage<SettingsViewModel>
     {
         public SettingsPage() : base()

@@ -1,12 +1,16 @@
-﻿using AdelaideFuel.Services;
+﻿using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using AdelaideFuel.UI.Services;
+using AdelaideFuel.ViewModels;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Plugin.StoreReview;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration;
@@ -18,10 +22,30 @@ namespace AdelaideFuel.UI
 {
     public partial class App : Xamarin.Forms.Application
     {
+        public const string Scheme = "adl-sif";
+        public const string Map = "map";
+
         static App()
         {
             IoC.RegisterSingleton<INavigationService, TabbedNavigationService>();
             IoC.RegisterSingleton<IThemeService, ThemeService>();
+
+            AppActions.OnAppAction += (sender, args) =>
+            {
+                const string uriFormat = "{0}://{1}";
+
+                if (Current is App app)
+                {
+                    var id = args.AppAction.Id;
+                    if (id.StartsWith(nameof(UserFuel)) && id.LastIndexOf("_") is int idx && idx > 0)
+                    {
+                        var fuelId = id.Substring(idx + 1, id.Length - idx - 1);
+                        app.SendOnAppLinkRequestReceived(new Uri(string.Format(uriFormat, Scheme, $"{Map}?{NavigationKeys.FuelIdQueryProperty}={fuelId}")));
+                    }
+
+                    IoC.Resolve<ILogger>().Event(AppCenterEvents.Action.AppAction);
+                }
+            };
         }
 
         public App()
@@ -80,6 +104,8 @@ namespace AdelaideFuel.UI
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();
 
             sw.Stop();
+
+            SetupAppShortcutsAsync().Wait();
         }
 
         protected override void OnResume()
@@ -87,6 +113,49 @@ namespace AdelaideFuel.UI
             // Handle when your app resumes
 
             UpdateDayCount();
+        }
+
+        protected override void OnAppLinkRequestReceived(Uri uri)
+        {
+            base.OnAppLinkRequestReceived(uri);
+
+            if (!uri.Scheme.Equals(Scheme, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var navService = IoC.Resolve<INavigationService>();
+            var task = Task.CompletedTask;
+
+            if (uri.Host.Equals(Map, StringComparison.OrdinalIgnoreCase))
+            {
+                var queryParams = HttpUtility.ParseQueryString(uri.Query);
+                var fuelId = queryParams.Get(NavigationKeys.FuelIdQueryProperty);
+
+                if (int.TryParse(fuelId, out var id))
+                {
+                    if (navService.TopViewModel is MapViewModel mapVm)
+                    {
+                        mapVm.When(vm => !vm.IsBusy && vm.Fuels.Count > 0, () =>
+                        {
+                            var fuel = mapVm.Fuels.FirstOrDefault(f => f.Id == id);
+                            if (fuel != null)
+                            {
+                                mapVm.Fuel = fuel;
+                            }
+                        }, 2500);
+                    }
+                    else
+                    {
+                        task = navService.PopToRootAsync(false)
+                            .ContinueWith(async t =>
+                            {
+                                await navService.NavigateToAsync<MapViewModel>(new Dictionary<string, string>()
+                                {
+                                    { NavigationKeys.FuelIdQueryProperty, fuelId }
+                                });
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }
+                }
+            }
         }
 
         private void UpdateDayCount()
@@ -128,6 +197,28 @@ namespace AdelaideFuel.UI
             catch (Exception ex)
             {
                 IoC.Resolve<ILogger>().Error(ex);
+            }
+        }
+
+        private async Task SetupAppShortcutsAsync()
+        {
+            try
+            {
+                var nativeService = IoC.Resolve<IUserNativeService>();
+                var fuels = nativeService.GetUserFuels();
+
+                var actions = fuels
+                    .Where(i => i.IsActive)
+                    .OrderBy(i => i.SortOrder)
+                    .Take(3)
+                    .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
+                    .ToArray();
+
+                await AppActions.SetAsync(actions);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
         }
     }

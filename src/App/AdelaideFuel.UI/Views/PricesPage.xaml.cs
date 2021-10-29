@@ -1,4 +1,5 @@
-﻿using AdelaideFuel.ViewModels;
+﻿using AdelaideFuel.UI.Attributes;
+using AdelaideFuel.ViewModels;
 using System;
 using System.Linq;
 using System.Threading;
@@ -9,6 +10,7 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
 {
+    [NavigationRoute(NavigationRoutes.Prices, true)]
     public partial class PricesPage : BaseAdPage<PricesViewModel>
     {
         private readonly IPermissions _permissions;

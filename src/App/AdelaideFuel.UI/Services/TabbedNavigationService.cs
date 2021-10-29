@@ -30,23 +30,9 @@ namespace AdelaideFuel.UI.Services
         {
         }
 
-        public IViewModel TopViewModel
-        {
-            get
-            {
-                var topPage = MainPage.Navigation.NavigationStack.FirstOrDefault();
-
-                switch (topPage)
-                {
-                    case TabbedPage tb:
-                        return (tb.SelectedItem as NavigationPage)?.RootPage?.BindingContext as IViewModel;
-                    case Page p:
-                        return p.BindingContext as IViewModel;
-                    default:
-                        return null;
-                }
-            }
-        }
+        public IViewModel TopViewModel => MainPage.CurrentPage is TabbedPage tp
+            ? (tp.CurrentPage as NavigationPage)?.RootPage?.BindingContext as IViewModel
+            : MainPage.CurrentPage.BindingContext as IViewModel;
 
         public void Init()
         {
@@ -166,6 +152,27 @@ namespace AdelaideFuel.UI.Services
             try
             {
                 await MainPage.PopAsync(animated);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        public async Task PopToRootAsync(bool animated = true)
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            try
+            {
+                await MainPage.PopToRootAsync(animated);
             }
             catch (Exception ex)
             {
