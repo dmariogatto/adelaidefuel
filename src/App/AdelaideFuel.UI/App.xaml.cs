@@ -92,6 +92,8 @@ namespace AdelaideFuel.UI
         {
             // Handle when your app sleeps
 
+            var appShortcutsTask = SetupAppShortcutsAsync();
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -104,8 +106,13 @@ namespace AdelaideFuel.UI
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();
 
             sw.Stop();
+            System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: UserDataSync: {sw.ElapsedMilliseconds}ms");
+            sw.Restart();
 
-            SetupAppShortcutsAsync().Wait();
+            appShortcutsTask.Wait();
+
+            sw.Stop();
+            System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: SetupAppShortcuts: {sw.ElapsedMilliseconds}ms");
         }
 
         protected override void OnResume()
@@ -214,7 +221,7 @@ namespace AdelaideFuel.UI
                     .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
                     .ToArray();
 
-                await AppActions.SetAsync(actions);
+                await AppActions.SetAsync(actions).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
