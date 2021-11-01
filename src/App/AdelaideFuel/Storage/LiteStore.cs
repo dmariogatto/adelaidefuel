@@ -13,7 +13,7 @@ namespace AdelaideFuel.Storage
     public class LiteStore<T> : IStore<T> where T : class
     {
         private const string IdColumn = "_id";
-        private const string DateExpiresColumn = nameof(StoreItem<int>.DateExpires);
+        private const string DateExpiresColumn = nameof(StoreItem<T>.DateExpires);
 
         private const string KeyNotEmptyExMsg = "Key can not be null or empty.";
 
@@ -68,7 +68,7 @@ namespace AdelaideFuel.Storage
             }
         }
 
-        public string Name { get => _col?.Name ?? string.Empty; }
+        public string Name => _col?.Name ?? string.Empty;
 
         #region Exist and Expiration Methods
         public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken)
