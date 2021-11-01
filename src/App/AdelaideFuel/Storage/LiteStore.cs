@@ -179,6 +179,26 @@ namespace AdelaideFuel.Storage
             return item?.DateExpires.ToUniversalTime();
         }
 
+        public async Task<bool> AnyAsync(bool includeExpired, CancellationToken cancellationToken)
+        {
+            var exists = false;
+
+            try
+            {
+                exists = await _retryPolicyAsync.ExecuteAsync(
+                    async (ct) => await Task.Run(() => includeExpired
+                                                       ? _col.Exists(Query.GTE(DateExpiresColumn, DateTime.MinValue))
+                                                       : _col.Exists(Query.GT(DateExpiresColumn, DateTime.UtcNow))).ConfigureAwait(false),
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, string.Empty);
+            }
+
+            return exists;
+        }
+
         public async Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken)
         {
             var count = -1;

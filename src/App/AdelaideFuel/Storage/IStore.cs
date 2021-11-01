@@ -28,6 +28,7 @@ namespace AdelaideFuel.Storage
         Task<bool> IsExpiredAsync(string key, CancellationToken cancellationToken);
         Task<DateTime?> GetExpirationAsync(string key, CancellationToken cancellationToken);
 
+        Task<bool> AnyAsync(bool includeExpired, CancellationToken cancellationToken);
         Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken);
     }
 
