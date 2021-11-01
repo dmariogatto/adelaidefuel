@@ -92,10 +92,10 @@ namespace AdelaideFuel.UI
         {
             // Handle when your app sleeps
 
-            var appShortcutsTask = SetupAppShortcutsAsync();
-
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
+
+            var appShortcutsTask = SetupAppShortcutsAsync();
 
             // insurance policy
             IoC.Resolve<IUserNativeService>().SyncUserBrandsAsync().Wait();
@@ -105,14 +105,13 @@ namespace AdelaideFuel.UI
             IoC.Resolve<IStoreFactory>().UserCheckpoint();
             IoC.Resolve<IStoreFactory>().CacheCheckpoint();
 
-            sw.Stop();
-            System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: UserDataSync: {sw.ElapsedMilliseconds}ms");
-            sw.Restart();
-
             appShortcutsTask.Wait();
 
             sw.Stop();
-            System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: SetupAppShortcuts: {sw.ElapsedMilliseconds}ms");
+
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: completed in {sw.ElapsedMilliseconds}ms");
+#endif
         }
 
         protected override void OnResume()
