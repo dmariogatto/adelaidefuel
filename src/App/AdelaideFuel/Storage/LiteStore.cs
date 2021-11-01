@@ -101,7 +101,7 @@ namespace AdelaideFuel.Storage
                 items = await _retryPolicyAsync.ExecuteAsync(
                     async (ct) => await Task.Run(() => (includeExpired
                                                         ? _col.FindAll()
-                                                        : _col.Find(Query.GTE(DateExpiresColumn, DateTime.UtcNow)))
+                                                        : _col.Find(Query.GT(DateExpiresColumn, DateTime.UtcNow)))
                                                            .Select(i => i.Contents)
                                                            .ToList()).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
@@ -134,7 +134,7 @@ namespace AdelaideFuel.Storage
 
                 var query = Query.In(IdColumn, bsonKeys);
                 if (!includeExpired)
-                    query = Query.And(query, Query.GTE(DateExpiresColumn, DateTime.UtcNow));
+                    query = Query.And(query, Query.GT(DateExpiresColumn, DateTime.UtcNow));
 
                 items = await _retryPolicyAsync.ExecuteAsync(
                     async (ct) => await Task.Run(() => _col.Find(query)
@@ -188,7 +188,7 @@ namespace AdelaideFuel.Storage
                 count = await _retryPolicyAsync.ExecuteAsync(
                     async (ct) => await Task.Run(() => includeExpired
                                                        ? _col.Count()
-                                                       : _col.Count(Query.GTE(DateExpiresColumn, DateTime.UtcNow))).ConfigureAwait(false),
+                                                       : _col.Count(Query.GT(DateExpiresColumn, DateTime.UtcNow))).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
