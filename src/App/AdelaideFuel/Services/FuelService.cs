@@ -555,11 +555,7 @@ namespace AdelaideFuel.Services
             {
                 var diskCache = _storeFactory.GetCacheStore<TResponse>();
 
-                if (_connectivity.NetworkAccess != NetworkAccess.Internet ||
-                    !await diskCache.IsExpiredAsync(cacheKey, cancellationToken).ConfigureAwait(false))
-                {
-                    response = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false);
-                }
+                response = await diskCache.GetAsync(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet, cancellationToken).ConfigureAwait(false);
 
                 if (response == default &&
                     _connectivity.NetworkAccess == NetworkAccess.Internet)
