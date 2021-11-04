@@ -43,6 +43,7 @@ namespace AdelaideFuel
         public const string AndroidId = "com.dgatto.adelaidefuel";
         public const string AppleId = "1565760343";
 
+        public const string FuelInfoForMotoristsUrl = "https://www.sa.gov.au/topics/driving-and-transport/fuel-pricing/fuel-pricing-information-for-motorists";
         public const string PriceErrorFormUrl = "https://forms.sa.gov.au/#/form/6029c6a9ad9c5a1dd463e6db";
 
         public const string AuthHeader = "x-functions-key";
