@@ -15,6 +15,7 @@ namespace AdelaideFuel.UI.Views
     {
         private readonly IPermissions _permissions;
 
+        private bool _isFirstLoad = true;
         private CancellationTokenSource _timerCancellation;
 
         public PricesPage() : base()
@@ -30,7 +31,13 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            _permissions.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+            var permissionsTask = _isFirstLoad
+                ? _permissions.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+                : _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+
+            _isFirstLoad = false;
+
+            permissionsTask
                 .ContinueWith(
                     r => SetupAutoRefresh(),
                     TaskScheduler.FromCurrentSynchronizationContext());
