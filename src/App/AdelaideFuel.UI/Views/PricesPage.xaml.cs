@@ -73,7 +73,6 @@ namespace AdelaideFuel.UI.Views
                         if (cts == _timerCancellation)
                             _timerCancellation = null;
 
-                        cts.Dispose();
                         return false;
                     }
 
