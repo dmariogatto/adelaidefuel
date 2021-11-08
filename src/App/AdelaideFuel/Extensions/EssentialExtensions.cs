@@ -36,11 +36,14 @@ namespace AdelaideFuel
 
             try
             {
-                var status = await Permissions.Value.CheckAndRequestAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
+                var status = await Permissions.Value.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+                    .ConfigureAwait(false);
                 if (status == PermissionStatus.Granted)
                 {
-                    var locRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5));
-                    location = await geolocation.GetLocationAsync(locRequest, cancellationToken).ConfigureAwait(false);
+                    location = await geolocation.GetLastKnownLocationAsync().ConfigureAwait(false) ??
+                        await geolocation.GetLocationAsync(
+                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(2.5)),
+                            cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

@@ -55,7 +55,7 @@ namespace AdelaideFuel.ViewModels
             FuelCategories = new ObservableRangeCollection<FuelCategory>();
 
             LoadSitesCommand = new AsyncCommand<UserFuel>(LoadSitesAsync);
-            LoadFuelsCommand = new AsyncCommand(LoadFuelsAsync);
+            LoadFuelsCommand = new AsyncCommand<int>(LoadFuelsAsync);
             ChangeFuelCommand = new AsyncCommand(ChangeFuelAsync);
             LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
 
@@ -157,14 +157,14 @@ namespace AdelaideFuel.ViewModels
         public ObservableRangeCollection<UserFuel> Fuels { get; private set; }
         public ObservableRangeCollection<FuelCategory> FuelCategories { get; private set; }
 
-        public AsyncCommand LoadFuelsCommand { get; private set; }
+        public AsyncCommand<int> LoadFuelsCommand { get; private set; }
         public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
         public AsyncCommand ChangeFuelCommand { get; private set; }
         public AsyncCommand<Site> LaunchMapCommand { get; private set; }
 
         public AsyncCommand CheckAndRequestLocationCommand { get; private set; }
 
-        private async Task LoadFuelsAsync()
+        private async Task LoadFuelsAsync(int defaultFuelId)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace AdelaideFuel.ViewModels
                     Fuels.ReplaceRange(fuels);
 
                 if (!Fuels.Contains(Fuel))
-                    Fuel = Fuels.FirstOrDefault();
+                    Fuel = Fuels.FirstOrDefault(i => i.Id == defaultFuelId) ?? Fuels.FirstOrDefault();
             }
             catch (Exception ex)
             {

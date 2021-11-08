@@ -1,4 +1,5 @@
-﻿using AdelaideFuel.ViewModels;
+﻿using AdelaideFuel.UI.Attributes;
+using AdelaideFuel.ViewModels;
 using System;
 using System.Linq;
 using System.Threading;
@@ -9,10 +10,12 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
 {
+    [NavigationRoute(NavigationRoutes.Prices, true)]
     public partial class PricesPage : BaseAdPage<PricesViewModel>
     {
         private readonly IPermissions _permissions;
 
+        private bool _isFirstLoad = true;
         private CancellationTokenSource _timerCancellation;
 
         public PricesPage() : base()
@@ -28,7 +31,13 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            _permissions.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+            var permissionsTask = _isFirstLoad
+                ? _permissions.CheckAndRequestAsync<Permissions.LocationWhenInUse>()
+                : _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+
+            _isFirstLoad = false;
+
+            permissionsTask
                 .ContinueWith(
                     r => SetupAutoRefresh(),
                     TaskScheduler.FromCurrentSynchronizationContext());
@@ -64,7 +73,6 @@ namespace AdelaideFuel.UI.Views
                         if (cts == _timerCancellation)
                             _timerCancellation = null;
 
-                        cts.Dispose();
                         return false;
                     }
 

@@ -27,6 +27,7 @@ namespace AdelaideFuel.Services
 
         private readonly IConnectivity _connectivity;
         private readonly IGeolocation _geolocation;
+        private readonly IPermissions _permissions;
 
         private readonly IAppPreferences _appPrefs;
 
@@ -47,6 +48,7 @@ namespace AdelaideFuel.Services
         public FuelService(
             IConnectivity connectivity,
             IGeolocation geolocation,
+            IPermissions permissions,
             IAppPreferences appPrefs,
             IAdelaideFuelApi adelaideFuelApi,
             IStoreFactory storeFactory,
@@ -56,6 +58,7 @@ namespace AdelaideFuel.Services
         {
             _connectivity = connectivity;
             _geolocation = geolocation;
+            _permissions = permissions;
 
             _appPrefs = appPrefs;
 
@@ -186,7 +189,28 @@ namespace AdelaideFuel.Services
 
         public async Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
-            var locTask = _geolocation.GetLocationAsync(cancellationToken);
+            async Task<Location> getLocationAsync(CancellationToken ct)
+            {
+                var location = default(Location);
+
+                try
+                {
+                    var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
+                    if (status == PermissionStatus.Granted)
+                    {
+                        location = await _geolocation.GetLocationAsync(
+                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(3.5)), ct).ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
+
+                return location;
+            }
+
+            var locTask = getLocationAsync(cancellationToken);
             var userFuelsTask = GetUserFuelsAsync(cancellationToken);
             var userRadiiTask = GetUserRadiiAsync(cancellationToken);
             var pricesTask = GetSitePricesAsync(cancellationToken);
@@ -555,11 +579,7 @@ namespace AdelaideFuel.Services
             {
                 var diskCache = _storeFactory.GetCacheStore<TResponse>();
 
-                if (_connectivity.NetworkAccess != NetworkAccess.Internet ||
-                    !await diskCache.IsExpiredAsync(cacheKey, cancellationToken).ConfigureAwait(false))
-                {
-                    response = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false);
-                }
+                response = await diskCache.GetAsync(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet, cancellationToken).ConfigureAwait(false);
 
                 if (response == default &&
                     _connectivity.NetworkAccess == NetworkAccess.Internet)

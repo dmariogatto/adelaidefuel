@@ -13,6 +13,9 @@ namespace AdelaideFuel.Storage
     public class LiteStore<T> : IStore<T> where T : class
     {
         private const string IdColumn = "_id";
+        private const string DateExpiresColumn = nameof(StoreItem<T>.DateExpires);
+
+        private const string KeyNotEmptyExMsg = "Key can not be null or empty.";
 
         private readonly ILogger _logger;
 
@@ -20,7 +23,15 @@ namespace AdelaideFuel.Storage
         private readonly ILiteCollection<StoreItem<T>> _col;
         private readonly bool _isCache;
 
-        private readonly AsyncRetryPolicy _retryPolicy =
+        private readonly RetryPolicy _retryPolicy =
+               Policy.Handle<LiteException>()
+                     .WaitAndRetry
+                       (
+                           retryCount: 3,
+                           sleepDurationProvider: retryAttempt => TimeSpan.FromMilliseconds(6 * Math.Pow(2, retryAttempt))
+                       );
+
+        private readonly AsyncRetryPolicy _retryPolicyAsync =
                Policy.Handle<LiteException>()
                      .WaitAndRetryAsync
                        (
@@ -46,29 +57,44 @@ namespace AdelaideFuel.Storage
                 throw new ArgumentException($"Collection name cannot be empty (type: '{typeof(T).FullName}')");
 
             _col = _db.GetCollection<StoreItem<T>>(name);
+
+            try
+            {
+                _retryPolicy.Execute(() => _col.EnsureIndex(i => i.DateExpires));
+            }
+            catch (LiteException ex)
+            {
+                LogError(ex, string.Empty);
+            }
         }
 
-        public string Name { get => _col?.Name ?? string.Empty; }
+        public string Name => _col?.Name ?? string.Empty;
 
         #region Exist and Expiration Methods
-        public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(string key, bool includeExpired, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
-            var item = await GetAsync(key, true, cancellationToken).ConfigureAwait(false);
-            return item != null;
+            var exists = false;
+
+            try
+            {
+                var query = Query.EQ(IdColumn, key);
+                if (!includeExpired)
+                    query = Query.And(query, Query.GT(DateExpiresColumn, DateTime.UtcNow));
+
+                exists = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Exists(query)),
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (LiteException ex)
+            {
+                LogError(ex, key);
+            }
+
+            return exists;
         }
-
-        public async Task<bool> IsExpiredAsync(string key, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
-
-            var item = await GetEntity(key, cancellationToken).ConfigureAwait(false);
-            return item == null || item.HasExpired();
-        }
-
         #endregion
 
         #region Get Methods
@@ -78,11 +104,12 @@ namespace AdelaideFuel.Storage
 
             try
             {
-                items = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.FindAll()
-                                                           .Where(i => includeExpired || !i.HasExpired())
-                                                           .Select(i => i.Contents)
-                                                           .ToList()).ConfigureAwait(false),
+                items = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => (includeExpired
+                                            ? _col.FindAll()
+                                            : _col.Find(Query.GT(DateExpiresColumn, DateTime.UtcNow)))
+                                           .Select(i => i.Contents)
+                                           .ToList()),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -95,10 +122,11 @@ namespace AdelaideFuel.Storage
 
         public async Task<T> GetAsync(string key, bool includeExpired, CancellationToken cancellationToken)
         {
-            var entity = await GetEntity(key, cancellationToken).ConfigureAwait(false);
-            return entity != null && (includeExpired || !entity.HasExpired())
-                ? entity.Contents
-                : default;
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
+
+            var item = await GetEntity(key, includeExpired, cancellationToken).ConfigureAwait(false);
+            return item?.Contents;
         }
 
         public async Task<IList<T>> GetRangeAsync(IEnumerable<string> keys, bool includeExpired, CancellationToken cancellationToken)
@@ -108,13 +136,17 @@ namespace AdelaideFuel.Storage
             try
             {
                 var bsonKeys = keys.Where(k => !string.IsNullOrWhiteSpace(k))
-                                   .Select(k => new BsonValue(k)).ToList();
+                                   .Select(k => new BsonValue(k))
+                                   .ToList();
+
                 var query = Query.In(IdColumn, bsonKeys);
-                items = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Find(query)
-                                                           .Where(i => includeExpired || !i.HasExpired())
-                                                           .Select(i => i.Contents)
-                                                           .ToList()).ConfigureAwait(false),
+                if (!includeExpired)
+                    query = Query.And(query, Query.GT(DateExpiresColumn, DateTime.UtcNow));
+
+                items = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Find(query)
+                                               .Select(i => i.Contents)
+                                               .ToList()),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -131,10 +163,10 @@ namespace AdelaideFuel.Storage
 
             try
             {
-                items = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.FindAll()
-                                                           .Select(i => (i.Id, !i.HasExpired() ? ItemState.Active : ItemState.Expired))
-                                                           .ToList()).ConfigureAwait(false),
+                items = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.FindAll()
+                                               .Select(i => (i.Id, !i.HasExpired() ? ItemState.Active : ItemState.Expired))
+                                               .ToList()),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -148,20 +180,44 @@ namespace AdelaideFuel.Storage
         public async Task<DateTime?> GetExpirationAsync(string key, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
-            var item = await GetEntity(key, cancellationToken).ConfigureAwait(false);
-            return item?.DateExpires.ToUniversalTime();
+            var item = await GetEntity(key, true, cancellationToken).ConfigureAwait(false);
+            return item?.DateExpires;
         }
 
-        public async Task<int> CountAsync(CancellationToken cancellationToken)
+        public async Task<bool> AnyAsync(bool includeExpired, CancellationToken cancellationToken)
+        {
+            var exists = false;
+
+            try
+            {
+                var query = includeExpired
+                    ? Query.GTE(DateExpiresColumn, DateTime.MinValue)
+                    : Query.GT(DateExpiresColumn, DateTime.UtcNow);
+
+                exists = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Exists(query)),
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, string.Empty);
+            }
+
+            return exists;
+        }
+
+        public async Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken)
         {
             var count = -1;
 
             try
             {
-                count = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Count()).ConfigureAwait(false),
+                count = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => includeExpired
+                                           ? _col.Count()
+                                           : _col.Count(Query.GT(DateExpiresColumn, DateTime.UtcNow))),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -178,10 +234,10 @@ namespace AdelaideFuel.Storage
         public async Task<bool> UpsertAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             if (data == null)
-                throw new ArgumentNullException("Data can not be null.", nameof(data));
+                throw new ArgumentNullException(nameof(data));
 
             var success = false;
 
@@ -195,8 +251,8 @@ namespace AdelaideFuel.Storage
                     Contents = data
                 };
 
-                await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Upsert(item)).ConfigureAwait(false),
+                await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Upsert(item)),
                     cancellationToken).ConfigureAwait(false);
 
                 success = true;
@@ -225,8 +281,8 @@ namespace AdelaideFuel.Storage
                         Contents = i.data
                     });
 
-                count = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Upsert(storeItems)).ConfigureAwait(false),
+                count = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Upsert(storeItems)),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -240,10 +296,10 @@ namespace AdelaideFuel.Storage
         public async Task<bool> UpdateAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             if (data == null)
-                throw new ArgumentNullException("Data can not be null.", nameof(data));
+                throw new ArgumentNullException(nameof(data));
 
             var success = false;
 
@@ -257,8 +313,8 @@ namespace AdelaideFuel.Storage
                     Contents = data
                 };
 
-                await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Update(item)).ConfigureAwait(false),
+                await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Update(item)),
                     cancellationToken).ConfigureAwait(false);
 
                 success = true;
@@ -274,14 +330,14 @@ namespace AdelaideFuel.Storage
         public async Task<bool> RemoveAsync(string key, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key can not be null or empty.", nameof(key));
+                throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             var success = false;
 
             try
             {
-                await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.Delete(key)).ConfigureAwait(false),
+                await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.Delete(key)),
                     cancellationToken).ConfigureAwait(false);
 
                 success = true;
@@ -303,8 +359,8 @@ namespace AdelaideFuel.Storage
                 var bsonKeys = keys.Where(k => !string.IsNullOrEmpty(k))
                                    .Select(k => new BsonValue(k)).ToList();
                 var query = Query.In(IdColumn, bsonKeys);
-                count = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.DeleteMany(query)).ConfigureAwait(false),
+                count = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.DeleteMany(query)),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -323,8 +379,9 @@ namespace AdelaideFuel.Storage
 
             try
             {
-                count = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.DeleteMany(i => i.DateExpires < DateTime.UtcNow)).ConfigureAwait(false),
+                var query = Query.LTE(DateExpiresColumn, DateTime.UtcNow);
+                count = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.DeleteMany(query)),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -341,8 +398,8 @@ namespace AdelaideFuel.Storage
 
             try
             {
-                count = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.DeleteAll()).ConfigureAwait(false),
+                count = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.DeleteAll()),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)
@@ -355,14 +412,18 @@ namespace AdelaideFuel.Storage
         #endregion
 
         #region Private Methods
-        private async Task<StoreItem<T>> GetEntity(string key, CancellationToken cancellationToken)
+        private async Task<StoreItem<T>> GetEntity(string key, bool includeExpired, CancellationToken cancellationToken)
         {
             var item = default(StoreItem<T>);
 
             try
             {
-                item = await _retryPolicy.ExecuteAsync(
-                    async (ct) => await Task.Run(() => _col.FindById(key)).ConfigureAwait(false),
+                var query = Query.EQ(IdColumn, key);
+                if (!includeExpired)
+                    query = Query.And(query, Query.GT(DateExpiresColumn, DateTime.UtcNow));
+
+                item = await _retryPolicyAsync.ExecuteAsync(
+                    (ct) => Task.Run(() => _col.FindOne(query)),
                     cancellationToken).ConfigureAwait(false);
             }
             catch (LiteException ex)

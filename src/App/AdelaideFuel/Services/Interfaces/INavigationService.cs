@@ -12,5 +12,6 @@ namespace AdelaideFuel.Services
 
         Task NavigateToAsync<T>(IDictionary<string, string> parameters = null, bool animated = true) where T : IViewModel;
         Task PopAsync(bool animated = true);
+        Task PopToRootAsync(bool animated = true);
     }
 }

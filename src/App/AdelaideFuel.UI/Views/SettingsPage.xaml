@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:services="clr-namespace:AdelaideFuel.Services;assembly=AdelaideFuel"
+    xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:sv="clr-namespace:AiForms.Renderers;assembly=SettingsView"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
@@ -62,10 +63,17 @@
             </sv:Section>
             <sv:Section x:Name="AttributionSection" Title="{local:Translate Attributions}">
                 <sv:CommandCell
-                    Title="SA Fuel Pricing Information Scheme"
+                    Title="{local:Translate SaFuelPricingScheme}"
                     Command="{Binding OpenUrlCommand}"
-                    CommandParameter="https://www.sa.gov.au/topics/driving-and-transport/fuel-pricing/fuel-pricing-information-for-motorists"
-                    Description="Information for motorists" />
+                    CommandParameter="{x:Static shared:Constants.FuelInfoForMotoristsUrl}"
+                    Description="{local:Translate InformationForMotorists}" />
+                <sv:CustomCell>
+                    <Label
+                        FontAttributes="Italic"
+                        FontSize="{DynamicResource {x:Static styles:Keys.CellDescriptionFontSize}}"
+                        Text="{local:Translate BasedOnDataProvidedSa}"
+                        TextColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+                </sv:CustomCell>
             </sv:Section>
             <sv:Section Title="{local:Translate ShouldIFuel}">
                 <sv:LabelCell Title="{local:Translate Version}" ValueText="{Binding Version}" />

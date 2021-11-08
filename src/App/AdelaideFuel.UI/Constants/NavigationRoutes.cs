@@ -6,6 +6,7 @@ namespace AdelaideFuel.UI
     {
         public const string AbsoluteFormat = "//{0}";
 
+        public const string Prices = "prices";
         public const string Map = "map";
         public const string Sites = "sites";
         public const string Brands = "brands";

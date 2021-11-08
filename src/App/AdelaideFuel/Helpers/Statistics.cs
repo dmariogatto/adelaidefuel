@@ -28,7 +28,7 @@ namespace AdelaideFuel
             }
 
             var percentages = new[] { 0d, 25d, 50d, 75d, 100d };
-            var quatiles = new double[percentages.Length];
+            var fns = new double[percentages.Length];
 
             for (var i = 0; i < percentages.Length; i++)
             {
@@ -36,7 +36,7 @@ namespace AdelaideFuel
 
                 if (p >= 100)
                 {
-                    quatiles[i] = values[values.Count - 1];
+                    fns[i] = values[values.Count - 1];
                     continue;
                 }
 
@@ -58,15 +58,15 @@ namespace AdelaideFuel
                 }
 
                 if (leftNum == rightNum)
-                    quatiles[i] = leftNum;
+                    fns[i] = leftNum;
                 else
                 {
                     var part = n - Math.Floor(n);
-                    quatiles[i] = leftNum + part * (rightNum - leftNum);
+                    fns[i] = leftNum + part * (rightNum - leftNum);
                 }
             }
 
-            return quatiles;
+            return fns;
         }
     }
 }

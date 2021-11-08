@@ -26,9 +26,7 @@ namespace AdelaideFuel.UI.Services
         {
         }
 
-        public IViewModel TopViewModel =>
-            (MainPage.Navigation.ModalStack.LastOrDefault()?.BindingContext ??
-             MainPage.Navigation.NavigationStack.LastOrDefault()?.BindingContext) as IViewModel;
+        public IViewModel TopViewModel => MainPage.CurrentPage?.BindingContext as IViewModel;
 
         public void Init()
         {
@@ -103,6 +101,27 @@ namespace AdelaideFuel.UI.Services
             try
             {
                 await MainPage.PopAsync(animated);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        public async Task PopToRootAsync(bool animated = true)
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            try
+            {
+                await MainPage.PopToRootAsync(animated);
             }
             catch (Exception ex)
             {
