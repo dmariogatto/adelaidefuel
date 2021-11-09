@@ -199,7 +199,7 @@ namespace AdelaideFuel.Services
                     if (status == PermissionStatus.Granted)
                     {
                         location = await _geolocation.GetLocationAsync(
-                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(3.5)), ct).ConfigureAwait(false);
+                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5)), ct).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
