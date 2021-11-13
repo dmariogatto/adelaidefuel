@@ -16,7 +16,6 @@ namespace AdelaideFuel.Droid
         Icon = "@mipmap/icon",
         RoundIcon = "@mipmap/icon_round",
         Theme = "@style/SplashTheme",
-        MainLauncher = true,
         LaunchMode = LaunchMode.SingleTask,        
         ScreenOrientation = ScreenOrientation.Portrait,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -80,7 +79,7 @@ namespace AdelaideFuel.Droid
             Xamarin.Essentials.Platform.OnNewIntent(intent);
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
