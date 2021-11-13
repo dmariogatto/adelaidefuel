@@ -20,7 +20,9 @@ namespace Xamarin.Forms.BetterMaps
         {
             var options = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(expires)
-                .RegisterPostEvictionCallback(EvictedCallback);
+#if DEBUG
+               .RegisterPostEvictionCallback(EvictedCallback);
+#endif
 
             _cache.Set(key, value, expires);
         }
@@ -29,7 +31,9 @@ namespace Xamarin.Forms.BetterMaps
         {
             var options = new MemoryCacheEntryOptions()
                .SetSlidingExpiration(sliding)
+#if DEBUG
                .RegisterPostEvictionCallback(EvictedCallback);
+#endif
 
             _cache.Set(key, value, options);
         }
