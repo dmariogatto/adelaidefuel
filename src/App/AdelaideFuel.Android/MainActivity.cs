@@ -16,7 +16,7 @@ namespace AdelaideFuel.Droid
         Icon = "@mipmap/icon",
         RoundIcon = "@mipmap/icon_round",
         Theme = "@style/SplashTheme",
-        LaunchMode = LaunchMode.SingleTask,        
+        LaunchMode = LaunchMode.SingleTask,
         ScreenOrientation = ScreenOrientation.Portrait,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(
