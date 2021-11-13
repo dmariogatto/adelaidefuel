@@ -119,7 +119,6 @@
     <Compile Include="Services\RendererService_Droid.cs" />
     <Compile Include="Services\EnvironmentService_Droid.cs" />
     <Compile Include="Services\LocaliseService_Droid.cs" />
-    <Compile Include="SplashActivity.cs" />
     <Compile Include="MainApplication.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
