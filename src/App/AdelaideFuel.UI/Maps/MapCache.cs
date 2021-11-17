@@ -20,7 +20,7 @@ namespace Xamarin.Forms.BetterMaps
         {
             var options = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(expires)
-                .RegisterPostEvictionCallback(EvictedCallback);
+               .RegisterPostEvictionCallback(EvictedCallback);
 
             _cache.Set(key, value, expires);
         }
@@ -36,7 +36,9 @@ namespace Xamarin.Forms.BetterMaps
 
         private static void EvictedCallback(object key, object item, EvictionReason reason, object state)
         {
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"MapCache: Evicted '{key}', '{reason}'");
+#endif
         }
     }
 }

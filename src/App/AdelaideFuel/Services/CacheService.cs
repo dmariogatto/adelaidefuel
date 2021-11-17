@@ -3,11 +3,11 @@ using System;
 
 namespace AdelaideFuel.Services
 {
-    public class MemoryCacheProvider : ICacheService
+    public class CacheService : ICacheService
     {
         private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
-        public MemoryCacheProvider()
+        public CacheService()
         {
         }
 

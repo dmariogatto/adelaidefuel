@@ -96,11 +96,11 @@
     <PackageReference Include="Plugin.StoreReview" Version="3.1.0" />
     <PackageReference Include="Sharpnado.Forms.HorizontalListView" Version="1.8.2" />
     <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.3.0" />
     <PackageReference Include="Xamarin.Forms.PancakeView" Version="2.3.0.759" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.3.0.1" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.3.0.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.3" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +109,7 @@
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
+    <Compile Include="SplashActivity.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />
     <Compile Include="Renderers\MapCustomRenderer.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="Services\RendererService_Droid.cs" />
     <Compile Include="Services\EnvironmentService_Droid.cs" />
     <Compile Include="Services\LocaliseService_Droid.cs" />
-    <Compile Include="SplashActivity.cs" />
     <Compile Include="MainApplication.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />

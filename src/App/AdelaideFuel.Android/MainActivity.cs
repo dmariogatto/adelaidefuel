@@ -15,14 +15,17 @@ namespace AdelaideFuel.Droid
         Label = "ShouldIFuel",
         Icon = "@mipmap/icon",
         RoundIcon = "@mipmap/icon_round",
-        Theme = "@style/MainTheme",
+        Theme = "@style/SplashTheme",
+        LaunchMode = LaunchMode.SingleTask,
         ScreenOrientation = ScreenOrientation.Portrait,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(
         new[] { Xamarin.Essentials.Platform.Intent.ActionAppAction },
-        Categories = new[] { Android.Content.Intent.CategoryDefault })]
+        Categories = new[] { Intent.CategoryDefault })]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        private static App FormsApp;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -54,8 +57,9 @@ namespace AdelaideFuel.Droid
             Xamarin.FormsBetterMaps.SetLightThemeAsset("map.style.light.json");
             Xamarin.FormsBetterMaps.SetDarkThemeAsset("map.style.dark.json");
 
-            var formsApp = new App();
-            LoadApplication(formsApp);
+            LoadApplication(FormsApp ??= new App());
+
+            SetTheme(Resource.Style.MainTheme);
         }
 
         protected override void OnResume()
@@ -63,16 +67,19 @@ namespace AdelaideFuel.Droid
             base.OnResume();
 
             Xamarin.Essentials.Platform.OnResume(this);
+
+            // https://github.com/xamarin/Essentials/issues/1922
+            Intent = new Intent(this, typeof(MainActivity));
         }
 
-        protected override void OnNewIntent(Android.Content.Intent intent)
+        protected override void OnNewIntent(Intent intent)
         {
             base.OnNewIntent(intent);
 
             Xamarin.Essentials.Platform.OnNewIntent(intent);
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 

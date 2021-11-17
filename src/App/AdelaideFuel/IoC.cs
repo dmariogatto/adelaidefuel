@@ -37,7 +37,7 @@ namespace AdelaideFuel
             Container.RegisterSingleton(typeof(IStoreReview), () => CrossStoreReview.Current);
 
             Container.Register<ILogger, Logger>(Lifestyle.Singleton);
-            Container.Register<ICacheService, MemoryCacheProvider>(Lifestyle.Singleton);
+            Container.Register<ICacheService, CacheService>(Lifestyle.Singleton);
             Container.Register<IStoreFactory, StoreFactory>(Lifestyle.Singleton);
             Container.Register<IFuelService, FuelService>(Lifestyle.Singleton);
             Container.Register<IAppPreferences, AppPreferences>(Lifestyle.Singleton);
