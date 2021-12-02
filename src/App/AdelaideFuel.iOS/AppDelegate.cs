@@ -40,7 +40,7 @@ namespace AdelaideFuel.iOS
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_iOS>();
 
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
-            Sharpnado.HorizontalListView.iOS.SharpnadoInitializer.Initialize();
+            Sharpnado.CollectionView.iOS.Initializer.Initialize();
             AiForms.Renderers.iOS.SettingsViewInit.Init();
             Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
             Google.MobileAds.MobileAds.SharedInstance.Start(null);

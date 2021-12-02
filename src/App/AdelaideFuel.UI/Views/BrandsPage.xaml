@@ -27,13 +27,13 @@
         <Grid>
             <sho:HorizontalListView
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+                CollectionLayout="Vertical"
                 EnableDragAndDrop="True"
                 IsVisible="{Binding HasError, Converter={StaticResource InverseBoolConverter}}"
                 ItemHeight="{x:Static views:UserEntityDataTemplateSelector.BrandHeight}"
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
                 ItemsSource="{Binding Entities, Mode=OneWay}"
-                ListLayout="Vertical"
                 TapCommand="{Binding EntityTappedCommand}" />
 
             <StackLayout

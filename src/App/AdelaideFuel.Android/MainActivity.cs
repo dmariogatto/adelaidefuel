@@ -34,7 +34,7 @@ namespace AdelaideFuel.Droid
             base.OnCreate(savedInstanceState);
 
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init(true);
-            Sharpnado.HorizontalListView.Droid.SharpnadoInitializer.Initialize();
+            Sharpnado.CollectionView.Droid.Initializer.Initialize();
             Acr.UserDialogs.UserDialogs.Init(this);
             AiForms.Renderers.Droid.SettingsViewInit.Init();
             Xamarin.FormsBetterMaps.Init(this, savedInstanceState, new Xamarin.Forms.BetterMaps.MapCache());

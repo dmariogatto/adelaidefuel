@@ -1,4 +1,4 @@
-﻿using Sharpnado.HorizontalListView.RenderedViews;
+﻿using Sharpnado.CollectionView.RenderedViews;
 
 namespace AdelaideFuel.UI.Views
 {
