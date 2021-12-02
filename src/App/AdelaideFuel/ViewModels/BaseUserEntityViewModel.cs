@@ -66,7 +66,7 @@ namespace AdelaideFuel.ViewModels
                 async Task loadEntitiesAsync()
                 {
                     // iOS binding issue when reseting radii
-                    //Entities.Clear();
+                    Entities.Clear();
 
                     switch (typeof(T))
                     {
