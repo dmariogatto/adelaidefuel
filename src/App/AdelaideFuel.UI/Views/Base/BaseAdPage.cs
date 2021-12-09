@@ -6,6 +6,7 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
 {
+    [ContentProperty(nameof(MainContent))]
     public class BaseAdPage<T> : BasePage<T> where T : BaseViewModel
     {
         private readonly Grid _mainGrid;
