@@ -217,7 +217,7 @@ namespace AdelaideFuel.Services
 
             await Task.WhenAll(locTask, userFuelsTask, userRadiiTask, pricesTask).ConfigureAwait(false);
 
-            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToList();
+            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToDictionary(i => i.Id, i => i);
             var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
 
             var loc = locTask.Result;
@@ -237,47 +237,48 @@ namespace AdelaideFuel.Services
                 return int.MaxValue;
             }
 
-            var fuelPriceData = new List<(SiteFuelPrice fp, double distanceKm, int radiusKm)>(pricesTask.Result.Count);
+            var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
             foreach (var fp in pricesTask.Result)
             {
                 var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
                 var radiusKm = getRadiusKm(distanceKm, userRadii);
-                fuelPriceData.Add((fp, distanceKm, radiusKm));
+                fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
             }
 
-            var fuelGroups =
-                (from fpd in fuelPriceData
-                 orderby fpd.fp.FuelSortOrder, fpd.radiusKm, fpd.fp.PriceInCents, fpd.distanceKm
-                 group fpd by fpd.fp.FuelId into fg
-                 join f in userFuels on fg.Key equals f.Id
-                 select new SiteFuelPriceItemGroup(f,
-                    fg.GroupBy(i => i.radiusKm)
-                      .Select(g => g.First())
-                      .Select(i => new SiteFuelPriceItem(i.fp)
-                      {
-                          LastKnowDistanceKm = i.distanceKm,
-                          RadiusKm = i.radiusKm
-                      }).ToList())).ToList();
+            var fuelGroups = new List<SiteFuelPriceItemGroup>();
 
+            var currentGroup = default(SiteFuelPriceItemGroup);
+            var currentRadius = -1;
+            var currentCheapest = double.MaxValue;
 
-            var toRemove = new List<SiteFuelPriceItem>();
-
-            foreach (var g in fuelGroups)
+            foreach (var fpd in fuelPriceData)
             {
-                toRemove.Clear();
+                var currentFuelId = fpd.Price.FuelId;
 
-                var cheapest = g.First();
-                for (var i = 1; i < g.Count; i++)
+                if (currentGroup?.Key?.Id != currentFuelId && userFuels.ContainsKey(currentFuelId))
                 {
-                    var fp = g[i];
+                    var fuel = userFuels[currentFuelId];
 
-                    if (fp.PriceInCents >= cheapest.PriceInCents)
-                        toRemove.Add(fp);
-                    else
-                        cheapest = fp;
+                    currentGroup = new SiteFuelPriceItemGroup(fuel, Array.Empty<SiteFuelPriceItem>());
+                    currentRadius = -1;
+                    currentCheapest = double.MaxValue;
+
+                    fuelGroups.Add(currentGroup);
                 }
 
-                g.RemoveRange(toRemove);
+                if (currentGroup?.Key?.Id == currentFuelId &&
+                    currentRadius != fpd.RadiusKm &&
+                    fpd.Price.PriceInCents < currentCheapest)
+                {
+                    currentRadius = fpd.RadiusKm;
+                    currentCheapest = Math.Min(currentCheapest, fpd.Price.PriceInCents);
+
+                    currentGroup.Add(new SiteFuelPriceItem(fpd.Price)
+                    {
+                        LastKnowDistanceKm = fpd.DistanceKm,
+                        RadiusKm = fpd.RadiusKm
+                    });
+                }
             }
 
             return fuelGroups;
