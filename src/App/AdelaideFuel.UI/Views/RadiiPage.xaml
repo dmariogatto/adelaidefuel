@@ -33,12 +33,12 @@
         <Grid>
             <sho:HorizontalListView
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+                CollectionLayout="Vertical"
                 EnableDragAndDrop="False"
                 ItemHeight="{x:Static views:UserEntityDataTemplateSelector.FuelHeight}"
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
                 ItemsSource="{Binding Entities, Mode=OneWay}"
-                ListLayout="Vertical"
                 TapCommand="{Binding EntityTappedCommand}" />
 
             <controls:LoadingIndicator HorizontalOptions="Center" VerticalOptions="Start" />

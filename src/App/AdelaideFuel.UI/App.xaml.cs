@@ -54,7 +54,7 @@ namespace AdelaideFuel.UI
 
             InitializeComponent();
 
-            Sharpnado.HorizontalListView.Initializer.Initialize(false, true);
+            Sharpnado.CollectionView.Initializer.Initialize(false, true);
 
             var appCenterId = Constants.AppCenterSecret;
             if (!string.IsNullOrEmpty(appCenterId))

@@ -64,7 +64,7 @@ namespace AdelaideFuel.UI.Views
                 if (cts.IsCancellationRequested)
                     return;
 
-                ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
+                ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(default);
 
                 Device.StartTimer(TimeSpan.FromSeconds(60), () =>
                 {

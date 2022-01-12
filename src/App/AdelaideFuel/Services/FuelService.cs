@@ -217,7 +217,7 @@ namespace AdelaideFuel.Services
 
             await Task.WhenAll(locTask, userFuelsTask, userRadiiTask, pricesTask).ConfigureAwait(false);
 
-            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToList();
+            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToDictionary(i => i.Id, i => i);
             var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
 
             var loc = locTask.Result;
@@ -237,47 +237,48 @@ namespace AdelaideFuel.Services
                 return int.MaxValue;
             }
 
-            var fuelPriceData = new List<(SiteFuelPrice fp, double distanceKm, int radiusKm)>(pricesTask.Result.Count);
+            var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
             foreach (var fp in pricesTask.Result)
             {
                 var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
                 var radiusKm = getRadiusKm(distanceKm, userRadii);
-                fuelPriceData.Add((fp, distanceKm, radiusKm));
+                fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
             }
 
-            var fuelGroups =
-                (from fpd in fuelPriceData
-                 orderby fpd.fp.FuelSortOrder, fpd.radiusKm, fpd.fp.PriceInCents, fpd.distanceKm
-                 group fpd by fpd.fp.FuelId into fg
-                 join f in userFuels on fg.Key equals f.Id
-                 select new SiteFuelPriceItemGroup(f,
-                    fg.GroupBy(i => i.radiusKm)
-                      .Select(g => g.First())
-                      .Select(i => new SiteFuelPriceItem(i.fp)
-                      {
-                          LastKnowDistanceKm = i.distanceKm,
-                          RadiusKm = i.radiusKm
-                      }).ToList())).ToList();
+            var fuelGroups = new List<SiteFuelPriceItemGroup>();
 
+            var currentGroup = default(SiteFuelPriceItemGroup);
+            var currentRadius = -1;
+            var currentCheapest = double.MaxValue;
 
-            var toRemove = new List<SiteFuelPriceItem>();
-
-            foreach (var g in fuelGroups)
+            foreach (var fpd in fuelPriceData)
             {
-                toRemove.Clear();
+                var currentFuelId = fpd.Price.FuelId;
 
-                var cheapest = g.First();
-                for (var i = 1; i < g.Count; i++)
+                if (currentGroup?.Key?.Id != currentFuelId && userFuels.ContainsKey(currentFuelId))
                 {
-                    var fp = g[i];
+                    var fuel = userFuels[currentFuelId];
 
-                    if (fp.PriceInCents >= cheapest.PriceInCents)
-                        toRemove.Add(fp);
-                    else
-                        cheapest = fp;
+                    currentGroup = new SiteFuelPriceItemGroup(fuel, Array.Empty<SiteFuelPriceItem>());
+                    currentRadius = -1;
+                    currentCheapest = double.MaxValue;
+
+                    fuelGroups.Add(currentGroup);
                 }
 
-                g.RemoveRange(toRemove);
+                if (currentGroup?.Key?.Id == currentFuelId &&
+                    currentRadius != fpd.RadiusKm &&
+                    fpd.Price.PriceInCents < currentCheapest)
+                {
+                    currentRadius = fpd.RadiusKm;
+                    currentCheapest = Math.Min(currentCheapest, fpd.Price.PriceInCents);
+
+                    currentGroup.Add(new SiteFuelPriceItem(fpd.Price)
+                    {
+                        LastKnowDistanceKm = fpd.DistanceKm,
+                        RadiusKm = fpd.RadiusKm
+                    });
+                }
             }
 
             return fuelGroups;
@@ -382,6 +383,11 @@ namespace AdelaideFuel.Services
             try
             {
                 var today = DateTime.Now.Date;
+
+#if DEBUG
+                today = DateTime.MaxValue;
+#endif
+
                 if (today > _appPrefs.LastDateSynced)
                 {
                     var tasks = new[]
@@ -505,34 +511,53 @@ namespace AdelaideFuel.Services
             where V : class, IFuelLookup
             where T : class, IUserSortableEntity, new()
         {
-            var updatedEntities =
-                (from ae in apiEntities
-                 join ue in userEntities on ae.Id equals ue.Id into j
-                 from mue in j.DefaultIfEmpty()
-                 where mue == null || mue.Name != ae.Name
-                 select new T()
-                 {
-                     Id = ae.Id,
-                     Name = ae.Name,
-                     SortOrder = mue?.SortOrder ?? (userEntities.Count + apiEntities.IndexOf(ae)),
-                     IsActive = mue?.IsActive ?? true,
-                 }).ToList();
+            var userLookup = userEntities.ToDictionary(i => i.Id, i => i);
+            var apiLookup = apiEntities.ToDictionary(i => i.Id, i => i);
 
-            var removedEntities = userEntities
-                .Where(e => apiEntities.All(ae => ae.Id != e.Id))
-                .ToList();
+            var toUpsert = new HashSet<T>();
+            var toRemove = new HashSet<T>();
+            var unmodified = new HashSet<T>();
 
-            var unmodified = userEntities
-                .Except(removedEntities)
-                .Where(e => !updatedEntities.Any(ue => ue.Id == e.Id))
-                .ToList();
+            foreach (var i in apiEntities)
+            {
+                if (userLookup.TryGetValue(i.Id, out var existing) && i.Name != existing.Name)
+                {
+                    toUpsert.Add(new T()
+                    {
+                        Id = i.Id,
+                        Name = i.Name,
+                        SortOrder = existing.SortOrder,
+                        IsActive = existing.IsActive
+                    });
+                }
+                else if (existing != null)
+                {
+                    unmodified.Add(existing);
+                }
+                else
+                {
+                    toUpsert.Add(new T()
+                    {
+                        Id = i.Id,
+                        Name = i.Name,
+                        SortOrder = userEntities.Count + toUpsert.Count,
+                        IsActive = true
+                    });
+                }
+            }
 
-            var result = updatedEntities
+            foreach (var i in userEntities)
+            {
+                if (!apiLookup.ContainsKey(i.Id))
+                    toRemove.Add(i);
+            }
+
+            var result = toUpsert
                 .Concat(unmodified)
                 .OrderBy(e => e.SortOrder)
                 .ToList();
 
-            if (updatedEntities.Any() || removedEntities.Any())
+            if (toUpsert.Any() || toRemove.Any())
             {
                 // fix up sort order
                 for (var i = 0; i < result.Count; i++)
@@ -540,29 +565,27 @@ namespace AdelaideFuel.Services
                     var e = result[i];
                     if (e.SortOrder != i)
                     {
-                        // make sure we update the order
-                        if (unmodified.Contains(e))
-                            updatedEntities.Add(e);
-                        result[i].SortOrder = i;
+                        e.SortOrder = i;
+                        toUpsert.Add(e);
                     }
                 }
             }
 
             await Task.WhenAll(
-                UpsertUserEntitiesAsync(updatedEntities, cancellationToken),
-                RemoveUserEntitiesAsync(removedEntities, cancellationToken)).ConfigureAwait(false);
+                UpsertUserEntitiesAsync(toUpsert, cancellationToken),
+                RemoveUserEntitiesAsync(toRemove, cancellationToken)).ConfigureAwait(false);
 
             return result;
         }
 
-        private Task<int> UpsertUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
+        private Task<int> UpsertUserEntitiesAsync<T>(ICollection<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
             => entities?.Any() == true
                ? _storeFactory
                     .GetUserStore<T>()
                     .UpsertRangeAsync(entities.Select(e => (e.Id.ToString(CultureInfo.InvariantCulture), e)).ToList(), TimeSpan.MaxValue, cancellationToken)
                : Task.FromResult(0);
 
-        private Task<int> RemoveUserEntitiesAsync<T>(IList<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
+        private Task<int> RemoveUserEntitiesAsync<T>(ICollection<T> entities, CancellationToken cancellationToken) where T : class, IUserEntity
             => entities?.Any() == true
                ? _storeFactory
                     .GetUserStore<T>()

@@ -23,7 +23,7 @@ namespace AdelaideFuel.Functions.Services
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
 
-            using var writer = new StreamWriter(await blob.OpenWriteAsync(true).ConfigureAwait(false));
+            using var writer = new StreamWriter(await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false));
             using var jw = new JsonTextWriter(writer);
             JsonSerializer.CreateDefault().Serialize(jw, data);
         }
@@ -37,7 +37,7 @@ namespace AdelaideFuel.Functions.Services
 
             if (await blob.ExistsAsync(cancellationToken).ConfigureAwait(false))
             {
-                using var reader = new StreamReader(await blob.OpenReadAsync().ConfigureAwait(false));
+                using var reader = new StreamReader(await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false));
                 using var jr = new JsonTextReader(reader);
                 result = JsonSerializer.CreateDefault().Deserialize<T>(jr);
             }
@@ -52,7 +52,7 @@ namespace AdelaideFuel.Functions.Services
 
             if (await blob.ExistsAsync(cancellationToken).ConfigureAwait(false))
             {
-                return await blob.OpenReadAsync().ConfigureAwait(false);
+                return await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
             return Stream.Null;
@@ -62,7 +62,7 @@ namespace AdelaideFuel.Functions.Services
         {
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
-            return await blob.OpenWriteAsync(true).ConfigureAwait(false);
+            return await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         public async Task WriteAllTextAsync(string data, string localFilePath, CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ namespace AdelaideFuel.Functions.Services
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
 
-            using var writer = new StreamWriter(await blob.OpenWriteAsync(true).ConfigureAwait(false));
+            using var writer = new StreamWriter(await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false));
             await writer.WriteAsync(data).ConfigureAwait(false);
         }
 
@@ -83,7 +83,7 @@ namespace AdelaideFuel.Functions.Services
 
             if (await blob.ExistsAsync(cancellationToken).ConfigureAwait(false))
             {
-                using var reader = new StreamReader(await blob.OpenReadAsync().ConfigureAwait(false));
+                using var reader = new StreamReader(await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false));
                 result = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
