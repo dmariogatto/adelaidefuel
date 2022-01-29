@@ -112,13 +112,10 @@
 
     <views:BaseAdPage.MainContent>
         <Grid RowDefinitions="Auto,*" RowSpacing="0">
-            <ScrollView Grid.Row="1" Padding="{StaticResource SmallThickness}">
+            <ScrollView Grid.Row="1" Padding="{StaticResource ItemMargin}">
                 <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
-                    <Grid
-                        Margin="{StaticResource SmallTopThickness}"
-                        ColumnDefinitions="*,*"
-                        ColumnSpacing="0">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="0">
                         <Button
                             Margin="{StaticResource SmallLeftThickness}"
                             Command="{Binding OpenUrlCommand}"
@@ -133,10 +130,10 @@
                             Margin="{StaticResource SmallRightThickness}"
                             FontFamily="{StaticResource ItalicFontFamily}"
                             FontSize="Small"
-                            HorizontalOptions="End"
+                            HorizontalTextAlignment="End"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
-                            VerticalOptions="Center" />
+                            VerticalTextAlignment="Center" />
                     </Grid>
                 </StackLayout>
             </ScrollView>
