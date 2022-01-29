@@ -27,8 +27,6 @@ namespace AdelaideFuel.iOS.Renderers
             if (_disposed)
                 return;
 
-            var needToRequestAd = false;
-
             if (_bannerView == null &&
                 !string.IsNullOrEmpty(e.NewElement?.AdUnitId) &&
                 GetRootViewController() is UIViewController rvc)
@@ -45,8 +43,6 @@ namespace AdelaideFuel.iOS.Renderers
                         AdUnitId = Element.AdUnitId,
                         RootViewController = rvc
                     };
-
-                    needToRequestAd = true;
                 }
 
                 Element.HeightRequest = _bannerView.AdHeight;
@@ -63,11 +59,8 @@ namespace AdelaideFuel.iOS.Renderers
                 }
             }
 
-            if (needToRequestAd)
-            {
-                var request = Request.GetDefaultRequest();
-                _bannerView.LoadRequest(request);
-            }
+            if (!_bannerView.AutoloadEnabled)
+                _bannerView.AutoloadEnabled = true;
         }
 
         private void AdReceived(object sender, EventArgs e)
