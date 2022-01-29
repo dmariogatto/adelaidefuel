@@ -104,7 +104,7 @@
                         Margin="{StaticResource MediumLeftThickness}"
                         BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         HeightRequest="1"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="Fill" />
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>
@@ -169,7 +169,7 @@
             <ContentView
                 Padding="{StaticResource SmallThickness}"
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.ContrastColor}}"
-                HorizontalOptions="FillAndExpand"
+                HorizontalOptions="Fill"
                 InputTransparent="True"
                 IsVisible="{Binding HasInternet, Converter={StaticResource InverseBoolConverter}}"
                 VerticalOptions="Start">
