@@ -104,7 +104,7 @@
                         Margin="{StaticResource MediumLeftThickness}"
                         BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         HeightRequest="1"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="Fill" />
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>
@@ -112,11 +112,11 @@
 
     <views:BaseAdPage.MainContent>
         <Grid RowDefinitions="Auto,*" RowSpacing="0">
-            <ScrollView Grid.Row="1" Padding="{StaticResource SmallThickness}">
+            <ScrollView Grid.Row="1" Padding="{StaticResource ItemMargin}">
                 <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
                     <Grid
-                        Margin="{StaticResource SmallTopThickness}"
+                        Margin="{StaticResource XSmallTopThickness}"
                         ColumnDefinitions="*,*"
                         ColumnSpacing="0">
                         <Button
@@ -133,10 +133,10 @@
                             Margin="{StaticResource SmallRightThickness}"
                             FontFamily="{StaticResource ItalicFontFamily}"
                             FontSize="Small"
-                            HorizontalOptions="End"
+                            HorizontalTextAlignment="End"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
-                            VerticalOptions="Center" />
+                            VerticalTextAlignment="Center" />
                     </Grid>
                 </StackLayout>
             </ScrollView>
@@ -169,7 +169,7 @@
             <ContentView
                 Padding="{StaticResource SmallThickness}"
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.ContrastColor}}"
-                HorizontalOptions="FillAndExpand"
+                HorizontalOptions="Fill"
                 InputTransparent="True"
                 IsVisible="{Binding HasInternet, Converter={StaticResource InverseBoolConverter}}"
                 VerticalOptions="Start">
