@@ -23,15 +23,13 @@ namespace AdelaideFuel
         {
             Container.Options.EnableAutoVerification = false;
 
-            var refitSettings = new RefitSettings(new NewtonsoftJsonContentSerializer(new JsonSerializerSettings()
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
             {
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            }));
+            };
 
-            Container.RegisterSingleton(typeof(IAdelaideFuelApi), () =>
-            {
-                return RestService.For<IAdelaideFuelApi>(Constants.ApiUrlBase, refitSettings);
-            });
+            Container.RegisterSingleton(typeof(IAdelaideFuelApi),
+                () => RestService.For<IAdelaideFuelApi>(Constants.ApiUrlBase, new RefitSettings(new NewtonsoftJsonContentSerializer())));
 
             Container.RegisterSingleton(typeof(IUserDialogs), () => UserDialogs.Instance);
             Container.RegisterSingleton(typeof(IStoreReview), () => CrossStoreReview.Current);
