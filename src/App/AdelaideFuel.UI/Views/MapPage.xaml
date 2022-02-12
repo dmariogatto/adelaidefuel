@@ -179,30 +179,7 @@
                         BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         HeightRequest="1" />
 
-                    <StackLayout
-                        Padding="{StaticResource MediumLeftTopThickness}"
-                        BindableLayout.ItemsSource="{Binding SelectedSite.Prices}"
-                        Spacing="0">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="models:SiteFuelPrice">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label
-                                        FontFamily="{StaticResource BoldFontFamily}"
-                                        FontSize="Medium"
-                                        HorizontalOptions="StartAndExpand"
-                                        Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding FuelName}"
-                                        VerticalTextAlignment="Center" />
-                                    <Label
-                                        FontSize="Large"
-                                        HorizontalOptions="End"
-                                        Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
-                                        VerticalTextAlignment="Center" />
-                                </StackLayout>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </StackLayout>
+                    <controls:PricesBoardView Padding="{StaticResource MediumLeftTopThickness}" SiteFuelPrices="{Binding SelectedSite.Prices}" />
 
                     <Grid
                         Padding="{StaticResource MediumLeftThickness}"

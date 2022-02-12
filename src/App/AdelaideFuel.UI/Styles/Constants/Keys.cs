@@ -4,6 +4,12 @@ namespace AdelaideFuel.UI.Styles
 {
     internal static class Keys
     {
+        public const string RegFontFamily = nameof(RegFontFamily);
+        public const string ItalicFontFamily = nameof(ItalicFontFamily);
+        public const string SemiBoldFontFamily = nameof(SemiBoldFontFamily);
+        public const string BoldFontFamily = nameof(BoldFontFamily);
+        public const string BoldItalicFontFamily = nameof(BoldItalicFontFamily);
+
         public const string PrimaryColor = nameof(PrimaryColor);
         public const string PrimaryDarkColor = nameof(PrimaryDarkColor);
         public const string PrimaryAccentColor = nameof(PrimaryAccentColor);
