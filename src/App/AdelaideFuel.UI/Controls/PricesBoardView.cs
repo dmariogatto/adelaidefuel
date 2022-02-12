@@ -61,7 +61,7 @@ namespace AdelaideFuel.UI.Controls
                     Children.Add(fuelLabel, 0, RowDefinitions.Count);
                     Children.Add(priceLabel, 1, RowDefinitions.Count);
 
-                    RowDefinitions.Add(new RowDefinition() {  Height = GridLength.Auto });
+                    RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 }
             }
         }
