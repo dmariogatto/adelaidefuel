@@ -117,15 +117,15 @@
                 <Setter Property="FontFamily" Value="{StaticResource BoldFontFamily}" />
                 <Setter Property="FontSize" Value="Medium" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
                 <Setter Property="FontFamily" Value="{StaticResource RegFontFamily}" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">

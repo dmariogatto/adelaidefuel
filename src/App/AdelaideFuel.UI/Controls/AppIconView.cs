@@ -33,7 +33,7 @@ namespace AdelaideFuel.UI.Controls
 
             var icon = new Image() { Source = Application.Current.Resources[Styles.Keys.TwoToneFuelImg] as string };
             icon.HeightRequest = icon.WidthRequest = 48;
-            icon.HorizontalOptions = icon.VerticalOptions = LayoutOptions.CenterAndExpand;
+            icon.HorizontalOptions = icon.VerticalOptions = LayoutOptions.Center;
 
             Content = icon;
         }

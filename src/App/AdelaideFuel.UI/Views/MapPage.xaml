@@ -33,42 +33,27 @@
             <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
 
             <views:MapPinDataTemplateSelector x:Key="mapPinDataSelector" />
-
-            <ConstraintExpression
-                x:Key="ConstraintFullHeight"
-                Constant="0"
-                Factor="1"
-                Type="RelativeToParent"
-                Property="Height" />
-            <ConstraintExpression
-                x:Key="ConstraintFullWidth"
-                Constant="0"
-                Factor="1"
-                Type="RelativeToParent"
-                Property="Width" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <views:BaseAdPage.MainContent>
-        <RelativeLayout x:Name="MainContentLayout" SizeChanged="MainContentSizeChanged">
+        <Grid x:Name="MainContentLayout" SizeChanged="MainContentSizeChanged">
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
                 ItemTemplateSelector="{StaticResource mapPinDataSelector}"
                 ItemsSource="{Binding FilteredSites}"
                 PropertyChanged="SiteMapPropertyChanged"
-                RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
-                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}"
                 ShowUserLocationButton="{Binding EnableMyLocation}" />
 
-            <Grid
+            <StackLayout
                 Margin="{StaticResource XSmallTopThickness}"
                 Padding="{StaticResource XLargeTopThickness}"
                 effects:SafeAreaInsetEffect.Insets="Left,Top,Right"
                 CascadeInputTransparent="False"
+                HorizontalOptions="Center"
                 InputTransparent="True"
-                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}"
-                RowDefinitions="Auto,Auto">
+                Spacing="{StaticResource SmallSpacing}">
                 <yummy:PancakeView
                     x:Name="FuelPickerView"
                     Margin="0"
@@ -95,18 +80,13 @@
                             VerticalTextAlignment="Center" />
                     </StackLayout>
                 </yummy:PancakeView>
-                <controls:LoadingIndicator
-                    Grid.Row="1"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center" />
-            </Grid>
+                <controls:LoadingIndicator HorizontalOptions="Center" />
+            </StackLayout>
 
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
                 Padding="{StaticResource SmallThickness}"
-                IsVisible="{Binding InitialLoadComplete}"
-                RelativeLayout.HeightConstraint="{StaticResource ConstraintFullHeight}"
-                RelativeLayout.WidthConstraint="{StaticResource ConstraintFullWidth}">
+                IsVisible="{Binding InitialLoadComplete}">
                 <StackLayout
                     SizeChanged="BottomSheetContentSizeChanged"
                     Spacing="0"
@@ -197,8 +177,7 @@
                         x:Name="BottomSheetDivider"
                         Margin="{StaticResource MediumLeftTopThickness}"
                         BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
-                        HeightRequest="1"
-                        HorizontalOptions="FillAndExpand" />
+                        HeightRequest="1" />
 
                     <StackLayout
                         Padding="{StaticResource MediumLeftTopThickness}"
@@ -210,6 +189,7 @@
                                     <Label
                                         FontFamily="{StaticResource BoldFontFamily}"
                                         FontSize="Medium"
+                                        HorizontalOptions="StartAndExpand"
                                         Style="{DynamicResource LabelStyle}"
                                         Text="{Binding FuelName}"
                                         VerticalTextAlignment="Center" />
@@ -248,7 +228,7 @@
                     </Grid>
                 </StackLayout>
             </controls:BottomDrawer>
-        </RelativeLayout>
+        </Grid>
     </views:BaseAdPage.MainContent>
 
 </views:BaseAdPage>

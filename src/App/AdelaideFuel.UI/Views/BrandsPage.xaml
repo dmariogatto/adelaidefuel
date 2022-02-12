@@ -37,7 +37,7 @@
                 TapCommand="{Binding EntityTappedCommand}" />
 
             <StackLayout
-                HorizontalOptions="FillAndExpand"
+                HorizontalOptions="Fill"
                 IsVisible="{Binding HasError}"
                 VerticalOptions="Center">
                 <Label

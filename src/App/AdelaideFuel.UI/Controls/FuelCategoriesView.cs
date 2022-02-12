@@ -78,7 +78,7 @@ namespace AdelaideFuel.UI.Controls
 
                     if (i < FuelCategories.Count - 1)
                     {
-                        var separator = new BoxView() { VerticalOptions = LayoutOptions.FillAndExpand, WidthRequest = 1 };
+                        var separator = new BoxView() { VerticalOptions = LayoutOptions.Fill, WidthRequest = 1 };
                         separator.Margin = new Thickness(separatorSpacing, 0, separatorSpacing, 0);
                         separator.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
 
