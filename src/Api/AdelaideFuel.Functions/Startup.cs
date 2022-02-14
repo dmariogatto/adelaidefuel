@@ -1,4 +1,5 @@
 using AdelaideFuel.Api;
+using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
@@ -23,6 +24,8 @@ namespace AdelaideFuel.Functions
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            var configuration = builder.GetContext().Configuration;
+
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
             {
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
@@ -59,6 +62,9 @@ namespace AdelaideFuel.Functions
                 return storageConnString;
             }
 
+            builder.Services.AddOptions<SendGridOptions>()
+                .Configure(configuration.GetSection("SendGrid").Bind);
+
             builder.Services.AddSingleton(serviceProvider =>
                 CloudTableStorageAccount.Parse(getConnectionString(serviceProvider)));
 
@@ -69,6 +75,7 @@ namespace AdelaideFuel.Functions
             });
 
             builder.Services.AddSingleton<IBlobService>(sp => new BlobService(getConnectionString(sp)));
+            builder.Services.AddSingleton<ISendGridService, SendGridService>();
             builder.Services.AddSingleton<ITableRepository<BrandEntity>, TableRepository<BrandEntity>>();
             builder.Services.AddSingleton<ITableRepository<FuelEntity>, TableRepository<FuelEntity>>();
             builder.Services.AddSingleton<ITableRepository<GeographicRegionEntity>, TableRepository<GeographicRegionEntity>>();

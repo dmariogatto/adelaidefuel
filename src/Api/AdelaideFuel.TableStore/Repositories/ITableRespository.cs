@@ -11,9 +11,10 @@ namespace AdelaideFuel.TableStore.Repositories
         Task CreateIfNotExistsAsync(CancellationToken cancellationToken);
 
         Task<IList<T>> GetPartitionAsync(string partitionKey, CancellationToken cancellationToken);
-        Task<IList<T>> GetPartitionsAsync(IEnumerable<string> partitionKeys, CancellationToken cancellationToken);
+        Task<IList<T>> GetPartitionsAsync(IList<string> partitionKeys, CancellationToken cancellationToken);
 
         Task<T> GetEntityAsync(string partitionKey, string rowKey, CancellationToken cancellationToken);
+        Task<IList<T>> GetEntitiesAsync(IList<(string partitionKey, string rowKey)> keys, CancellationToken cancellationToken);
         Task<IList<T>> GetAllEntitiesAsync(CancellationToken cancellationToken);
 
         Task DeleteAsync(IEnumerable<T> entities, ILogger logger, CancellationToken cancellationToken);

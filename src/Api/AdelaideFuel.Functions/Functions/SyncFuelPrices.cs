@@ -1,11 +1,17 @@
 ﻿using AdelaideFuel.Api;
+using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,26 +21,32 @@ namespace AdelaideFuel.Functions
     {
         private readonly ISaFuelPricingApi _saFuelPricingApi;
 
+        private readonly ITableRepository<FuelEntity> _fuelRepository;
         private readonly ITableRepository<SiteEntity> _siteRepository;
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
         private readonly ITableRepository<SitePriceArchiveEntity> _sitePriceArchiveRepository;
 
         private readonly IBlobService _blobService;
+        private readonly ISendGridService _sendGridService;
 
         public SyncFuelPrices(
             ISaFuelPricingApi saFuelPricingApi,
+            ITableRepository<FuelEntity> fuelRepository,
             ITableRepository<SiteEntity> siteRepository,
             ITableRepository<SitePriceEntity> sitePriceRepository,
             ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository,
-            IBlobService blobService)
+            IBlobService blobService,
+            ISendGridService sendGridService)
         {
             _saFuelPricingApi = saFuelPricingApi;
 
+            _fuelRepository = fuelRepository;
             _siteRepository = siteRepository;
             _sitePriceRepository = sitePriceRepository;
             _sitePriceArchiveRepository = sitePriceArchiveRepository;
 
             _blobService = blobService;
+            _sendGridService = sendGridService;
         }
 
         [FunctionName(nameof(SyncFuelPrices))]
@@ -60,7 +72,7 @@ namespace AdelaideFuel.Functions
                  // sometimes sites change brands
                  let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
                  select (active.SiteId, active.BrandId))
-                 .ToDictionary(i => i.SiteId, i => i.BrandId);
+                .ToDictionary(i => i.SiteId, i => i.BrandId);
 
             var priceEntities =
                 (from sp in apiPrices.SitePrices
@@ -70,23 +82,27 @@ namespace AdelaideFuel.Functions
                  select g)
                 .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
 
-            // The Smoky Bay & Mt Ive Exception, reporting in cents
-            if (priceEntities.TryGetValue("12", out var independants))
+            var exceptionSiteIds = new HashSet<int>()
             {
-                var exceptions = new[]
-                {
-                    // Smoky Bay
-                    61577275,
-                    // Mt Ive
-                    61577323,
-                    // Minnipa Community Store
-                    61577296,
-                };
+                // Tinty Auto & Ag
+                61501446,
+                // Smoky Bay
+                61577275,
+                // Mt Ive
+                61577323,
+                // Minnipa Community Store
+                61577296,
+            };
 
-                var toUpdate = independants.Where(i => i.Price < 500 && exceptions.Contains(i.SiteId));
-                foreach (var i in toUpdate)
-                    i.Price *= 10;
-            }
+            var exceptionSitePrices =
+                (from g in priceEntities
+                 from pe in g.Value
+                 where exceptionSiteIds.Contains(pe.SiteId) &&
+                       pe.Price < 500
+                 select pe).ToList();
+
+            foreach(var i in exceptionSitePrices)
+                i.Price *= 10;
 
             var sitePriceDtos =
                 (from vals in priceEntities.Values
@@ -122,6 +138,105 @@ namespace AdelaideFuel.Functions
             sw.Stop();
             log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}.");
             log.LogInformation($"Have a nice day 😋");
+
+            var exceptions = await FindPossibleExceptionsAsync(
+                priceEntities
+                    .SelectMany(i => i.Value)
+                    .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
+                ct);
+            await SendPossibleExceptionsEmailAsync(exceptions, ct);
         }
+
+        private async Task<IList<SitePriceException>> FindPossibleExceptionsAsync(IEnumerable<SitePriceEntity> sitePrices, CancellationToken ct)
+        {
+            var possibleExceptions = sitePrices
+                .Where(i => NumOfIntDigits(i.Price) <= (i.FuelId == 4 ? 2 : 3))
+                .ToList();
+
+            if (!possibleExceptions.Any())
+                return Array.Empty<SitePriceException>();
+
+            var previousSitePricesTask = _sitePriceRepository.GetEntitiesAsync(possibleExceptions.Select(i => (i.PartitionKey, i.RowKey)).ToList(), ct);
+            var sitesTask = _siteRepository.GetEntitiesAsync(possibleExceptions.Select(i => (i.BrandId.ToString(CultureInfo.InvariantCulture), i.SiteId.ToString(CultureInfo.InvariantCulture))).ToList(), ct);
+            var fuelsTask = _fuelRepository.GetAllEntitiesAsync(ct);
+
+            await Task.WhenAll(previousSitePricesTask, sitesTask, fuelsTask);
+
+            var previousSitePrices = previousSitePricesTask.Result.ToDictionary(i => (i.SiteId, i.FuelId), i => i);
+            var sites = sitesTask.Result.ToDictionary(i => (i.BrandId, i.SiteId), i => i);
+            var fuels = fuelsTask.Result.ToDictionary(i => i.FuelId, i => i);
+
+            var exceptions = new List<SitePriceException>();
+
+            foreach (var i in possibleExceptions)
+            {
+                previousSitePrices.TryGetValue((i.SiteId, i.FuelId), out var previous);
+                sites.TryGetValue((i.BrandId, i.SiteId), out var site);
+                fuels.TryGetValue(i.FuelId, out var fuel);
+
+                if (i.Price != previous?.Price)
+                {
+                    exceptions.Add(new SitePriceException()
+                    {
+                        BrandId = i.BrandId,
+                        SiteId = i.SiteId,
+                        FuelId = i.FuelId,
+                        SiteName = site?.Name ?? string.Empty,
+                        FuelName = fuel?.Name ?? string.Empty,
+                        PreviousPrice = previous?.Price ?? -1,
+                        CurrentPrice = i.Price
+                    });
+                }
+            }
+
+            return exceptions;
+        }
+
+        private async Task SendPossibleExceptionsEmailAsync(IList<SitePriceException> exceptions, CancellationToken ct)
+        {
+            if (!exceptions.Any())
+                return;
+
+            const string thFmt = "<td><b>{0}</b></td>";
+            const string tdFmt = "<td>{0}</td>";
+            const string tdRightFmt = "<td style=\"text-align:right\">{0}</td>";
+
+            var emailBuilder = new StringBuilder();
+            emailBuilder.Append("<table cellpadding=\"6\" border=\"1\">");
+            emailBuilder.Append("<thead>");
+            emailBuilder.AppendFormat(thFmt, "Brand Id");
+            emailBuilder.AppendFormat(thFmt, "Site Id");
+            emailBuilder.AppendFormat(thFmt, "Site Name");
+            emailBuilder.AppendFormat(thFmt, "Fuel Id");
+            emailBuilder.AppendFormat(thFmt, "Fuel Name");
+            emailBuilder.AppendFormat(thFmt, "Previous Price");
+            emailBuilder.AppendFormat(thFmt, "Current Price");
+            emailBuilder.Append("</thead>");
+
+            emailBuilder.Append("<tbody>");
+
+            foreach (var ex in exceptions)
+            {
+                emailBuilder.Append("<tr>");
+
+                emailBuilder.AppendFormat(tdFmt, ex.BrandId);
+                emailBuilder.AppendFormat(tdFmt, ex.SiteId);
+                emailBuilder.AppendFormat(tdFmt, ex?.SiteName ?? string.Empty);
+                emailBuilder.AppendFormat(tdFmt, ex.FuelId);
+                emailBuilder.AppendFormat(tdFmt, ex.FuelName ?? string.Empty);
+                emailBuilder.AppendFormat(tdRightFmt, ex.PreviousPrice);
+                emailBuilder.AppendFormat(tdRightFmt, ex.CurrentPrice);
+
+                emailBuilder.Append("</tr>");
+            }
+
+            emailBuilder.Append("</tbody>");
+            emailBuilder.Append("</table>");
+
+            await _sendGridService.SendEmailAsync("Possible Fuel Price Exceptions", emailBuilder.ToString());
+        }
+
+        private static int NumOfIntDigits(double value)
+            => value == 0 ? 1 : 1 + (int)Math.Log10(Math.Abs(value));
     }
 }
