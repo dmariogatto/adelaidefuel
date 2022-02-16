@@ -37,30 +37,30 @@ namespace AdelaideFuel.UI.Controls
             var dataItemCount = SiteFuelPrices?.Count ?? 0;
             var childItemCount = Children.Count / 2;
 
-            var toAdd = Math.Max(0, dataItemCount - childItemCount);
-            var toRemove = Math.Max(0, childItemCount - dataItemCount);
-
-            for (var i = 0; i < toAdd; i++)
+            for (var i = childItemCount; i < dataItemCount; i++)
             {
                 var fuelLabel = new Label()
                 {
-                    BindingContext = new SiteFuelPrice(),
                     FontFamily = (string)Application.Current.Resources[Styles.Keys.BoldFontFamily],
                     FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
                     VerticalTextAlignment = TextAlignment.Center
                 };
                 fuelLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                fuelLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.FuelName)));
+                fuelLabel.SetBinding(Label.TextProperty, new Binding(
+                    $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.FuelName)}",
+                    source: this));
 
                 var priceLabel = new Label()
                 {
-                    BindingContext = new SiteFuelPrice(),
                     FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
                     HorizontalOptions = LayoutOptions.End,
                     VerticalTextAlignment = TextAlignment.Center
                 };
                 priceLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                priceLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.PriceInCents), stringFormat: "{0:#.0}"));
+                priceLabel.SetBinding(Label.TextProperty, new Binding(
+                    $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.PriceInCents)}",
+                    stringFormat: "{0:#.0}",
+                    source: this));
 
                 Children.Add(fuelLabel, 0, RowDefinitions.Count);
                 Children.Add(priceLabel, 1, RowDefinitions.Count);
@@ -68,20 +68,11 @@ namespace AdelaideFuel.UI.Controls
                 RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             }
 
-            if (toRemove > 0)
+            for (var i = childItemCount; i > dataItemCount; i--)
             {
-                Children.RemoveRange(Children.Skip(Children.Count - toRemove * 2).ToList());
-                RowDefinitions.RemoveRange(RowDefinitions.Skip(RowDefinitions.Count - toRemove).ToList());
-            }
-
-            if (SiteFuelPrices?.Any() == true)
-            {
-                var childIdx = 0;
-                foreach (var item in SiteFuelPrices)
-                {
-                    Children[childIdx++].BindingContext = item;
-                    Children[childIdx++].BindingContext = item;
-                }
+                Children.RemoveAt(Children.Count - 1);
+                Children.RemoveAt(Children.Count - 1);
+                RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
             }
         }
 
