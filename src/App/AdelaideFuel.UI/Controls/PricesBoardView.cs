@@ -68,11 +68,23 @@ namespace AdelaideFuel.UI.Controls
                 RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             }
 
+            void removeLastChild()
+            {
+                if (Children.Count > 0)
+                    Children.RemoveAt(Children.Count - 1);
+            }
+
+            void removeLastRowDef()
+            {
+                if (RowDefinitions.Count > 0)
+                    RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
+            }
+
             for (var i = childItemCount; i > dataItemCount; i--)
             {
-                Children.RemoveAt(Children.Count - 1);
-                Children.RemoveAt(Children.Count - 1);
-                RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
+                removeLastChild();
+                removeLastChild();
+                removeLastRowDef();
             }
         }
 

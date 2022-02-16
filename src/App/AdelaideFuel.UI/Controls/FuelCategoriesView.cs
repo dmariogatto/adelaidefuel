@@ -19,17 +19,21 @@ namespace AdelaideFuel.UI.Controls
               propertyChanged: (b, o, n) => ((FuelCategoriesView)b).FuelCategoriesSourceChanged((ObservableRangeCollection<FuelCategory>)o, (ObservableRangeCollection<FuelCategory>)n));
 
         private readonly PriceCategoryToColorConverter _priceCategoryToColorConverter = new PriceCategoryToColorConverter();
+        private readonly EnumToDescriptionConverter _enumToDescriptionConverter = new EnumToDescriptionConverter();
+        private readonly double _separatorSpacing;
 
         public FuelCategoriesView()
         {
             HorizontalOptions = LayoutOptions.Center;
 
-            RowSpacing = 0;
+            ColumnSpacing = RowSpacing = 0;
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
-            ColumnSpacing = 0;
+            _separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
+                ? (double)Application.Current.Resources[Styles.Keys.MediumSpacing]
+                : (double)Application.Current.Resources[Styles.Keys.XSmallSpacing];
 
             PropertyChanged += (sender, args) =>
             {
@@ -46,47 +50,74 @@ namespace AdelaideFuel.UI.Controls
 
         private void Redraw()
         {
-            Children.Clear();
-            ColumnDefinitions.Clear();
+            var dataItemCount = FuelCategories?.Count ?? 0;
+            var childItemCount = (Children.Count + 1) / 3;
 
-            var separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
-                ? (double)Application.Current.Resources[Styles.Keys.MediumSpacing]
-                : (double)Application.Current.Resources[Styles.Keys.XSmallSpacing];
-
-            if (FuelCategories?.Any() == true)
+            void createSeparator()
             {
-                for (var i = 0; i < FuelCategories.Count; i++)
-                {
-                    var v = FuelCategories[i];
+                var separator = new BoxView() { VerticalOptions = LayoutOptions.Fill, WidthRequest = 1 };
+                separator.Margin = new Thickness(_separatorSpacing, 0, _separatorSpacing, 0);
+                separator.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
 
-                    var tintImg = new TintImage();
-                    tintImg.HeightRequest = tintImg.WidthRequest = 24;
-                    tintImg.HorizontalOptions = LayoutOptions.Center;
-                    tintImg.Source = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
-                    tintImg.SetBinding(TintImage.TintColorProperty, new Binding(nameof(v.PriceCategory), converter: _priceCategoryToColorConverter, source: v));
-                    AutomationProperties.SetHelpText(tintImg, v.PriceCategory.GetDescription());
+                ColumnDefinitions.Add(new ColumnDefinition { Width = 1 + _separatorSpacing * 2 });
+                Children.Add(separator, ColumnDefinitions.Count - 1, 0);
+                SetRowSpan(separator, 2);
+            }
 
-                    var lbl = new Label();
-                    lbl.SetDynamicResource(StyleProperty, Styles.Keys.LabelStyle);
-                    lbl.HorizontalOptions = LayoutOptions.Center;
-                    lbl.FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label));
-                    lbl.SetBinding(Label.TextProperty, new Binding(nameof(v.Description), source: v));
+            for (var i = childItemCount; i < dataItemCount; i++)
+            {
+                if (i == childItemCount && childItemCount > 0)
+                    createSeparator();
 
-                    ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                    Children.Add(tintImg, ColumnDefinitions.Count - 1, 0);
-                    Children.Add(lbl, ColumnDefinitions.Count - 1, 1);
+                var tintImg = new TintImage();
+                tintImg.HeightRequest = tintImg.WidthRequest = 24;
+                tintImg.HorizontalOptions = LayoutOptions.Center;
+                tintImg.Source = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
+                tintImg.SetBinding(TintImage.TintColorProperty, new Binding(
+                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.PriceCategory)}",
+                    converter: _priceCategoryToColorConverter,
+                    source: this));
+                tintImg.SetBinding(AutomationProperties.HelpTextProperty, new Binding(
+                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.PriceCategory)}",
+                    converter: _enumToDescriptionConverter,
+                    source: this));
 
-                    if (i < FuelCategories.Count - 1)
-                    {
-                        var separator = new BoxView() { VerticalOptions = LayoutOptions.Fill, WidthRequest = 1 };
-                        separator.Margin = new Thickness(separatorSpacing, 0, separatorSpacing, 0);
-                        separator.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
+                var lbl = new Label();
+                lbl.SetDynamicResource(StyleProperty, Styles.Keys.LabelStyle);
+                lbl.HorizontalOptions = LayoutOptions.Center;
+                lbl.FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label));
+                lbl.SetBinding(Label.TextProperty, new Binding(
+                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.Description)}",
+                    source: this));
 
-                        ColumnDefinitions.Add(new ColumnDefinition { Width = 1 + separatorSpacing * 2 });
-                        Children.Add(separator, ColumnDefinitions.Count - 1, 0);
-                        SetRowSpan(separator, 2);
-                    }
-                }
+                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                Children.Add(tintImg, ColumnDefinitions.Count - 1, 0);
+                Children.Add(lbl, ColumnDefinitions.Count - 1, 1);
+
+                if (i < dataItemCount - 1)
+                    createSeparator();
+            }
+
+            void removeLastChild()
+            {
+                if (Children.Count > 0)
+                    Children.RemoveAt(Children.Count - 1);
+            }
+
+            void removeLastColDef()
+            {
+                if (ColumnDefinitions.Count > 0)
+                    ColumnDefinitions.RemoveAt(ColumnDefinitions.Count - 1);
+            }
+
+            for (var i = childItemCount; i > dataItemCount; i--)
+            {
+
+                removeLastChild();
+                removeLastChild();
+                removeLastChild();
+                removeLastColDef();
+                removeLastColDef();
             }
         }
 
