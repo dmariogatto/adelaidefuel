@@ -112,7 +112,6 @@ namespace AdelaideFuel.UI.Controls
 
             for (var i = childItemCount; i > dataItemCount; i--)
             {
-
                 removeLastChild();
                 removeLastChild();
                 removeLastChild();
