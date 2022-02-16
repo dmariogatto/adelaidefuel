@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdelaideFuel.Services
 {
@@ -13,25 +10,7 @@ namespace AdelaideFuel.Services
         {
         }
 
-        protected readonly static HttpClient HttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
-
-        protected async Task<bool> HeadAsync(string url, CancellationToken cancellationToken)
-        {
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Head, url);
-                using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-
-            return false;
-        }
+        protected readonly static HttpClient HttpClient = new HttpClient();
 
         protected static T DeserializeJsonFromStream<T>(Stream stream)
         {
