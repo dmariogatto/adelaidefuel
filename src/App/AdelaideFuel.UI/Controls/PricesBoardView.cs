@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Models;
 using MvvmHelpers;
+using System;
 using System.Collections.Specialized;
 using System.Linq;
 using Xamarin.Forms;
@@ -33,35 +34,53 @@ namespace AdelaideFuel.UI.Controls
 
         private void Redraw()
         {
-            Children.Clear();
-            RowDefinitions.Clear();
+            var dataItemCount = SiteFuelPrices?.Count ?? 0;
+            var childItemCount = Children.Count / 2;
+
+            var toAdd = Math.Max(0, dataItemCount - childItemCount);
+            var toRemove = Math.Max(0, childItemCount - dataItemCount);
+
+            for (var i = 0; i < toAdd; i++)
+            {
+                var fuelLabel = new Label()
+                {
+                    BindingContext = new SiteFuelPrice(),
+                    FontFamily = (string)Application.Current.Resources[Styles.Keys.BoldFontFamily],
+                    FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
+                    VerticalTextAlignment = TextAlignment.Center
+                };
+                fuelLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
+                fuelLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.FuelName)));
+
+                var priceLabel = new Label()
+                {
+                    BindingContext = new SiteFuelPrice(),
+                    FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+                    HorizontalOptions = LayoutOptions.End,
+                    VerticalTextAlignment = TextAlignment.Center
+                };
+                priceLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
+                priceLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.PriceInCents), stringFormat: "{0:#.0}"));
+
+                Children.Add(fuelLabel, 0, RowDefinitions.Count);
+                Children.Add(priceLabel, 1, RowDefinitions.Count);
+
+                RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            }
+
+            if (toRemove > 0)
+            {
+                Children.RemoveRange(Children.Skip(Children.Count - toRemove * 2).ToList());
+                RowDefinitions.RemoveRange(RowDefinitions.Skip(RowDefinitions.Count - toRemove).ToList());
+            }
 
             if (SiteFuelPrices?.Any() == true)
             {
+                var childIdx = 0;
                 foreach (var item in SiteFuelPrices)
                 {
-                    var fuelLabel = new Label()
-                    {
-                        FontFamily = (string)Application.Current.Resources[Styles.Keys.BoldFontFamily],
-                        FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
-                        VerticalTextAlignment = TextAlignment.Center
-                    };
-                    fuelLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                    fuelLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.FuelName), source: item));
-
-                    var priceLabel = new Label()
-                    {
-                        FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
-                        HorizontalOptions = LayoutOptions.End,
-                        VerticalTextAlignment = TextAlignment.Center
-                    };
-                    priceLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                    priceLabel.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.PriceInCents), stringFormat: "{0:#.0}", source: item));
-
-                    Children.Add(fuelLabel, 0, RowDefinitions.Count);
-                    Children.Add(priceLabel, 1, RowDefinitions.Count);
-
-                    RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                    Children[childIdx++].BindingContext = item;
+                    Children[childIdx++].BindingContext = item;
                 }
             }
         }
