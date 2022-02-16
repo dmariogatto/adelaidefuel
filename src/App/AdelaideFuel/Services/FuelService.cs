@@ -644,7 +644,9 @@ namespace AdelaideFuel.Services
             var uri = Path.Combine(Constants.ApiUrlBase, !string.IsNullOrEmpty(queryString) ? $"{sitePrices}?{queryString}" : sitePrices);
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.Add(Constants.AuthHeader, Constants.ApiKeySitePrices);
-            using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(10));
+            using var response = await HttpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var result = DeserializeJsonFromStream<List<SitePriceDto>>(s);
