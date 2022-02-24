@@ -8,19 +8,27 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
+using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
     public class SiteSearchViewModel : BaseViewModel
     {
-        private readonly SemaphoreSlim _searchSemaphore = new SemaphoreSlim(1, 1);
+        private readonly IGeolocation _geolocation;
+        private readonly IPermissions _permissions;
 
         private CancellationTokenSource _searchCancellation;
 
         public SiteSearchViewModel(
+            IGeolocation geolocation,
+            IPermissions permissions,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             Title = Resources.Stations;
+
+            _geolocation = geolocation;
+            _permissions = permissions;
 
             Sites = new ObservableRangeCollection<SiteDto>();
             FilteredSites = new ObservableRangeCollection<SiteDto>();
@@ -74,15 +82,19 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
+                var locationTask = GetLastLocationAsync();
                 var sitesTask = FuelService.GetSitesAsync(default);
                 var userBrandsTask = FuelService.GetUserBrandsAsync(default);
 
-                await Task.WhenAll(sitesTask, userBrandsTask);
+                await Task.WhenAll(locationTask, sitesTask, userBrandsTask);
 
                 var sites =
                     (from s in sitesTask.Result
                      join ub in userBrandsTask.Result on s.BrandId equals ub.Id
-                     orderby ub.IsActive descending, ub.SortOrder, s.Name
+                     let distanceKm = locationTask.Result is not null
+                        ? locationTask.Result.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers)
+                        : double.MaxValue
+                     orderby ub.IsActive descending, distanceKm, ub.SortOrder, s.Name
                      select s).ToList();
 
                 Sites.ReplaceRange(sites);
@@ -98,63 +110,53 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private async Task SearchAsync(string searchText, CancellationToken cancellationToken)
+        private async Task SearchAsync(string searchText, CancellationToken ct)
         {
-            // Not great but stops a race condition when the ObserableCollection changes too quickly
             await Task.Delay(250);
-            if (cancellationToken.IsCancellationRequested ||
-                searchText == null ||
+
+            if (IsBusy ||
+                ct.IsCancellationRequested ||
+                searchText is null ||
                 !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            await _searchSemaphore.WaitAsync();
+            IsBusy = true;
 
-            if (!IsBusy && !cancellationToken.IsCancellationRequested)
+            try
             {
-                IsBusy = true;
+                var filtered = (IList<SiteDto>)Sites;
 
-                try
+                if (!string.IsNullOrWhiteSpace(searchText))
                 {
-                    var filtered = (IList<SiteDto>)Sites;
+                    var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
+                    filtered = Sites
+                        .Where(i => compareInfo.IndexOf(i.Name, searchText, CompareOptions.IgnoreCase) >= 0)
+                        .ToList();
 
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!filtered.Any() && searchText.Length >= 3)
                     {
-                        if (!string.IsNullOrWhiteSpace(searchText))
-                        {
-                            var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
-                            filtered = Sites
-                                .Where(i => compareInfo.IndexOf(i.Name, searchText, CompareOptions.IgnoreCase) >= 0)
-                                .ToList();
-
-                            if (!filtered.Any() &&
-                                searchText.Length >= 3)
-                            {
-                                var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                filtered = Sites
-                                    .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.IgnoreCase) >= 0) ||
-                                                parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.IgnoreCase) >= 0)).ToList();
-                            }
-                        }
-
-                        FilteredSites.Clear();
-                        FilteredSites.ReplaceRange(filtered.ToList());
+                        var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        filtered = Sites
+                            .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.IgnoreCase) >= 0) ||
+                                        parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.IgnoreCase) >= 0)).ToList();
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                    await UserDialogs.AlertAsync(
-                        Resources.UnableToLoadStations,
-                        Resources.Error,
-                        Resources.OK);
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
-            }
 
-            _searchSemaphore.Release();
+                FilteredSites.Clear();
+                FilteredSites.ReplaceRange(filtered);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                await UserDialogs.AlertAsync(
+                    Resources.UnableToLoadStations,
+                    Resources.Error,
+                    Resources.OK);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private async Task TappedAsync(SiteDto site)
@@ -168,6 +170,27 @@ namespace AdelaideFuel.ViewModels
                 { NavigationKeys.SiteIdQueryProperty, site.SiteId.ToString() },
                 { NavigationKeys.LatLongQueryProperty, $"{site.Latitude},{site.Longitude}" }
             });
+        }
+
+        private async Task<Location> GetLastLocationAsync()
+        {
+            var location = default(Location);
+
+            try
+            {
+                var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>()
+                    .ConfigureAwait(false);
+                if (status == PermissionStatus.Granted)
+                {
+                    location = await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
+
+            return location;
         }
     }
 }

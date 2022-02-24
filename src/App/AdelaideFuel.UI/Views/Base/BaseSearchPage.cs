@@ -3,12 +3,13 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
 {
-    public partial class BaseSearchPage<T> : BasePage<T>, ISearchPage where T : BaseViewModel
+    public class BaseSearchPage<T> : BasePage<T>, ISearchPage where T : BaseViewModel
     {
         public static readonly BindableProperty QueryProperty =
             BindableProperty.CreateAttached(
                 propertyName: nameof(Query),
                 returnType: typeof(string),
+                defaultBindingMode: BindingMode.TwoWay,
                 declaringType: typeof(BaseSearchPage<>),
                 defaultValue: string.Empty);
 

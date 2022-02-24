@@ -12,7 +12,7 @@ namespace AdelaideFuel.UI.Views
         {
             InitializeComponent();
 
-            SetBinding(QueryProperty, new Binding(nameof(ViewModel.SearchText), mode: BindingMode.TwoWay));
+            SetBinding(QueryProperty, new Binding(nameof(ViewModel.SearchText)));
         }
 
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)
