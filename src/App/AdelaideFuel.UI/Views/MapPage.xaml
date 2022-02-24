@@ -83,6 +83,25 @@
                 <controls:LoadingIndicator HorizontalOptions="Center" />
             </StackLayout>
 
+            <yummy:PancakeView
+                Margin="{StaticResource XSmallThickness}"
+                Padding="0"
+                CornerRadius="18"
+                HeightRequest="36"
+                HorizontalOptions="End"
+                IsVisible="{Binding IsDevelopment}"
+                Style="{DynamicResource CardStyle}"
+                VerticalOptions="Center"
+                WidthRequest="36">
+                <View.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToSiteSearchCommand}" />
+                </View.GestureRecognizers>
+                <controls:TintImage
+                    Margin="{StaticResource SmallThickness}"
+                    Source="{StaticResource SearchImg}"
+                    TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
+            </yummy:PancakeView>
+
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
                 Padding="{StaticResource SmallThickness}"

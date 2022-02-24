@@ -20,6 +20,7 @@
             <x:String x:Key="TwoToneCircleImg">twotone_circle.png</x:String>
             <x:String x:Key="TwoToneFuelImg">twotone_fuel.png</x:String>
             <x:String x:Key="DeleteImg">delete.png</x:String>
+            <x:String x:Key="SearchImg">search.png</x:String>
 
             <Color x:Key="OtherColor">#FAAF2C</Color>
             <Color x:Key="TitleColor">#18335D</Color>
@@ -147,14 +148,6 @@
                 <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="Border" Value="{DynamicResource {x:Static styles:Keys.CardYummyBorder}}" />
                 <Setter Property="Shadow" Value="{yummy:ShadowMarkup BlurRadius=2}" />
-            </Style>
-
-            <Style x:Key="CardRouteStyle" TargetType="Frame">
-                <Setter Property="Padding" Value="{StaticResource XSmallThickness}" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="HasShadow" Value="False" />
-                <Setter Property="HorizontalOptions" Value="Center" />
-                <Setter Property="VerticalOptions" Value="Center" />
             </Style>
 
             <Style TargetType="sv:SettingsView">

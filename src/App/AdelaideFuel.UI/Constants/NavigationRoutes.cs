@@ -8,7 +8,7 @@ namespace AdelaideFuel.UI
 
         public const string Prices = "prices";
         public const string Map = "map";
-        public const string Sites = "sites";
+        public const string SiteSearch = "sitesearch";
         public const string Brands = "brands";
         public const string Fuels = "fuels";
         public const string Radii = "radii";

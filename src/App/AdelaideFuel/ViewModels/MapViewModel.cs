@@ -58,6 +58,7 @@ namespace AdelaideFuel.ViewModels
             LoadFuelsCommand = new AsyncCommand<int>(LoadFuelsAsync);
             ChangeFuelCommand = new AsyncCommand(ChangeFuelAsync);
             LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
+            GoToSiteSearchCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>());
 
             CheckAndRequestLocationCommand = new AsyncCommand(CheckAndRequestLocationAsync);
         }
@@ -161,6 +162,7 @@ namespace AdelaideFuel.ViewModels
         public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
         public AsyncCommand ChangeFuelCommand { get; private set; }
         public AsyncCommand<Site> LaunchMapCommand { get; private set; }
+        public AsyncCommand GoToSiteSearchCommand { get; private set; }
 
         public AsyncCommand CheckAndRequestLocationCommand { get; private set; }
 

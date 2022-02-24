@@ -111,6 +111,7 @@
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
+    <Compile Include="Renderers\SearchPageRenderer.cs" />
     <Compile Include="SplashActivity.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />
@@ -209,6 +210,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\fuel_shortcut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\search.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>

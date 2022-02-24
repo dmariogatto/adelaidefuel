@@ -42,8 +42,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Base\BaseSearchPage.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Views\BrandsPage.xaml.cs">
       <DependentUpon>BrandsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SiteSearchPage.xaml.cs">
+      <DependentUpon>SiteSearchPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\RadiiPage.xaml.cs">
       <DependentUpon>RadiiPage.xaml</DependentUpon>
@@ -76,6 +82,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\BrandsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SiteSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\RadiiPage.xaml">

@@ -99,6 +99,7 @@
     <Compile Include="Helpers\TraitCollectionExtensions.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Renderers\SearchPageRenderer.cs" />
     <Compile Include="Renderers\CustomMapRenderer.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\CustomNavigationPageRenderer.cs" />
@@ -266,6 +267,12 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\fuel_shortcut%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\search%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\search%403x.png" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

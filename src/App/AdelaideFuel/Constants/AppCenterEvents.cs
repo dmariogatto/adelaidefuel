@@ -8,6 +8,7 @@ namespace AdelaideFuel
         {
             public const string HomeView = "home_view";
             public const string MapView = "map_view";
+            public const string SiteSearchView = "site_search_view";
             public const string BrandsView = "brands_view";
             public const string FuelsView = "fuels_view";
             public const string RadiiView = "radii_view";

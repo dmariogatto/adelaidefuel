@@ -19,7 +19,7 @@ namespace AdelaideFuel.Localisation {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -124,8 +124,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Based on or contains data provided by the State of South Australia (Office of Consumer and Business Services 2021-2023).
-        ///Copyright of the State of South Australia.
+        ///   Looks up a localized string similar to Based on or contains data provided by the State of South Australia (Office of Consumer and Business Services 2021-2023). Copyright of the State of South Australia.
         /// </summary>
         public static string BasedOnDataProvidedSa {
             get {
@@ -553,6 +552,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Results.
+        /// </summary>
+        public static string NoResults {
+            get {
+                return ResourceManager.GetString("NoResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No stations found.
         /// </summary>
         public static string NoStationsFound {
@@ -724,6 +732,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Send Feedback.
         /// </summary>
         public static string SendFeedback {
@@ -756,6 +773,15 @@ namespace AdelaideFuel.Localisation {
         public static string ShouldIFuel {
             get {
                 return ResourceManager.GetString("ShouldIFuel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stations.
+        /// </summary>
+        public static string Stations {
+            get {
+                return ResourceManager.GetString("Stations", resourceCulture);
             }
         }
         
@@ -841,11 +867,11 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to load, tap for more.
+        ///   Looks up a localized string similar to Unable to load stations, please check your internet.
         /// </summary>
-        public static string UnableToLoadTapForMore {
+        public static string UnableToLoadStations {
             get {
-                return ResourceManager.GetString("UnableToLoadTapForMore", resourceCulture);
+                return ResourceManager.GetString("UnableToLoadStations", resourceCulture);
             }
         }
         
