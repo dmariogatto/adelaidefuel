@@ -15,6 +15,13 @@ namespace AdelaideFuel.UI.Views
             SetBinding(QueryProperty, new Binding(nameof(ViewModel.SearchText)));
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            ViewModel.SearchText = null;
+        }
+
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)
         {
             if (e.Item is SiteDto model)
