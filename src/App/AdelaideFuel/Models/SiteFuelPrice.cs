@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
-    [DebuggerDisplay("{FuelName} - {PriceInCents}")]
+    [DebuggerDisplay("{SiteName} - {FuelName} - {PriceInCents}")]
     public class SiteFuelPrice : ObservableObject
     {
         public SiteFuelPrice() { }
