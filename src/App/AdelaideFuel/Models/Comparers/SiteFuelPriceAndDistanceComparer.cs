@@ -21,6 +21,8 @@ namespace AdelaideFuel.Models
             if (cmp == 0)
                 cmp = priceX.BrandSortOrder.CompareTo(priceY.BrandSortOrder);
             if (cmp == 0)
+                cmp = (priceX.SiteName ?? string.Empty).CompareTo(priceY.SiteName ?? string.Empty);
+            if (cmp == 0)
                 cmp = priceX.SiteId.CompareTo(priceY.SiteId);
 
             return cmp;
