@@ -34,7 +34,7 @@ namespace AdelaideFuel.ViewModels
             FilteredSites = new ObservableRangeCollection<SiteDto>();
 
             LoadCommand = new AsyncCommand(LoadAsync);
-            SearchCommand = new AsyncCommand<CancellationToken>(ct => SearchAsync(SearchText, ct));
+            SearchCommand = new AsyncCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
             TappedCommand = new AsyncCommand<SiteDto>(TappedAsync);
         }
 
@@ -62,7 +62,7 @@ namespace AdelaideFuel.ViewModels
                 _searchCancellation = null;
 
                 _searchCancellation = new CancellationTokenSource();
-                SearchCommand.ExecuteAsync(_searchCancellation.Token);
+                SearchCommand.ExecuteAsync((_searchText, _searchCancellation.Token));
             }
         }
 
@@ -70,7 +70,7 @@ namespace AdelaideFuel.ViewModels
         public ObservableRangeCollection<SiteDto> FilteredSites { get; private set; }
 
         public AsyncCommand LoadCommand { get; private set; }
-        public AsyncCommand<CancellationToken> SearchCommand { get; private set; }
+        public AsyncCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
         public AsyncCommand<SiteDto> TappedCommand { get; private set; }
 
         private async Task LoadAsync()
