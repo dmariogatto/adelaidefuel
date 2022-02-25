@@ -19,11 +19,9 @@ namespace AdelaideFuel.Models
                 cmp = x.DistanceKm.CompareTo(y.DistanceKm);
 
             if (cmp == 0)
-                cmp = priceX.FuelSortOrder.CompareTo(priceY.FuelSortOrder);
-            if (cmp == 0)
                 cmp = priceX.BrandSortOrder.CompareTo(priceY.BrandSortOrder);
             if (cmp == 0)
-                cmp = (priceX.SiteName ?? string.Empty).CompareTo(priceY.SiteName ?? string.Empty);
+                cmp = priceX.SiteId.CompareTo(priceY.SiteId);
 
             return cmp;
         }
