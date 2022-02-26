@@ -112,11 +112,14 @@ namespace AdelaideFuel.ViewModels
 
         private async Task SearchAsync(string searchText, CancellationToken ct)
         {
+            if (ct.IsCancellationRequested ||
+                searchText is null)
+                return;
+
             await Task.Delay(250);
 
             if (IsBusy ||
                 ct.IsCancellationRequested ||
-                searchText is null ||
                 !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase))
                 return;
 
