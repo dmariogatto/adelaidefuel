@@ -42,9 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\Base\BaseSearchPage.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
     <Compile Update="Views\BrandsPage.xaml.cs">
       <DependentUpon>BrandsPage.xaml</DependentUpon>
     </Compile>
