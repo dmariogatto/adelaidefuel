@@ -73,13 +73,10 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                var userFuelsTask = FuelService.GetUserFuelsAsync(default);
                 var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
-                await Task.WhenAll(userFuelsTask, sitePricesTask);
-
                 var sitesByFuelId =
-                    (from s in sitePricesTask.Result
+                    (from s in await sitePricesTask
                      orderby s.FuelSortOrder, s.PriceInCents, s.BrandSortOrder
                      group s by s.FuelId into g
                      select g);
