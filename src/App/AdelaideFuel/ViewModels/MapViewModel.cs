@@ -56,9 +56,11 @@ namespace AdelaideFuel.ViewModels
 
             LoadSitesCommand = new AsyncCommand<UserFuel>(LoadSitesAsync);
             LoadFuelsCommand = new AsyncCommand<int>(LoadFuelsAsync);
-            ChangeFuelCommand = new AsyncCommand(ChangeFuelAsync);
             LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
-            GoToSiteSearchCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>());
+            GoToSiteSearchCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>(new Dictionary<string, string>()
+            {
+                { NavigationKeys.FuelIdQueryProperty, (Fuel?.Id ?? -1).ToString()  }
+            }));
 
             CheckAndRequestLocationCommand = new AsyncCommand(CheckAndRequestLocationAsync);
         }
@@ -160,7 +162,6 @@ namespace AdelaideFuel.ViewModels
 
         public AsyncCommand<int> LoadFuelsCommand { get; private set; }
         public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
-        public AsyncCommand ChangeFuelCommand { get; private set; }
         public AsyncCommand<Site> LaunchMapCommand { get; private set; }
         public AsyncCommand GoToSiteSearchCommand { get; private set; }
 
@@ -357,29 +358,6 @@ namespace AdelaideFuel.ViewModels
             if (!ct.IsCancellationRequested && !_sitesCancellation.IsCancellationRequested)
             {
                 IsBusy = false;
-            }
-        }
-
-        private async Task ChangeFuelAsync()
-        {
-            try
-            {
-                var fuelNames = Fuels.Select(i => i.Name).ToArray();
-                var result = await UserDialogs.ActionSheetAsync(
-                    Resources.Fuels,
-                    Resources.Cancel,
-                    default,
-                    default,
-                    fuelNames);
-
-                if (!string.IsNullOrEmpty(result) &&
-                    Array.IndexOf(fuelNames, result) is int idx &&
-                    idx >= 0)
-                    Fuel = Fuels[idx];
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
             }
         }
 

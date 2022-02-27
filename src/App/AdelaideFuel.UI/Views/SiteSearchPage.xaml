@@ -5,40 +5,38 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-    xmlns:dtos="clr-namespace:AdelaideFuel.Shared;assembly=AdelaideFuel.Shared"
     xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
     xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     Title="{Binding Title}"
+    ios:Page.UseSafeArea="True"
     x:DataType="viewModels:SiteSearchViewModel"
     x:TypeArguments="viewModels:SiteSearchViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Query="{Binding SearchText}"
     mc:Ignorable="d">
-
-    <Shell.SearchHandler>
-        <SearchHandler
-            Placeholder="{local:Translate Search}"
-            Query="{Binding SearchText}"
-            SearchBoxVisibility="Collapsible" />
-    </Shell.SearchHandler>
 
     <ContentPage.Content>
         <Grid>
             <ListView
-                BackgroundColor="Transparent"
                 CachingStrategy="RecycleElement"
+                GroupDisplayBinding="{Binding Key.Name}"
                 HasUnevenRows="True"
+                IsGroupingEnabled="True"
                 ItemTapped="ListViewItemTapped"
                 ItemsSource="{Binding FilteredSites}"
                 SelectionMode="None"
                 SeparatorVisibility="None">
                 <ListView.Header>
-                    <StackLayout Padding="{StaticResource SmallThickness}">
+                    <StackLayout x:Name="ListHeaderView">
                         <Label
+                            Padding="{StaticResource XLargeTopThickness}"
                             HorizontalTextAlignment="Center"
                             IsVisible="False"
                             Style="{DynamicResource LabelStyle}"
@@ -55,11 +53,18 @@
                         </Label>
                     </StackLayout>
                 </ListView.Header>
+                <ListView.Footer>
+                    <ContentView Padding="{StaticResource XSmallThickness}" />
+                </ListView.Footer>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="dtos:SiteDto">
+                    <DataTemplate x:DataType="models:SiteFuelPrice">
                         <ViewCell>
                             <yummy:PancakeView Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
-                                <Grid ColumnDefinitions="48,*" RowDefinitions="Auto,Auto">
+                                <Grid
+                                    ColumnDefinitions="48,*,Auto"
+                                    ColumnSpacing="{StaticResource XSmallSpacing}"
+                                    RowDefinitions="Auto,Auto"
+                                    RowSpacing="{StaticResource XSmallSpacing}">
                                     <yummy:PancakeView
                                         Grid.RowSpan="2"
                                         CornerRadius="20"
@@ -76,12 +81,28 @@
                                     <Label
                                         Grid.Column="1"
                                         Style="{DynamicResource LabelTitleStyle}"
-                                        Text="{Binding Name}" />
+                                        Text="{Binding SiteName}" />
                                     <Label
                                         Grid.Row="1"
                                         Grid.Column="1"
+                                        FontSize="Small"
+                                        Style="{DynamicResource LabelStyle}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0}, {1}">
+                                                <Binding Path="SiteAddress" />
+                                                <Binding Path="SitePostcode" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+
+                                    <Label
+                                        Grid.RowSpan="2"
+                                        Grid.Column="2"
+                                        FontSize="Large"
+                                        HorizontalTextAlignment="End"
                                         Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding Address}" />
+                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                        VerticalTextAlignment="Center" />
                                 </Grid>
                             </yummy:PancakeView>
                         </ViewCell>
@@ -89,7 +110,17 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <controls:LoadingIndicator HorizontalOptions="Center" VerticalOptions="Start" />
+            <ContentView
+                x:Name="SelectedFuelView"
+                HorizontalOptions="Center"
+                VerticalOptions="Start">
+                <controls:FuelSelectionView
+                    Margin="{StaticResource SmallTopThickness}"
+                    FuelsSource="{Binding Fuels}"
+                    SelectedFuel="{Binding Fuel}" />
+            </ContentView>
+
+            <controls:LoadingIndicator />
         </Grid>
     </ContentPage.Content>
 

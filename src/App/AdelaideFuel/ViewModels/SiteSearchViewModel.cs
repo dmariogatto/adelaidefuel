@@ -1,5 +1,5 @@
 ﻿using AdelaideFuel.Localisation;
-using AdelaideFuel.Shared;
+using AdelaideFuel.Models;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
@@ -8,34 +8,26 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
     public class SiteSearchViewModel : BaseViewModel
     {
-        private readonly IGeolocation _geolocation;
-        private readonly IPermissions _permissions;
+        public readonly Dictionary<UserFuel, List<SiteFuelPrice>> _sites = new Dictionary<UserFuel, List<SiteFuelPrice>>();
 
         private CancellationTokenSource _searchCancellation;
 
         public SiteSearchViewModel(
-            IGeolocation geolocation,
-            IPermissions permissions,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             Title = Resources.Stations;
 
-            _geolocation = geolocation;
-            _permissions = permissions;
-
-            Sites = new ObservableRangeCollection<SiteDto>();
-            FilteredSites = new ObservableRangeCollection<SiteDto>();
+            Fuels = new ObservableRangeCollection<UserFuel>();
+            FilteredSites = new ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>>();
 
             LoadCommand = new AsyncCommand(LoadAsync);
-            SearchCommand = new AsyncCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
-            TappedCommand = new AsyncCommand<SiteDto>(TappedAsync);
+            SearchCommand = new AsyncCommand<(string, int, int)>(t => SearchAsync(t.Item1, t.Item2, t.Item3));
+            TappedCommand = new AsyncCommand<SiteFuelPrice>(TappedAsync);
         }
 
         #region Overrides
@@ -55,23 +47,29 @@ namespace AdelaideFuel.ViewModels
             get => _searchText;
             set
             {
-                SetProperty(ref _searchText, value?.Trim());
-
-                _searchCancellation?.Cancel();
-                _searchCancellation?.Dispose();
-                _searchCancellation = null;
-
-                _searchCancellation = new CancellationTokenSource();
-                SearchCommand.ExecuteAsync((_searchText, _searchCancellation.Token));
+                if (SetProperty(ref _searchText, value?.Trim()))
+                    SearchCommand.ExecuteAsync((SearchText, Fuel?.Id ?? -1, 250));
             }
         }
 
-        public ObservableRangeCollection<SiteDto> Sites { get; private set; }
-        public ObservableRangeCollection<SiteDto> FilteredSites { get; private set; }
+        private UserFuel _fuel;
+        public UserFuel Fuel
+        {
+            get => _fuel;
+            set
+            {
+                if (SetProperty(ref _fuel, value))
+                    SearchCommand.ExecuteAsync((SearchText, Fuel?.Id ?? -1, 0));
+            }
+        }
+
+        public ObservableRangeCollection<UserFuel> Fuels { get; private set; }
+
+        public ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>> FilteredSites { get; private set; }
 
         public AsyncCommand LoadCommand { get; private set; }
-        public AsyncCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
-        public AsyncCommand<SiteDto> TappedCommand { get; private set; }
+        public AsyncCommand<(string searchText, int fuelId, int delayMs)> SearchCommand { get; private set; }
+        public AsyncCommand<SiteFuelPrice> TappedCommand { get; private set; }
 
         private async Task LoadAsync()
         {
@@ -82,23 +80,39 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                var locationTask = GetLastLocationAsync();
-                var sitesTask = FuelService.GetSitesAsync(default);
-                var userBrandsTask = FuelService.GetUserBrandsAsync(default);
+                Fuels.Add(new UserFuel()
+                {
+                    Id = -1,
+                    Name = Resources.All,
+                    SortOrder = -1,
+                    IsActive = true
+                });
+                Fuel = Fuels.First();
 
-                await Task.WhenAll(locationTask, sitesTask, userBrandsTask);
+                var userFuelsTask = FuelService.GetUserFuelsAsync(default);
+                var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
-                var sites =
-                    (from s in sitesTask.Result
-                     join ub in userBrandsTask.Result on s.BrandId equals ub.Id
-                     let distanceKm = locationTask.Result is not null
-                        ? locationTask.Result.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers)
-                        : double.MaxValue
-                     orderby ub.IsActive descending, distanceKm, ub.SortOrder, s.Name
-                     select s).ToList();
+                await Task.WhenAll(userFuelsTask, sitePricesTask);
 
-                Sites.ReplaceRange(sites);
-                FilteredSites.ReplaceRange(sites);
+                Fuels.AddRange(await userFuelsTask);
+
+                var sitesByFuelId =
+                    (from s in sitePricesTask.Result
+                     orderby s.FuelSortOrder, s.PriceInCents, s.BrandSortOrder
+                     group s by s.FuelId into g
+                     select g);
+
+                foreach (var g in sitesByFuelId)
+                    _sites[new UserFuel()
+                    {
+                        Id = g.First().FuelId,
+                        Name = g.First().FuelName,
+                        SortOrder = g.First().FuelSortOrder,
+                        IsActive = true
+                    }] = g.ToList();
+
+                FilteredSites.ReplaceRange(
+                    _sites.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)));
             }
             catch (Exception ex)
             {
@@ -110,43 +124,64 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private async Task SearchAsync(string searchText, CancellationToken ct)
+        private async Task SearchAsync(string searchText, int fuelId, int delayMs)
         {
-            if (ct.IsCancellationRequested ||
-                searchText is null)
+            _searchCancellation?.Cancel();
+            _searchCancellation?.Dispose();
+            _searchCancellation = null;
+
+            _searchCancellation = new CancellationTokenSource();
+            var ct = _searchCancellation.Token;
+
+            if (searchText is null || !Fuels.Any(i => i.Id == fuelId))
                 return;
 
-            await Task.Delay(250);
+            if (delayMs > 0)
+                await Task.Delay(delayMs);
 
             if (IsBusy ||
                 ct.IsCancellationRequested ||
-                !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase))
+                !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                fuelId != Fuel.Id)
                 return;
 
             IsBusy = true;
 
             try
             {
-                var filtered = (IList<SiteDto>)Sites;
+                var sites = _sites
+                    .Where(i => Fuel.Id < 1 || i.Key.Id == Fuel.Id)
+                    .SelectMany(i => i.Value);
+                var filtered = sites;
 
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
                     var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
-                    filtered = Sites
-                        .Where(i => compareInfo.IndexOf(i.Name, searchText, CompareOptions.IgnoreCase) >= 0)
-                        .ToList();
+                    filtered = sites
+                        .Where(i => compareInfo.IndexOf(i.SiteName, searchText, CompareOptions.IgnoreCase) >= 0); ;
 
                     if (!filtered.Any() && searchText.Length >= 3)
                     {
                         var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        filtered = Sites
-                            .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.IgnoreCase) >= 0) ||
-                                        parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.IgnoreCase) >= 0)).ToList();
+                        filtered = sites
+                            .Where(i => parts.Any(p => compareInfo.IndexOf(i.SiteName, p, CompareOptions.IgnoreCase) >= 0 || p == i.SitePostcode) ||
+                                        parts.All(p => compareInfo.IndexOf(i.SiteAddress, p, CompareOptions.IgnoreCase) >= 0));
                     }
                 }
 
                 FilteredSites.Clear();
-                FilteredSites.ReplaceRange(filtered);
+                FilteredSites.ReplaceRange(
+                    from s in filtered
+                    group s by s.FuelId into g
+                    select new Grouping<UserFuel, SiteFuelPrice>(
+                        new UserFuel()
+                        {
+                            Id = g.First().FuelId,
+                            Name = g.First().FuelName,
+                            SortOrder = g.First().FuelSortOrder,
+                            IsActive = true
+                        },
+                        g));
             }
             catch (Exception ex)
             {
@@ -162,7 +197,7 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private async Task TappedAsync(SiteDto site)
+        private async Task TappedAsync(SiteFuelPrice site)
         {
             if (site is null)
                 return;
@@ -171,29 +206,8 @@ namespace AdelaideFuel.ViewModels
             await NavigationService.NavigateToAsync<MapViewModel>(new Dictionary<string, string>()
             {
                 { NavigationKeys.SiteIdQueryProperty, site.SiteId.ToString() },
-                { NavigationKeys.LatLongQueryProperty, $"{site.Latitude},{site.Longitude}" }
+                { NavigationKeys.FuelIdQueryProperty, site.FuelId.ToString() }
             });
-        }
-
-        private async Task<Location> GetLastLocationAsync()
-        {
-            var location = default(Location);
-
-            try
-            {
-                var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>()
-                    .ConfigureAwait(false);
-                if (status == PermissionStatus.Granted)
-                {
-                    location = await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
-
-            return location;
         }
     }
 }

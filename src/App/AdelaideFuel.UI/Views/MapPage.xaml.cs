@@ -15,7 +15,6 @@ namespace AdelaideFuel.UI.Views
     [NavigationRoute(NavigationRoutes.Map, true)]
     [QueryProperty(nameof(SiteId), NavigationKeys.SiteIdQueryProperty)]
     [QueryProperty(nameof(FuelId), NavigationKeys.FuelIdQueryProperty)]
-    [QueryProperty(nameof(LatLong), NavigationKeys.LatLongQueryProperty)]
     public partial class MapPage : BaseAdPage<MapViewModel>
     {
         private const string BottomDrawerHandleShake = nameof(BottomDrawerHandleShake);
@@ -60,17 +59,6 @@ namespace AdelaideFuel.UI.Views
             }
         }
 
-        private string _latLong;
-        public string LatLong
-        {
-            get => _latLong;
-            set
-            {
-                _latLong = value;
-                UpdateFromLatLong();
-            }
-        }
-
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -86,7 +74,6 @@ namespace AdelaideFuel.UI.Views
 
             FuelId = string.Empty;
             SiteId = string.Empty;
-            LatLong = string.Empty;
         }
 
         private void SetupAutoRefresh()
@@ -155,30 +142,6 @@ namespace AdelaideFuel.UI.Views
                         }
                     }
                 }, 7500);
-            }
-        }
-
-        private void UpdateFromLatLong()
-        {
-            if (!string.IsNullOrEmpty(LatLong))
-            {
-                var coords = LatLong.Split(",", StringSplitOptions.RemoveEmptyEntries);
-                if (coords.Length == 2 &&
-                    double.TryParse(coords[0], out var latCoord) &&
-                    double.TryParse(coords[1], out var longCoord))
-                {
-                    var mapSpan = MapSpan.FromCenterAndRadius(
-                        new Position(latCoord, longCoord),
-                        SiteMap.VisibleRegion.Radius);
-                    SiteMap.MoveToRegion(mapSpan);
-
-                    var sitePin = SiteMap.Pins
-                        .FirstOrDefault(p => p.BindingContext is Site s &&
-                                             s.Latitude == latCoord &&
-                                             s.Longitude == longCoord);
-                    if (sitePin is not null)
-                        SiteMap.SelectedPin = sitePin;
-                }
             }
         }
 

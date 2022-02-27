@@ -36,6 +36,8 @@ namespace AdelaideFuel.UI.Styles
         public const string NextImg = nameof(NextImg);
         public const string TwoToneCircleImg = nameof(TwoToneCircleImg);
         public const string TwoToneFuelImg = nameof(TwoToneFuelImg);
+        public const string DeleteImg = nameof(DeleteImg);
+        public const string SearchImg = nameof(SearchImg);
 
         public const string BaseTabbedPageStyle = nameof(BaseTabbedPageStyle);
 

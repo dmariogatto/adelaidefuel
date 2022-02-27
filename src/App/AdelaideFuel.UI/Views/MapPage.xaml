@@ -54,33 +54,11 @@
                 HorizontalOptions="Center"
                 InputTransparent="True"
                 Spacing="{StaticResource SmallSpacing}">
-                <yummy:PancakeView
-                    x:Name="FuelPickerView"
-                    Margin="0"
-                    Padding="{StaticResource SmallThickness}"
-                    CornerRadius="{Binding Height, Converter={StaticResource MultiplyByConverter}, ConverterParameter={StaticResource Half}, Source={x:Reference FuelPickerView}}"
-                    HorizontalOptions="Center"
+                <controls:FuelSelectionView
+                    FuelsSource="{Binding Fuels}"
                     IsVisible="{Binding InitialLoadComplete}"
-                    Style="{DynamicResource CardStyle}">
-                    <View.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ChangeFuelCommand}" />
-                    </View.GestureRecognizers>
-                    <StackLayout Orientation="Horizontal">
-                        <controls:TintImage
-                            Margin="{StaticResource SmallLeftThickness}"
-                            HeightRequest="24"
-                            Source="{StaticResource FuelImg}"
-                            TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}"
-                            VerticalOptions="Center"
-                            WidthRequest="24" />
-                        <Label
-                            Margin="{StaticResource SmallRightThickness}"
-                            Style="{DynamicResource LabelStyle}"
-                            Text="{Binding Fuel.Name}"
-                            VerticalTextAlignment="Center" />
-                    </StackLayout>
-                </yummy:PancakeView>
-                <controls:LoadingIndicator HorizontalOptions="Center" />
+                    SelectedFuel="{Binding Fuel}" />
+                <controls:LoadingIndicator />
             </StackLayout>
 
             <yummy:PancakeView

@@ -106,6 +106,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string All {
+            get {
+                return ResourceManager.GetString("All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attributions.
         /// </summary>
         public static string Attributions {
