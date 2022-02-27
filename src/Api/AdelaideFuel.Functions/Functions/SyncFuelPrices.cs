@@ -5,8 +5,6 @@ using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -111,40 +109,56 @@ namespace AdelaideFuel.Functions
                  group sp by (sp.SiteId, sp.FuelId) into fuelGroup
                  select fuelGroup.First().ToSitePrice()).ToList();
 
-            try
-            {
-                log.LogInformation("Updating site prices JSON file...");
-                await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.SitePricesJson, ct);
-                log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Error writing 'adelaidefuel/site_prices.json'");
-            }
+            var modifiedUtc = sitePriceDtos.FirstOrDefault()?.TransactionDateUtc ?? DateTime.UnixEpoch;
 
-            await _sitePriceRepository.CreateIfNotExistsAsync(ct);
+            var previousModifiedUtc = DateTime.MinValue;
+            DateTime.TryParseExact(
+                await _blobService.ReadAllTextAsync(SitePrices.PricesLastModifiedTxt, ct),
+                CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AdjustToUniversal,
+                out previousModifiedUtc);
 
-            var syncResult = await _sitePriceRepository.SyncPartitionsWithDeleteAsync(priceEntities, log, ct);
-            log.LogInformation($"Finished sync of fuel prices in {sw.ElapsedMilliseconds}.");
-
-            var deletedPrices = syncResult.changes.Where(re => !re.IsActive).ToList();
-            if (deletedPrices.Any())
+            if (modifiedUtc > previousModifiedUtc)
             {
-                log.LogInformation($"Moving deleted prices to archive...");
-                await _sitePriceArchiveRepository.CreateIfNotExistsAsync(ct);
-                await _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(deletedPrices.Select(i => new SitePriceArchiveEntity(i.BrandId, i)), log, ct);
+                try
+                {
+                    log.LogInformation("Updating site prices JSON file...");
+                    await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct);
+
+                    await _blobService.WriteAllTextAsync(modifiedUtc.ToString("R", CultureInfo.InvariantCulture.DateTimeFormat), SitePrices.PricesLastModifiedTxt, ct);
+
+                    log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Error writing 'adelaidefuel/site_prices.json'");
+                }
+
+                await _sitePriceRepository.CreateIfNotExistsAsync(ct);
+
+                var syncResult = await _sitePriceRepository.SyncPartitionsWithDeleteAsync(priceEntities, log, ct);
+                log.LogInformation($"Finished sync of fuel prices in {sw.ElapsedMilliseconds}.");
+
+                var deletedPrices = syncResult.changes.Where(re => !re.IsActive).ToList();
+                if (deletedPrices.Any())
+                {
+                    log.LogInformation($"Moving deleted prices to archive...");
+                    await _sitePriceArchiveRepository.CreateIfNotExistsAsync(ct);
+                    await _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(deletedPrices.Select(i => new SitePriceArchiveEntity(i.BrandId, i)), log, ct);
+                }
+
+                var exceptions = await FindPossibleExceptionsAsync(
+                    priceEntities
+                        .SelectMany(i => i.Value)
+                        .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
+                    ct);
+                await SendPossibleExceptionsEmailAsync(exceptions, ct);
             }
 
             sw.Stop();
-            log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}.");
+            log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}ms");
             log.LogInformation($"Have a nice day 😋");
-
-            var exceptions = await FindPossibleExceptionsAsync(
-                priceEntities
-                    .SelectMany(i => i.Value)
-                    .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
-                ct);
-            await SendPossibleExceptionsEmailAsync(exceptions, ct);
         }
 
         private async Task<IList<SitePriceException>> FindPossibleExceptionsAsync(IEnumerable<SitePriceEntity> sitePrices, CancellationToken ct)

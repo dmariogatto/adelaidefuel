@@ -73,11 +73,11 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _hasInternet, value);
         }
 
-        private DateTime _lastUpdatedUtc = DateTime.MinValue;
-        public DateTime LastUpdatedUtc
+        private DateTime _modifiedUtc = DateTime.MinValue;
+        public DateTime ModifiedUtc
         {
-            get => _lastUpdatedUtc;
-            set => SetProperty(ref _lastUpdatedUtc, value);
+            get => _modifiedUtc;
+            set => SetProperty(ref _modifiedUtc, value);
         }
 
         private bool _hasPrices = false;
@@ -200,30 +200,27 @@ namespace AdelaideFuel.ViewModels
             if (ct.IsCancellationRequested || !FuelPriceGroups.Any())
                 return false;
 
-            var priceLookup = (await FuelService.GetFuelPricesByRadiusAsync(ct))
-                ?.ToDictionary(p => p.Key.Id, p => p.Items);
+            var (prices, modifiedUtc) = await FuelService.GetFuelPricesByRadiusAsync(ct);
+            var priceLookup = prices?.ToDictionary(p => p.Key.Id, p => p.Items);
 
             if (!ct.IsCancellationRequested)
             {
                 foreach (var fpg in FuelPriceGroups)
                 {
-                    var prices = default(IList<SiteFuelPriceItem>);
-                    priceLookup?.TryGetValue(fpg.Key.Id, out prices);
-                    prices ??= Array.Empty<SiteFuelPriceItem>();
+                    var priceItems = default(IList<SiteFuelPriceItem>);
+                    priceLookup?.TryGetValue(fpg.Key.Id, out priceItems);
+                    priceItems ??= Array.Empty<SiteFuelPriceItem>();
 
                     for (var i = 0; i < fpg.Items.Count; i++)
                     {
-                        if (i < prices.Count)
+                        if (i < priceItems.Count)
                         {
-                            fpg.Items[i].SetFuelPrice(prices[i]);
+                            fpg.Items[i].SetFuelPrice(priceItems[i]);
                             fpg.Items[i].Closest =
                                 i == 0 && // must be the first (ordered by distance)
-                                prices[i].LastKnowDistanceKm >= 0 && // have a valid distance
+                                priceItems[i].LastKnowDistanceKm >= 0 && // have a valid distance
                                 fpg.Count > 1; // more than one valid user radius
-                            fpg.Items[i].CheapestInSa = i == prices.Count - 1;
-
-                            if (prices[i].ModifiedUtc > LastUpdatedUtc)
-                                LastUpdatedUtc = prices[i].ModifiedUtc;
+                            fpg.Items[i].CheapestInSa = i == priceItems.Count - 1;
                         }
                         else
                         {
@@ -233,6 +230,8 @@ namespace AdelaideFuel.ViewModels
 
                     fpg.RefreshHasPrices();
                 }
+
+                ModifiedUtc = modifiedUtc;
 
                 return true;
             }

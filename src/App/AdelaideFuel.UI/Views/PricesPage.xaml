@@ -135,7 +135,7 @@
                             FontSize="Small"
                             HorizontalTextAlignment="End"
                             Style="{DynamicResource LabelStyle}"
-                            Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
+                            Text="{Binding ModifiedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
                             VerticalTextAlignment="Center" />
                     </Grid>
                 </StackLayout>

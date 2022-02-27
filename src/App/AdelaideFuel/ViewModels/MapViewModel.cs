@@ -140,11 +140,11 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private DateTime _lastUpdatedUtc = DateTime.MinValue;
-        public DateTime LastUpdatedUtc
+        private DateTime _modifiedUtc = DateTime.MinValue;
+        public DateTime ModifiedUtc
         {
-            get => _lastUpdatedUtc;
-            set => SetProperty(ref _lastUpdatedUtc, value);
+            get => _modifiedUtc;
+            set => SetProperty(ref _modifiedUtc, value);
         }
 
         private DateTime _lastLoadedUtc = DateTime.MinValue;
@@ -219,16 +219,14 @@ namespace AdelaideFuel.ViewModels
 
                     await Task.WhenAll(locationTask, pricesTask);
 
-                    var updatedUtc = pricesTask.Result?.Any() == true
-                        ? pricesTask.Result.Max(i => i.ModifiedUtc)
-                        : DateTime.MinValue;
+                    var (prices, modifiedUtc) = pricesTask.Result;
 
-                    if (!ct.IsCancellationRequested && (updatedUtc > LastUpdatedUtc || fuel.Id != LoadedFuel?.Id))
+                    if (!ct.IsCancellationRequested && (modifiedUtc > ModifiedUtc || fuel.Id != LoadedFuel?.Id))
                     {
-                        var priceLookup = pricesTask.Result
+                        var priceLookup = prices
                             .GroupBy(i => i.SiteId)
                             .ToDictionary(g => g.Key, g => g.ToList());
-                        var fuelPrices = pricesTask.Result
+                        var fuelPrices = prices
                             .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
                             .Select(i => i.PriceInCents).ToList();
 
@@ -335,7 +333,7 @@ namespace AdelaideFuel.ViewModels
                         FilteredSites.AddRange(toAdd);
 
                         LastLoadedUtc = DateTime.UtcNow;
-                        LastUpdatedUtc = updatedUtc;
+                        ModifiedUtc = modifiedUtc;
                     }
                     else if (!ct.IsCancellationRequested)
                     {

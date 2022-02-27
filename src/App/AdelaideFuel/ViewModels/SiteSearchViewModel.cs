@@ -83,7 +83,7 @@ namespace AdelaideFuel.ViewModels
                 _sites.AddRange(sitesTask.Result);
 
                 var sitesByFuelId =
-                    (from s in sitePricesTask.Result
+                    (from s in sitePricesTask.Result.prices
                      orderby s.FuelSortOrder, s.PriceInCents, s.BrandSortOrder
                      group s by s.FuelId into g
                      select g);
