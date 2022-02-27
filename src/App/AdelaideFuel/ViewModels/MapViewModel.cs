@@ -229,7 +229,7 @@ namespace AdelaideFuel.ViewModels
                             .GroupBy(i => i.SiteId)
                             .ToDictionary(g => g.Key, g => g.ToList());
                         var fuelPrices = pricesTask.Result
-                            .Where(i => i.FuelId == Fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
+                            .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
                             .Select(i => i.PriceInCents).ToList();
 
                         var validCategories = default(IList<FuelCategory>);
