@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using AdelaideFuel.Shared;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
@@ -13,7 +14,8 @@ namespace AdelaideFuel.ViewModels
 {
     public class SiteSearchViewModel : BaseViewModel
     {
-        public readonly Dictionary<UserFuel, List<SiteFuelPrice>> _sites = new Dictionary<UserFuel, List<SiteFuelPrice>>();
+        private readonly List<SiteDto> _sites = new List<SiteDto>();
+        private readonly Dictionary<UserFuel, List<SiteFuelPrice>> _sitePrices = new Dictionary<UserFuel, List<SiteFuelPrice>>();
 
         private CancellationTokenSource _searchCancellation;
 
@@ -66,23 +68,28 @@ namespace AdelaideFuel.ViewModels
 
         private async Task LoadAsync()
         {
-            if (IsBusy)
+            if (IsBusy || _sites.Any())
                 return;
 
             IsBusy = true;
 
             try
             {
+                var sitesTask = FuelService.GetSitesAsync(default);
                 var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
+                await Task.WhenAll(sitesTask, sitePricesTask);
+
+                _sites.AddRange(sitesTask.Result);
+
                 var sitesByFuelId =
-                    (from s in await sitePricesTask
+                    (from s in sitePricesTask.Result
                      orderby s.FuelSortOrder, s.PriceInCents, s.BrandSortOrder
                      group s by s.FuelId into g
                      select g);
 
                 foreach (var g in sitesByFuelId)
-                    _sites[new UserFuel()
+                    _sitePrices[new UserFuel()
                     {
                         Id = g.First().FuelId,
                         Name = g.First().FuelName,
@@ -91,7 +98,7 @@ namespace AdelaideFuel.ViewModels
                     }] = g.ToList();
 
                 FilteredSites.ReplaceRange(
-                    _sites.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)));
+                    _sitePrices.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)));
             }
             catch (Exception ex)
             {
@@ -120,37 +127,38 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                var sites = _sites.SelectMany(i => i.Value);
+                var sites = (IEnumerable<SiteDto>)_sites;
                 var filtered = sites;
 
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
                     var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
+                    var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     filtered = sites
-                        .Where(i => compareInfo.IndexOf(i.SiteName, searchText, CompareOptions.IgnoreCase) >= 0); ;
-
-                    if (!filtered.Any() && searchText.Length >= 3)
-                    {
-                        var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        filtered = sites
-                            .Where(i => parts.Any(p => compareInfo.IndexOf(i.SiteName, p, CompareOptions.IgnoreCase) >= 0 || p == i.SitePostcode) ||
-                                        parts.All(p => compareInfo.IndexOf(i.SiteAddress, p, CompareOptions.IgnoreCase) >= 0));
-                    }
+                        .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.IgnoreCase) >= 0 || p == i.Postcode) ||
+                                    parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.IgnoreCase) >= 0));
                 }
 
+                var filteredSiteIds = new HashSet<int>(filtered.Select(i => i.SiteId));
+
                 FilteredSites.Clear();
-                FilteredSites.ReplaceRange(
-                    from s in filtered
-                    group s by s.FuelId into g
-                    select new Grouping<UserFuel, SiteFuelPrice>(
-                        new UserFuel()
-                        {
-                            Id = g.First().FuelId,
-                            Name = g.First().FuelName,
-                            SortOrder = g.First().FuelSortOrder,
-                            IsActive = true
-                        },
-                        g));
+
+                foreach (var kv in _sitePrices)
+                {
+                    var prices = kv.Value.Where(i => filteredSiteIds.Contains(i.SiteId));
+                    if (prices.Any())
+                    {
+                        FilteredSites.Add(new Grouping<UserFuel, SiteFuelPrice>(
+                            new UserFuel()
+                            {
+                                Id = prices.First().FuelId,
+                                Name = prices.First().FuelName,
+                                SortOrder = prices.First().FuelSortOrder,
+                                IsActive = true
+                            },
+                            prices));
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -165,6 +173,7 @@ namespace AdelaideFuel.ViewModels
                 IsBusy = false;
             }
         }
+
 
         private async Task TappedAsync(SiteFuelPrice site)
         {

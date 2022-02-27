@@ -39,6 +39,13 @@ namespace AdelaideFuel.UI.Styles
         public const string DeleteImg = nameof(DeleteImg);
         public const string SearchImg = nameof(SearchImg);
 
+        public const string LowestColor = nameof(LowestColor);
+        public const string LowColor = nameof(LowColor);
+        public const string AverageColor = nameof(AverageColor);
+        public const string HighColor = nameof(HighColor);
+        public const string HighestColor = nameof(HighestColor);
+        public const string UnavailableColor = nameof(UnavailableColor);
+
         public const string BaseTabbedPageStyle = nameof(BaseTabbedPageStyle);
 
         public const string LargeBottomThickness = nameof(LargeBottomThickness);

@@ -177,7 +177,7 @@ namespace AdelaideFuel.Services
 
                         if (sitePrices?.Any() == true)
                         {
-                            MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
+                            MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3.5));
                             _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
                         }
                     }
@@ -238,7 +238,7 @@ namespace AdelaideFuel.Services
             }
 
             var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
-            foreach (var fp in pricesTask.Result)
+            foreach (var fp in pricesTask.Result.Where(i => i.PriceInCents != Constants.OutOfStockPriceInCents))
             {
                 var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
                 var radiusKm = getRadiusKm(distanceKm, userRadii);

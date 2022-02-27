@@ -225,7 +225,7 @@ namespace AdelaideFuel.ViewModels
                             .GroupBy(i => i.SiteId)
                             .ToDictionary(g => g.Key, g => g.ToList());
                         var fuelPrices = pricesTask.Result
-                            .Where(i => i.FuelId == Fuel.Id)
+                            .Where(i => i.FuelId == Fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
                             .Select(i => i.PriceInCents).ToList();
 
                         var validCategories = default(IList<FuelCategory>);
@@ -301,7 +301,7 @@ namespace AdelaideFuel.ViewModels
                                 s.Prices.Clear();
                             }
 
-                            if (s.SelectedFuelPrice is SiteFuelPrice fp)
+                            if (s.SelectedFuelPrice is SiteFuelPrice fp && fp.PriceInCents != Constants.OutOfStockPriceInCents)
                             {
                                 if (fp.PriceInCents <= q1)
                                     s.PriceCategory = PriceCategory.Lowest;

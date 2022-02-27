@@ -25,6 +25,13 @@
             <Color x:Key="OtherColor">#FAAF2C</Color>
             <Color x:Key="TitleColor">#18335D</Color>
 
+            <Color x:Key="LowestColor">#00C853</Color>
+            <Color x:Key="LowColor">#CDDC39</Color>
+            <Color x:Key="AverageColor">#FFAB00</Color>
+            <Color x:Key="HighColor">#FF6D00</Color>
+            <Color x:Key="HighestColor">#DD2C00</Color>
+            <Color x:Key="UnavailableColor">#787878</Color>
+
             <x:Double x:Key="FuelPriceDivisor">10</x:Double>
             <x:Double x:Key="UnselectedOpacity">0.75</x:Double>
 
