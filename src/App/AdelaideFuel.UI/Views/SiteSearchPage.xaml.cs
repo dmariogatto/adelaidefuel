@@ -20,16 +20,6 @@ namespace AdelaideFuel.UI.Views
             ViewModel.SearchText = null;
         }
 
-        protected override void OnSizeAllocated(double width, double height)
-        {
-            base.OnSizeAllocated(width, height);
-
-            if (width > 0 && height > 0)
-            {
-                ListHeaderView.Padding = new Thickness(0, SelectedFuelView.Height, 0, 0);
-            }
-        }
-
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)
         {
             if (e.Item is SiteFuelPrice model)

@@ -26,36 +26,36 @@
         <Grid>
             <ListView
                 CachingStrategy="RecycleElement"
-                GroupDisplayBinding="{Binding Key.Name}"
                 HasUnevenRows="True"
                 IsGroupingEnabled="True"
                 ItemTapped="ListViewItemTapped"
                 ItemsSource="{Binding FilteredSites}"
                 SelectionMode="None"
                 SeparatorVisibility="None">
-                <ListView.Header>
-                    <StackLayout x:Name="ListHeaderView">
-                        <Label
-                            Padding="{StaticResource XLargeTopThickness}"
-                            HorizontalTextAlignment="Center"
-                            IsVisible="False"
-                            Style="{DynamicResource LabelStyle}"
-                            Text="{local:Translate NoResults}">
-                            <View.Triggers>
-                                <MultiTrigger TargetType="View">
-                                    <MultiTrigger.Conditions>
-                                        <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
-                                        <BindingCondition Binding="{Binding IsBusy}" Value="False" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="IsVisible" Value="True" />
-                                </MultiTrigger>
-                            </View.Triggers>
-                        </Label>
-                    </StackLayout>
-                </ListView.Header>
                 <ListView.Footer>
                     <ContentView Padding="{StaticResource XSmallThickness}" />
                 </ListView.Footer>
+                <ListView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="{x:Null}">
+                        <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">
+                            <StackLayout
+                                Padding="{StaticResource SmallThickness}"
+                                Orientation="Horizontal"
+                                Spacing="{StaticResource XSmallSpacing}">
+                                <controls:TintImage
+                                    HeightRequest="24"
+                                    Source="{StaticResource FuelImg}"
+                                    TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}"
+                                    VerticalOptions="Center"
+                                    WidthRequest="24" />
+                                <Label
+                                    Style="{DynamicResource LabelTitleStyle}"
+                                    Text="{Binding Key.Name}"
+                                    VerticalTextAlignment="Center" />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.GroupHeaderTemplate>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:SiteFuelPrice">
                         <ViewCell>
@@ -110,15 +110,22 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <ContentView
-                x:Name="SelectedFuelView"
-                HorizontalOptions="Center"
-                VerticalOptions="Start">
-                <controls:FuelSelectionView
-                    Margin="{StaticResource SmallTopThickness}"
-                    FuelsSource="{Binding Fuels}"
-                    SelectedFuel="{Binding Fuel}" />
-            </ContentView>
+            <Label
+                Margin="{StaticResource MediumTopThickness}"
+                HorizontalTextAlignment="Center"
+                IsVisible="False"
+                Style="{DynamicResource LabelStyle}"
+                Text="{local:Translate NoResults}">
+                <View.Triggers>
+                    <MultiTrigger TargetType="View">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
+                            <BindingCondition Binding="{Binding IsBusy}" Value="False" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </View.Triggers>
+            </Label>
 
             <controls:LoadingIndicator />
         </Grid>

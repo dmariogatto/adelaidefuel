@@ -22,21 +22,11 @@ namespace AdelaideFuel.ViewModels
         {
             Title = Resources.Stations;
 
-            Fuels = new ObservableRangeCollection<UserFuel>();
             FilteredSites = new ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>>();
 
             LoadCommand = new AsyncCommand(LoadAsync);
-            SearchCommand = new AsyncCommand<(string, int, int)>(t => SearchAsync(t.Item1, t.Item2, t.Item3));
+            SearchCommand = new AsyncCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
             TappedCommand = new AsyncCommand<SiteFuelPrice>(TappedAsync);
-
-            Fuels.Add(new UserFuel()
-            {
-                Id = -1,
-                Name = Resources.All,
-                SortOrder = -1,
-                IsActive = true
-            });
-            Fuel = Fuels.First();
         }
 
         #region Overrides
@@ -57,27 +47,21 @@ namespace AdelaideFuel.ViewModels
             set
             {
                 if (SetProperty(ref _searchText, value?.Trim()))
-                    SearchCommand.ExecuteAsync((SearchText, Fuel?.Id ?? -1, 250));
+                {
+                    _searchCancellation?.Cancel();
+                    _searchCancellation?.Dispose();
+                    _searchCancellation = null;
+
+                    _searchCancellation = new CancellationTokenSource();
+                    SearchCommand.ExecuteAsync((_searchText, _searchCancellation.Token));
+                }
             }
         }
-
-        private UserFuel _fuel;
-        public UserFuel Fuel
-        {
-            get => _fuel;
-            set
-            {
-                if (SetProperty(ref _fuel, value))
-                    SearchCommand.ExecuteAsync((SearchText, Fuel?.Id ?? -1, 0));
-            }
-        }
-
-        public ObservableRangeCollection<UserFuel> Fuels { get; private set; }
 
         public ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>> FilteredSites { get; private set; }
 
         public AsyncCommand LoadCommand { get; private set; }
-        public AsyncCommand<(string searchText, int fuelId, int delayMs)> SearchCommand { get; private set; }
+        public AsyncCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
         public AsyncCommand<SiteFuelPrice> TappedCommand { get; private set; }
 
         private async Task LoadAsync()
@@ -93,8 +77,6 @@ namespace AdelaideFuel.ViewModels
                 var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
                 await Task.WhenAll(userFuelsTask, sitePricesTask);
-
-                Fuels.AddRange(await userFuelsTask);
 
                 var sitesByFuelId =
                     (from s in sitePricesTask.Result
@@ -124,34 +106,24 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private async Task SearchAsync(string searchText, int fuelId, int delayMs)
+        private async Task SearchAsync(string searchText, CancellationToken ct)
         {
-            _searchCancellation?.Cancel();
-            _searchCancellation?.Dispose();
-            _searchCancellation = null;
-
-            _searchCancellation = new CancellationTokenSource();
-            var ct = _searchCancellation.Token;
-
-            if (searchText is null || !Fuels.Any(i => i.Id == fuelId))
+            if (ct.IsCancellationRequested ||
+                searchText is null)
                 return;
 
-            if (delayMs > 0)
-                await Task.Delay(delayMs);
+            await Task.Delay(250);
 
             if (IsBusy ||
                 ct.IsCancellationRequested ||
-                !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                fuelId != Fuel.Id)
+                !searchText.Equals(SearchText, StringComparison.OrdinalIgnoreCase))
                 return;
 
             IsBusy = true;
 
             try
             {
-                var sites = _sites
-                    .Where(i => Fuel.Id < 1 || i.Key.Id == Fuel.Id)
-                    .SelectMany(i => i.Value);
+                var sites = _sites.SelectMany(i => i.Value);
                 var filtered = sites;
 
                 if (!string.IsNullOrWhiteSpace(searchText))
