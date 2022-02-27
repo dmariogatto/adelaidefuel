@@ -137,12 +137,10 @@ namespace AdelaideFuel.Services
             (IList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
                 (Array.Empty<SiteFuelPrice>(), DateTime.MinValue);
 
-            var lastCheck = DateTime.MinValue;
-            MemoryCache.TryGetValue(lastCheckCacheKey, out lastCheck);
-
-            async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime lastCheck, DateTime modifiedUtc, CancellationToken ct)
+            async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime modifiedUtc, CancellationToken ct)
             {
-                if ((DateTime.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
+                if (MemoryCache.TryGetValue(lastCheckCacheKey, out DateTime lastCheck) &&
+                    (DateTime.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
                     return false;
 
                 var newModifiedUtc = DateTime.MaxValue;
@@ -169,7 +167,7 @@ namespace AdelaideFuel.Services
             }
 
             if (!MemoryCache.TryGetValue(cacheKey, out result) ||
-                await isOutOfDateAsync(lastCheckCacheKey, lastCheck, result.modifiedUtc, cancellationToken).ConfigureAwait(false))
+                await isOutOfDateAsync(lastCheckCacheKey, result.modifiedUtc, cancellationToken).ConfigureAwait(false))
             {
                 var diskCache = _storeFactory.GetCacheStore<IList<SiteFuelPrice>>();
 
