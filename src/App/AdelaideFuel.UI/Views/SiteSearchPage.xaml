@@ -46,7 +46,7 @@
                             <View.Triggers>
                                 <MultiTrigger TargetType="View">
                                     <MultiTrigger.Conditions>
-                                        <BindingCondition Binding="{Binding FilterSites.Count}" Value="0" />
+                                        <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
                                         <BindingCondition Binding="{Binding IsBusy}" Value="False" />
                                     </MultiTrigger.Conditions>
                                     <Setter Property="IsVisible" Value="True" />
