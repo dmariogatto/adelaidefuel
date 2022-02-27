@@ -14,9 +14,9 @@ namespace AdelaideFuel.TableStore.Entities
             BrandId = site.BrandId;
             SiteId = site.SiteId;
 
-            Address = site.Address;
-            Name = site.Name;
-            Postcode = site.Postcode;
+            Address = site.Address?.Trim();
+            Name = site.Name?.Trim();
+            Postcode = site.Postcode?.Trim();
 
             GeographicRegionLevel1 = site.GeographicRegionLevel1;
             GeographicRegionLevel2 = site.GeographicRegionLevel2;
