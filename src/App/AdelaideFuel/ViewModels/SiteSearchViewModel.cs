@@ -28,6 +28,15 @@ namespace AdelaideFuel.ViewModels
             LoadCommand = new AsyncCommand(LoadAsync);
             SearchCommand = new AsyncCommand<(string, int, int)>(t => SearchAsync(t.Item1, t.Item2, t.Item3));
             TappedCommand = new AsyncCommand<SiteFuelPrice>(TappedAsync);
+
+            Fuels.Add(new UserFuel()
+            {
+                Id = -1,
+                Name = Resources.All,
+                SortOrder = -1,
+                IsActive = true
+            });
+            Fuel = Fuels.First();
         }
 
         #region Overrides
@@ -80,15 +89,6 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                Fuels.Add(new UserFuel()
-                {
-                    Id = -1,
-                    Name = Resources.All,
-                    SortOrder = -1,
-                    IsActive = true
-                });
-                Fuel = Fuels.First();
-
                 var userFuelsTask = FuelService.GetUserFuelsAsync(default);
                 var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
