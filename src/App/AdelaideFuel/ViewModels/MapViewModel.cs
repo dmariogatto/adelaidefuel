@@ -219,7 +219,11 @@ namespace AdelaideFuel.ViewModels
 
                     await Task.WhenAll(locationTask, pricesTask);
 
-                    if (!ct.IsCancellationRequested && pricesTask.Result?.Any() == true)
+                    var updatedUtc = pricesTask.Result?.Any() == true
+                        ? pricesTask.Result.Max(i => i.ModifiedUtc)
+                        : DateTime.MinValue;
+
+                    if (!ct.IsCancellationRequested && (updatedUtc > LastUpdatedUtc || fuel.Id != LoadedFuel?.Id))
                     {
                         var priceLookup = pricesTask.Result
                             .GroupBy(i => i.SiteId)
@@ -320,7 +324,7 @@ namespace AdelaideFuel.ViewModels
                                 s.PriceCategory = PriceCategory.Unknown;
                         }
 
-                        var newFiltered = Sites.Where(s => s.SelectedFuelPrice?.FuelId == Fuel.Id).ToList();
+                        var newFiltered = Sites.Where(s => s.SelectedFuelPrice?.FuelId == Fuel.Id);
                         var toRemove = FilteredSites.Except(newFiltered).ToList();
                         var toAdd = newFiltered.Except(FilteredSites).ToList();
 
@@ -331,9 +335,15 @@ namespace AdelaideFuel.ViewModels
                         FilteredSites.AddRange(toAdd);
 
                         LastLoadedUtc = DateTime.UtcNow;
-                        LastUpdatedUtc = FilteredSites.Any()
-                            ? FilteredSites.Max(s => s.LastUpdatedUtc)
-                            : DateTime.MinValue;
+                        LastUpdatedUtc = updatedUtc;
+                    }
+                    else if (!ct.IsCancellationRequested)
+                    {
+                        foreach (var s in Sites)
+                        {
+                            s.LastKnownDistanceKm =
+                                locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
+                        }
                     }
 
                     if (!ct.IsCancellationRequested)
