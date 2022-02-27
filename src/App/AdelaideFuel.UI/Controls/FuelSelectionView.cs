@@ -129,7 +129,7 @@ namespace AdelaideFuel.UI.Controls
         {
             view.SelectedFuel ??= newValue?.FirstOrDefault();
 
-            if (view.SelectedFuel is not null && newValue?.Any() == true && !newValue.Contains(view.SelectedFuel))
+            if (view.SelectedFuel is not null && (newValue is null || !newValue.Contains(view.SelectedFuel)))
                 view.SelectedFuel = null;
         }
     }
