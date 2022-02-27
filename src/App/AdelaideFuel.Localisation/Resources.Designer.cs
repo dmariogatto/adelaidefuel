@@ -606,6 +606,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to *fuels marked 999.9 are unavailable.
+        /// </summary>
+        public static string OosFuels {
+            get {
+                return ResourceManager.GetString("OosFuels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         public static string Open {

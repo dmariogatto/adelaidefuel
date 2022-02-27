@@ -88,7 +88,6 @@ namespace AdelaideFuel.UI.Styles
         public const string LabelStyle = nameof(LabelStyle);
         public const string CardStyle = nameof(CardStyle);
 
-        public const string UnfavouriteOpacity = nameof(UnfavouriteOpacity);
         public const string UnselectedOpacity = nameof(UnselectedOpacity);
 
         public const string CellDescriptionFontSize = nameof(CellDescriptionFontSize);

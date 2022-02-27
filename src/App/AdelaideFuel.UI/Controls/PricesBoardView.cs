@@ -1,13 +1,12 @@
 ﻿using AdelaideFuel.Models;
 using MvvmHelpers;
-using System;
 using System.Collections.Specialized;
 using System.Linq;
 using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Controls
 {
-    public class PricesBoardView : Grid
+    public class PricesBoardView : StackLayout
     {
         public static readonly BindableProperty SiteFuelPricesProperty =
           BindableProperty.Create(
@@ -17,13 +16,32 @@ namespace AdelaideFuel.UI.Controls
               defaultValue: null,
               propertyChanged: (b, o, n) => ((PricesBoardView)b).SiteFuelPricesSourceChanged((ObservableRangeCollection<SiteFuelPrice>)o, (ObservableRangeCollection<SiteFuelPrice>)n));
 
+        private readonly Grid _pricesGrid;
+        private readonly Label _oosLabel;
+
         public PricesBoardView()
         {
-            RowSpacing = 0;
-            ColumnSpacing = 0;
+            Spacing = (double)App.Current.Resources[Styles.Keys.XSmallSpacing];
 
-            ColumnDefinitions.Add(new ColumnDefinition());
-            ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            _pricesGrid = new Grid()
+            {
+                RowSpacing = 0,
+                ColumnSpacing = 0
+            };
+
+            _pricesGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            _pricesGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+
+            Children.Add(_pricesGrid);
+
+            _oosLabel = new Label()
+            {
+                FontFamily = (string)App.Current.Resources[Styles.Keys.ItalicFontFamily],
+                FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label)),
+                HorizontalTextAlignment = TextAlignment.End,
+                Text = Localisation.Resources.OosFuels,
+            };
+            _oosLabel.SetDynamicResource(Label.StyleProperty, Styles.Keys.LabelStyle);
         }
 
         public ObservableRangeCollection<SiteFuelPrice> SiteFuelPrices
@@ -35,7 +53,7 @@ namespace AdelaideFuel.UI.Controls
         private void Redraw()
         {
             var dataItemCount = SiteFuelPrices?.Count ?? 0;
-            var childItemCount = Children.Count / 2;
+            var childItemCount = _pricesGrid.Children.Count / 2;
 
             for (var i = childItemCount; i < dataItemCount; i++)
             {
@@ -50,6 +68,7 @@ namespace AdelaideFuel.UI.Controls
                     $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.FuelName)}",
                     source: this));
 
+                var fuelPricePropertyPath = $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.PriceInCents)}";
                 var priceLabel = new Label()
                 {
                     FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
@@ -58,26 +77,35 @@ namespace AdelaideFuel.UI.Controls
                 };
                 priceLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
                 priceLabel.SetBinding(Label.TextProperty, new Binding(
-                    $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.PriceInCents)}",
+                    fuelPricePropertyPath,
                     stringFormat: "{0:#.0}",
                     source: this));
 
-                Children.Add(fuelLabel, 0, RowDefinitions.Count);
-                Children.Add(priceLabel, 1, RowDefinitions.Count);
+                var oosTrigger = new DataTrigger(typeof(View))
+                {
+                    Binding = new Binding(fuelPricePropertyPath, source: this),
+                    Value = Constants.OutOfStockPriceInCents
+                };
+                oosTrigger.Setters.Add(new Setter() { Property = View.OpacityProperty, Value = (double)App.Current.Resources[Styles.Keys.UnselectedOpacity] });
 
-                RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                priceLabel.Triggers.Add(oosTrigger);
+
+                _pricesGrid.Children.Add(fuelLabel, 0, _pricesGrid.RowDefinitions.Count);
+                _pricesGrid.Children.Add(priceLabel, 1, _pricesGrid.RowDefinitions.Count);
+
+                _pricesGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             }
 
             void removeLastChild()
             {
-                if (Children.Count > 0)
-                    Children.RemoveAt(Children.Count - 1);
+                if (_pricesGrid.Children.Count > 0)
+                    _pricesGrid.Children.RemoveAt(_pricesGrid.Children.Count - 1);
             }
 
             void removeLastRowDef()
             {
-                if (RowDefinitions.Count > 0)
-                    RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
+                if (_pricesGrid.RowDefinitions.Count > 0)
+                    _pricesGrid.RowDefinitions.RemoveAt(_pricesGrid.RowDefinitions.Count - 1);
             }
 
             for (var i = childItemCount; i > dataItemCount; i--)
@@ -85,6 +113,16 @@ namespace AdelaideFuel.UI.Controls
                 removeLastChild();
                 removeLastChild();
                 removeLastRowDef();
+            }
+
+            if (SiteFuelPrices?.Any(i => i.PriceInCents == Constants.OutOfStockPriceInCents) == true)
+            {
+                if (!Children.Contains(_oosLabel))
+                    Children.Add(_oosLabel);
+            }
+            else
+            {
+                Children.Remove(_oosLabel);
             }
         }
 

@@ -407,4 +407,7 @@ You can update your preferences in Settings.</value>
   <data name="All" xml:space="preserve">
     <value>All</value>
   </data>
+  <data name="OosFuels" xml:space="preserve">
+    <value>*fuels marked 999.9 are unavailable</value>
+  </data>
 </root>

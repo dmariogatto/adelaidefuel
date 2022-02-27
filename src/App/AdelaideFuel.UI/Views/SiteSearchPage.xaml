@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
@@ -102,7 +103,16 @@
                                         HorizontalTextAlignment="End"
                                         Style="{DynamicResource LabelStyle}"
                                         Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
-                                        VerticalTextAlignment="Center" />
+                                        VerticalTextAlignment="Center">
+                                        <View.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding PriceInCents}"
+                                                TargetType="View"
+                                                Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
+                                                <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                                            </DataTrigger>
+                                        </View.Triggers>
+                                    </Label>
                                 </Grid>
                             </yummy:PancakeView>
                         </ViewCell>
