@@ -11,13 +11,9 @@ namespace AdelaideFuel.UI.Views
         public SiteSearchPage() : base()
         {
             InitializeComponent();
-        }
 
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-
-            ViewModel.SearchText = null;
+            Search.SetBinding(SearchBar.TextProperty, new Binding(nameof(Query), source: this));
+            Search.SetBinding(SearchBar.PlaceholderProperty, new Binding(nameof(Placeholder), source: this));
         }
 
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)

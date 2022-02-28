@@ -99,7 +99,6 @@
     <Compile Include="Helpers\TraitCollectionExtensions.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="Renderers\SearchPageRenderer.cs" />
     <Compile Include="Renderers\CustomMapRenderer.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\CustomNavigationPageRenderer.cs" />

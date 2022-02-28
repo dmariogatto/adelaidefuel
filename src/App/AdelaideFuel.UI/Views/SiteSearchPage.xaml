@@ -24,8 +24,17 @@
     mc:Ignorable="d">
 
     <ContentPage.Content>
-        <Grid>
+        <Grid RowDefinitions="Auto,*" RowSpacing="0">
+            <SearchBar
+                x:Name="Search"
+                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+                CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
+                HorizontalOptions="Fill"
+                PlaceholderColor="{DynamicResource PrimaryTextColor}"
+                TextColor="{DynamicResource PrimaryTextColor}" />
+
             <ListView
+                Grid.Row="1"
                 CachingStrategy="RecycleElement"
                 HasUnevenRows="True"
                 IsGroupingEnabled="True"
@@ -121,6 +130,7 @@
             </ListView>
 
             <Label
+                Grid.Row="1"
                 Margin="{StaticResource MediumTopThickness}"
                 HorizontalTextAlignment="Center"
                 IsVisible="False"
@@ -137,7 +147,7 @@
                 </View.Triggers>
             </Label>
 
-            <controls:LoadingIndicator />
+            <controls:LoadingIndicator Grid.Row="1" />
         </Grid>
     </ContentPage.Content>
 
