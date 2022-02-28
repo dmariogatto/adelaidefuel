@@ -18,12 +18,14 @@ namespace AdelaideFuel.ViewModels
     {
         public readonly double InitialRadiusMetres;
 
-        private readonly SemaphoreSlim _sitesSemaphore = new SemaphoreSlim(1, 1);
-        private CancellationTokenSource _sitesCancellation;
-
         private readonly IPermissions _permissions;
         private readonly IGeolocation _geolocation;
         private readonly IMap _map;
+
+        private readonly SemaphoreSlim _sitesSemaphore = new SemaphoreSlim(1, 1);
+
+        private List<int> _userBrandIds;
+        private CancellationTokenSource _sitesCancellation;
 
         private readonly Dictionary<PriceCategory, FuelCategory> _fuelCategories = new Dictionary<PriceCategory, FuelCategory>()
         {
@@ -206,6 +208,7 @@ namespace AdelaideFuel.ViewModels
                 {
                     var locationTask = _geolocation.GetLocationAsync(ct);
                     var pricesTask = FuelService.GetSitePricesAsync(ct);
+                    var userBrandsTask = FuelService.GetUserBrandsAsync(ct);
 
 #if DEBUG
                     //await Task.Delay(2500);
@@ -217,11 +220,22 @@ namespace AdelaideFuel.ViewModels
                         Sites.ReplaceRange(sites.Select(i => new Site(i)));
                     }
 
-                    await Task.WhenAll(locationTask, pricesTask);
+                    await Task.WhenAll(locationTask, pricesTask, userBrandsTask);
+
+                    // Don't care if sort order changed, just active state
+                    var brandIds = userBrandsTask.Result
+                        .Where(i => i.IsActive)
+                        .Select(i => i.Id)
+                        .OrderBy(i => i)
+                        .ToList();
+
+                    var userBrandsChanged = !_userBrandIds?.SequenceEqual(brandIds) ?? true;
+                    if (userBrandsChanged)
+                        _userBrandIds = brandIds;
 
                     var (prices, modifiedUtc) = pricesTask.Result;
 
-                    if (!ct.IsCancellationRequested && (modifiedUtc > ModifiedUtc || fuel.Id != LoadedFuel?.Id))
+                    if (!ct.IsCancellationRequested && (userBrandsChanged || modifiedUtc > ModifiedUtc || fuel.Id != LoadedFuel?.Id))
                     {
                         var priceLookup = prices
                             .GroupBy(i => i.SiteId)
