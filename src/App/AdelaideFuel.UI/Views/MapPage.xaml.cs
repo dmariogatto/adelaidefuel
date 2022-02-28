@@ -238,8 +238,8 @@ namespace AdelaideFuel.UI.Views
                 if (c == BottomSheetDivider)
                 {
                     offset = heightAcc;
-                    RelativeLayout.SetYConstraint(drawer,
-                        Constraint.RelativeToParent(p => p.Height - offset));
+                    var offsetMargin = MainContentLayout.Height - offset;
+                    drawer.Margin = new Thickness(0, offsetMargin, 0, -offsetMargin);
                 }
             }
 

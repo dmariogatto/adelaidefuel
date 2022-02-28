@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,26 +40,23 @@ namespace AdelaideFuel.TableStore.Repositories
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
-        public Task<IList<T>> GetPartitionsAsync(IEnumerable<string> partitionKeys, CancellationToken cancellationToken)
+        public Task<IList<T>> GetPartitionsAsync(IList<string> partitionKeys, CancellationToken cancellationToken)
         {
-            var query = new TableQuery<T>();
+            if (!partitionKeys.Any())
+                return Task.FromResult<IList<T>>(Array.Empty<T>());
 
-            var combined = string.Empty;
-            foreach (var pk in partitionKeys)
+            var sb = new StringBuilder();
+            for (var i = 0; i < partitionKeys.Count; i++)
             {
-                var predicate = TableQuery.GenerateFilterCondition(
-                        nameof(TableEntity.PartitionKey),
-                        QueryComparisons.Equal,
-                        pk);
-                combined = !string.IsNullOrEmpty(combined)
-                    ? TableQuery.CombineFilters(
-                        combined,
-                        TableOperators.Or,
-                        predicate)
-                    : predicate;
+                var pk = partitionKeys[i];
+
+                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, pk);
+
+                if (i < partitionKeys.Count - 1)
+                    sb.AppendFormat(" {0} ", TableOperators.Or);
             }
 
-            query = query.Where(combined);
+            var query = new TableQuery<T>().Where(sb.ToString());
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
@@ -68,6 +66,30 @@ namespace AdelaideFuel.TableStore.Repositories
             var result = await _cloudTable.ExecuteAsync(retrieveOp, cancellationToken)
                 .ConfigureAwait(false);
             return (T)result.Result;
+        }
+
+        public Task<IList<T>> GetEntitiesAsync(IList<(string partitionKey, string rowKey)> keys, CancellationToken cancellationToken)
+        {
+            if (!keys.Any())
+                return Task.FromResult<IList<T>>(Array.Empty<T>());
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < keys.Count; i++)
+            {
+                var k = keys[i];
+
+                sb.Append("(");
+                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, k.partitionKey);
+                sb.AppendFormat(" {0} ", TableOperators.And);
+                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.RowKey), QueryComparisons.Equal, k.rowKey);
+                sb.Append(")");
+
+                if (i < keys.Count - 1)
+                    sb.AppendFormat(" {0} ", TableOperators.Or);
+            }
+
+            var query = new TableQuery<T>().Where(sb.ToString());
+            return ExecuteQueryAsync(query, cancellationToken);
         }
 
         public Task<IList<T>> GetAllEntitiesAsync(CancellationToken cancellationToken)

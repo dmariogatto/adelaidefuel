@@ -4,6 +4,12 @@ namespace AdelaideFuel.UI.Styles
 {
     internal static class Keys
     {
+        public const string RegFontFamily = nameof(RegFontFamily);
+        public const string ItalicFontFamily = nameof(ItalicFontFamily);
+        public const string SemiBoldFontFamily = nameof(SemiBoldFontFamily);
+        public const string BoldFontFamily = nameof(BoldFontFamily);
+        public const string BoldItalicFontFamily = nameof(BoldItalicFontFamily);
+
         public const string PrimaryColor = nameof(PrimaryColor);
         public const string PrimaryDarkColor = nameof(PrimaryDarkColor);
         public const string PrimaryAccentColor = nameof(PrimaryAccentColor);
@@ -30,6 +36,15 @@ namespace AdelaideFuel.UI.Styles
         public const string NextImg = nameof(NextImg);
         public const string TwoToneCircleImg = nameof(TwoToneCircleImg);
         public const string TwoToneFuelImg = nameof(TwoToneFuelImg);
+        public const string DeleteImg = nameof(DeleteImg);
+        public const string SearchImg = nameof(SearchImg);
+
+        public const string LowestColor = nameof(LowestColor);
+        public const string LowColor = nameof(LowColor);
+        public const string AverageColor = nameof(AverageColor);
+        public const string HighColor = nameof(HighColor);
+        public const string HighestColor = nameof(HighestColor);
+        public const string UnavailableColor = nameof(UnavailableColor);
 
         public const string BaseTabbedPageStyle = nameof(BaseTabbedPageStyle);
 
@@ -73,7 +88,6 @@ namespace AdelaideFuel.UI.Styles
         public const string LabelStyle = nameof(LabelStyle);
         public const string CardStyle = nameof(CardStyle);
 
-        public const string UnfavouriteOpacity = nameof(UnfavouriteOpacity);
         public const string UnselectedOpacity = nameof(UnselectedOpacity);
 
         public const string CellDescriptionFontSize = nameof(CellDescriptionFontSize);

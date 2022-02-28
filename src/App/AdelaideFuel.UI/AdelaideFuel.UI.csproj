@@ -29,11 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="AiForms.SettingsView" Version="1.3.29" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.5.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.5.0" />
-    <PackageReference Include="Plugin.StoreReview" Version="3.2.0-beta" />
     <PackageReference Include="Sharpnado.CollectionView" Version="2.0.0" />
-    <PackageReference Include="Xamarin.Essentials.Interfaces" Version="1.7.0" />
     <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2337" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.3.0" />
@@ -48,6 +44,9 @@
   <ItemGroup>
     <Compile Update="Views\BrandsPage.xaml.cs">
       <DependentUpon>BrandsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SiteSearchPage.xaml.cs">
+      <DependentUpon>SiteSearchPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\RadiiPage.xaml.cs">
       <DependentUpon>RadiiPage.xaml</DependentUpon>
@@ -80,6 +79,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\BrandsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SiteSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\RadiiPage.xaml">

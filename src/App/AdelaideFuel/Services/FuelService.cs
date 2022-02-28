@@ -22,6 +22,7 @@ namespace AdelaideFuel.Services
     public class FuelService : BaseHttpService, IFuelService
     {
         private readonly static TimeSpan CacheExpireTimeSpan = TimeSpan.FromHours(12);
+        private readonly static TimeSpan CachePricesExpireTimeSpan = TimeSpan.FromMinutes(60);
 
         private readonly int[] _defaultRadii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
 
@@ -104,7 +105,7 @@ namespace AdelaideFuel.Services
             return sites ?? Array.Empty<SiteDto>();
         }
 
-        public async Task<IList<SiteFuelPrice>> GetSitePricesAsync(CancellationToken cancellationToken)
+        public async Task<(IList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken)
         {
             var userBrandsTask = GetUserBrandsAsync(cancellationToken);
             var userFuelsTask = GetUserFuelsAsync(cancellationToken);
@@ -130,34 +131,69 @@ namespace AdelaideFuel.Services
             }
 
             var queryString = keyBuilder.ToString();
-
             var cacheKey = CacheKey(queryString, nameof(GetSitePricesAsync));
-            var sitePrices = default(IList<SiteFuelPrice>);
+            var lastCheckCacheKey = CacheKey("last_check", nameof(GetSitePricesAsync));
 
-            if (!MemoryCache.TryGetValue(cacheKey, out sitePrices))
+            (IList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
+                (Array.Empty<SiteFuelPrice>(), DateTime.MinValue);
+
+            async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime modifiedUtc, CancellationToken ct)
+            {
+                if (MemoryCache.TryGetValue(lastCheckCacheKey, out DateTime lastCheck) &&
+                    (DateTime.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
+                    return false;
+
+                var newModifiedUtc = DateTime.MaxValue;
+
+                try
+                {
+                    (_, newModifiedUtc) = _connectivity.NetworkAccess == NetworkAccess.Internet
+                        ? await _retryPolicy.ExecuteAsync(
+                              (ct) => RequestSitePriceAsync(HttpMethod.Head, string.Empty, ct),
+                              ct).ConfigureAwait(false)
+                        : (null, DateTime.MinValue);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+
+                var hasChanged = newModifiedUtc > modifiedUtc;
+
+                if (!hasChanged)
+                    MemoryCache.SetAbsolute(lastCheckCacheKey, DateTime.UtcNow, CachePricesExpireTimeSpan);
+
+                return hasChanged;
+            }
+
+            if (!MemoryCache.TryGetValue(cacheKey, out result) ||
+                await isOutOfDateAsync(lastCheckCacheKey, result.modifiedUtc, cancellationToken).ConfigureAwait(false))
             {
                 var diskCache = _storeFactory.GetCacheStore<IList<SiteFuelPrice>>();
 
                 if (_connectivity.NetworkAccess != NetworkAccess.Internet)
                 {
-                    sitePrices = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false);
+                    result.prices = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false) ?? Array.Empty<SiteFuelPrice>();
+                    if (result.prices.Any())
+                        result.modifiedUtc = result.prices.Max(i => i.ModifiedUtc);
                 }
                 else
                 {
                     var sites = default(IList<SiteDto>);
                     var prices = default(IList<SitePriceDto>);
+                    var newModifiedUtc = DateTime.MinValue;
 
                     try
                     {
                         var sitesTask = GetSitesAsync(cancellationToken);
                         var pricesTask = _retryPolicy.ExecuteAsync(
-                            (ct) => GetSitePriceDtosAsync(queryString, ct),
+                            (ct) => RequestSitePriceAsync(HttpMethod.Get, queryString, ct),
                             cancellationToken);
 
                         await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
 
                         sites = sitesTask.Result;
-                        prices = pricesTask.Result;
+                        (prices, newModifiedUtc) = pricesTask.Result;
                     }
                     catch (Exception ex)
                     {
@@ -166,7 +202,7 @@ namespace AdelaideFuel.Services
 
                     if (!cancellationToken.IsCancellationRequested && sites?.Any() == true && prices?.Any() == true)
                     {
-                        sitePrices =
+                        result.prices =
                             (from sp in prices
                              join s in sites on sp.SiteId equals s.SiteId
                              join b in userBrandsTask.Result on s.BrandId equals b.Id
@@ -174,20 +210,23 @@ namespace AdelaideFuel.Services
                              where b.IsActive && f.IsActive
                              orderby f.SortOrder, sp.Price, b.SortOrder
                              select new SiteFuelPrice(b, f, s, sp)).ToList();
+                        result.modifiedUtc = newModifiedUtc;
 
-                        if (sitePrices?.Any() == true)
+                        if (result.prices.Any())
                         {
-                            MemoryCache.SetAbsolute(cacheKey, sitePrices, TimeSpan.FromMinutes(3));
-                            _ = diskCache.UpsertAsync(cacheKey, sitePrices, TimeSpan.FromDays(2), default);
+                            MemoryCache.SetAbsolute(cacheKey, result, CachePricesExpireTimeSpan);
+                            MemoryCache.SetAbsolute(lastCheckCacheKey, DateTime.UtcNow, CachePricesExpireTimeSpan);
+
+                            _ = diskCache.UpsertAsync(cacheKey, result.prices, TimeSpan.FromDays(3), default);
                         }
                     }
                 }
             }
 
-            return sitePrices ?? Array.Empty<SiteFuelPrice>();
+            return result;
         }
 
-        public async Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
+        public async Task<(IList<SiteFuelPriceItemGroup> groups, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
             async Task<Location> getLocationAsync(CancellationToken ct)
             {
@@ -219,8 +258,8 @@ namespace AdelaideFuel.Services
 
             var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToDictionary(i => i.Id, i => i);
             var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
-
             var loc = locTask.Result;
+            var (prices, modifiedUtc) = pricesTask.Result;
 
             static int getRadiusKm(double distanceKm, List<UserRadius> radii)
             {
@@ -238,7 +277,7 @@ namespace AdelaideFuel.Services
             }
 
             var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
-            foreach (var fp in pricesTask.Result)
+            foreach (var fp in prices.Where(i => i.PriceInCents != Constants.OutOfStockPriceInCents))
             {
                 var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
                 var radiusKm = getRadiusKm(distanceKm, userRadii);
@@ -281,7 +320,7 @@ namespace AdelaideFuel.Services
                 }
             }
 
-            return fuelGroups;
+            return (fuelGroups, modifiedUtc);
         }
 
         public async Task<bool> SyncBrandsAsync(CancellationToken cancellationToken)
@@ -637,19 +676,33 @@ namespace AdelaideFuel.Services
             return response;
         }
 
-        private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(string queryString, CancellationToken cancellationToken)
+        private async Task<(IList<SitePriceDto> prices, DateTime modifiedUtc)> RequestSitePriceAsync(HttpMethod httpMethod, string queryString, CancellationToken ct)
         {
             const string sitePrices = "SitePrices";
 
-            var uri = Path.Combine(Constants.ApiUrlBase, !string.IsNullOrEmpty(queryString) ? $"{sitePrices}?{queryString}" : sitePrices);
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Headers.Add(Constants.AuthHeader, Constants.ApiKeySitePrices);
-            using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var result = DeserializeJsonFromStream<List<SitePriceDto>>(s);
+            if (httpMethod != HttpMethod.Head && httpMethod != HttpMethod.Get)
+                throw new ArgumentOutOfRangeException(nameof(httpMethod));
 
-            return result;
+            var uri = Path.Combine(Constants.ApiUrlBase, !string.IsNullOrEmpty(queryString) ? $"{sitePrices}?{queryString}" : sitePrices);
+            var request = new HttpRequestMessage(httpMethod, uri);
+            request.Headers.Add(Constants.AuthHeader, Constants.ApiKeySitePrices);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(10));
+            using var response = await HttpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var modifiedUtc = response.Content.Headers.LastModified is not null
+                ? response.Content.Headers.LastModified.Value.UtcDateTime
+                : DateTime.UtcNow;
+
+            var result = default(IList<SitePriceDto>);
+            if (httpMethod == HttpMethod.Get)
+            {
+                using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                result = DeserializeJsonFromStream<List<SitePriceDto>>(s);
+            }
+
+            return (result, modifiedUtc);
         }
     }
 }

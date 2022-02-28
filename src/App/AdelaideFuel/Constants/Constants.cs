@@ -51,6 +51,8 @@ namespace AdelaideFuel
         public static readonly TimeZoneInfo AdelaideTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Australia/Adelaide");
         public static DateTime AdelaideNow => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AdelaideTimeZone);
 
+        public static double OutOfStockPriceInCents = 999.9;
+
         public static readonly Coords AdelaideCenter = new Coords(-34.9241446714455, 138.599550649524);
         public static readonly Coords SaCenter = new Coords(-30.058333, 135.763333, 1025 * 1000);
 

@@ -135,7 +135,7 @@
                             FontSize="Small"
                             HorizontalTextAlignment="End"
                             Style="{DynamicResource LabelStyle}"
-                            Text="{Binding LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
+                            Text="{Binding ModifiedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
                             VerticalTextAlignment="Center" />
                     </Grid>
                 </StackLayout>
@@ -158,7 +158,7 @@
                         Style="{DynamicResource LabelStyle}"
                         Text="{local:Translate UnableToLoadPrices}" />
                     <Button
-                        Command="{Binding LoadFuelPriceGroupsCommand}"
+                        Clicked="TryAgainClicked"
                         HorizontalOptions="Center"
                         IsVisible="{Binding HasError}"
                         Style="{DynamicResource ButtonStyle}"

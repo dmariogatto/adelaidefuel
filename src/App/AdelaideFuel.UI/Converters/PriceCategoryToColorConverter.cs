@@ -11,12 +11,12 @@ namespace AdelaideFuel.UI.Converters
         {
             return (PriceCategory)value switch
             {
-                PriceCategory.Lowest => Color.FromHex("#00C853"),
-                PriceCategory.Low => Color.FromHex("#CDDC39"),
-                PriceCategory.Average => Color.FromHex("#FFAB00"),
-                PriceCategory.High => Color.FromHex("#FF6D00"),
-                PriceCategory.Highest => Color.FromHex("#DD2C00"),
-                _ => Color.Blue
+                PriceCategory.Lowest => (Color)App.Current.Resources[Styles.Keys.LowestColor],
+                PriceCategory.Low => (Color)App.Current.Resources[Styles.Keys.LowColor],
+                PriceCategory.Average => (Color)App.Current.Resources[Styles.Keys.AverageColor],
+                PriceCategory.High => (Color)App.Current.Resources[Styles.Keys.HighColor],
+                PriceCategory.Highest => (Color)App.Current.Resources[Styles.Keys.HighestColor],
+                _ => (Color)App.Current.Resources[Styles.Keys.UnavailableColor],
             };
         }
 

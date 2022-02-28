@@ -20,9 +20,17 @@
             <x:String x:Key="TwoToneCircleImg">twotone_circle.png</x:String>
             <x:String x:Key="TwoToneFuelImg">twotone_fuel.png</x:String>
             <x:String x:Key="DeleteImg">delete.png</x:String>
+            <x:String x:Key="SearchImg">search.png</x:String>
 
             <Color x:Key="OtherColor">#FAAF2C</Color>
             <Color x:Key="TitleColor">#18335D</Color>
+
+            <Color x:Key="LowestColor">#00C853</Color>
+            <Color x:Key="LowColor">#CDDC39</Color>
+            <Color x:Key="AverageColor">#FFAB00</Color>
+            <Color x:Key="HighColor">#FF6D00</Color>
+            <Color x:Key="HighestColor">#DD2C00</Color>
+            <Color x:Key="UnavailableColor">#787878</Color>
 
             <x:Double x:Key="FuelPriceDivisor">10</x:Double>
             <x:Double x:Key="UnselectedOpacity">0.75</x:Double>
@@ -117,15 +125,15 @@
                 <Setter Property="FontFamily" Value="{StaticResource BoldFontFamily}" />
                 <Setter Property="FontSize" Value="Medium" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
                 <Setter Property="FontFamily" Value="{StaticResource RegFontFamily}" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
@@ -147,14 +155,6 @@
                 <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="Border" Value="{DynamicResource {x:Static styles:Keys.CardYummyBorder}}" />
                 <Setter Property="Shadow" Value="{yummy:ShadowMarkup BlurRadius=2}" />
-            </Style>
-
-            <Style x:Key="CardRouteStyle" TargetType="Frame">
-                <Setter Property="Padding" Value="{StaticResource XSmallThickness}" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="HasShadow" Value="False" />
-                <Setter Property="HorizontalOptions" Value="Center" />
-                <Setter Property="VerticalOptions" Value="Center" />
             </Style>
 
             <Style TargetType="sv:SettingsView">

@@ -204,8 +204,8 @@
   <data name="TryAgain" xml:space="preserve">
     <value>Try Again</value>
   </data>
-  <data name="UnableToLoadTapForMore" xml:space="preserve">
-    <value>Unable to load, tap for more</value>
+  <data name="UnableToLoadStations" xml:space="preserve">
+    <value>Unable to load stations, please check your internet</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
@@ -394,5 +394,20 @@ You can update your preferences in Settings.</value>
   </data>
   <data name="SaFuelPricingScheme" xml:space="preserve">
     <value>SA Fuel Pricing Information Scheme</value>
+  </data>
+  <data name="Stations" xml:space="preserve">
+    <value>Stations</value>
+  </data>
+  <data name="NoResults" xml:space="preserve">
+    <value>No Results</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="OosFuels" xml:space="preserve">
+    <value>*fuels marked 999.9 are unavailable</value>
   </data>
 </root>

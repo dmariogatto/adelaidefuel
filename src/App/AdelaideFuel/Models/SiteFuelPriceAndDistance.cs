@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
+    [DebuggerDisplay("({RadiusKm}km) {Price}")]
     public struct SiteFuelPriceAndDistance
     {
         public SiteFuelPriceAndDistance(SiteFuelPrice price, double distanceKm, int radiusKm)

@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
-    [DebuggerDisplay("{FuelName} - {PriceInCents}")]
+    [DebuggerDisplay("{SiteName} - {FuelName} - {PriceInCents}")]
     public class SiteFuelPrice : ObservableObject
     {
         public SiteFuelPrice() { }
@@ -23,6 +23,7 @@ namespace AdelaideFuel.Models
             SiteId = site.SiteId;
             SiteName = site.Name;
             SiteAddress = site.Address;
+            SitePostcode = site.Postcode;
             Latitude = site.Latitude;
             Longitude = site.Longitude;
 
@@ -73,6 +74,13 @@ namespace AdelaideFuel.Models
         {
             get => _siteAddress;
             set => SetProperty(ref _siteAddress, value);
+        }
+
+        private string _sitePostcode;
+        public string SitePostcode
+        {
+            get => _sitePostcode;
+            set => SetProperty(ref _sitePostcode, value);
         }
 
         private double _latitude;

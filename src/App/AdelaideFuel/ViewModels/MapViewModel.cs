@@ -18,12 +18,14 @@ namespace AdelaideFuel.ViewModels
     {
         public readonly double InitialRadiusMetres;
 
-        private readonly SemaphoreSlim _sitesSemaphore = new SemaphoreSlim(1, 1);
-        private CancellationTokenSource _sitesCancellation;
-
         private readonly IPermissions _permissions;
         private readonly IGeolocation _geolocation;
         private readonly IMap _map;
+
+        private readonly SemaphoreSlim _sitesSemaphore = new SemaphoreSlim(1, 1);
+
+        private List<int> _userBrandIds;
+        private CancellationTokenSource _sitesCancellation;
 
         private readonly Dictionary<PriceCategory, FuelCategory> _fuelCategories = new Dictionary<PriceCategory, FuelCategory>()
         {
@@ -56,8 +58,11 @@ namespace AdelaideFuel.ViewModels
 
             LoadSitesCommand = new AsyncCommand<UserFuel>(LoadSitesAsync);
             LoadFuelsCommand = new AsyncCommand<int>(LoadFuelsAsync);
-            ChangeFuelCommand = new AsyncCommand(ChangeFuelAsync);
             LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
+            GoToSiteSearchCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>(new Dictionary<string, string>()
+            {
+                { NavigationKeys.FuelIdQueryProperty, (Fuel?.Id ?? -1).ToString()  }
+            }));
 
             CheckAndRequestLocationCommand = new AsyncCommand(CheckAndRequestLocationAsync);
         }
@@ -137,11 +142,11 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private DateTime _lastUpdatedUtc = DateTime.MinValue;
-        public DateTime LastUpdatedUtc
+        private DateTime _modifiedUtc = DateTime.MinValue;
+        public DateTime ModifiedUtc
         {
-            get => _lastUpdatedUtc;
-            set => SetProperty(ref _lastUpdatedUtc, value);
+            get => _modifiedUtc;
+            set => SetProperty(ref _modifiedUtc, value);
         }
 
         private DateTime _lastLoadedUtc = DateTime.MinValue;
@@ -159,8 +164,8 @@ namespace AdelaideFuel.ViewModels
 
         public AsyncCommand<int> LoadFuelsCommand { get; private set; }
         public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
-        public AsyncCommand ChangeFuelCommand { get; private set; }
         public AsyncCommand<Site> LaunchMapCommand { get; private set; }
+        public AsyncCommand GoToSiteSearchCommand { get; private set; }
 
         public AsyncCommand CheckAndRequestLocationCommand { get; private set; }
 
@@ -203,6 +208,7 @@ namespace AdelaideFuel.ViewModels
                 {
                     var locationTask = _geolocation.GetLocationAsync(ct);
                     var pricesTask = FuelService.GetSitePricesAsync(ct);
+                    var userBrandsTask = FuelService.GetUserBrandsAsync(ct);
 
 #if DEBUG
                     //await Task.Delay(2500);
@@ -214,15 +220,28 @@ namespace AdelaideFuel.ViewModels
                         Sites.ReplaceRange(sites.Select(i => new Site(i)));
                     }
 
-                    await Task.WhenAll(locationTask, pricesTask);
+                    await Task.WhenAll(locationTask, pricesTask, userBrandsTask);
 
-                    if (!ct.IsCancellationRequested && pricesTask.Result?.Any() == true)
+                    // Don't care if sort order changed, just active state
+                    var brandIds = userBrandsTask.Result
+                        .Where(i => i.IsActive)
+                        .Select(i => i.Id)
+                        .OrderBy(i => i)
+                        .ToList();
+
+                    var userBrandsChanged = !_userBrandIds?.SequenceEqual(brandIds) ?? true;
+                    if (userBrandsChanged)
+                        _userBrandIds = brandIds;
+
+                    var (prices, modifiedUtc) = pricesTask.Result;
+
+                    if (!ct.IsCancellationRequested && (userBrandsChanged || modifiedUtc > ModifiedUtc || fuel.Id != LoadedFuel?.Id))
                     {
-                        var priceLookup = pricesTask.Result
+                        var priceLookup = prices
                             .GroupBy(i => i.SiteId)
                             .ToDictionary(g => g.Key, g => g.ToList());
-                        var fuelPrices = pricesTask.Result
-                            .Where(i => i.FuelId == Fuel.Id)
+                        var fuelPrices = prices
+                            .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
                             .Select(i => i.PriceInCents).ToList();
 
                         var validCategories = default(IList<FuelCategory>);
@@ -298,7 +317,7 @@ namespace AdelaideFuel.ViewModels
                                 s.Prices.Clear();
                             }
 
-                            if (s.SelectedFuelPrice is SiteFuelPrice fp)
+                            if (s.SelectedFuelPrice is SiteFuelPrice fp && fp.PriceInCents != Constants.OutOfStockPriceInCents)
                             {
                                 if (fp.PriceInCents <= q1)
                                     s.PriceCategory = PriceCategory.Lowest;
@@ -317,7 +336,7 @@ namespace AdelaideFuel.ViewModels
                                 s.PriceCategory = PriceCategory.Unknown;
                         }
 
-                        var newFiltered = Sites.Where(s => s.SelectedFuelPrice?.FuelId == Fuel.Id).ToList();
+                        var newFiltered = Sites.Where(s => s.SelectedFuelPrice?.FuelId == Fuel.Id);
                         var toRemove = FilteredSites.Except(newFiltered).ToList();
                         var toAdd = newFiltered.Except(FilteredSites).ToList();
 
@@ -328,9 +347,15 @@ namespace AdelaideFuel.ViewModels
                         FilteredSites.AddRange(toAdd);
 
                         LastLoadedUtc = DateTime.UtcNow;
-                        LastUpdatedUtc = FilteredSites.Any()
-                            ? FilteredSites.Max(s => s.LastUpdatedUtc)
-                            : DateTime.MinValue;
+                        ModifiedUtc = modifiedUtc;
+                    }
+                    else if (!ct.IsCancellationRequested)
+                    {
+                        foreach (var s in Sites)
+                        {
+                            s.LastKnownDistanceKm =
+                                locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
+                        }
                     }
 
                     if (!ct.IsCancellationRequested)
@@ -355,29 +380,6 @@ namespace AdelaideFuel.ViewModels
             if (!ct.IsCancellationRequested && !_sitesCancellation.IsCancellationRequested)
             {
                 IsBusy = false;
-            }
-        }
-
-        private async Task ChangeFuelAsync()
-        {
-            try
-            {
-                var fuelNames = Fuels.Select(i => i.Name).ToArray();
-                var result = await UserDialogs.ActionSheetAsync(
-                    Resources.Fuels,
-                    Resources.Cancel,
-                    default,
-                    default,
-                    fuelNames);
-
-                if (!string.IsNullOrEmpty(result) &&
-                    Array.IndexOf(fuelNames, result) is int idx &&
-                    idx >= 0)
-                    Fuel = Fuels[idx];
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
             }
         }
 

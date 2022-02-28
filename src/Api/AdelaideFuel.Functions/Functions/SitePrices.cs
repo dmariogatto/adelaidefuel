@@ -3,6 +3,7 @@ using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,7 +18,9 @@ namespace AdelaideFuel.Functions
 {
     public class SitePrices
     {
-        public const string SitePricesJson = "site_prices.json";
+        public const string PricesJson = "site_prices.json";
+        public const string PricesLastModifiedTxt = "site_prices_last_modified.txt";
+        public const string LastModifiedHeader = "Last-Modified";
 
         private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3.5);
@@ -36,11 +39,20 @@ namespace AdelaideFuel.Functions
         }
 
         [FunctionName(nameof(SitePrices))]
-        public async Task<IList<SitePriceDto>> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+        public async Task<IActionResult> GetSitePrices(
+            [HttpTrigger(AuthorizationLevel.Function, Route = null)] HttpRequest req,
             ILogger log,
             CancellationToken ct)
         {
+            var lastModified = await _blobService.ReadAllTextAsync(PricesLastModifiedTxt, ct);
+            if (!string.IsNullOrEmpty(lastModified))
+                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified);
+
+            if (req.Method == HttpMethods.Head)
+                return new OkResult();
+            if (req.Method != HttpMethods.Get)
+                return new NotFoundResult();
+
             const string brandIdsKey = "brandIds";
             const string fuelIdsKey = "fuelIds";
 
@@ -60,7 +72,7 @@ namespace AdelaideFuel.Functions
                        (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
                  select sp).ToList();
 
-            return prices ?? new List<SitePriceDto>(0);
+            return new OkObjectResult(prices ?? new List<SitePriceDto>(0));
         }
 
         private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(ILogger log, CancellationToken ct)
@@ -71,7 +83,7 @@ namespace AdelaideFuel.Functions
             {
                 try
                 {
-                    dtos = await _blobService.DeserialiseAsync<List<SitePriceDto>>(SitePricesJson, ct);
+                    dtos = await _blobService.DeserialiseAsync<List<SitePriceDto>>(PricesJson, ct);
                 }
                 catch (Exception ex)
                 {

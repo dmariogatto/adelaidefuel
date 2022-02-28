@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Models;
 using AdelaideFuel.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace AdelaideFuel.Services
         Task<IList<SiteDto>> GetSitesAsync(CancellationToken cancellationToken);
         Task<IList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken);
 
-        Task<IList<SiteFuelPrice>> GetSitePricesAsync(CancellationToken cancellationToken);
+        Task<(IList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken);
 
-        Task<IList<SiteFuelPriceItemGroup>> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
+        Task<(IList<SiteFuelPriceItemGroup> groups, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 
         Task<bool> SyncBrandsAsync(CancellationToken cancellationToken);
         Task<bool> SyncFuelsAsync(CancellationToken cancellationToken);
