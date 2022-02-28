@@ -25,14 +25,6 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="Auto,*" RowSpacing="0">
-            <SearchBar
-                x:Name="Search"
-                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-                CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
-                HorizontalOptions="Fill"
-                PlaceholderColor="{DynamicResource PrimaryTextColor}"
-                TextColor="{DynamicResource PrimaryTextColor}" />
-
             <ListView
                 Grid.Row="1"
                 CachingStrategy="RecycleElement"
@@ -128,6 +120,14 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <SearchBar
+                x:Name="Search"
+                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+                CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
+                HorizontalOptions="Fill"
+                PlaceholderColor="{DynamicResource PrimaryTextColor}"
+                TextColor="{DynamicResource PrimaryTextColor}" />
 
             <Label
                 Grid.Row="1"
