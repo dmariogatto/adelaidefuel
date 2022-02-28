@@ -87,5 +87,10 @@ namespace AdelaideFuel.UI.Views
             _timerCancellation?.Cancel();
             _timerCancellation = null;
         }
+
+        private void TryAgainClicked(object sender, EventArgs e)
+        {
+            ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(default);
+        }
     }
 }

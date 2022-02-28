@@ -158,7 +158,7 @@
                         Style="{DynamicResource LabelStyle}"
                         Text="{local:Translate UnableToLoadPrices}" />
                     <Button
-                        Command="{Binding LoadFuelPriceGroupsCommand}"
+                        Clicked="TryAgainClicked"
                         HorizontalOptions="Center"
                         IsVisible="{Binding HasError}"
                         Style="{DynamicResource ButtonStyle}"
