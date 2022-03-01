@@ -2,6 +2,7 @@
 using AdelaideFuel.Services;
 using AdelaideFuel.UI.Attributes;
 using AdelaideFuel.UI.Controls;
+using AdelaideFuel.UI.Converters;
 using AdelaideFuel.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,16 @@ namespace AdelaideFuel.UI.Views
 
             UpdateMapTheme();
             ThemeManager.CurrentThemeChanged += (sender, args) => UpdateMapTheme();
+
+            if (Device.Idiom == TargetIdiom.Tablet)
+            {
+                BottomDrawerControl.HorizontalOptions = LayoutOptions.Center;
+                BottomDrawerControl.SetBinding(BottomDrawer.WidthRequestProperty, new Binding(
+                    nameof(Width),
+                    converter: (IValueConverter)App.Current.Resources[nameof(MultiplyByConverter)],
+                    converterParameter: 0.7d,
+                    source: MainContentLayout));
+            }
 
             SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(
                     new Position(ViewModel.InitialCameraUpdate.Latitude, ViewModel.InitialCameraUpdate.Longitude),
@@ -214,25 +225,28 @@ namespace AdelaideFuel.UI.Views
                 case nameof(BottomDrawer.Height):
                 case nameof(BottomDrawer.LockStates):
                 case nameof(BottomDrawer.TranslationY):
-                    var opacity = 1d;
-
-                    var maxLockState = BottomDrawerControl.LockStates.Length > 1
-                        ? BottomDrawerControl.LockStates.Last()
-                        : 0.45;
-                    var expandedPercentage = BottomDrawerControl.Height > 0
-                        ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
-                        : -1;
-
-                    if (expandedPercentage > 0 && maxLockState > 0)
+                    if (Device.Idiom == TargetIdiom.Phone)
                     {
-                        opacity = 1 - expandedPercentage / maxLockState;
+                        var opacity = 1d;
 
-                        if (opacity < 0) opacity = 0;
-                        if (opacity > 1) opacity = 1;
+                        var lockState = BottomDrawerControl.LockStates.Length > 1
+                            ? BottomDrawerControl.LockStates.Last()
+                            : 0.45;
+                        var expandedPercentage = BottomDrawerControl.Height > 0
+                            ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
+                            : -1;
+
+                        if (expandedPercentage > 0 && lockState > 0)
+                        {
+                            opacity = 1 - expandedPercentage / lockState;
+
+                            if (opacity < 0) opacity = 0;
+                            if (opacity > 1) opacity = 1;
+                        }
+
+                        SearchButtonLayout.Opacity = opacity;
+                        SearchButtonLayout.InputTransparent = opacity == 0;
                     }
-
-                    SearchButtonLayout.Opacity = opacity;
-                    SearchButtonLayout.IsEnabled = opacity > 0;
                     break;
             }
         }
