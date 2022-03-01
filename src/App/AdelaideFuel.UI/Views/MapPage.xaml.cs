@@ -216,17 +216,24 @@ namespace AdelaideFuel.UI.Views
                 case nameof(BottomDrawer.TranslationY):
                     var opacity = 1d;
 
-                    var maxLockState = BottomDrawerControl.LockStates?.LastOrDefault() ?? -1;
+                    var maxLockState = BottomDrawerControl.LockStates.Length > 1
+                        ? BottomDrawerControl.LockStates.Last()
+                        : 0.45;
                     var expandedPercentage = BottomDrawerControl.Height > 0
                         ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
                         : -1;
 
-                    if (expandedPercentage >= 0 && maxLockState > 0)
+                    if (expandedPercentage > 0 && maxLockState > 0)
                     {
                         opacity = 1 - expandedPercentage / maxLockState;
 
                         if (opacity < 0) opacity = 0;
                         if (opacity > 1) opacity = 1;
+                    }
+
+                    if (opacity == 0)
+                    {
+
                     }
 
                     SearchButtonLayout.Opacity = opacity;
