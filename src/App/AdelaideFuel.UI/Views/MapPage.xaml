@@ -61,6 +61,7 @@
             </StackLayout>
 
             <yummy:PancakeView
+                x:Name="SearchButtonLayout"
                 Margin="{StaticResource XSmallThickness}"
                 Padding="0"
                 CornerRadius="18"
@@ -82,7 +83,8 @@
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
                 Padding="{StaticResource SmallThickness}"
-                IsVisible="{Binding InitialLoadComplete}">
+                IsVisible="{Binding InitialLoadComplete}"
+                PropertyChanged="BottomDrawerControlPropertyChanged">
                 <StackLayout
                     SizeChanged="BottomSheetContentSizeChanged"
                     Spacing="0"

@@ -1,9 +1,11 @@
 ﻿using AdelaideFuel.Models;
 using AdelaideFuel.Services;
 using AdelaideFuel.UI.Attributes;
+using AdelaideFuel.UI.Controls;
 using AdelaideFuel.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -145,7 +147,7 @@ namespace AdelaideFuel.UI.Views
             }
         }
 
-        private void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ViewModel.InitialCameraUpdate))
             {
@@ -158,7 +160,7 @@ namespace AdelaideFuel.UI.Views
         }
 
         private bool _skipSelectedPinChange = false;
-        private void SiteMapPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void SiteMapPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Map.VisibleRegion))
             {
@@ -202,6 +204,34 @@ namespace AdelaideFuel.UI.Views
                     handle.CancelAnimations();
                     handle.TranslationX = 0;
                 }
+            }
+        }
+
+        private void BottomDrawerControlPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(BottomDrawer.Height):
+                case nameof(BottomDrawer.LockStates):
+                case nameof(BottomDrawer.TranslationY):
+                    var opacity = 1d;
+
+                    var maxLockState = BottomDrawerControl.LockStates?.LastOrDefault() ?? -1;
+                    var expandedPercentage = BottomDrawerControl.Height > 0
+                        ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
+                        : -1;
+
+                    if (expandedPercentage >= 0 && maxLockState > 0)
+                    {
+                        opacity = 1 - expandedPercentage / maxLockState;
+
+                        if (opacity < 0) opacity = 0;
+                        if (opacity > 1) opacity = 1;
+                    }
+
+                    SearchButtonLayout.Opacity = opacity;
+                    SearchButtonLayout.IsEnabled = opacity > 0;
+                    break;
             }
         }
 
