@@ -107,7 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProguardConfiguration Include="proguard.cfg" />
-    <Compile Include="Effects\PressedEffect_Droid.cs" />
+    <Compile Include="Effects\SearchBarIconEffect_Droid.cs" />
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />

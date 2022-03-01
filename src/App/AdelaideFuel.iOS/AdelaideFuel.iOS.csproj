@@ -93,7 +93,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Effects\SafeAreaInsetEffect_iOS.cs" />
-    <Compile Include="Effects\PressedEffect_iOS.cs" />
+    <Compile Include="Effects\SearchBarIconEffect_iOS.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
     <Compile Include="Ads\BannerAdView.cs" />
     <Compile Include="Helpers\TraitCollectionExtensions.cs" />

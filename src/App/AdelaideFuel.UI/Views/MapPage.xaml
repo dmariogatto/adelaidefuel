@@ -10,7 +10,6 @@
     xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
@@ -67,7 +66,7 @@
                 CornerRadius="18"
                 HeightRequest="36"
                 HorizontalOptions="End"
-                IsVisible="{Binding IsDevelopment}"
+                IsVisible="{Binding InitialLoadComplete}"
                 Style="{DynamicResource CardStyle}"
                 VerticalOptions="Center"
                 WidthRequest="36">
