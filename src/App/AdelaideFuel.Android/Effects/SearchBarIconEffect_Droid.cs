@@ -40,7 +40,7 @@ namespace AdelaideFuel.Droid.Effects
                 return;
 
             if (tint == Color.Default)
-                _searchIcon.SetColorFilter(null);
+                _searchIcon.ClearColorFilter();
             else
                 _searchIcon.SetColorFilter(tint.ToAndroid());
         }
