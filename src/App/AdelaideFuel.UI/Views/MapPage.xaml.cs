@@ -231,11 +231,6 @@ namespace AdelaideFuel.UI.Views
                         if (opacity > 1) opacity = 1;
                     }
 
-                    if (opacity == 0)
-                    {
-
-                    }
-
                     SearchButtonLayout.Opacity = opacity;
                     SearchButtonLayout.IsEnabled = opacity > 0;
                     break;
