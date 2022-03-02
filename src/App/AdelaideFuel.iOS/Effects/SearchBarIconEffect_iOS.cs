@@ -1,6 +1,7 @@
 ﻿using AdelaideFuel.iOS.Effects;
 using AdelaideFuel.UI.Effects;
 using Foundation;
+using System;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
@@ -35,10 +36,17 @@ namespace AdelaideFuel.iOS.Effects
             if (_leftView is null)
                 return;
 
-            if (tint == Color.Default)
-                _leftView.TintColor = null;
-            else
-                _leftView.TintColor = tint.ToUIColor();
+            try
+            {
+                if (tint == Color.Default)
+                    _leftView.TintColor = null;
+                else
+                    _leftView.TintColor = tint.ToUIColor();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
     }
 }

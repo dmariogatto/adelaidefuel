@@ -2,6 +2,7 @@
 using AdelaideFuel.UI.Effects;
 using Android.Runtime;
 using Android.Widget;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
@@ -39,10 +40,17 @@ namespace AdelaideFuel.Droid.Effects
             if (_searchIcon is null)
                 return;
 
-            if (tint == Color.Default)
-                _searchIcon.ClearColorFilter();
-            else
-                _searchIcon.SetColorFilter(tint.ToAndroid());
+            try
+            {
+                if (tint == Color.Default)
+                    _searchIcon.ClearColorFilter();
+                else
+                    _searchIcon.SetColorFilter(tint.ToAndroid());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
     }
 }
