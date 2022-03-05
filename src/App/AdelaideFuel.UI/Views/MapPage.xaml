@@ -76,6 +76,7 @@
                 </View.GestureRecognizers>
                 <controls:TintImage
                     Margin="{StaticResource SmallThickness}"
+                    AutomationProperties.HelpText="{local:Translate Search}"
                     Source="{StaticResource SearchImg}"
                     TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
             </yummy:PancakeView>
