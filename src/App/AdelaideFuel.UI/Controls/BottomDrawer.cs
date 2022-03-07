@@ -163,9 +163,9 @@ namespace AdelaideFuel.UI.Controls
                 {
                     var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(drawer.GetProportionCoordinate(expandValue)));
                     if (expandValue < 0)
-                        drawer.TranslateTo(drawer.X, finalTranslation, 250, Easing.SpringIn);
+                        drawer.TranslateTo(0, finalTranslation, 250, Easing.SpringIn);
                     else
-                        drawer.TranslateTo(drawer.X, finalTranslation, 250, Easing.SpringOut);
+                        drawer.TranslateTo(0, finalTranslation, 250, Easing.SpringOut);
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace AdelaideFuel.UI.Controls
                     var Y = (Device.RuntimePlatform == Device.Android ? this.TranslationY : _translationYStart) + e.TotalY;
                     // Translate and ensure we don't y + e.TotalY pan beyond the wrapped user interface element bounds.
                     var translateY = Math.Max(Math.Min(0, Y), -Math.Abs((Height * .25) - Height));
-                    this.TranslateTo(this.X, translateY, 1);
+                    this.TranslationY = translateY;
                     ExpandedPercentage = GetPropertionDistance(Y);
                     break;
                 case GestureStatus.Completed:
@@ -191,9 +191,9 @@ namespace AdelaideFuel.UI.Controls
 
                     // Depending on Swipe Up or Down - change the snapping animation
                     if (DetectSwipeUp(e))
-                        this.TranslateTo(this.X, finalTranslation, 250, Easing.SpringIn);
+                        this.TranslateTo(0, finalTranslation, 250, Easing.SpringIn);
                     else
-                        this.TranslateTo(this.X, finalTranslation, 250, Easing.SpringOut);
+                        this.TranslateTo(0, finalTranslation, 250, Easing.SpringOut);
                     ExpandedPercentage = GetClosestLockState(e.TotalY + this.TranslationY);
                     _isDragging = false;
                     break;
@@ -280,7 +280,7 @@ namespace AdelaideFuel.UI.Controls
         public void Dismiss()
         {
             var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(GetProportionCoordinate(LockStates[0])));
-            this.TranslateTo(this.X, finalTranslation, 450, Device.RuntimePlatform == Device.Android ? Easing.SpringOut : null);
+            this.TranslateTo(0, finalTranslation, 450, Device.RuntimePlatform == Device.Android ? Easing.SpringOut : null);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace AdelaideFuel.UI.Controls
         public void Open()
         {
             var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(GetProportionCoordinate(LockStates.Last())));
-            this.TranslateTo(this.X, finalTranslation, 150, Device.RuntimePlatform == Device.Android ? Easing.SpringIn : null);
+            this.TranslateTo(0, finalTranslation, 150, Device.RuntimePlatform == Device.Android ? Easing.SpringIn : null);
         }
         #endregion Public
     }

@@ -10,7 +10,6 @@
     xmlns:ffimg="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
     xmlns:local="clr-namespace:AdelaideFuel.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
@@ -62,12 +61,13 @@
             </StackLayout>
 
             <yummy:PancakeView
+                x:Name="SearchButtonLayout"
                 Margin="{StaticResource XSmallThickness}"
                 Padding="0"
                 CornerRadius="18"
                 HeightRequest="36"
                 HorizontalOptions="End"
-                IsVisible="{Binding IsDevelopment}"
+                IsVisible="{Binding InitialLoadComplete}"
                 Style="{DynamicResource CardStyle}"
                 VerticalOptions="Center"
                 WidthRequest="36">
@@ -76,6 +76,7 @@
                 </View.GestureRecognizers>
                 <controls:TintImage
                     Margin="{StaticResource SmallThickness}"
+                    AutomationProperties.HelpText="{local:Translate Search}"
                     Source="{StaticResource SearchImg}"
                     TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
             </yummy:PancakeView>
@@ -83,7 +84,8 @@
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
                 Padding="{StaticResource SmallThickness}"
-                IsVisible="{Binding InitialLoadComplete}">
+                IsVisible="{Binding InitialLoadComplete}"
+                PropertyChanged="BottomDrawerControlPropertyChanged">
                 <StackLayout
                     SizeChanged="BottomSheetContentSizeChanged"
                     Spacing="0"

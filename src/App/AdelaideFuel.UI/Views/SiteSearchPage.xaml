@@ -123,7 +123,6 @@
 
             <SearchBar
                 x:Name="Search"
-                BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
                 CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
                 HorizontalOptions="Fill"
                 PlaceholderColor="{DynamicResource PrimaryTextColor}"
@@ -140,6 +139,7 @@
                     <MultiTrigger TargetType="View">
                         <MultiTrigger.Conditions>
                             <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
+                            <BindingCondition Binding="{Binding InitialLoadComplete}" Value="True" />
                             <BindingCondition Binding="{Binding IsBusy}" Value="False" />
                         </MultiTrigger.Conditions>
                         <Setter Property="IsVisible" Value="True" />

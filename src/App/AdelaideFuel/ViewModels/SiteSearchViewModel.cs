@@ -42,6 +42,13 @@ namespace AdelaideFuel.ViewModels
         }
         #endregion
 
+        private bool _initialLoadComplete;
+        public bool InitialLoadComplete
+        {
+            get => _initialLoadComplete;
+            set => SetProperty(ref _initialLoadComplete, value);
+        }
+
         private string _searchText;
         public string SearchText
         {
@@ -106,6 +113,7 @@ namespace AdelaideFuel.ViewModels
             }
             finally
             {
+                InitialLoadComplete = true;
                 IsBusy = false;
             }
         }

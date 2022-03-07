@@ -208,7 +208,7 @@ namespace AdelaideFuel.Services
                              join b in userBrandsTask.Result on s.BrandId equals b.Id
                              join f in userFuelsTask.Result on sp.FuelId equals f.Id
                              where b.IsActive && f.IsActive
-                             orderby f.SortOrder, sp.Price, b.SortOrder
+                             orderby f.SortOrder, sp.Price, b.SortOrder, s.Name
                              select new SiteFuelPrice(b, f, s, sp)).ToList();
                         result.modifiedUtc = newModifiedUtc;
 

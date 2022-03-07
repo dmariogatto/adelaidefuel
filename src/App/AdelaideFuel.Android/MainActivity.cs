@@ -17,7 +17,6 @@ namespace AdelaideFuel.Droid
         RoundIcon = "@mipmap/icon_round",
         Theme = "@style/SplashTheme",
         LaunchMode = LaunchMode.SingleTask,
-        ScreenOrientation = ScreenOrientation.Portrait,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(
         new[] { Xamarin.Essentials.Platform.Intent.ActionAppAction },
@@ -42,6 +41,9 @@ namespace AdelaideFuel.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+            if (Device.Idiom == TargetIdiom.Phone)
+                RequestedOrientation = ScreenOrientation.UserPortrait;
 
 #if DEBUG
             var testDevices = new List<string>()
