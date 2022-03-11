@@ -130,14 +130,13 @@ namespace AdelaideFuel.ViewModels
             get => _selectedSite;
             set
             {
-                if (SetProperty(ref _selectedSite, value))
+                if (SetProperty(ref _selectedSite, value) && value is not null)
                 {
-                    if (value != null)
-                        _geolocation.GetLocationAsync().ContinueWith(r =>
-                        {
-                            if (r.Result != null)
-                                value.LastKnownDistanceKm = r.Result.CalculateDistance(value.Latitude, value.Longitude, DistanceUnits.Kilometers);
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    _geolocation.GetLocationAsync().ContinueWith(r =>
+                    {
+                        if (r.Result is not null)
+                            value.LastKnownDistanceKm = r.Result.CalculateDistance(value.Latitude, value.Longitude, DistanceUnits.Kilometers);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
         }
@@ -190,7 +189,7 @@ namespace AdelaideFuel.ViewModels
 
         private async Task LoadSitesAsync(UserFuel fuel)
         {
-            if (fuel == null)
+            if (fuel is null)
                 return;
 
             var localCancelCopy = _sitesCancellation;
@@ -262,10 +261,10 @@ namespace AdelaideFuel.ViewModels
                         else if (fuelPrices.Count < Statistics.MinLengthForFns)
                         {
                             // set this for the categorisation below
-                            q1 = fuelPrices.Max();
+                            q1 = fuelPrices.Last();
 
-                            _fuelCategories[PriceCategory.Lowest].LowerBound = (int)fuelPrices.Min();
-                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)fuelPrices.Max();
+                            _fuelCategories[PriceCategory.Lowest].LowerBound = (int)fuelPrices.First();
+                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
 
                             validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
                         }
@@ -340,7 +339,7 @@ namespace AdelaideFuel.ViewModels
                         var toRemove = FilteredSites.Except(newFiltered).ToList();
                         var toAdd = newFiltered.Except(FilteredSites).ToList();
 
-                        if (SelectedSite != null && toRemove.Contains(SelectedSite))
+                        if (SelectedSite is not null && toRemove.Contains(SelectedSite))
                             SelectedSite = null;
 
                         FilteredSites.RemoveRange(toRemove, NotifyCollectionChangedAction.Remove);
@@ -415,7 +414,7 @@ namespace AdelaideFuel.ViewModels
                     var loc = await _geolocation.GetLastKnownLocationAsync() ??
                               await _geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(3)));
 
-                    if (!_initialCameraUpdate.HasValue && loc != default)
+                    if (!_initialCameraUpdate.HasValue && loc is not null)
                     {
                         var distanceFromCenter = loc.CalculateDistance(Constants.SaCenter.Latitude, Constants.SaCenter.Longitude, DistanceUnits.Kilometers);
                         if (distanceFromCenter * 1000d <= Constants.SaCenter.RadiusMetres)
