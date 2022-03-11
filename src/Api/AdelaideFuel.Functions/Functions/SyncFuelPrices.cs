@@ -90,6 +90,8 @@ namespace AdelaideFuel.Functions
                 61577323,
                 // Minnipa Community Store
                 61577296,
+                // Liberty Autopro
+                61501603,
             };
 
             var exceptionSitePrices =
@@ -101,6 +103,13 @@ namespace AdelaideFuel.Functions
 
             foreach(var i in exceptionSitePrices)
                 i.Price *= 10;
+
+            var exceptions = await FindPossibleExceptionsAsync(
+                    priceEntities
+                        .SelectMany(i => i.Value)
+                        .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
+                    ct);
+            var exceptionEmailTask = SendPossibleExceptionsEmailAsync(exceptions, ct);
 
             var sitePriceDtos =
                 (from vals in priceEntities.Values
@@ -148,12 +157,7 @@ namespace AdelaideFuel.Functions
                     await _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(deletedPrices.Select(i => new SitePriceArchiveEntity(i.BrandId, i)), log, ct);
                 }
 
-                var exceptions = await FindPossibleExceptionsAsync(
-                    priceEntities
-                        .SelectMany(i => i.Value)
-                        .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
-                    ct);
-                await SendPossibleExceptionsEmailAsync(exceptions, ct);
+                await exceptionEmailTask;
             }
 
             sw.Stop();
