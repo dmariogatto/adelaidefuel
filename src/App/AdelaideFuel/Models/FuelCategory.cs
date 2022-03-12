@@ -1,7 +1,9 @@
 ﻿using MvvmHelpers;
+using System.Diagnostics;
 
 namespace AdelaideFuel.Models
 {
+    [DebuggerDisplay("{PriceCategory}, {Description}")]
     public class FuelCategory : ObservableObject
     {
         public FuelCategory(PriceCategory priceCategory)
@@ -18,9 +20,7 @@ namespace AdelaideFuel.Models
             set
             {
                 if (SetProperty(ref _lowerBound, value))
-                {
-                    OnPropertyChanged(nameof(Description));
-                }
+                    UpdateDescription();
             }
         }
 
@@ -31,29 +31,31 @@ namespace AdelaideFuel.Models
             set
             {
                 if (SetProperty(ref _upperBound, value))
-                {
-                    OnPropertyChanged(nameof(Description));
-                }
+                    UpdateDescription();
             }
         }
 
+        private string _description;
         public string Description
         {
-            get
-            {
-                var result = string.Empty;
+            get => _description;
+            private set => SetProperty(ref _description, value);
+        }
 
-                if (LowerBound == UpperBound)
-                    result = LowerBound.ToString();
-                else if (LowerBound > 0 && UpperBound > 0)
-                    result = string.Format("{0} - {1}", LowerBound, UpperBound);
-                else if (LowerBound > 0)
-                    result = string.Format("> {0}", LowerBound);
-                else if (UpperBound > 0)
-                    result = string.Format("< {0}", UpperBound);
+        private void UpdateDescription()
+        {
+            var result = string.Empty;
 
-                return result;
-            }
+            if (LowerBound == UpperBound)
+                result = LowerBound.ToString();
+            else if (LowerBound > 0 && UpperBound > 0)
+                result = string.Format("{0} - {1}", LowerBound, UpperBound);
+            else if (LowerBound > 0)
+                result = string.Format("> {0}", LowerBound);
+            else if (UpperBound > 0)
+                result = string.Format("< {0}", UpperBound);
+
+            Description = result;
         }
     }
 }
