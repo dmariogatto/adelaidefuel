@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace AdelaideFuel.Services
 {
@@ -17,7 +18,7 @@ namespace AdelaideFuel.Services
 
         Task<(IList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken);
 
-        Task<(IList<SiteFuelPriceItemGroup> groups, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
+        Task<(IList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 
         Task<bool> SyncBrandsAsync(CancellationToken cancellationToken);
         Task<bool> SyncFuelsAsync(CancellationToken cancellationToken);

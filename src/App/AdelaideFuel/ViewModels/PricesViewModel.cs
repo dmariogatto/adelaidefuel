@@ -94,6 +94,13 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _noPricesFound, value);
         }
 
+        private bool _noLocation = false;
+        public bool NoLocation
+        {
+            get => _noLocation;
+            set => SetProperty(ref _noLocation, value);
+        }
+
         public ObservableRangeCollection<SiteFuelPriceItemGroup> FuelPriceGroups { get; private set; }
 
         public AsyncCommand<CancellationToken> LoadFuelPriceGroupsCommand { get; private set; }
@@ -200,7 +207,7 @@ namespace AdelaideFuel.ViewModels
             if (ct.IsCancellationRequested || !FuelPriceGroups.Any())
                 return false;
 
-            var (prices, modifiedUtc) = await FuelService.GetFuelPricesByRadiusAsync(ct);
+            var (prices, location, modifiedUtc) = await FuelService.GetFuelPricesByRadiusAsync(ct);
             var priceLookup = prices?.ToDictionary(p => p.Key.Id, p => p.Items);
 
             if (!ct.IsCancellationRequested)
@@ -231,6 +238,7 @@ namespace AdelaideFuel.ViewModels
                     fpg.RefreshHasPrices();
                 }
 
+                NoLocation = location is null;
                 ModifiedUtc = modifiedUtc;
 
                 return true;

@@ -114,6 +114,22 @@
         <Grid RowDefinitions="Auto,*" RowSpacing="0">
             <ScrollView Grid.Row="1" Padding="{StaticResource ItemMargin}">
                 <StackLayout IsVisible="{Binding HasPrices}" Spacing="0">
+                    <Grid
+                        Margin="{StaticResource XSmallBottomThickness}"
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="{StaticResource XSmallSpacing}"
+                        IsVisible="{Binding NoLocation}">
+                        <Label
+                            FontSize="Small"
+                            Text="⚠️"
+                            VerticalOptions="Center" />
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource ItalicFontFamily}"
+                            FontSize="Small"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{local:Translate NoLocationWarning}" />
+                    </Grid>
                     <StackLayout BindableLayout.ItemTemplate="{StaticResource FuelPriceGroupTemplate}" BindableLayout.ItemsSource="{Binding FuelPriceGroups}" />
                     <Grid
                         Margin="{StaticResource XSmallTopThickness}"
