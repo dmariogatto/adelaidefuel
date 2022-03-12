@@ -109,7 +109,7 @@ namespace AdelaideFuel.Functions
                         .SelectMany(i => i.Value)
                         .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
                     ct);
-            var exceptionEmailTask = SendPossibleExceptionsEmailAsync(exceptions, ct);
+            var exEmailTask = SendPossibleExceptionsEmailAsync(exceptions, ct);
 
             var sitePriceDtos =
                 (from vals in priceEntities.Values
@@ -157,7 +157,7 @@ namespace AdelaideFuel.Functions
                     await _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(deletedPrices.Select(i => new SitePriceArchiveEntity(i.BrandId, i)), log, ct);
                 }
 
-                await exceptionEmailTask;
+                await exEmailTask;
             }
 
             sw.Stop();
