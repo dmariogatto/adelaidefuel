@@ -15,6 +15,7 @@ namespace AdelaideFuel.ViewModels
     public class PricesViewModel : BaseViewModel
     {
         private readonly IConnectivity _connectivity;
+        private readonly IPermissions _permissions;
         private readonly IVersionTracking _versionTracking;
 
         private readonly ObservableRangeCollection<UserFuel> _userFuels;
@@ -22,6 +23,7 @@ namespace AdelaideFuel.ViewModels
 
         public PricesViewModel(
             IConnectivity connectivity,
+            IPermissions permissions,
             IVersionTracking versionTracking,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
@@ -29,6 +31,7 @@ namespace AdelaideFuel.ViewModels
             _userRadii = new ObservableRangeCollection<UserRadius>();
 
             _connectivity = connectivity;
+            _permissions = permissions;
             _versionTracking = versionTracking;
 
             Title = Resources.Prices;
@@ -142,26 +145,45 @@ namespace AdelaideFuel.ViewModels
                 IsBusy = false;
             }
 
-            if (firstLoad && (
-#if DEBUG
-                //true ||
-#endif
-                _versionTracking.IsFirstLaunchEver &&
-                HasInternet))
+            if (firstLoad && HasInternet)
             {
-                var config = await UserDialogs.ConfirmAsync(
+                if (_versionTracking.IsFirstLaunchEver)
+                {
+                    var config = await UserDialogs.ConfirmAsync(
                                     Resources.FuelSetup,
                                     Resources.SaBowser,
                                     Resources.Now,
                                     Resources.Later);
 
-                if (config)
-                    await NavigationService.NavigateToAsync<FuelsViewModel>();
+                    if (config)
+                        await NavigationService.NavigateToAsync<FuelsViewModel>();
 
-                Logger.Event(AppCenterEvents.Action.FuelSetup, new Dictionary<string, string>()
+                    Logger.Event(AppCenterEvents.Action.FuelSetup, new Dictionary<string, string>()
+                    {
+                        { nameof(config), config.ToString() }
+                    });
+                }
+                else if (NoLocation)
                 {
-                    { nameof(config), config.ToString() }
-                });
+                    try
+                    {
+                        var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                        if (status == PermissionStatus.Granted)
+                        {
+                            // First load & no location - will try again
+                            _ = Task.Delay(1500, ct)
+                                    .ContinueWith(t =>
+                                    {
+                                        if (!ct.IsCancellationRequested)
+                                            _ = LoadFuelPriceGroupsCommand.ExecuteAsync(ct);
+                                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
+                }
             }
         }
 
