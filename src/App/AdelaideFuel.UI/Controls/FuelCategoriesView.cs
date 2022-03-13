@@ -29,7 +29,7 @@ namespace AdelaideFuel.UI.Controls
             ColumnSpacing = RowSpacing = 0;
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            
+
             _separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
                 ? (double)Application.Current.Resources[Styles.Keys.MediumSpacing]
                 : (double)Application.Current.Resources[Styles.Keys.XSmallSpacing];
