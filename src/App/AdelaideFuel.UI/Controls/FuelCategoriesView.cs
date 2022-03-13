@@ -2,7 +2,6 @@
 using AdelaideFuel.UI.Converters;
 using MvvmHelpers;
 using System.Collections.Specialized;
-using System.Linq;
 using Xamarin.Essentials.Interfaces;
 using Xamarin.Forms;
 
