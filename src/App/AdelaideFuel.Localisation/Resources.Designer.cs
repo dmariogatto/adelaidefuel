@@ -804,6 +804,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show radii on map.
+        /// </summary>
+        public static string ShowRadiiOnMap {
+            get {
+                return ResourceManager.GetString("ShowRadiiOnMap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stations.
         /// </summary>
         public static string Stations {

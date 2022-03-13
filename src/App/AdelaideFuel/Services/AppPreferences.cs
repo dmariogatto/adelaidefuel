@@ -77,5 +77,22 @@ namespace AdelaideFuel.Services
                 }
             }
         }
+
+        public bool ShowRadiiOnMap
+        {
+#if DEBUG
+            get => _preferences.Get(nameof(ShowRadiiOnMap), false);
+#else
+            get => false;
+#endif
+            set
+            {
+                if (ShowRadiiOnMap != value)
+                {
+                    _preferences.Set(nameof(ShowRadiiOnMap), value);
+                    OnPropertyChanged();
+                }
+            }
+        }
     }
 }

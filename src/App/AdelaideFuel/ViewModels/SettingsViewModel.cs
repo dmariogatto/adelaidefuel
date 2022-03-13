@@ -106,6 +106,19 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
+        public bool ShowRadiiOnMap
+        {
+            get => AppPrefs.ShowRadiiOnMap;
+            set
+            {
+                if (ShowRadiiOnMap != value)
+                {
+                    AppPrefs.ShowRadiiOnMap = value;
+                    OnPropertyChanged(nameof(ShowRadiiOnMap));
+                }
+            }
+        }
+
         public ObservableRangeCollection<string> Themes { get; private set; }
 
         public Command LoadSettingsCommand { get; private set; }

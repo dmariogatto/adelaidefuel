@@ -413,4 +413,7 @@ You can update your preferences in Settings.</value>
   <data name="NoLocationWarning" xml:space="preserve">
     <value>Cannot find current location, distances from Adelaide CBD</value>
   </data>
+  <data name="ShowRadiiOnMap" xml:space="preserve">
+    <value>Show radii on map</value>
+  </data>
 </root>
