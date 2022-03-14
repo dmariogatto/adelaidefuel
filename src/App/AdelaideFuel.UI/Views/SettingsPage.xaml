@@ -80,6 +80,7 @@
                 <sv:LabelCell Title="{local:Translate Build}" ValueText="{Binding Build}" />
             </sv:Section>
             <sv:Section Title="{local:Translate Development}" IsVisible="{Binding IsDevelopment}">
+                <sv:SwitchCell Title="{local:Translate ShowRadiiOnMap}" On="{Binding ShowRadiiOnMap}" />
                 <sv:ButtonCell Title="{local:Translate GenerateTestCrash}" Command="{Binding GenerateTestCrashCommand}" />
                 <sv:LabelCell Title="{local:Translate LogSize}" ValueText="{Binding LogDataSize, Converter={StaticResource bytesToKbConverter}}" />
                 <sv:ButtonCell Title="{local:Translate ViewLog}" Command="{Binding ViewLogCommand}" />

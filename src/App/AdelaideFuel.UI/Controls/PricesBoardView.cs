@@ -52,46 +52,68 @@ namespace AdelaideFuel.UI.Controls
 
         private void Redraw()
         {
-            var dataItemCount = SiteFuelPrices?.Count ?? 0;
-            var childItemCount = _pricesGrid.Children.Count / 2;
+            const int childrenPerItem = 2;
 
-            for (var i = childItemCount; i < dataItemCount; i++)
+            var dataItemCount = SiteFuelPrices?.Count ?? 0;
+            var childItemCount = _pricesGrid.Children.Count / childrenPerItem;
+
+            for (var i = 0; i < dataItemCount; i++)
             {
-                var fuelLabel = new Label()
+                var item = SiteFuelPrices[i];
+
+                var fuelLbl = default(Label);
+                var priceLbl = default(Label);
+
+                if (i < childItemCount)
                 {
+                    fuelLbl = (Label)_pricesGrid.Children[i * childrenPerItem];
+                    priceLbl = (Label)_pricesGrid.Children[i * childrenPerItem + 1];
+
+                    if (!ReferenceEquals(fuelLbl.BindingContext, item))
+                    {
+                        fuelLbl.BindingContext = item;
+                        priceLbl.BindingContext = item;
+                        foreach (var t in priceLbl.Triggers)
+                            t.BindingContext = item;
+                    }
+
+                    continue;
+                }
+
+                fuelLbl = new Label()
+                {
+                    BindingContext = item,
                     FontFamily = (string)Application.Current.Resources[Styles.Keys.BoldFontFamily],
                     FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
                     VerticalTextAlignment = TextAlignment.Center
                 };
-                fuelLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                fuelLabel.SetBinding(Label.TextProperty, new Binding(
-                    $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.FuelName)}",
-                    source: this));
+                fuelLbl.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
+                fuelLbl.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.FuelName)));
 
-                var fuelPricePropertyPath = $"{nameof(SiteFuelPrices)}[{i}].{nameof(SiteFuelPrice.PriceInCents)}";
-                var priceLabel = new Label()
+                priceLbl = new Label()
                 {
+                    BindingContext = item,
                     FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
                     HorizontalOptions = LayoutOptions.End,
                     VerticalTextAlignment = TextAlignment.Center
                 };
-                priceLabel.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                priceLabel.SetBinding(Label.TextProperty, new Binding(
-                    fuelPricePropertyPath,
-                    stringFormat: "{0:#.0}",
-                    source: this));
+                priceLbl.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
+                priceLbl.SetBinding(Label.TextProperty, new Binding(
+                    nameof(SiteFuelPrice.PriceInCents),
+                    stringFormat: "{0:#.0}"));
 
                 var oosTrigger = new DataTrigger(typeof(View))
                 {
-                    Binding = new Binding(fuelPricePropertyPath, source: this),
+                    BindingContext = item,
+                    Binding = new Binding(nameof(SiteFuelPrice.PriceInCents)),
                     Value = Constants.OutOfStockPriceInCents
                 };
                 oosTrigger.Setters.Add(new Setter() { Property = View.OpacityProperty, Value = (double)App.Current.Resources[Styles.Keys.UnselectedOpacity] });
 
-                priceLabel.Triggers.Add(oosTrigger);
+                priceLbl.Triggers.Add(oosTrigger);
 
-                _pricesGrid.Children.Add(fuelLabel, 0, _pricesGrid.RowDefinitions.Count);
-                _pricesGrid.Children.Add(priceLabel, 1, _pricesGrid.RowDefinitions.Count);
+                _pricesGrid.Children.Add(fuelLbl, 0, _pricesGrid.RowDefinitions.Count);
+                _pricesGrid.Children.Add(priceLbl, 1, _pricesGrid.RowDefinitions.Count);
 
                 _pricesGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             }
@@ -128,10 +150,10 @@ namespace AdelaideFuel.UI.Controls
 
         private void SiteFuelPricesSourceChanged(ObservableRangeCollection<SiteFuelPrice> oldValue, ObservableRangeCollection<SiteFuelPrice> newValue)
         {
-            if (oldValue != null)
+            if (oldValue is not null)
                 oldValue.CollectionChanged -= CollectionChanged;
 
-            if (newValue != null)
+            if (newValue is not null)
                 newValue.CollectionChanged += CollectionChanged;
 
             Redraw();

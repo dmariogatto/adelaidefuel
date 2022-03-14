@@ -551,6 +551,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot find current location, distances from Adelaide CBD.
+        /// </summary>
+        public static string NoLocationWarning {
+            get {
+                return ResourceManager.GetString("NoLocationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are no prices for your combination of Brands &amp; Fuels.
         ///You can update your preferences in Settings..
         /// </summary>
@@ -791,6 +800,15 @@ namespace AdelaideFuel.Localisation {
         public static string ShouldIFuel {
             get {
                 return ResourceManager.GetString("ShouldIFuel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show radii on map.
+        /// </summary>
+        public static string ShowRadiiOnMap {
+            get {
+                return ResourceManager.GetString("ShowRadiiOnMap", resourceCulture);
             }
         }
         

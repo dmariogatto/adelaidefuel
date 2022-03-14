@@ -104,7 +104,7 @@ namespace AdelaideFuel.Models
 
         #region IMapPin
         public string Label => Name;
-        public string Description => SelectedFuelPrice != null
+        public string Description => SelectedFuelPrice is not null
             ? string.Format(Resources.ItemDashItem, SelectedFuelPrice.FuelName, SelectedFuelPrice.PriceInCents)
             : Address;
         public Coords Position { get; private set; }

@@ -226,7 +226,7 @@ namespace AdelaideFuel.Services
             return result;
         }
 
-        public async Task<(IList<SiteFuelPriceItemGroup> groups, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
+        public async Task<(IList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
             async Task<Location> getLocationAsync(CancellationToken ct)
             {
@@ -276,10 +276,11 @@ namespace AdelaideFuel.Services
                 return int.MaxValue;
             }
 
+            var disLoc = loc ?? Constants.AdelaideCenter.ToLocation();
             var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
             foreach (var fp in prices.Where(i => i.PriceInCents != Constants.OutOfStockPriceInCents))
             {
-                var distanceKm = loc?.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers) ?? -1;
+                var distanceKm = disLoc.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers);
                 var radiusKm = getRadiusKm(distanceKm, userRadii);
                 fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
             }
@@ -320,7 +321,7 @@ namespace AdelaideFuel.Services
                 }
             }
 
-            return (fuelGroups, modifiedUtc);
+            return (fuelGroups, loc, modifiedUtc);
         }
 
         public async Task<bool> SyncBrandsAsync(CancellationToken cancellationToken)

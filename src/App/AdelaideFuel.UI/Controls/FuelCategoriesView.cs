@@ -2,7 +2,6 @@
 using AdelaideFuel.UI.Converters;
 using MvvmHelpers;
 using System.Collections.Specialized;
-using System.Linq;
 using Xamarin.Essentials.Interfaces;
 using Xamarin.Forms;
 
@@ -29,7 +28,6 @@ namespace AdelaideFuel.UI.Controls
             ColumnSpacing = RowSpacing = 0;
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
             _separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
                 ? (double)Application.Current.Resources[Styles.Keys.MediumSpacing]
@@ -50,8 +48,10 @@ namespace AdelaideFuel.UI.Controls
 
         private void Redraw()
         {
+            const int childrenPerItem = 3;
+
             var dataItemCount = FuelCategories?.Count ?? 0;
-            var childItemCount = (Children.Count + 1) / 3;
+            var childItemCount = (Children.Count + 1) / childrenPerItem;
 
             void createSeparator()
             {
@@ -64,31 +64,53 @@ namespace AdelaideFuel.UI.Controls
                 SetRowSpan(separator, 2);
             }
 
-            for (var i = childItemCount; i < dataItemCount; i++)
+            for (var i = 0; i < dataItemCount; i++)
             {
+                var item = FuelCategories[i];
+
+                var tintImg = default(TintImage);
+                var lbl = default(Label);
+
+                if (i < childItemCount)
+                {
+                    tintImg = (TintImage)Children[i * childrenPerItem];
+                    lbl = (Label)Children[i * childrenPerItem + 1];
+
+                    if (!ReferenceEquals(tintImg.BindingContext, item))
+                    {
+                        tintImg.BindingContext = item;
+                        lbl.BindingContext = item;
+                    }
+
+                    continue;
+                }
+
                 if (i == childItemCount && childItemCount > 0)
                     createSeparator();
 
-                var tintImg = new TintImage();
-                tintImg.HeightRequest = tintImg.WidthRequest = 24;
-                tintImg.HorizontalOptions = LayoutOptions.Center;
-                tintImg.Source = Application.Current.Resources[Styles.Keys.TwoToneCircleImg]?.ToString();
+                tintImg = new TintImage()
+                {
+                    BindingContext = item,
+                    HeightRequest = 24,
+                    WidthRequest = 24,
+                    HorizontalOptions = LayoutOptions.Center,
+                    Source = (string)Application.Current.Resources[Styles.Keys.TwoToneCircleImg],
+                };
                 tintImg.SetBinding(TintImage.TintColorProperty, new Binding(
-                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.PriceCategory)}",
-                    converter: _priceCategoryToColorConverter,
-                    source: this));
+                    nameof(FuelCategory.PriceCategory),
+                    converter: _priceCategoryToColorConverter));
                 tintImg.SetBinding(AutomationProperties.HelpTextProperty, new Binding(
-                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.PriceCategory)}",
-                    converter: _enumToDescriptionConverter,
-                    source: this));
+                    nameof(FuelCategory.PriceCategory),
+                    converter: _enumToDescriptionConverter));
 
-                var lbl = new Label();
+                lbl = new Label()
+                {
+                    BindingContext = item,
+                    HorizontalOptions = LayoutOptions.Center,
+                    FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+                };
                 lbl.SetDynamicResource(StyleProperty, Styles.Keys.LabelStyle);
-                lbl.HorizontalOptions = LayoutOptions.Center;
-                lbl.FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label));
-                lbl.SetBinding(Label.TextProperty, new Binding(
-                    $"{nameof(FuelCategories)}[{i}].{nameof(FuelCategory.Description)}",
-                    source: this));
+                lbl.SetBinding(Label.TextProperty, new Binding(nameof(FuelCategory.Description)));
 
                 ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 Children.Add(tintImg, ColumnDefinitions.Count - 1, 0);
@@ -122,10 +144,10 @@ namespace AdelaideFuel.UI.Controls
 
         private void FuelCategoriesSourceChanged(ObservableRangeCollection<FuelCategory> oldValue, ObservableRangeCollection<FuelCategory> newValue)
         {
-            if (oldValue != null)
+            if (oldValue is not null)
                 oldValue.CollectionChanged -= CollectionChanged;
 
-            if (newValue != null)
+            if (newValue is not null)
                 newValue.CollectionChanged += CollectionChanged;
 
             Redraw();

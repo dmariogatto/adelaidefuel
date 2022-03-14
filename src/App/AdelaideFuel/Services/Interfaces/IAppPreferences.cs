@@ -11,5 +11,7 @@ namespace AdelaideFuel.Services
         DateTime LastDateOpened { get; set; }
         int DayCount { get; set; }
         bool ReviewRequested { get; set; }
+
+        bool ShowRadiiOnMap { get; set; }
     }
 }

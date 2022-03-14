@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials.Interfaces;
 using Xamarin.Forms;
 using Xamarin.Forms.BetterMaps;
 
@@ -120,6 +121,11 @@ namespace AdelaideFuel.UI.Views
                     ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
                     return true;
                 });
+
+                if (IoC.Resolve<IAppPreferences>().ShowRadiiOnMap)
+                    _ = DrawRadiiAsync(cts.Token);
+                else if (SiteMap.MapElements.Any())
+                    SiteMap.MapElements.Clear();
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -302,6 +308,54 @@ namespace AdelaideFuel.UI.Views
             drawer.ExpandedPercentage = expIdx >= 0 && expIdx < lockStates.Count
                 ? lockStates[expIdx]
                 : 0;
+        }
+
+        private async Task DrawRadiiAsync(CancellationToken ct)
+        {
+            try
+            {
+                var locationTask = IoC.Resolve<IGeolocation>().GetLastKnownLocationAsync();
+                var radiiTask = IoC.Resolve<IFuelService>().GetUserRadiiAsync(ct);
+
+                await Task.WhenAll(locationTask, radiiTask);
+
+                if (!ct.IsCancellationRequested)
+                {
+                    var location = locationTask.Result;
+
+                    SiteMap.MapElements.Clear();
+
+                    if (location is not null)
+                    {
+                        var radii =
+                            (from i in radiiTask.Result
+                             where i.Id < int.MaxValue
+                             select i.Id);
+
+                        foreach (var i in radii)
+                        {
+                            var circle = new Circle()
+                            {
+                                Center = new Position(location.Latitude, location.Longitude),
+                                Radius = Distance.FromKilometers(i),
+                                StrokeColor = ThemeManager.ResolvedTheme switch
+                                {
+                                    Theme.Dark => Color.LightSkyBlue,
+                                    _ => Color.DeepSkyBlue
+                                },
+                                StrokeWidth = 8,
+                            };
+
+                            SiteMap.MapElements.Add(circle);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SiteMap.MapElements.Clear();
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
 
         private void UpdateMapTheme()
