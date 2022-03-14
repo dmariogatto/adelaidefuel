@@ -136,8 +136,7 @@ namespace AdelaideFuel.Storage
             try
             {
                 var bsonKeys = keys.Where(k => !string.IsNullOrWhiteSpace(k))
-                                   .Select(k => new BsonValue(k))
-                                   .ToList();
+                                   .Select(k => new BsonValue(k));
 
                 var query = Query.In(IdColumn, bsonKeys);
                 if (!includeExpired)
@@ -357,7 +356,7 @@ namespace AdelaideFuel.Storage
             try
             {
                 var bsonKeys = keys.Where(k => !string.IsNullOrEmpty(k))
-                                   .Select(k => new BsonValue(k)).ToList();
+                                   .Select(k => new BsonValue(k));
                 var query = Query.In(IdColumn, bsonKeys);
                 count = await _retryPolicyAsync.ExecuteAsync(
                     (ct) => Task.Run(() => _col.DeleteMany(query)),
