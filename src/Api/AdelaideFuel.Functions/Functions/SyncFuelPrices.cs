@@ -92,6 +92,8 @@ namespace AdelaideFuel.Functions
                 61577296,
                 // Liberty Autopro
                 61501603,
+                // Hanly Auto Repairs
+                61501981,
             };
 
             var exceptionSitePrices =
