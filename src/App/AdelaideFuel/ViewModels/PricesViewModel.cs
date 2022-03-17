@@ -171,7 +171,7 @@ namespace AdelaideFuel.ViewModels
                         if (status == PermissionStatus.Granted)
                         {
                             // First load & no location - will try again
-                            _ = Task.Delay(1500, ct)
+                            _ = Task.Delay(2000, ct)
                                     .ContinueWith(t =>
                                     {
                                         if (!ct.IsCancellationRequested)

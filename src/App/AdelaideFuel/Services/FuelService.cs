@@ -223,6 +223,8 @@ namespace AdelaideFuel.Services
                 }
             }
 
+            result.prices ??= Array.Empty<SiteFuelPrice>();
+
             return result;
         }
 
@@ -254,74 +256,79 @@ namespace AdelaideFuel.Services
             var userRadiiTask = GetUserRadiiAsync(cancellationToken);
             var pricesTask = GetSitePricesAsync(cancellationToken);
 
-            await Task.WhenAll(locTask, userFuelsTask, userRadiiTask, pricesTask).ConfigureAwait(false);
-
-            var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToDictionary(i => i.Id, i => i);
-            var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
-            var loc = locTask.Result;
-            var (prices, modifiedUtc) = pricesTask.Result;
-
-            static int getRadiusKm(double distanceKm, List<UserRadius> radii)
-            {
-                if (distanceKm < 0) return int.MaxValue;
-
-                foreach (var rkm in radii)
-                {
-                    var km = rkm.Id;
-
-                    if (distanceKm <= km) return km;
-                    if ((distanceKm - km) <= 0.05d) return km;
-                }
-
-                return int.MaxValue;
-            }
-
-            var disLoc = loc ?? Constants.AdelaideCenter.ToLocation();
-            var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
-            foreach (var fp in prices.Where(i => i.PriceInCents != Constants.OutOfStockPriceInCents))
-            {
-                var distanceKm = disLoc.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers);
-                var radiusKm = getRadiusKm(distanceKm, userRadii);
-                fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
-            }
+            var (prices, modifiedUtc) = await pricesTask.ConfigureAwait(false);
 
             var fuelGroups = new List<SiteFuelPriceItemGroup>();
+            var gpsLocation = default(Location);
 
-            var currentGroup = default(SiteFuelPriceItemGroup);
-            var currentRadius = -1;
-            var currentCheapest = double.MaxValue;
-
-            foreach (var fpd in fuelPriceData)
+            if (prices?.Any() == true)
             {
-                var currentFuelId = fpd.Price.FuelId;
+                await Task.WhenAll(locTask, userFuelsTask, userRadiiTask).ConfigureAwait(false);
 
-                if (currentGroup?.Key?.Id != currentFuelId && userFuels.ContainsKey(currentFuelId))
+                var userFuels = userFuelsTask.Result.Where(i => i.IsActive).ToDictionary(i => i.Id, i => i);
+                var userRadii = userRadiiTask.Result.Where(i => i.IsActive).ToList();
+                gpsLocation = locTask.Result;
+
+                static int getRadiusKm(double distanceKm, List<UserRadius> radii)
                 {
-                    var fuel = userFuels[currentFuelId];
+                    if (distanceKm < 0) return int.MaxValue;
 
-                    currentGroup = new SiteFuelPriceItemGroup(fuel, Array.Empty<SiteFuelPriceItem>());
-                    currentRadius = -1;
-                    currentCheapest = double.MaxValue;
+                    foreach (var rkm in radii)
+                    {
+                        var km = rkm.Id;
 
-                    fuelGroups.Add(currentGroup);
+                        if (distanceKm <= km) return km;
+                        if ((distanceKm - km) <= 0.05d) return km;
+                    }
+
+                    return int.MaxValue;
                 }
 
-                if (currentGroup?.Key?.Id == currentFuelId &&
-                    currentRadius != fpd.RadiusKm &&
-                    fpd.Price.PriceInCents < currentCheapest)
+                var distanceLocation = gpsLocation ?? Constants.AdelaideCenter.ToLocation();
+                var fuelPriceData = new SortedSet<SiteFuelPriceAndDistance>(new SiteFuelPriceAndDistanceComparer());
+                foreach (var fp in prices.Where(i => i.PriceInCents != Constants.OutOfStockPriceInCents))
                 {
-                    currentRadius = fpd.RadiusKm;
-                    currentCheapest = Math.Min(currentCheapest, fpd.Price.PriceInCents);
+                    var distanceKm = distanceLocation.CalculateDistance(fp.Latitude, fp.Longitude, DistanceUnits.Kilometers);
+                    var radiusKm = getRadiusKm(distanceKm, userRadii);
+                    fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
+                }
 
-                    currentGroup.Add(new SiteFuelPriceItem(fpd.Price)
+                var currentGroup = default(SiteFuelPriceItemGroup);
+                var currentRadius = -1;
+                var currentCheapest = double.MaxValue;
+
+                foreach (var fpd in fuelPriceData)
+                {
+                    var currentFuelId = fpd.Price.FuelId;
+
+                    if (currentGroup?.Key?.Id != currentFuelId && userFuels.ContainsKey(currentFuelId))
                     {
-                        LastKnowDistanceKm = fpd.DistanceKm,
-                        RadiusKm = fpd.RadiusKm
-                    });
+                        var fuel = userFuels[currentFuelId];
+
+                        currentGroup = new SiteFuelPriceItemGroup(fuel, Array.Empty<SiteFuelPriceItem>());
+                        currentRadius = -1;
+                        currentCheapest = double.MaxValue;
+
+                        fuelGroups.Add(currentGroup);
+                    }
+
+                    if (currentGroup?.Key?.Id == currentFuelId &&
+                        currentRadius != fpd.RadiusKm &&
+                        fpd.Price.PriceInCents < currentCheapest)
+                    {
+                        currentRadius = fpd.RadiusKm;
+                        currentCheapest = Math.Min(currentCheapest, fpd.Price.PriceInCents);
+
+                        currentGroup.Add(new SiteFuelPriceItem(fpd.Price)
+                        {
+                            LastKnowDistanceKm = fpd.DistanceKm,
+                            RadiusKm = fpd.RadiusKm
+                        });
+                    }
                 }
             }
 
-            return (fuelGroups, loc, modifiedUtc);
+            return (fuelGroups, gpsLocation, modifiedUtc);
         }
 
         public async Task<bool> SyncBrandsAsync(CancellationToken cancellationToken)

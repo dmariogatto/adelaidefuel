@@ -12,14 +12,9 @@ namespace AdelaideFuel.iOS.Renderers
     [Preserve(AllMembers = true)]
     public class CustomNavigationPageRenderer : NavigationRenderer
     {
-        public bool ViewAdded = false;
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-
-            // for some reason XForms forces DarkContent on iOS 13
-            UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
         }
 
         public override void ViewDidLoad()
@@ -46,6 +41,14 @@ namespace AdelaideFuel.iOS.Renderers
             TraitCollection?.UpdateTheme(previousTraitCollection);
         }
 
+        public override UIStatusBarStyle PreferredStatusBarStyle() =>
+            ThemeManager.CurrentTheme switch
+            {
+                Theme.Light => UIStatusBarStyle.DarkContent,
+                Theme.Dark => UIStatusBarStyle.LightContent,
+                _ => UIStatusBarStyle.Default
+            };
+
         private void ThemeChanged(object sender, ThemeEventArgs e)
         {
             UpdateStyle();
@@ -63,7 +66,7 @@ namespace AdelaideFuel.iOS.Renderers
                 };
             }
 
-            StatusBarStyle.SetTheme(ThemeManager.CurrentTheme);
+            SetNeedsStatusBarAppearanceUpdate();
         }
     }
 }

@@ -92,6 +92,10 @@ namespace AdelaideFuel.Functions
                 61577296,
                 // Liberty Autopro
                 61501603,
+                // Hanly Auto Repairs
+                61501981,
+                // Marion Bay General Store
+                61501509
             };
 
             var exceptionSitePrices =
