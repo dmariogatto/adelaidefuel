@@ -94,6 +94,8 @@ namespace AdelaideFuel.Functions
                 61501603,
                 // Hanly Auto Repairs
                 61501981,
+                // Marion Bay General Store
+                61501509
             };
 
             var exceptionSitePrices =
