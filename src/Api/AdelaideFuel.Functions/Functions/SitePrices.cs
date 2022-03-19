@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,19 +21,21 @@ namespace AdelaideFuel.Functions
         public const string PricesTicksTxt = "site_prices_ticks.txt";
         public const string LastModifiedHeader = "Last-Modified";
 
-        private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
-        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3.5);
+        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3);
 
         private readonly ITableRepository<SitePriceEntity> _sitePricesRepository;
 
+        private readonly ICacheService _cacheService;
         private readonly IBlobService _blobService;
 
         public SitePrices(
             ITableRepository<SitePriceEntity> sitePriceRepository,
+            ICacheService cacheService,
             IBlobService blobService)
         {
             _sitePricesRepository = sitePriceRepository;
 
+            _cacheService = cacheService;
             _blobService = blobService;
         }
 
@@ -81,7 +82,7 @@ namespace AdelaideFuel.Functions
         {
             const string dtosKey = "SitePrices_Entities";
 
-            if (!Cache.TryGetValue(dtosKey, out IList<SitePriceDto> dtos))
+            if (!_cacheService.TryGetValue(dtosKey, out IList<SitePriceDto> dtos))
             {
                 try
                 {
@@ -92,7 +93,7 @@ namespace AdelaideFuel.Functions
                     log.LogError(ex, "Error reading 'adelaidefuel/site_prices.json'");
                 }
 
-                if (dtos == null || !dtos.Any())
+                if (dtos is null || !dtos.Any())
                 {
                     dtos =
                         (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
@@ -103,7 +104,7 @@ namespace AdelaideFuel.Functions
                 }
 
                 if (dtos?.Any() == true)
-                    Cache.Set(dtosKey, dtos, CacheDuration);
+                    _cacheService.SetAbsolute(dtosKey, dtos, CacheDuration);
             }
 
             return dtos ?? Array.Empty<SitePriceDto>();

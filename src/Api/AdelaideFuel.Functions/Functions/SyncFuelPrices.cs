@@ -1,9 +1,11 @@
 ﻿using AdelaideFuel.Api;
 using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
+using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,9 @@ namespace AdelaideFuel.Functions
 {
     public class SyncFuelPrices
     {
+        private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
+        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(60);
+
         private readonly ISaFuelPricingApi _saFuelPricingApi;
 
         private readonly ITableRepository<FuelEntity> _fuelRepository;
@@ -26,7 +31,7 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SiteExceptionEntity> _siteExceptionRepository;
         private readonly ITableRepository<SitePriceExceptionLogEntity> _sitePriceExceptionLogRepository;
 
-
+        private readonly ICacheService _cacheService;
         private readonly IBlobService _blobService;
         private readonly ISendGridService _sendGridService;
 
@@ -38,6 +43,7 @@ namespace AdelaideFuel.Functions
             ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository,
             ITableRepository<SiteExceptionEntity> siteExceptionRepository,
             ITableRepository<SitePriceExceptionLogEntity> sitePriceExceptionLogRepository,
+            ICacheService cacheService,
             IBlobService blobService,
             ISendGridService sendGridService)
         {
@@ -50,6 +56,7 @@ namespace AdelaideFuel.Functions
             _siteExceptionRepository = siteExceptionRepository;
             _sitePriceExceptionLogRepository = sitePriceExceptionLogRepository;
 
+            _cacheService = cacheService;
             _blobService = blobService;
             _sendGridService = sendGridService;
         }
@@ -65,6 +72,27 @@ namespace AdelaideFuel.Functions
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
+            async Task<IDictionary<int, int>> getSiteToBrandMapAsync(CancellationToken ct)
+            {
+                const string cacheKey = "SyncFuelPrices_SiteToBrandMap";
+
+                if (!_cacheService.TryGetValue(cacheKey, out Dictionary<int, int> map))
+                {
+                    map =
+                        (from site in await _siteRepository.GetAllEntitiesAsync(ct)
+                         group site by site.SiteId into sg
+                         // sometimes sites change brands
+                         let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
+                         select (active.SiteId, active.BrandId))
+                        .ToDictionary(i => i.SiteId, i => i.BrandId);
+
+                    if (map.Any())
+                        _cacheService.SetAbsolute(cacheKey, map, CacheDuration);
+                }
+
+                return map ?? new Dictionary<int, int>(0);
+            }
+
             await _siteExceptionRepository.CreateIfNotExistsAsync(ct);
             var exceptionSitesTask = _siteExceptionRepository.GetAllEntitiesAsync(ct);
 
@@ -74,52 +102,51 @@ namespace AdelaideFuel.Functions
 
             var apiPrices = await _saFuelPricingApi.GetPricesAsync(ct);
 
-            sw.Stop();
             log.LogInformation($"Finished API call in {sw.ElapsedMilliseconds}...");
-            sw.Start();
 
-            var modifiedUtc = apiPrices?.SitePrices?.Any() == true
-                ? apiPrices.SitePrices.Max(i => i.TransactionDateUtc)
-                : DateTime.UnixEpoch;
+            var apiPricesToUpdate = apiPrices
+                ?.SitePrices
+                ?.Where(i => i.TransactionDateUtc > previousModifiedUtc);
 
-            if (modifiedUtc > previousModifiedUtc)
+            if (apiPricesToUpdate?.Any() == true)
             {
-                var siteBrands =
-                    (from site in await _siteRepository.GetAllEntitiesAsync(ct)
-                     group site by site.SiteId into sg
-                     // sometimes sites change brands
-                     let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
-                     select (active.SiteId, active.BrandId))
-                    .ToDictionary(i => i.SiteId, i => i.BrandId);
+                var siteToBrand = await getSiteToBrandMapAsync(default);
 
                 var priceEntities =
-                    (from sp in apiPrices.SitePrices
-                     where siteBrands.ContainsKey(sp.SiteId)
-                     let spe = new SitePriceEntity(siteBrands[sp.SiteId], sp)
+                    (from sp in apiPricesToUpdate
+                     where siteToBrand.ContainsKey(sp.SiteId)
+                     let spe = new SitePriceEntity(siteToBrand[sp.SiteId], sp)
                      group spe by spe.PartitionKey into g
                      select g)
                     .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
 
-                var exceptionSiteIds = (await exceptionSitesTask).Select(i => i.SiteId).ToHashSet();
-
+                // Get sites that have previously reported incorrect pricing
+                var exceptionSiteIds = (await exceptionSitesTask)
+                    .Where(i => i.IsActive)
+                    .Select(i => i.SiteId)
+                    .ToHashSet();
+                // Find new sites that are possibly incorrect
                 var exceptions = await FindPriceExceptionsAsync(
                         priceEntities
                             .SelectMany(i => i.Value)
                             .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
                         ct);
+                // Notification of newly found exceptions
                 var exEmailTask = SendPriceExceptionsEmailAsync(exceptions, ct);
 
-                var newSiteExceptions = exceptions.Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName)).ToList();
+                // Add new sites to exception list
+                var newSiteExceptions = exceptions.Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName));
                 await _siteExceptionRepository.InsertOrReplaceBulkAsync(newSiteExceptions, log, ct);
                 foreach (var i in newSiteExceptions)
                     exceptionSiteIds.Add(i.SiteId);
 
+                // Get price exceptions & attempt to update
                 var exceptionSitePrices =
                     (from g in priceEntities
                      from pe in g.Value
                      where exceptionSiteIds.Contains(pe.SiteId) &&
                            IsPriceException(pe.Price, pe.FuelId)
-                     select pe).ToList();
+                     select pe);
 
                 var exceptionLogEntries = new List<SitePriceExceptionLogEntity>();
                 foreach (var i in exceptionSitePrices)
@@ -127,6 +154,7 @@ namespace AdelaideFuel.Functions
                     var adjustedPrice = i.Price * 10;
                     if (!IsPriceException(adjustedPrice, i.FuelId))
                     {
+                        // Log any new changes for later review
                         if (i.TransactionDateUtc > previousModifiedUtc)
                             exceptionLogEntries.Add(new SitePriceExceptionLogEntity(i.BrandId, i, adjustedPrice));
 
@@ -145,7 +173,7 @@ namespace AdelaideFuel.Functions
                 {
                     log.LogInformation("Updating site prices JSON file...");
                     await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct);
-                    await _blobService.WriteAllTextAsync(modifiedUtc.Ticks.ToString(CultureInfo.InvariantCulture), SitePrices.PricesTicksTxt, ct);
+                    await _blobService.WriteAllTextAsync(sitePriceDtos.First().TransactionDateUtc.Ticks.ToString(), SitePrices.PricesTicksTxt, ct);
                     log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
                 }
                 catch (Exception ex)
@@ -172,6 +200,7 @@ namespace AdelaideFuel.Functions
             }
 
             sw.Stop();
+
             log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}ms");
             log.LogInformation($"Have a nice day 😋");
         }

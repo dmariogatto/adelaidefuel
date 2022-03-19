@@ -74,6 +74,7 @@ namespace AdelaideFuel.Functions
                 return storageAccount.CreateCloudTableClient();
             });
 
+            builder.Services.AddSingleton<ICacheService, CacheService>();
             builder.Services.AddSingleton<IBlobService>(sp => new BlobService(getConnectionString(sp)));
             builder.Services.AddSingleton<ISendGridService, SendGridService>();
             builder.Services.AddSingleton<ITableRepository<BrandEntity>, TableRepository<BrandEntity>>();
