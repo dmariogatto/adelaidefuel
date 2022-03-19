@@ -82,6 +82,8 @@ namespace AdelaideFuel.Functions
             builder.Services.AddSingleton<ITableRepository<SiteEntity>, TableRepository<SiteEntity>>();
             builder.Services.AddSingleton<ITableRepository<SitePriceEntity>, TableRepository<SitePriceEntity>>();
             builder.Services.AddSingleton<ITableRepository<SitePriceArchiveEntity>, TableRepository<SitePriceArchiveEntity>>();
+            builder.Services.AddSingleton<ITableRepository<SiteExceptionEntity>, TableRepository<SiteExceptionEntity>>();
+            builder.Services.AddSingleton<ITableRepository<SitePriceExceptionLogEntity>, TableRepository<SitePriceExceptionLogEntity>>();
         }
     }
 }

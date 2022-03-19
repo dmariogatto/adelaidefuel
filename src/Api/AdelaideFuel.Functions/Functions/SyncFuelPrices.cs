@@ -23,6 +23,9 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SiteEntity> _siteRepository;
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
         private readonly ITableRepository<SitePriceArchiveEntity> _sitePriceArchiveRepository;
+        private readonly ITableRepository<SiteExceptionEntity> _siteExceptionRepository;
+        private readonly ITableRepository<SitePriceExceptionLogEntity> _sitePriceExceptionLogRepository;
+
 
         private readonly IBlobService _blobService;
         private readonly ISendGridService _sendGridService;
@@ -33,6 +36,8 @@ namespace AdelaideFuel.Functions
             ITableRepository<SiteEntity> siteRepository,
             ITableRepository<SitePriceEntity> sitePriceRepository,
             ITableRepository<SitePriceArchiveEntity> sitePriceArchiveRepository,
+            ITableRepository<SiteExceptionEntity> siteExceptionRepository,
+            ITableRepository<SitePriceExceptionLogEntity> sitePriceExceptionLogRepository,
             IBlobService blobService,
             ISendGridService sendGridService)
         {
@@ -42,6 +47,8 @@ namespace AdelaideFuel.Functions
             _siteRepository = siteRepository;
             _sitePriceRepository = sitePriceRepository;
             _sitePriceArchiveRepository = sitePriceArchiveRepository;
+            _siteExceptionRepository = siteExceptionRepository;
+            _sitePriceExceptionLogRepository = sitePriceExceptionLogRepository;
 
             _blobService = blobService;
             _sendGridService = sendGridService;
@@ -58,89 +65,87 @@ namespace AdelaideFuel.Functions
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
+            await _siteExceptionRepository.CreateIfNotExistsAsync(ct);
+            var exceptionSitesTask = _siteExceptionRepository.GetAllEntitiesAsync(ct);
+
+            var previousModifiedUtc = DateTime.UnixEpoch;
+            if (long.TryParse(await _blobService.ReadAllTextAsync(SitePrices.PricesTicksTxt, ct), out var ticks))
+                previousModifiedUtc = new DateTime(ticks, DateTimeKind.Utc);
+
             var apiPrices = await _saFuelPricingApi.GetPricesAsync(ct);
 
             sw.Stop();
             log.LogInformation($"Finished API call in {sw.ElapsedMilliseconds}...");
             sw.Start();
 
-            var siteBrands =
-                (from site in await _siteRepository.GetAllEntitiesAsync(ct)
-                 group site by site.SiteId into sg
-                 // sometimes sites change brands
-                 let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
-                 select (active.SiteId, active.BrandId))
-                .ToDictionary(i => i.SiteId, i => i.BrandId);
-
-            var priceEntities =
-                (from sp in apiPrices.SitePrices
-                 where siteBrands.ContainsKey(sp.SiteId)
-                 let spe = new SitePriceEntity(siteBrands[sp.SiteId], sp)
-                 group spe by spe.PartitionKey into g
-                 select g)
-                .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
-
-            var exceptionSiteIds = new HashSet<int>()
-            {
-                // Tinty Auto & Ag
-                61501446,
-                // Smoky Bay
-                61577275,
-                // Mt Ive
-                61577323,
-                // Minnipa Community Store
-                61577296,
-                // Liberty Autopro
-                61501603,
-                // Hanly Auto Repairs
-                61501981,
-                // Marion Bay General Store
-                61501509
-            };
-
-            var exceptionSitePrices =
-                (from g in priceEntities
-                 from pe in g.Value
-                 where exceptionSiteIds.Contains(pe.SiteId) &&
-                       pe.Price < 500
-                 select pe).ToList();
-
-            foreach(var i in exceptionSitePrices)
-                i.Price *= 10;
-
-            var exceptions = await FindPossibleExceptionsAsync(
-                    priceEntities
-                        .SelectMany(i => i.Value)
-                        .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
-                    ct);
-            var exEmailTask = SendPossibleExceptionsEmailAsync(exceptions, ct);
-
-            var sitePriceDtos =
-                (from vals in priceEntities.Values
-                 from sp in vals
-                 orderby sp.TransactionDateUtc descending
-                 group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                 select fuelGroup.First().ToSitePrice()).ToList();
-
-            var modifiedUtc = sitePriceDtos.FirstOrDefault()?.TransactionDateUtc ?? DateTime.UnixEpoch;
-
-            var previousModifiedUtc = DateTime.MinValue;
-            DateTime.TryParseExact(
-                await _blobService.ReadAllTextAsync(SitePrices.PricesLastModifiedTxt, ct),
-                CultureInfo.InvariantCulture.DateTimeFormat.RFC1123Pattern,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.AdjustToUniversal,
-                out previousModifiedUtc);
+            var modifiedUtc = apiPrices?.SitePrices?.Any() == true
+                ? apiPrices.SitePrices.Max(i => i.TransactionDateUtc)
+                : DateTime.UnixEpoch;
 
             if (modifiedUtc > previousModifiedUtc)
             {
+                var siteBrands =
+                    (from site in await _siteRepository.GetAllEntitiesAsync(ct)
+                     group site by site.SiteId into sg
+                     // sometimes sites change brands
+                     let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
+                     select (active.SiteId, active.BrandId))
+                    .ToDictionary(i => i.SiteId, i => i.BrandId);
+
+                var priceEntities =
+                    (from sp in apiPrices.SitePrices
+                     where siteBrands.ContainsKey(sp.SiteId)
+                     let spe = new SitePriceEntity(siteBrands[sp.SiteId], sp)
+                     group spe by spe.PartitionKey into g
+                     select g)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
+
+                var exceptionSiteIds = (await exceptionSitesTask).Select(i => i.SiteId).ToHashSet();
+
+                var exceptions = await FindPriceExceptionsAsync(
+                        priceEntities
+                            .SelectMany(i => i.Value)
+                            .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
+                        ct);
+                var exEmailTask = SendPriceExceptionsEmailAsync(exceptions, ct);
+
+                var newSiteExceptions = exceptions.Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName)).ToList();
+                await _siteExceptionRepository.InsertOrReplaceBulkAsync(newSiteExceptions, log, ct);
+                foreach (var i in newSiteExceptions)
+                    exceptionSiteIds.Add(i.SiteId);
+
+                var exceptionSitePrices =
+                    (from g in priceEntities
+                     from pe in g.Value
+                     where exceptionSiteIds.Contains(pe.SiteId) &&
+                           IsPriceException(pe.Price, pe.FuelId)
+                     select pe).ToList();
+
+                var exceptionLogEntries = new List<SitePriceExceptionLogEntity>();
+                foreach (var i in exceptionSitePrices)
+                {
+                    var adjustedPrice = i.Price * 10;
+                    if (!IsPriceException(adjustedPrice, i.FuelId))
+                    {
+                        if (i.TransactionDateUtc > previousModifiedUtc)
+                            exceptionLogEntries.Add(new SitePriceExceptionLogEntity(i.BrandId, i, adjustedPrice));
+
+                        i.Price = adjustedPrice;
+                    }
+                }
+
+                var sitePriceDtos =
+                    (from vals in priceEntities.Values
+                     from sp in vals
+                     orderby sp.TransactionDateUtc descending
+                     group sp by (sp.SiteId, sp.FuelId) into fuelGroup
+                     select fuelGroup.First().ToSitePrice()).ToList();
+
                 try
                 {
                     log.LogInformation("Updating site prices JSON file...");
                     await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct);
-
-                    await _blobService.WriteAllTextAsync(modifiedUtc.ToString("R", CultureInfo.InvariantCulture.DateTimeFormat), SitePrices.PricesLastModifiedTxt, ct);
-
+                    await _blobService.WriteAllTextAsync(modifiedUtc.Ticks.ToString(CultureInfo.InvariantCulture), SitePrices.PricesTicksTxt, ct);
                     log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
                 }
                 catch (Exception ex)
@@ -149,8 +154,10 @@ namespace AdelaideFuel.Functions
                 }
 
                 await _sitePriceRepository.CreateIfNotExistsAsync(ct);
+                await _sitePriceExceptionLogRepository.CreateIfNotExistsAsync(ct);
 
                 var syncResult = await _sitePriceRepository.SyncPartitionsWithDeleteAsync(priceEntities, log, ct);
+                await _sitePriceExceptionLogRepository.InsertOrReplaceBulkAsync(exceptionLogEntries, log, ct);
                 log.LogInformation($"Finished sync of fuel prices in {sw.ElapsedMilliseconds}.");
 
                 var deletedPrices = syncResult.changes.Where(re => !re.IsActive).ToList();
@@ -169,10 +176,10 @@ namespace AdelaideFuel.Functions
             log.LogInformation($"Have a nice day 😋");
         }
 
-        private async Task<IList<SitePriceException>> FindPossibleExceptionsAsync(IEnumerable<SitePriceEntity> sitePrices, CancellationToken ct)
+        private async Task<IList<SitePriceException>> FindPriceExceptionsAsync(IEnumerable<SitePriceEntity> sitePrices, CancellationToken ct)
         {
             var possibleExceptions = sitePrices
-                .Where(i => NumOfIntDigits(i.Price) <= (i.FuelId == 4 ? 2 : 3))
+                .Where(i => IsPriceException(i.Price, i.FuelId))
                 .ToList();
 
             if (!possibleExceptions.Any())
@@ -214,7 +221,7 @@ namespace AdelaideFuel.Functions
             return exceptions;
         }
 
-        private async Task SendPossibleExceptionsEmailAsync(IList<SitePriceException> exceptions, CancellationToken ct)
+        private async Task SendPriceExceptionsEmailAsync(IList<SitePriceException> exceptions, CancellationToken ct)
         {
             if (!exceptions.Any())
                 return;
@@ -255,8 +262,11 @@ namespace AdelaideFuel.Functions
             emailBuilder.Append("</tbody>");
             emailBuilder.Append("</table>");
 
-            await _sendGridService.SendEmailAsync("Possible Fuel Price Exceptions", emailBuilder.ToString());
+            await _sendGridService.SendEmailAsync("New Fuel Price Exceptions", emailBuilder.ToString());
         }
+
+        private static bool IsPriceException(double price, int fuelId)
+            => NumOfIntDigits(price) <= (fuelId == 4 ? 2 : 3);
 
         private static int NumOfIntDigits(double value)
             => value == 0 ? 1 : 1 + (int)Math.Log10(Math.Abs(value));

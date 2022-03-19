@@ -19,7 +19,7 @@ namespace AdelaideFuel.Functions
     public class SitePrices
     {
         public const string PricesJson = "site_prices.json";
-        public const string PricesLastModifiedTxt = "site_prices_last_modified.txt";
+        public const string PricesTicksTxt = "site_prices_ticks.txt";
         public const string LastModifiedHeader = "Last-Modified";
 
         private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
@@ -44,9 +44,11 @@ namespace AdelaideFuel.Functions
             ILogger log,
             CancellationToken ct)
         {
-            var lastModified = await _blobService.ReadAllTextAsync(PricesLastModifiedTxt, ct);
-            if (!string.IsNullOrEmpty(lastModified))
-                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified);
+            if (long.TryParse(await _blobService.ReadAllTextAsync(SitePrices.PricesTicksTxt, ct), out var ticks))
+            {
+                var lastModified = new DateTime(ticks, DateTimeKind.Utc);
+                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified.ToString("R"));
+            }
 
             if (req.Method == HttpMethods.Head)
                 return new OkResult();
