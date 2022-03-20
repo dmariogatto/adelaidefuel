@@ -136,7 +136,11 @@ namespace AdelaideFuel.Functions
                 var exEmailTask = SendPriceExceptionsEmailAsync(exceptions, ct);
 
                 // Add new sites to exception list
-                var newSiteExceptions = exceptions.Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName));
+                var newSiteExceptions = exceptions
+                    .Select(i => (i.BrandId, i.SiteId, i.SiteName))
+                    .Distinct()
+                    .Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName))
+                    .ToList();
                 await _siteExceptionRepository.InsertOrReplaceBulkAsync(newSiteExceptions, log, ct);
                 foreach (var i in newSiteExceptions)
                     exceptionSiteIds.Add(i.SiteId);
