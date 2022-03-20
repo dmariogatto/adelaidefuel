@@ -105,8 +105,9 @@ namespace AdelaideFuel.Functions
             log.LogInformation($"Finished API call in {sw.ElapsedMilliseconds}...");
 
             var apiPricesToUpdate = apiPrices
-                ?.SitePrices
-                ?.Where(i => i.TransactionDateUtc > previousModifiedUtc);
+                ?.SitePrices;
+                // Can't filter by date (yet) since sync below deletes
+                // ?.Where(i => i.TransactionDateUtc > previousModifiedUtc);
 
             if (apiPricesToUpdate?.Any() == true)
             {
