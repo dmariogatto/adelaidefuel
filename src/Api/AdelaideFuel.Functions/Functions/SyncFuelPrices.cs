@@ -72,54 +72,38 @@ namespace AdelaideFuel.Functions
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            async Task<IDictionary<int, int>> getSiteToBrandMapAsync(CancellationToken ct)
-            {
-                const string cacheKey = "SyncFuelPrices_SiteToBrandMap";
-
-                if (!_cacheService.TryGetValue(cacheKey, out Dictionary<int, int> map))
-                {
-                    map =
-                        (from site in await _siteRepository.GetAllEntitiesAsync(ct)
-                         group site by site.SiteId into sg
-                         // sometimes sites change brands
-                         let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
-                         select (active.SiteId, active.BrandId))
-                        .ToDictionary(i => i.SiteId, i => i.BrandId);
-
-                    if (map.Any())
-                        _cacheService.SetAbsolute(cacheKey, map, CacheDuration);
-                }
-
-                return map ?? new Dictionary<int, int>(0);
-            }
-
-            await _siteExceptionRepository.CreateIfNotExistsAsync(ct);
+            var siteToBrandTask = GetSiteToBrandMapAsync(default);
             var exceptionSitesTask = _siteExceptionRepository.GetAllEntitiesAsync(ct);
 
             var previousModifiedUtc = DateTime.UnixEpoch;
             if (long.TryParse(await _blobService.ReadAllTextAsync(SitePrices.PricesTicksTxt, ct), out var ticks))
                 previousModifiedUtc = new DateTime(ticks, DateTimeKind.Utc);
 
-            var apiPrices = await _saFuelPricingApi.GetPricesAsync(ct);
+            var apiPricesTask = _saFuelPricingApi.GetPricesAsync(ct);
+
+            await Task.WhenAll(
+                apiPricesTask,
+                siteToBrandTask,
+                _sitePriceRepository.CreateIfNotExistsAsync(ct),
+                _sitePriceArchiveRepository.CreateIfNotExistsAsync(ct),
+                _siteExceptionRepository.CreateIfNotExistsAsync(ct),
+                _sitePriceExceptionLogRepository.CreateIfNotExistsAsync(ct));
 
             log.LogInformation($"Finished API call in {sw.ElapsedMilliseconds}...");
 
-            var apiPricesToUpdate = apiPrices
-                ?.SitePrices;
-                // Can't filter by date (yet) since sync below deletes
-                // ?.Where(i => i.TransactionDateUtc > previousModifiedUtc);
+            var apiPricesOrdered = apiPricesTask.Result
+                ?.SitePrices
+                ?.OrderByDescending(i => i.TransactionDateUtc)
+                ?.GroupBy(i => (i.SiteId, i.FuelId))
+                ?.Select(g => g.First());
+            var modifiedUtc = apiPricesOrdered?.FirstOrDefault()?.TransactionDateUtc ?? DateTime.UnixEpoch;
 
-            if (apiPricesToUpdate?.Any() == true)
+            if (modifiedUtc > previousModifiedUtc)
             {
-                var siteToBrand = await getSiteToBrandMapAsync(default);
-
-                var priceEntities =
-                    (from sp in apiPricesToUpdate
-                     where siteToBrand.ContainsKey(sp.SiteId)
-                     let spe = new SitePriceEntity(siteToBrand[sp.SiteId], sp)
-                     group spe by spe.PartitionKey into g
-                     select g)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e).ToList());
+                var priceEntities = apiPricesOrdered
+                    .Where(i => siteToBrandTask.Result.ContainsKey(i.SiteId))
+                    .Select(i => new SitePriceEntity(siteToBrandTask.Result[i.SiteId], i))
+                    .ToList();
 
                 // Get sites that have previously reported incorrect pricing
                 var exceptionSiteIds = (await exceptionSitesTask)
@@ -128,9 +112,7 @@ namespace AdelaideFuel.Functions
                     .ToHashSet();
                 // Find new sites that are possibly incorrect
                 var exceptions = await FindPriceExceptionsAsync(
-                        priceEntities
-                            .SelectMany(i => i.Value)
-                            .Where(i => !exceptionSiteIds.Contains(i.SiteId)),
+                        priceEntities.Where(i => !exceptionSiteIds.Contains(i.SiteId)),
                         ct);
                 // Notification of newly found exceptions
                 var exEmailTask = SendPriceExceptionsEmailAsync(exceptions, ct);
@@ -147,8 +129,7 @@ namespace AdelaideFuel.Functions
 
                 // Get price exceptions & attempt to update
                 var exceptionSitePrices =
-                    (from g in priceEntities
-                     from pe in g.Value
+                    (from pe in priceEntities
                      where exceptionSiteIds.Contains(pe.SiteId) &&
                            IsPriceException(pe.Price, pe.FuelId)
                      select pe);
@@ -167,47 +148,58 @@ namespace AdelaideFuel.Functions
                     }
                 }
 
-                var sitePriceDtos =
-                    (from vals in priceEntities.Values
-                     from sp in vals
-                     orderby sp.TransactionDateUtc descending
-                     group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                     select fuelGroup.First().ToSitePrice()).ToList();
+                var sitePriceDtos = priceEntities.Select(i => i.ToSitePrice());
+                var existingPriceEntities = await _sitePriceRepository.GetAllEntitiesAsync(ct);
 
-                try
+                var toDelete = existingPriceEntities.Except(priceEntities).ToList();
+                var toUpdate = priceEntities.Where(i => i.TransactionDateUtc > previousModifiedUtc).ToList();
+                var toArchive = existingPriceEntities
+                    .Intersect(toUpdate)
+                    .Concat(toDelete)
+                    .Select(i => new SitePriceArchiveEntity(i.BrandId, i))
+                    .ToList();
+
+                var updateTasks = new List<Task>
                 {
-                    log.LogInformation("Updating site prices JSON file...");
-                    await _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct);
-                    await _blobService.WriteAllTextAsync(sitePriceDtos.First().TransactionDateUtc.Ticks.ToString(), SitePrices.PricesTicksTxt, ct);
-                    log.LogInformation($"Updated site prices JSON file in {sw.ElapsedMilliseconds}.");
-                }
-                catch (Exception ex)
-                {
-                    log.LogError(ex, "Error writing 'adelaidefuel/site_prices.json'");
-                }
+                    _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct),
+                    _blobService.WriteAllTextAsync(sitePriceDtos.First().TransactionDateUtc.Ticks.ToString(), SitePrices.PricesTicksTxt, ct),
+                    _sitePriceRepository.InsertOrReplaceBulkAsync(toUpdate, log, ct),
+                    _sitePriceRepository.DeleteAsync(toDelete, log, ct),
+                    _sitePriceExceptionLogRepository.InsertOrReplaceBulkAsync(exceptionLogEntries, log, ct),
+                    _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(toArchive, log, ct),
+                    exEmailTask
+                };
 
-                await _sitePriceRepository.CreateIfNotExistsAsync(ct);
-                await _sitePriceExceptionLogRepository.CreateIfNotExistsAsync(ct);
+                await Task.WhenAll(updateTasks);
 
-                var syncResult = await _sitePriceRepository.SyncPartitionsWithDeleteAsync(priceEntities, log, ct);
-                await _sitePriceExceptionLogRepository.InsertOrReplaceBulkAsync(exceptionLogEntries, log, ct);
                 log.LogInformation($"Finished sync of fuel prices in {sw.ElapsedMilliseconds}.");
-
-                var deletedPrices = syncResult.changes.Where(re => !re.IsActive).ToList();
-                if (deletedPrices.Any())
-                {
-                    log.LogInformation($"Moving deleted prices to archive...");
-                    await _sitePriceArchiveRepository.CreateIfNotExistsAsync(ct);
-                    await _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(deletedPrices.Select(i => new SitePriceArchiveEntity(i.BrandId, i)), log, ct);
-                }
-
-                await exEmailTask;
             }
 
             sw.Stop();
 
             log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}ms");
             log.LogInformation($"Have a nice day 😋");
+        }
+
+        private async Task<IDictionary<int, int>> GetSiteToBrandMapAsync(CancellationToken ct)
+        {
+            const string cacheKey = "SyncFuelPrices_SiteToBrandMap";
+
+            if (!_cacheService.TryGetValue(cacheKey, out Dictionary<int, int> map))
+            {
+                map =
+                    (from site in await _siteRepository.GetAllEntitiesAsync(ct)
+                     group site by site.SiteId into sg
+                     // sometimes sites change brands
+                     let active = sg.FirstOrDefault(s => s.IsActive) ?? sg.First()
+                     select (active.SiteId, active.BrandId))
+                    .ToDictionary(i => i.SiteId, i => i.BrandId);
+
+                if (map.Any())
+                    _cacheService.SetAbsolute(cacheKey, map, CacheDuration);
+            }
+
+            return map ?? new Dictionary<int, int>(0);
         }
 
         private async Task<IList<SitePriceException>> FindPriceExceptionsAsync(IEnumerable<SitePriceEntity> sitePrices, CancellationToken ct)

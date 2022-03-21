@@ -12,11 +12,14 @@ namespace AdelaideFuel.TableStore.Entities
         public SitePriceEntity(int brandId, ISitePrice sitePrice)
         {
             BrandId = brandId;
-            SiteId = sitePrice.SiteId;
-            FuelId = sitePrice.FuelId;
             CollectionMethod = sitePrice.CollectionMethod;
-            TransactionDateUtc = sitePrice.TransactionDateUtc;
             Price = sitePrice.Price;
+
+            _siteId = sitePrice.SiteId;
+            _fuelId = sitePrice.FuelId;
+            _transactionDateUtc = sitePrice.TransactionDateUtc;
+
+            UpdateRowKey();
         }
 
         public int BrandId
@@ -51,11 +54,7 @@ namespace AdelaideFuel.TableStore.Entities
         public DateTime TransactionDateUtc
         {
             get => _transactionDateUtc;
-            set
-            {
-                _transactionDateUtc = value;
-                UpdateRowKey();
-            }
+            set => _transactionDateUtc = value;
         }
 
         public string CollectionMethod { get; set; }
@@ -86,8 +85,8 @@ namespace AdelaideFuel.TableStore.Entities
             Price = Price,
         };
 
-        private void UpdateRowKey()
-            => RowKey = $"{_siteId}_{_fuelId}_{_transactionDateUtc:yyyyMMddTHHmmss.fff}";
+        protected virtual void UpdateRowKey()
+            => RowKey = $"{_siteId}_{_fuelId}";
 
         public override string ToString()
             => $"{SiteId} | {FuelId} | {Price:0.00}";

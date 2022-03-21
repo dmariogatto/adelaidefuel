@@ -73,9 +73,9 @@ namespace AdelaideFuel.Functions
                 (from sp in await GetSitePriceDtosAsync(log, ct)
                  where (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
                        (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
-                 select sp).ToList();
+                 select sp);
 
-            return new OkObjectResult(prices ?? new List<SitePriceDto>(0));
+            return new OkObjectResult(prices ?? Enumerable.Empty<SitePriceDto>());
         }
 
         private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(ILogger log, CancellationToken ct)
@@ -99,8 +99,7 @@ namespace AdelaideFuel.Functions
                         (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
                          where sp.IsActive
                          orderby sp.TransactionDateUtc descending
-                         group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                         select fuelGroup.First().ToSitePrice()).ToList();
+                         select sp.ToSitePrice()).ToList();
                 }
 
                 if (dtos?.Any() == true)
