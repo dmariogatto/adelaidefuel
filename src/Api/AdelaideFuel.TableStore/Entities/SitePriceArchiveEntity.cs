@@ -9,5 +9,8 @@ namespace AdelaideFuel.TableStore.Entities
         public SitePriceArchiveEntity(int brandId, ISitePrice sitePrice) : base(brandId, sitePrice)
         {
         }
+
+        protected override void UpdateRowKey()
+            => RowKey = $"{SiteId}_{FuelId}_{TransactionDateUtc:yyyyMMddTHHmmss.fff}";
     }
 }

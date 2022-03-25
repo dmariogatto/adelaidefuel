@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,22 +18,24 @@ namespace AdelaideFuel.Functions
     public class SitePrices
     {
         public const string PricesJson = "site_prices.json";
-        public const string PricesLastModifiedTxt = "site_prices_last_modified.txt";
+        public const string PricesTicksTxt = "site_prices_ticks.txt";
         public const string LastModifiedHeader = "Last-Modified";
 
-        private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
-        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3.5);
+        private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(3);
 
         private readonly ITableRepository<SitePriceEntity> _sitePricesRepository;
 
+        private readonly ICacheService _cacheService;
         private readonly IBlobService _blobService;
 
         public SitePrices(
             ITableRepository<SitePriceEntity> sitePriceRepository,
+            ICacheService cacheService,
             IBlobService blobService)
         {
             _sitePricesRepository = sitePriceRepository;
 
+            _cacheService = cacheService;
             _blobService = blobService;
         }
 
@@ -44,9 +45,11 @@ namespace AdelaideFuel.Functions
             ILogger log,
             CancellationToken ct)
         {
-            var lastModified = await _blobService.ReadAllTextAsync(PricesLastModifiedTxt, ct);
-            if (!string.IsNullOrEmpty(lastModified))
-                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified);
+            if (long.TryParse(await _blobService.ReadAllTextAsync(SitePrices.PricesTicksTxt, ct), out var ticks))
+            {
+                var lastModified = new DateTime(ticks, DateTimeKind.Utc);
+                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified.ToString("R"));
+            }
 
             if (req.Method == HttpMethods.Head)
                 return new OkResult();
@@ -70,16 +73,16 @@ namespace AdelaideFuel.Functions
                 (from sp in await GetSitePriceDtosAsync(log, ct)
                  where (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
                        (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
-                 select sp).ToList();
+                 select sp);
 
-            return new OkObjectResult(prices ?? new List<SitePriceDto>(0));
+            return new OkObjectResult(prices ?? Enumerable.Empty<SitePriceDto>());
         }
 
         private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(ILogger log, CancellationToken ct)
         {
             const string dtosKey = "SitePrices_Entities";
 
-            if (!Cache.TryGetValue(dtosKey, out IList<SitePriceDto> dtos))
+            if (!_cacheService.TryGetValue(dtosKey, out IList<SitePriceDto> dtos))
             {
                 try
                 {
@@ -90,18 +93,17 @@ namespace AdelaideFuel.Functions
                     log.LogError(ex, "Error reading 'adelaidefuel/site_prices.json'");
                 }
 
-                if (dtos == null || !dtos.Any())
+                if (dtos is null || !dtos.Any())
                 {
                     dtos =
                         (from sp in await _sitePricesRepository.GetAllEntitiesAsync(ct) ?? Array.Empty<SitePriceEntity>()
                          where sp.IsActive
                          orderby sp.TransactionDateUtc descending
-                         group sp by (sp.SiteId, sp.FuelId) into fuelGroup
-                         select fuelGroup.First().ToSitePrice()).ToList();
+                         select sp.ToSitePrice()).ToList();
                 }
 
                 if (dtos?.Any() == true)
-                    Cache.Set(dtosKey, dtos, CacheDuration);
+                    _cacheService.SetAbsolute(dtosKey, dtos, CacheDuration);
             }
 
             return dtos ?? Array.Empty<SitePriceDto>();

@@ -5,21 +5,21 @@ using System.Globalization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class SitePriceEntity : TableEntity, IEntity, ISitePrice
+    public class SitePriceExceptionLogEntity : TableEntity, IEntity
     {
-        public SitePriceEntity() { }
+        public SitePriceExceptionLogEntity() { }
 
-        public SitePriceEntity(int brandId, ISitePrice sitePrice)
+        public SitePriceExceptionLogEntity(
+            int brandId,
+            ISitePrice sitePrice,
+            double adjustedPrice)
         {
             BrandId = brandId;
-            CollectionMethod = sitePrice.CollectionMethod;
-            Price = sitePrice.Price;
-
-            _siteId = sitePrice.SiteId;
-            _fuelId = sitePrice.FuelId;
-            _transactionDateUtc = sitePrice.TransactionDateUtc;
-
-            UpdateRowKey();
+            SiteId = sitePrice.SiteId;
+            FuelId = sitePrice.FuelId;
+            TransactionDateUtc = sitePrice.TransactionDateUtc;
+            OriginalPrice = sitePrice.Price;
+            AdjustedPrice = adjustedPrice;
         }
 
         public int BrandId
@@ -54,46 +54,43 @@ namespace AdelaideFuel.TableStore.Entities
         public DateTime TransactionDateUtc
         {
             get => _transactionDateUtc;
-            set => _transactionDateUtc = value;
+            set
+            {
+                _transactionDateUtc = value;
+                UpdateRowKey();
+            }
         }
 
-        public string CollectionMethod { get; set; }
-        public double Price { get; set; }
+        public double OriginalPrice { get; set; }
+        public double AdjustedPrice { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public bool IsDifferent(IEntity entity)
         {
-            if (entity is SitePriceEntity other && Equals(other))
+            if (entity is SitePriceExceptionLogEntity other && Equals(other))
             {
                 return
-                    CollectionMethod != other.CollectionMethod ||
-                    !Price.FuzzyEquals(other.Price, 0.1) ||
+                    BrandId != other.BrandId ||
+                    SiteId != other.SiteId ||
+                    FuelId != other.FuelId ||
+                    !OriginalPrice.FuzzyEquals(other.OriginalPrice, 0.1) ||
+                    !AdjustedPrice.FuzzyEquals(other.AdjustedPrice, 0.1) ||
                     IsActive != other.IsActive;
             }
 
             return true;
         }
 
-        public SitePriceDto ToSitePrice() => new SitePriceDto()
-        {
-            BrandId = BrandId,
-            SiteId = SiteId,
-            FuelId = FuelId,
-            CollectionMethod = CollectionMethod,
-            TransactionDateUtc = TransactionDateUtc,
-            Price = Price,
-        };
-
-        protected virtual void UpdateRowKey()
-            => RowKey = $"{_siteId}_{_fuelId}";
+        private void UpdateRowKey()
+            => RowKey = $"{_siteId}_{_fuelId}_{_transactionDateUtc:yyyyMMddTHHmmss.fff}";
 
         public override string ToString()
-            => $"{SiteId} | {FuelId} | {Price:0.00}";
+            => $"{SiteId} | {FuelId} | {OriginalPrice:0.00} | {AdjustedPrice:0.00}";
 
         public override bool Equals(object obj)
         {
-            return obj is SitePriceEntity other &&
+            return obj is SitePriceExceptionLogEntity other &&
                    PartitionKey == other.PartitionKey &&
                    RowKey == other.RowKey;
         }
