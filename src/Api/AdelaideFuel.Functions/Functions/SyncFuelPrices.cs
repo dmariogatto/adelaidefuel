@@ -137,7 +137,9 @@ namespace AdelaideFuel.Functions
                 var exceptionLogEntries = new List<SitePriceExceptionLogEntity>();
                 foreach (var i in exceptionSitePrices)
                 {
-                    var adjustedPrice = i.Price * 10;
+                    var adjustedPrice = i.Price == 999
+                        ? 9999
+                        : i.Price * 10;
                     if (!IsPriceException(adjustedPrice, i.FuelId))
                     {
                         // Log any new changes for later review
