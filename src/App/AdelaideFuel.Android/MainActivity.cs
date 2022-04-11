@@ -69,9 +69,6 @@ namespace AdelaideFuel.Droid
             base.OnResume();
 
             Xamarin.Essentials.Platform.OnResume(this);
-
-            // https://github.com/xamarin/Essentials/issues/1922
-            Intent = new Intent(this, typeof(MainActivity));
         }
 
         protected override void OnNewIntent(Intent intent)

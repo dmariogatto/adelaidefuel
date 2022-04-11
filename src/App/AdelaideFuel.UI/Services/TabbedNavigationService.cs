@@ -61,7 +61,6 @@ namespace AdelaideFuel.UI.Services
                     Title = Localisation.Resources.Settings
                 });
 
-                ApplyNavigationPageStyle(tabbedPage.Children[0]);
                 ApplyNavigationPageStyle(tabbedPage.Children[2]);
 
                 tabbedPage.CurrentPage = tabbedPage.Children.First();
@@ -111,7 +110,6 @@ namespace AdelaideFuel.UI.Services
                 else
                 {
                     navigatedPage = CreatePage<T>();
-                    ApplyNavigationPageStyle(navigatedPage);
                     navFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
