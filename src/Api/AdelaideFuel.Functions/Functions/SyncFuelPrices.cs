@@ -19,6 +19,8 @@ namespace AdelaideFuel.Functions
 {
     public class SyncFuelPrices
     {
+        private const int OutOfStockPrice = 9999;
+
         private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(60);
 
@@ -128,26 +130,24 @@ namespace AdelaideFuel.Functions
                     exceptionSiteIds.Add(i.SiteId);
 
                 // Get price exceptions & attempt to update
-                var exceptionSitePrices =
-                    (from pe in priceEntities
-                     where exceptionSiteIds.Contains(pe.SiteId) &&
-                           IsPriceException(pe.Price, pe.FuelId)
-                     select pe);
-
                 var exceptionLogEntries = new List<SitePriceExceptionLogEntity>();
-                foreach (var i in exceptionSitePrices)
+                foreach (var i in priceEntities
+                                    .Where(i => exceptionSiteIds.Contains(i.SiteId) &&
+                                                IsPriceException(i.Price, i.FuelId)))
                 {
                     var adjustedPrice = i.Price == 999
-                        ? 9999
+                        ? OutOfStockPrice
                         : i.Price * 10;
-                    if (!IsPriceException(adjustedPrice, i.FuelId))
-                    {
-                        // Log any new changes for later review
-                        if (i.TransactionDateUtc > previousModifiedUtc)
-                            exceptionLogEntries.Add(new SitePriceExceptionLogEntity(i.BrandId, i, adjustedPrice));
 
-                        i.Price = adjustedPrice;
-                    }
+                    // Price is still invalid - then set to OOS
+                    if (IsPriceException(adjustedPrice, i.FuelId))
+                        adjustedPrice = OutOfStockPrice;
+
+                    // Log any new changes for later review
+                    if (i.TransactionDateUtc > previousModifiedUtc)
+                        exceptionLogEntries.Add(new SitePriceExceptionLogEntity(i.BrandId, i, adjustedPrice));
+
+                    i.Price = adjustedPrice;
                 }
 
                 var sitePriceDtos = priceEntities.Select(i => i.ToSitePrice());
