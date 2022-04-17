@@ -551,7 +551,8 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot find current location, distances from Adelaide CBD.
+        ///   Looks up a localized string similar to Cannot find current location,
+        ///distances from Adelaide CBD.
         /// </summary>
         public static string NoLocationWarning {
             get {

@@ -411,7 +411,8 @@ You can update your preferences in Settings.</value>
     <value>*fuels marked 999.9 are unavailable</value>
   </data>
   <data name="NoLocationWarning" xml:space="preserve">
-    <value>Cannot find current location, distances from Adelaide CBD</value>
+    <value>Cannot find current location,
+distances from Adelaide CBD</value>
   </data>
   <data name="ShowRadiiOnMap" xml:space="preserve">
     <value>Show radii on map</value>

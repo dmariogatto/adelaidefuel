@@ -39,7 +39,11 @@ namespace AdelaideFuel.UI.Views
 
             permissionsTask
                 .ContinueWith(
-                    r => SetupAutoRefresh(),
+                    t =>
+                    {
+                        NoLocationTryAgainButton.IsVisible = t.Result == PermissionStatus.Granted;
+                        SetupAutoRefresh();
+                    },
                     TaskScheduler.FromCurrentSynchronizationContext());
         }
 

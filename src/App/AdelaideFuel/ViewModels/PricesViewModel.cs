@@ -163,7 +163,7 @@ namespace AdelaideFuel.ViewModels
                         { nameof(config), config.ToString() }
                     });
                 }
-                else if (NoLocation)
+                else if (NoLocation && FuelPriceGroups.Any())
                 {
                     try
                     {
