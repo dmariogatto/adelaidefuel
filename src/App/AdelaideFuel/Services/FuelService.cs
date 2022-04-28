@@ -639,7 +639,7 @@ namespace AdelaideFuel.Services
                     .RemoveRangeAsync(entities.Select(e => e.Id.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken)
                : Task.FromResult(0);
 
-        private async Task<TResponse> GetResponseAsync<TResponse>(string cacheKey, Func<CancellationToken, Task<TResponse>> apiRequest, CancellationToken cancellationToken, TimeSpan? cacheTimeSpan = null)
+        private async Task<TResponse> GetResponseAsync<TResponse>(string cacheKey, Func<CancellationToken, Task<TResponse>> apiRequest, CancellationToken cancellationToken, TimeSpan? diskCacheTime = null)
             where TResponse : class
         {
             if (string.IsNullOrEmpty(cacheKey)) throw new ArgumentException("Cache key cannot be empty!");
@@ -657,19 +657,19 @@ namespace AdelaideFuel.Services
                     try
                     {
                         response = await _retryPolicy.ExecuteAsync(apiRequest, cancellationToken).ConfigureAwait(false);
-                        if (!cancellationToken.IsCancellationRequested && response != default)
-                            await diskCache.UpsertAsync(cacheKey, response, cacheTimeSpan ?? CacheExpireTimeSpan, cancellationToken).ConfigureAwait(false);
+                        // Cache regardless, no CT token
+                        if (response != default)
+                            await diskCache.UpsertAsync(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan, default).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        var url = string.Empty;
+                        response = default;
 
-                        switch (ex)
+                        var url = ex switch
                         {
-                            case ApiException apiEx:
-                                url = apiEx.Uri.ToString();
-                                break;
-                        }
+                            ApiException apiEx => apiEx.Uri.ToString(),
+                            _ => string.Empty
+                        };
 
                         Logger.Error(ex, !string.IsNullOrEmpty(url)
                             ? new Dictionary<string, string>() { { nameof(url), url } }
