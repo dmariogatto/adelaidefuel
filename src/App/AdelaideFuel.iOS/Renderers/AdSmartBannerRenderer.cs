@@ -1,7 +1,5 @@
 ﻿using AdelaideFuel.iOS.Renderers;
-using AdelaideFuel.Services;
 using AdelaideFuel.UI.Controls;
-using CoreGraphics;
 using Foundation;
 using Google.MobileAds;
 using System;
@@ -27,13 +25,13 @@ namespace AdelaideFuel.iOS.Renderers
             if (_disposed)
                 return;
 
-            if (_bannerView == null &&
+            if (_bannerView is null &&
                 !string.IsNullOrEmpty(e.NewElement?.AdUnitId) &&
                 GetRootViewController() is UIViewController rvc)
             {
                 _bannerView = BannerAdPool.Get(Element.AdUnitId);
 
-                if (_bannerView == null)
+                if (_bannerView is null)
                 {
                     var size = rvc.View?.Frame.Size ?? UIScreen.MainScreen.Bounds.Size;
                     var adSize = AdSizeCons.GetCurrentOrientationAnchoredAdaptiveBannerAdSize(size.Width);
@@ -47,19 +45,26 @@ namespace AdelaideFuel.iOS.Renderers
 
                 Element.HeightRequest = _bannerView.AdHeight;
 
-                if (_bannerView.AdStatus == AdLoadStatus.Loaded)
+                switch (_bannerView.AdStatus)
                 {
-                    AttachBannerAd();
-                }
-                else
-                {
-                    _registered = true;
-                    _bannerView.AdReceived += AdReceived;
-                    _bannerView.ReceiveAdFailed += ReceiveAdFailed;
+                    case AdLoadStatus.Loaded:
+                        AttachBannerAd();
+                        break;
+                    case AdLoadStatus.Failed:
+                        DetachBannerAd();
+                        break;
+                    default:
+                        if (!_registered)
+                        {
+                            _registered = true;
+                            _bannerView.AdReceived += AdReceived;
+                            _bannerView.ReceiveAdFailed += ReceiveAdFailed;
+                        }
+                        break;
                 }
             }
 
-            if (!_bannerView.AutoloadEnabled)
+            if (_bannerView?.AutoloadEnabled == false)
                 _bannerView.AutoloadEnabled = true;
         }
 
@@ -70,23 +75,28 @@ namespace AdelaideFuel.iOS.Renderers
 
         private void ReceiveAdFailed(object sender, BannerViewErrorEventArgs e)
         {
-            if (!_disposed && Element != null)
-            {
-                Element.HeightRequest = 0;
-                Element.IsVisible = false;
-                Element.AdStatus = AdLoadStatus.Failed;
-            }
-
+            DetachBannerAd();
             System.Diagnostics.Debug.WriteLine($"Failed to load ad: {e.Error}");
         }
 
         private void AttachBannerAd()
         {
-            if (!_disposed && Element != null && Control == null)
+            if (!_disposed && Element is not null && Control is null)
             {
                 Element.IsVisible = true;
+                Element.HeightRequest = _bannerView.AdHeight;
                 SetNativeControl(_bannerView);
                 Element.AdStatus = AdLoadStatus.Loaded;
+            }
+        }
+
+        private void DetachBannerAd()
+        {
+            if (!_disposed && Element is not null)
+            {
+                Element.HeightRequest = 0;
+                Element.IsVisible = false;
+                Element.AdStatus = AdLoadStatus.Failed;
             }
         }
 
@@ -99,7 +109,7 @@ namespace AdelaideFuel.iOS.Renderers
 
             _disposed = true;
 
-            if (disposing && _bannerView != null)
+            if (disposing && _bannerView is not null)
             {
                 if (_registered)
                 {
@@ -109,7 +119,10 @@ namespace AdelaideFuel.iOS.Renderers
                 }
 
                 _bannerView.RemoveFromSuperview();
-                BannerAdPool.Add(_bannerView);
+
+                if (!BannerAdPool.Add(_bannerView))
+                    _bannerView.Dispose();
+
                 _bannerView = null;
             }
 
@@ -118,7 +131,7 @@ namespace AdelaideFuel.iOS.Renderers
 
         private static UIViewController GetRootViewController()
             => UIApplication.SharedApplication.Windows
-                .Where(w => w.RootViewController != null)
+                .Where(w => w.RootViewController is not null)
                 .Select(w => w.RootViewController)
                 .FirstOrDefault();
     }
