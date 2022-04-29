@@ -396,7 +396,7 @@ namespace AdelaideFuel.Services
             try
             {
                 var radii = await _radiusUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
-                if (radii == null || !radii.Any())
+                if (radii is null || !radii.Any())
                 {
                     radii = _defaultRadii.Select(i => new UserRadius()
                     {
@@ -577,7 +577,7 @@ namespace AdelaideFuel.Services
                         IsActive = existing.IsActive
                     });
                 }
-                else if (existing != null)
+                else if (existing is not null)
                 {
                     unmodified.Add(existing);
                 }
