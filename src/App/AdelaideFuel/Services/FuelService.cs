@@ -648,22 +648,20 @@ namespace AdelaideFuel.Services
             if (!MemoryCache.TryGetValue(cacheKey, out TResponse response))
             {
                 var diskCache = _storeFactory.GetCacheStore<TResponse>();
-
                 response = await diskCache.GetAsync(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet, cancellationToken).ConfigureAwait(false);
 
-                if (response == default &&
-                    _connectivity.NetworkAccess == NetworkAccess.Internet)
+                if (response is null && _connectivity.NetworkAccess == NetworkAccess.Internet)
                 {
                     try
                     {
                         response = await _retryPolicy.ExecuteAsync(apiRequest, cancellationToken).ConfigureAwait(false);
-                        if (!cancellationToken.IsCancellationRequested && response != default)
+                        if (!cancellationToken.IsCancellationRequested && response is not null)
                             // Cache regardless, no CT token
                             await diskCache.UpsertAsync(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan, default).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        response = default;
+                        response = null;
 
                         var url = ex switch
                         {
@@ -677,7 +675,7 @@ namespace AdelaideFuel.Services
                     }
                 }
 
-                if (response != default)
+                if (response is not null)
                     MemoryCache.SetSliding(cacheKey, response, TimeSpan.FromMinutes(30));
             }
 
