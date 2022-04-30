@@ -122,14 +122,9 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
+                await FuelService.SyncAllAsync(default);
+
                 await LoadGroupsAsync(ct);
-
-                if (!FuelPriceGroups.Any())
-                {
-                    await FuelService.SyncAllAsync(default);
-                    await LoadGroupsAsync(ct);
-                }
-
                 await UpdatePricesAsync(ct);
 
                 HasPrices = FuelPriceGroups.Any(g => g.HasPrices);
