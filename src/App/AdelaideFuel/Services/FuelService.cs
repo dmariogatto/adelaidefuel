@@ -435,7 +435,7 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var today = DateTime.Now.Date;
+                var today = DateTime.Today;
 
 #if DEBUG
                 today = DateTime.MaxValue;
