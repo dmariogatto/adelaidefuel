@@ -343,9 +343,12 @@ namespace AdelaideFuel.Services
                 var userBrandsTask = _brandUserStore.AllAsync(true, cancellationToken);
 
                 await Task.WhenAll(apiBrandsTask, userBrandsTask).ConfigureAwait(false);
-                await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
 
-                success = true;
+                if (apiBrandsTask.Result?.Any() == true)
+                {
+                    await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
+                    success = true;
+                }
             }
             catch (Exception ex)
             {
@@ -371,9 +374,12 @@ namespace AdelaideFuel.Services
                 var userFuelsTask = _fuelUserStore.AllAsync(true, cancellationToken);
 
                 await Task.WhenAll(apiFuelsTask, userFuelsTask).ConfigureAwait(false);
-                await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
 
-                success = true;
+                if (apiFuelsTask.Result?.Any() == true)
+                {
+                    await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
+                    success = true;
+                }
             }
             catch (Exception ex)
             {
