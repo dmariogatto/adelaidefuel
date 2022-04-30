@@ -667,8 +667,6 @@ namespace AdelaideFuel.Services
                     }
                     catch (Exception ex)
                     {
-                        response = null;
-
                         var url = ex switch
                         {
                             ApiException apiEx => apiEx.Uri.ToString(),
