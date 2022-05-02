@@ -17,7 +17,8 @@ namespace AdelaideFuel.Droid
         RoundIcon = "@mipmap/icon_round",
         Theme = "@style/SplashTheme",
         LaunchMode = LaunchMode.SingleTask,
-        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
+        Exported = false)]
     [IntentFilter(
         new[] { Xamarin.Essentials.Platform.Intent.ActionAppAction },
         Categories = new[] { Intent.CategoryDefault })]

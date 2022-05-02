@@ -343,9 +343,12 @@ namespace AdelaideFuel.Services
                 var userBrandsTask = _brandUserStore.AllAsync(true, cancellationToken);
 
                 await Task.WhenAll(apiBrandsTask, userBrandsTask).ConfigureAwait(false);
-                await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
 
-                success = true;
+                if (apiBrandsTask.Result?.Any() == true)
+                {
+                    await SyncSortableEntitiesWithApiAsync(apiBrandsTask.Result, userBrandsTask.Result, cancellationToken).ConfigureAwait(false);
+                    success = true;
+                }
             }
             catch (Exception ex)
             {
@@ -371,9 +374,12 @@ namespace AdelaideFuel.Services
                 var userFuelsTask = _fuelUserStore.AllAsync(true, cancellationToken);
 
                 await Task.WhenAll(apiFuelsTask, userFuelsTask).ConfigureAwait(false);
-                await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
 
-                success = true;
+                if (apiFuelsTask.Result?.Any() == true)
+                {
+                    await SyncSortableEntitiesWithApiAsync(apiFuelsTask.Result, userFuelsTask.Result, cancellationToken).ConfigureAwait(false);
+                    success = true;
+                }
             }
             catch (Exception ex)
             {
@@ -396,7 +402,7 @@ namespace AdelaideFuel.Services
             try
             {
                 var radii = await _radiusUserStore.AllAsync(true, cancellationToken).ConfigureAwait(false);
-                if (radii == null || !radii.Any())
+                if (radii is null || !radii.Any())
                 {
                     radii = _defaultRadii.Select(i => new UserRadius()
                     {
@@ -429,7 +435,7 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var today = DateTime.Now.Date;
+                var today = DateTime.Today;
 
 #if DEBUG
                 today = DateTime.MaxValue;
@@ -577,7 +583,7 @@ namespace AdelaideFuel.Services
                         IsActive = existing.IsActive
                     });
                 }
-                else if (existing != null)
+                else if (existing is not null)
                 {
                     unmodified.Add(existing);
                 }
@@ -639,7 +645,7 @@ namespace AdelaideFuel.Services
                     .RemoveRangeAsync(entities.Select(e => e.Id.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken)
                : Task.FromResult(0);
 
-        private async Task<TResponse> GetResponseAsync<TResponse>(string cacheKey, Func<CancellationToken, Task<TResponse>> apiRequest, CancellationToken cancellationToken, TimeSpan? cacheTimeSpan = null)
+        private async Task<TResponse> GetResponseAsync<TResponse>(string cacheKey, Func<CancellationToken, Task<TResponse>> apiRequest, CancellationToken cancellationToken, TimeSpan? diskCacheTime = null)
             where TResponse : class
         {
             if (string.IsNullOrEmpty(cacheKey)) throw new ArgumentException("Cache key cannot be empty!");
@@ -648,28 +654,24 @@ namespace AdelaideFuel.Services
             if (!MemoryCache.TryGetValue(cacheKey, out TResponse response))
             {
                 var diskCache = _storeFactory.GetCacheStore<TResponse>();
-
                 response = await diskCache.GetAsync(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet, cancellationToken).ConfigureAwait(false);
 
-                if (response == default &&
-                    _connectivity.NetworkAccess == NetworkAccess.Internet)
+                if (response is null && _connectivity.NetworkAccess == NetworkAccess.Internet)
                 {
                     try
                     {
                         response = await _retryPolicy.ExecuteAsync(apiRequest, cancellationToken).ConfigureAwait(false);
-                        if (!cancellationToken.IsCancellationRequested && response != default)
-                            await diskCache.UpsertAsync(cacheKey, response, cacheTimeSpan ?? CacheExpireTimeSpan, cancellationToken).ConfigureAwait(false);
+                        if (!cancellationToken.IsCancellationRequested && response is not null)
+                            // Cache regardless, no CT token
+                            await diskCache.UpsertAsync(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan, default).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        var url = string.Empty;
-
-                        switch (ex)
+                        var url = ex switch
                         {
-                            case ApiException apiEx:
-                                url = apiEx.Uri.ToString();
-                                break;
-                        }
+                            ApiException apiEx => apiEx.Uri.ToString(),
+                            _ => string.Empty
+                        };
 
                         Logger.Error(ex, !string.IsNullOrEmpty(url)
                             ? new Dictionary<string, string>() { { nameof(url), url } }
@@ -677,7 +679,7 @@ namespace AdelaideFuel.Services
                     }
                 }
 
-                if (response != default)
+                if (response is not null)
                     MemoryCache.SetSliding(cacheKey, response, TimeSpan.FromMinutes(30));
             }
 

@@ -35,11 +35,11 @@ namespace AdelaideFuel.Droid.Renderers
 
             var needToRequestAd = false;
 
-            if (_adHolder == null && !string.IsNullOrEmpty(Element?.AdUnitId))
+            if (_adHolder is null && !string.IsNullOrEmpty(Element?.AdUnitId))
             {
                 _adHolder = BannerAdPool.Get(Element.AdUnitId);
 
-                if (_adHolder == null)
+                if (_adHolder is null)
                 {
                     var widthPixels = DeviceDisplay.MainDisplayInfo.Width;
                     var density = DeviceDisplay.MainDisplayInfo.Density;
@@ -56,15 +56,22 @@ namespace AdelaideFuel.Droid.Renderers
 
                 Element.HeightRequest = _adHolder.AdHeight;
 
-                if (_adHolder.AdStatus == AdLoadStatus.Loaded)
+                switch (_adHolder.AdStatus)
                 {
-                    AttachBannerAd();
-                }
-                else
-                {
-                    _registered = true;
-                    _adHolder.AdReceived += AdReceived;
-                    _adHolder.ReceiveAdFailed += ReceiveAdFailed;
+                    case AdLoadStatus.Loaded:
+                        AttachBannerAd();
+                        break;
+                    case AdLoadStatus.Failed:
+                        DetachBannerAd();
+                        break;
+                    default:
+                        if (!_registered)
+                        {
+                            _registered = true;
+                            _adHolder.AdReceived += AdReceived;
+                            _adHolder.ReceiveAdFailed += ReceiveAdFailed;
+                        }
+                        break;
                 }
             }
 
@@ -81,23 +88,28 @@ namespace AdelaideFuel.Droid.Renderers
 
         private void ReceiveAdFailed(object sender, LoadAdError e)
         {
-            if (!_disposed && Element != null)
-            {
-                Element.HeightRequest = 0;
-                Element.IsVisible = false;
-                Element.AdStatus = AdLoadStatus.Failed;
-            }
-
+            DetachBannerAd();
             System.Diagnostics.Debug.WriteLine($"Failed to load ad: {e?.Code ?? -1}, '{e?.Message ?? string.Empty}'");
         }
 
         private void AttachBannerAd()
         {
-            if (!_disposed && Element != null && Control == null)
+            if (!_disposed && Element is not null && Control is null)
             {
                 Element.IsVisible = true;
+                Element.HeightRequest = _adHolder.AdHeight;
                 SetNativeControl(_adHolder.View);
                 Element.AdStatus = AdLoadStatus.Loaded;
+            }
+        }
+
+        private void DetachBannerAd()
+        {
+            if (!_disposed && Element is not null)
+            {
+                Element.HeightRequest = 0;
+                Element.IsVisible = false;
+                Element.AdStatus = AdLoadStatus.Failed;
             }
         }
 
@@ -110,7 +122,7 @@ namespace AdelaideFuel.Droid.Renderers
 
             _disposed = true;
 
-            if (disposing && _adHolder != null)
+            if (disposing && _adHolder is not null)
             {
                 if (_registered)
                 {
@@ -120,11 +132,14 @@ namespace AdelaideFuel.Droid.Renderers
                 }
 
                 _adHolder.View.RemoveFromParent();
-                BannerAdPool.Add(_adHolder);
+
+                if (!BannerAdPool.Add(_adHolder))
+                    _adHolder.Dispose();
+
                 _adHolder = null;
             }
 
             base.Dispose(disposing);
         }
-    }    
+    }
 }
