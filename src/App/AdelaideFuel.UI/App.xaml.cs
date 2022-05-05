@@ -25,11 +25,14 @@ namespace AdelaideFuel.UI
         public const string Scheme = "adl-sif";
         public const string Map = "map";
 
-        static App()
+        public static void IoCRegister()
         {
             IoC.RegisterSingleton<INavigationService, TabbedNavigationService>();
             IoC.RegisterSingleton<IThemeService, ThemeService>();
+        }
 
+        static App()
+        {
             AppActions.OnAppAction += (sender, args) =>
             {
                 const string uriFormat = "{0}://{1}";

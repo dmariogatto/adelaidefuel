@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Droid.Services;
 using AdelaideFuel.Services;
+using AdelaideFuel.UI;
 using AdelaideFuel.UI.Services;
 using Android.App;
 using Android.Runtime;
@@ -30,6 +31,8 @@ namespace AdelaideFuel.Droid
             IoC.RegisterSingleton<IUserNativeService, UserNativeService_Droid>();
             IoC.RegisterSingleton<IRendererService, RendererService_Droid>();
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_Droid>();
+
+            App.IoCRegister();
         }
     }
 }
