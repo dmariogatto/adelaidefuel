@@ -85,6 +85,18 @@ namespace AdelaideFuel.Droid.Renderers
 
                 Element.HeightRequest = _adHolder.AdHeight;
 
+                switch (_adHolder.AdStatus)
+                {
+                    case AdLoadStatus.Loaded:
+                        BannerAdLoaded();
+                        break;
+                    case AdLoadStatus.Failed:
+                        BannerAdFailed();
+                        break;
+                    default:
+                        break;
+                }
+
                 if (!_registered)
                 {
                     _registered = true;

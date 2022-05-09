@@ -81,6 +81,18 @@ namespace AdelaideFuel.iOS.Renderers
 
                 Element.HeightRequest = _bannerView.AdHeight;
 
+                switch (_bannerView.AdStatus)
+                {
+                    case AdLoadStatus.Loaded:
+                        BannerAdLoaded();
+                        break;
+                    case AdLoadStatus.Failed:
+                        BannerAdFailed();
+                        break;
+                    default:
+                        break;
+                }
+
                 if (!_registered)
                 {
                     _registered = true;
