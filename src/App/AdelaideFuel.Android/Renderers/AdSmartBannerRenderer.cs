@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Gms.Ads;
 using Android.Runtime;
 using System;
+using System.ComponentModel;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -22,25 +23,55 @@ namespace AdelaideFuel.Droid.Renderers
         {
         }
 
+        protected override bool ManageNativeControlLifetime => false;
+
         protected override void OnElementChanged(ElementChangedEventArgs<AdSmartBanner> e)
         {
             base.OnElementChanged(e);
 
-            if (_disposed
-#if DEBUG
-                //|| DeviceInfo.DeviceType == DeviceType.Virtual
-#endif
-                )
+            AdUnitIdChanged();
+        }
+
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
+
+            if (e.PropertyName == AdSmartBanner.AdUnitIdProperty.PropertyName)
+                AdUnitIdChanged();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_disposed)
                 return;
 
-            var needToRequestAd = false;
+            _disposed = true;
 
-            if (_adHolder is null && !string.IsNullOrEmpty(Element?.AdUnitId))
+            if (disposing)
+            {
+                CleanUpBannerAd();
+            }
+
+            base.Dispose(disposing);
+        }
+
+        private void AdUnitIdChanged()
+        {
+            if (_disposed)
+                return;
+
+            CleanUpBannerAd();
+
+            if (_adHolder is null &&
+                !string.IsNullOrEmpty(Element?.AdUnitId))
             {
                 _adHolder = BannerAdPool.Get(Element.AdUnitId);
+                var needToRequestAd = false;
 
                 if (_adHolder is null)
                 {
+                    needToRequestAd = true;
+
                     var widthPixels = DeviceDisplay.MainDisplayInfo.Width;
                     var density = DeviceDisplay.MainDisplayInfo.Density;
                     var adWidth = (int)(widthPixels / density);
@@ -50,60 +81,46 @@ namespace AdelaideFuel.Droid.Renderers
                         AdUnitId = Element.AdUnitId,
                         AdSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSize(Context, adWidth)
                     });
-
-                    needToRequestAd = true;
                 }
 
                 Element.HeightRequest = _adHolder.AdHeight;
 
-                switch (_adHolder.AdStatus)
+                if (!_registered)
                 {
-                    case AdLoadStatus.Loaded:
-                        AttachBannerAd();
-                        break;
-                    case AdLoadStatus.Failed:
-                        DetachBannerAd();
-                        break;
-                    default:
-                        if (!_registered)
-                        {
-                            _registered = true;
-                            _adHolder.AdReceived += AdReceived;
-                            _adHolder.ReceiveAdFailed += ReceiveAdFailed;
-                        }
-                        break;
+                    _registered = true;
+                    _adHolder.AdReceived += AdReceived;
+                    _adHolder.ReceiveAdFailed += ReceiveAdFailed;
                 }
-            }
 
-            if (needToRequestAd)
-            {
-                _adHolder.LoadAd(new AdRequest.Builder().Build());
+                if (needToRequestAd)
+                    _adHolder.LoadAd(new AdRequest.Builder().Build());
             }
         }
 
         private void AdReceived(object sender, EventArgs e)
         {
-            AttachBannerAd();
+            BannerAdLoaded();
         }
 
         private void ReceiveAdFailed(object sender, LoadAdError e)
         {
-            DetachBannerAd();
+            BannerAdFailed();
             System.Diagnostics.Debug.WriteLine($"Failed to load ad: {e?.Code ?? -1}, '{e?.Message ?? string.Empty}'");
         }
 
-        private void AttachBannerAd()
+        private void BannerAdLoaded()
         {
-            if (!_disposed && Element is not null && Control is null)
+            if (!_disposed && Element is not null && _adHolder is not null)
             {
+                if (Control != _adHolder.View)
+                    SetNativeControl(_adHolder.View);
                 Element.IsVisible = true;
                 Element.HeightRequest = _adHolder.AdHeight;
-                SetNativeControl(_adHolder.View);
                 Element.AdStatus = AdLoadStatus.Loaded;
             }
         }
 
-        private void DetachBannerAd()
+        private void BannerAdFailed()
         {
             if (!_disposed && Element is not null)
             {
@@ -113,16 +130,9 @@ namespace AdelaideFuel.Droid.Renderers
             }
         }
 
-        protected override bool ManageNativeControlLifetime => false;
-
-        protected override void Dispose(bool disposing)
+        private void CleanUpBannerAd()
         {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-
-            if (disposing && _adHolder is not null)
+            if (_adHolder is not null)
             {
                 if (_registered)
                 {
@@ -138,8 +148,6 @@ namespace AdelaideFuel.Droid.Renderers
 
                 _adHolder = null;
             }
-
-            base.Dispose(disposing);
         }
     }
 }
