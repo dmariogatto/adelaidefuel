@@ -124,8 +124,7 @@ namespace AdelaideFuel.Droid.Renderers
         {
             if (!_disposed && Element is not null && _adHolder is not null)
             {
-                if (Control != _adHolder.View)
-                    SetNativeControl(_adHolder.View);
+                AttachBannerView();
                 Element.IsVisible = true;
                 Element.HeightRequest = _adHolder.AdHeight;
                 Element.AdStatus = AdLoadStatus.Loaded;
@@ -136,6 +135,7 @@ namespace AdelaideFuel.Droid.Renderers
         {
             if (!_disposed && Element is not null)
             {
+                DetachBannerView();
                 Element.HeightRequest = 0;
                 Element.IsVisible = false;
                 Element.AdStatus = AdLoadStatus.Failed;
@@ -153,13 +153,30 @@ namespace AdelaideFuel.Droid.Renderers
                     _registered = false;
                 }
 
-                _adHolder.View.RemoveFromParent();
+                DetachBannerView();
 
                 if (!BannerAdPool.Add(_adHolder))
                     _adHolder.Dispose();
 
                 _adHolder = null;
             }
+        }
+
+        private void AttachBannerView()
+        {
+            if (_adHolder is null || ChildCount > 0)
+                return;
+
+            SetNativeControl(_adHolder.View);
+        }
+
+        private void DetachBannerView()
+        {
+            if (_adHolder is null || ChildCount == 0)
+                return;
+
+            _adHolder.View.RemoveFromParent();
+            _adHolder.View.OnFocusChangeListener = null;
         }
     }
 }

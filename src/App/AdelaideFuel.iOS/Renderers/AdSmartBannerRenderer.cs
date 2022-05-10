@@ -120,8 +120,7 @@ namespace AdelaideFuel.iOS.Renderers
         {
             if (!_disposed && Element is not null && _bannerView is not null)
             {
-                if (Control != _bannerView)
-                    SetNativeControl(_bannerView);
+                AttachBannerView();
                 Element.IsVisible = true;
                 Element.HeightRequest = _bannerView.AdHeight;
                 Element.AdStatus = AdLoadStatus.Loaded;
@@ -132,6 +131,7 @@ namespace AdelaideFuel.iOS.Renderers
         {
             if (!_disposed && Element is not null)
             {
+                DetachBannerView();
                 Element.HeightRequest = 0;
                 Element.IsVisible = false;
                 Element.AdStatus = AdLoadStatus.Failed;
@@ -149,13 +149,29 @@ namespace AdelaideFuel.iOS.Renderers
                     _registered = false;
                 }
 
-                _bannerView.RemoveFromSuperview();
+                DetachBannerView();
 
                 if (!BannerAdPool.Add(_bannerView))
                     _bannerView.Dispose();
 
                 _bannerView = null;
             }
+        }
+
+        private void AttachBannerView()
+        {
+            if (_bannerView is null || Subviews.Length > 0)
+                return;
+
+            SetNativeControl(_bannerView);
+        }
+
+        private void DetachBannerView()
+        {
+            if (_bannerView is null || Subviews.Length == 0)
+                return;
+
+            _bannerView.RemoveFromSuperview();
         }
 
         private static UIViewController GetRootViewController()
