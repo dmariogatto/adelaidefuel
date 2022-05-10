@@ -29,7 +29,10 @@ namespace AdelaideFuel.Droid.Renderers
         {
             base.OnElementChanged(e);
 
-            AdUnitIdChanged();
+            if (e.NewElement is not null)
+            {
+                AdUnitIdChanged();
+            }
         }
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
