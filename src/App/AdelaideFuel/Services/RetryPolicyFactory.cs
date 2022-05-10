@@ -1,5 +1,6 @@
 ﻿using Polly;
 using Refit;
+using System.Net;
 using System.Net.Http;
 
 namespace AdelaideFuel.Services
@@ -15,7 +16,9 @@ namespace AdelaideFuel.Services
 
         public PolicyBuilder GetNetRetryPolicy() =>
             _retryPolicyService.GetNativeNetRetryPolicy()
-                .Or<ApiException>()
+                .Or<ApiException>(e => e.StatusCode != HttpStatusCode.BadRequest &&
+                                       e.StatusCode != HttpStatusCode.NotFound &&
+                                       e.StatusCode != HttpStatusCode.InternalServerError)
                 .Or<HttpRequestException>();
     }
 }
