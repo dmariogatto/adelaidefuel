@@ -3,6 +3,7 @@ using AdelaideFuel.UI.Controls;
 using Foundation;
 using Google.MobileAds;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using UIKit;
 using Xamarin.Forms;
@@ -18,15 +19,50 @@ namespace AdelaideFuel.iOS.Renderers
         private bool _registered;
         private BannerAdView _bannerView;
 
+        protected override bool ManageNativeControlLifetime => false;
+
         protected override void OnElementChanged(ElementChangedEventArgs<AdSmartBanner> e)
         {
             base.OnElementChanged(e);
 
+            if (e.NewElement is not null)
+            {
+                AdUnitIdChanged();
+            }
+        }
+
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
+
+            if (e.PropertyName == AdSmartBanner.AdUnitIdProperty.PropertyName)
+                AdUnitIdChanged();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
+            _disposed = true;
+
+            if (disposing)
+            {
+                CleanUpBannerAd();
+            }
+
+            base.Dispose(disposing);
+        }
+
+        private void AdUnitIdChanged()
+        {
+            if (_disposed)
+                return;
+
+            CleanUpBannerAd();
+
             if (_bannerView is null &&
-                !string.IsNullOrEmpty(e.NewElement?.AdUnitId) &&
+                !string.IsNullOrEmpty(Element?.AdUnitId) &&
                 GetRootViewController() is UIViewController rvc)
             {
                 _bannerView = BannerAdPool.Get(Element.AdUnitId);
@@ -48,68 +84,63 @@ namespace AdelaideFuel.iOS.Renderers
                 switch (_bannerView.AdStatus)
                 {
                     case AdLoadStatus.Loaded:
-                        AttachBannerAd();
+                        BannerAdLoaded();
                         break;
                     case AdLoadStatus.Failed:
-                        DetachBannerAd();
+                        BannerAdFailed();
                         break;
                     default:
-                        if (!_registered)
-                        {
-                            _registered = true;
-                            _bannerView.AdReceived += AdReceived;
-                            _bannerView.ReceiveAdFailed += ReceiveAdFailed;
-                        }
                         break;
                 }
-            }
 
-            if (_bannerView?.AutoloadEnabled == false)
-                _bannerView.AutoloadEnabled = true;
+                if (!_registered)
+                {
+                    _registered = true;
+                    _bannerView.AdReceived += AdReceived;
+                    _bannerView.ReceiveAdFailed += ReceiveAdFailed;
+                }
+
+                if (!_bannerView.AutoloadEnabled)
+                    _bannerView.AutoloadEnabled = true;
+            }
         }
 
         private void AdReceived(object sender, EventArgs e)
         {
-            AttachBannerAd();
+            BannerAdLoaded();
         }
 
         private void ReceiveAdFailed(object sender, BannerViewErrorEventArgs e)
         {
-            DetachBannerAd();
+            BannerAdFailed();
             System.Diagnostics.Debug.WriteLine($"Failed to load ad: {e.Error}");
         }
 
-        private void AttachBannerAd()
+        private void BannerAdLoaded()
         {
-            if (!_disposed && Element is not null && Control is null)
+            if (!_disposed && Element is not null && _bannerView is not null)
             {
+                AttachBannerView();
                 Element.IsVisible = true;
                 Element.HeightRequest = _bannerView.AdHeight;
-                SetNativeControl(_bannerView);
                 Element.AdStatus = AdLoadStatus.Loaded;
             }
         }
 
-        private void DetachBannerAd()
+        private void BannerAdFailed()
         {
             if (!_disposed && Element is not null)
             {
+                DetachBannerView();
                 Element.HeightRequest = 0;
                 Element.IsVisible = false;
                 Element.AdStatus = AdLoadStatus.Failed;
             }
         }
 
-        protected override bool ManageNativeControlLifetime => false;
-
-        protected override void Dispose(bool disposing)
+        private void CleanUpBannerAd()
         {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-
-            if (disposing && _bannerView is not null)
+            if (_bannerView is not null)
             {
                 if (_registered)
                 {
@@ -118,15 +149,29 @@ namespace AdelaideFuel.iOS.Renderers
                     _registered = false;
                 }
 
-                _bannerView.RemoveFromSuperview();
+                DetachBannerView();
 
                 if (!BannerAdPool.Add(_bannerView))
                     _bannerView.Dispose();
 
                 _bannerView = null;
             }
+        }
 
-            base.Dispose(disposing);
+        private void AttachBannerView()
+        {
+            if (_bannerView is null || Subviews.Length > 0)
+                return;
+
+            SetNativeControl(_bannerView);
+        }
+
+        private void DetachBannerView()
+        {
+            if (_bannerView is null || Subviews.Length == 0)
+                return;
+
+            _bannerView.RemoveFromSuperview();
         }
 
         private static UIViewController GetRootViewController()

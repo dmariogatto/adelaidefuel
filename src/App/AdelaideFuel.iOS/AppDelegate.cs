@@ -39,6 +39,8 @@ namespace AdelaideFuel.iOS
             IoC.RegisterSingleton<IRendererService, RendererService_iOS>();
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_iOS>();
 
+            App.IoCRegister();
+
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
             Sharpnado.CollectionView.iOS.Initializer.Initialize();
             AiForms.Renderers.iOS.SettingsViewInit.Init();
