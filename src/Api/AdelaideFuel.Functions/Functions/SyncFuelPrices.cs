@@ -113,14 +113,12 @@ namespace AdelaideFuel.Functions
                     .Select(i => i.SiteId)
                     .ToHashSet();
                 // Find new sites that are possibly incorrect
-                var exceptions = await FindPriceExceptionsAsync(
+                var newExceptions = await FindPriceExceptionsAsync(
                         priceEntities.Where(i => !exceptionSiteIds.Contains(i.SiteId)),
                         ct);
-                // Notification of newly found exceptions
-                var exEmailTask = SendPriceExceptionsEmailAsync(exceptions, ct);
 
                 // Add new sites to exception list
-                var newSiteExceptions = exceptions
+                var newSiteExceptions = newExceptions
                     .Select(i => (i.BrandId, i.SiteId, i.SiteName))
                     .Distinct()
                     .Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName))
@@ -148,7 +146,18 @@ namespace AdelaideFuel.Functions
                         exceptionLogEntries.Add(new SitePriceExceptionLogEntity(i.BrandId, i, adjustedPrice));
 
                     i.Price = adjustedPrice;
+
+                    var sitePriceEx = newExceptions
+                        .FirstOrDefault(e =>
+                            e.BrandId == i.BrandId &&
+                            e.SiteId == i.SiteId &&
+                            e.FuelId == i.FuelId);
+                    if (sitePriceEx is not null)
+                        sitePriceEx.AdjustedPrice = adjustedPrice;
                 }
+
+                // Notification of newly found exceptions
+                var exEmailTask = SendPriceExceptionsEmailAsync(newExceptions, ct);
 
                 var sitePriceDtos = priceEntities.Select(i => i.ToSitePrice());
                 var existingPriceEntities = await _sitePriceRepository.GetAllEntitiesAsync(ct);
@@ -241,7 +250,8 @@ namespace AdelaideFuel.Functions
                         SiteName = site?.Name ?? string.Empty,
                         FuelName = fuel?.Name ?? string.Empty,
                         PreviousPrice = previous?.Price ?? -1,
-                        CurrentPrice = i.Price
+                        CurrentPrice = i.Price,
+                        AdjustedPrice = -1
                     });
                 }
             }
@@ -268,6 +278,7 @@ namespace AdelaideFuel.Functions
             emailBuilder.AppendFormat(thFmt, "Fuel Name");
             emailBuilder.AppendFormat(thFmt, "Previous Price");
             emailBuilder.AppendFormat(thFmt, "Current Price");
+            emailBuilder.AppendFormat(thFmt, "Adjusted Price");
             emailBuilder.Append("</thead>");
 
             emailBuilder.Append("<tbody>");
@@ -283,6 +294,7 @@ namespace AdelaideFuel.Functions
                 emailBuilder.AppendFormat(tdFmt, ex.FuelName ?? string.Empty);
                 emailBuilder.AppendFormat(tdRightFmt, ex.PreviousPrice);
                 emailBuilder.AppendFormat(tdRightFmt, ex.CurrentPrice);
+                emailBuilder.AppendFormat(tdRightFmt, ex.AdjustedPrice);
 
                 emailBuilder.Append("</tr>");
             }
@@ -290,7 +302,13 @@ namespace AdelaideFuel.Functions
             emailBuilder.Append("</tbody>");
             emailBuilder.Append("</table>");
 
-            await _sendGridService.SendEmailAsync("New Fuel Price Exceptions", emailBuilder.ToString());
+            var subject = "New Fuel Price Exceptions";
+
+#if DEBUG
+            subject = $"{subject} - DEBUG";
+#endif
+
+            await _sendGridService.SendEmailAsync(subject, emailBuilder.ToString());
         }
 
         private static bool IsPriceException(double price, int fuelId)
