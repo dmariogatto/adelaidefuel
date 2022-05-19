@@ -79,12 +79,12 @@ namespace AdelaideFuel.UI.Controls
             _userDialogs = IoC.Resolve<IUserDialogs>();
             _logger = IoC.Resolve<ILogger>();
 
-            var tappeGesture = new TapGestureRecognizer();
-            tappeGesture.Tapped += (s, e) =>
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += (s, e) =>
             {
                 _ = ChangeFuelAsync();
             };
-            GestureRecognizers.Add(tappeGesture);
+            GestureRecognizers.Add(tapGesture);
         }
 
         public UserFuel SelectedFuel
