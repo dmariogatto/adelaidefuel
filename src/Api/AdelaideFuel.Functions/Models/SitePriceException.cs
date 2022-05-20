@@ -15,5 +15,6 @@ namespace AdelaideFuel.Functions.Models
 
         public double PreviousPrice { get; set; }
         public double CurrentPrice { get; set; }
+        public double AdjustedPrice { get; set; }
     }
 }
