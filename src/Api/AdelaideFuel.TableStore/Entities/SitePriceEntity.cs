@@ -1,11 +1,11 @@
 ﻿using AdelaideFuel.Shared;
-using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class SitePriceEntity : TableEntity, IEntity, ISitePrice
+    public class SitePriceEntity : BaseTableStoreEntity, ITableStoreEntity, ISitePrice
     {
         public SitePriceEntity() { }
 
@@ -22,6 +22,7 @@ namespace AdelaideFuel.TableStore.Entities
             UpdateRowKey();
         }
 
+        [IgnoreDataMember]
         public int BrandId
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
@@ -60,9 +61,7 @@ namespace AdelaideFuel.TableStore.Entities
         public string CollectionMethod { get; set; }
         public double Price { get; set; }
 
-        public bool IsActive { get; set; }
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is SitePriceEntity other && Equals(other))
             {

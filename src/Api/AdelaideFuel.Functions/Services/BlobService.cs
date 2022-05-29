@@ -1,6 +1,8 @@
-﻿using Azure.Storage.Blobs;
+﻿using AdelaideFuel.Functions.Models;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,13 +11,18 @@ namespace AdelaideFuel.Functions.Services
 {
     public class BlobService : IBlobService
     {
-        private const string ContainerName = "adelaidefuel";
-
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _blobContainerName;
 
-        public BlobService(string connectionString)
+        public BlobService(BlobStorageOptions options)
         {
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            if (string.IsNullOrEmpty(options?.AzureWebJobsStorage))
+                throw new ArgumentException(nameof(BlobStorageOptions.AzureWebJobsStorage));
+            if (string.IsNullOrEmpty(options?.BlobContainerName))
+                throw new ArgumentException(nameof(BlobStorageOptions.AzureWebJobsStorage));
+
+            _blobServiceClient = new BlobServiceClient(options.AzureWebJobsStorage);
+            _blobContainerName = options.BlobContainerName;
         }
 
         public async Task SerialiseAsync<T>(T data, string localFilePath, CancellationToken cancellationToken)
@@ -106,7 +113,7 @@ namespace AdelaideFuel.Functions.Services
 
         private async Task<BlobContainerClient> GetBlobContainerAsync(CancellationToken cancellationToken = default)
         {
-            var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             return containerClient;
         }
