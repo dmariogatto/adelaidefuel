@@ -102,7 +102,7 @@ namespace AdelaideFuel.TableStore.Repositories
         {
             var results = new List<T>();
 
-            await foreach (Page<T> page in asyncQuery.AsPages().ConfigureAwait(false))
+            await foreach (var page in asyncQuery.AsPages().ConfigureAwait(false))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 results.AddRange(page.Values);
