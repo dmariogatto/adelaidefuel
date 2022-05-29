@@ -1,9 +1,9 @@
-﻿using Microsoft.Azure.Cosmos.Table;
-using System.Globalization;
+﻿using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class SiteExceptionEntity : TableEntity, IEntity
+    public class SiteExceptionEntity : BaseTableStoreEntity, ITableStoreEntity
     {
         public SiteExceptionEntity() { }
 
@@ -14,12 +14,14 @@ namespace AdelaideFuel.TableStore.Entities
             Name = name;
         }
 
+        [IgnoreDataMember]
         public int BrandId
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
             set => PartitionKey = value.ToString(CultureInfo.InvariantCulture);
         }
 
+        [IgnoreDataMember]
         public int SiteId
         {
             get => int.TryParse(RowKey, out var id) ? id : -1;
@@ -28,9 +30,7 @@ namespace AdelaideFuel.TableStore.Entities
 
         public string Name { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is SiteExceptionEntity other && Equals(other))
             {

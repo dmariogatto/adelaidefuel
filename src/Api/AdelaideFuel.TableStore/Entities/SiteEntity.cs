@@ -1,11 +1,11 @@
 ﻿using AdelaideFuel.Shared;
-using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class SiteEntity : TableEntity, IEntity, ISite
+    public class SiteEntity : BaseTableStoreEntity, ITableStoreEntity, ISite
     {
         public SiteEntity() { }
 
@@ -47,12 +47,14 @@ namespace AdelaideFuel.TableStore.Entities
             SundayClose = site.SundayClose;
         }
 
+        [IgnoreDataMember]
         public int BrandId
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
             set => PartitionKey = value.ToString(CultureInfo.InvariantCulture);
         }
 
+        [IgnoreDataMember]
         public int SiteId
         {
             get => int.TryParse(RowKey, out var id) ? id : -1;
@@ -91,9 +93,7 @@ namespace AdelaideFuel.TableStore.Entities
         public string SundayOpen { get; set; }
         public string SundayClose { get; set; }
 
-        public bool IsActive { get; set; }
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is SiteEntity other && Equals(other))
             {

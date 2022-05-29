@@ -1,10 +1,10 @@
 ﻿using AdelaideFuel.Shared;
-using Microsoft.Azure.Cosmos.Table;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class GeographicRegionEntity : TableEntity, IEntity, IGeographicRegion
+    public class GeographicRegionEntity : BaseTableStoreEntity, ITableStoreEntity, IGeographicRegion
     {
         public GeographicRegionEntity() { }
 
@@ -17,12 +17,14 @@ namespace AdelaideFuel.TableStore.Entities
             GeoRegionParentId = geographicRegion.GeoRegionParentId;
         }
 
+        [IgnoreDataMember]
         public int GeoRegionLevel
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
             set => PartitionKey = value.ToString(CultureInfo.InvariantCulture);
         }
 
+        [IgnoreDataMember]
         public int GeoRegionId
         {
             get => int.TryParse(RowKey, out var id) ? id : -1;
@@ -33,9 +35,7 @@ namespace AdelaideFuel.TableStore.Entities
         public string Abbrev { get; set; }
         public int? GeoRegionParentId { get; set; }
 
-        public bool IsActive { get; set; }
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is GeographicRegionEntity other && Equals(other))
             {

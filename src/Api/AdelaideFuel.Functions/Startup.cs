@@ -2,8 +2,8 @@ using AdelaideFuel.Api;
 using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
+using AdelaideFuel.TableStore.Models;
 using AdelaideFuel.TableStore.Repositories;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using Polly;
 using Refit;
 using System;
-using CloudTableStorageAccount = Microsoft.Azure.Cosmos.Table.CloudStorageAccount;
 
 [assembly: FunctionsStartup(typeof(AdelaideFuel.Functions.Startup))]
 
@@ -51,31 +50,24 @@ namespace AdelaideFuel.Functions
                 .AddHttpMessageHandler(() => new FuelPriceAuthHeaderHandler(SubscriberToken))
                 .AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(3, n => TimeSpan.FromSeconds(Math.Pow(2, n))));
 
-            string getConnectionString(IServiceProvider serviceProvider)
-            {
-                var config = serviceProvider.GetService<IConfiguration>();
-                var storageConnString =
-                    config["Values:AzureWebJobsStorage"] ??
-                    config.GetConnectionString("StorageConnectionString") ??
-                    Environment.GetEnvironmentVariable("AzureWebJobsStorage") ??
-                    "UseDevelopmentStorage=true;";
-                return storageConnString;
-            }
+            builder.Services.AddSingleton(services =>
+                new TableStorageOptions()
+                {
+                    AzureWebJobsStorage = services.GetService<IConfiguration>().GetValue<string>("AzureWebJobsStorage")
+                });
+
+            builder.Services.AddSingleton(services =>
+                new BlobStorageOptions()
+                {
+                    AzureWebJobsStorage = services.GetService<IConfiguration>().GetValue<string>("AzureWebJobsStorage"),
+                    BlobContainerName = services.GetService<IConfiguration>().GetValue<string>("BlobContainerName")
+                });
 
             builder.Services.AddOptions<SendGridOptions>()
                 .Configure(configuration.GetSection("SendGrid").Bind);
 
-            builder.Services.AddSingleton(serviceProvider =>
-                CloudTableStorageAccount.Parse(getConnectionString(serviceProvider)));
-
-            builder.Services.AddSingleton(serviceProvider =>
-            {
-                var storageAccount = serviceProvider.GetService<CloudTableStorageAccount>();
-                return storageAccount.CreateCloudTableClient();
-            });
-
             builder.Services.AddSingleton<ICacheService, CacheService>();
-            builder.Services.AddSingleton<IBlobService>(sp => new BlobService(getConnectionString(sp)));
+            builder.Services.AddSingleton<IBlobService, BlobService>();
             builder.Services.AddSingleton<ISendGridService, SendGridService>();
             builder.Services.AddSingleton<ITableRepository<BrandEntity>, TableRepository<BrandEntity>>();
             builder.Services.AddSingleton<ITableRepository<FuelEntity>, TableRepository<FuelEntity>>();

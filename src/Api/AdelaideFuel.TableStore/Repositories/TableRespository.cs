@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using AdelaideFuel.TableStore.Models;
+using Azure;
+using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,34 +11,28 @@ using System.Threading.Tasks;
 
 namespace AdelaideFuel.TableStore.Repositories
 {
-    public class TableRepository<T> : ITableRepository<T> where T : IEntity, new()
+    public class TableRepository<T> : ITableRepository<T> where T : class, ITableStoreEntity, new()
     {
-        private readonly CloudTable _cloudTable;
+        private const int MaxBatchCount = 100;
 
-        public TableRepository(CloudTableClient tableClient)
+        private readonly TableClient _tableClient;
+
+        public TableRepository(TableStorageOptions options)
         {
-            if (tableClient == null)
-                throw new ArgumentNullException(nameof(tableClient));
+            if (string.IsNullOrEmpty(options?.AzureWebJobsStorage))
+                throw new ArgumentException(nameof(TableStorageOptions.AzureWebJobsStorage));
 
-            var tableName = typeof(T).Name;
-
-            _cloudTable = tableClient.GetTableReference(tableName)
-                ?? throw new NullReferenceException($"Reference to table '{tableName}' cannot be null!");
+            _tableClient = new TableClient(options.AzureWebJobsStorage, typeof(T).Name);
         }
 
         public Task CreateIfNotExistsAsync(CancellationToken cancellationToken)
         {
-            return _cloudTable.CreateIfNotExistsAsync(cancellationToken);
+            return _tableClient.CreateIfNotExistsAsync(cancellationToken);
         }
 
         public Task<IList<T>> GetPartitionAsync(string partitionKey, CancellationToken cancellationToken)
         {
-            var query = new TableQuery<T>();
-            query = query.Where(
-                    TableQuery.GenerateFilterCondition(
-                        nameof(TableEntity.PartitionKey),
-                        QueryComparisons.Equal,
-                        partitionKey));
+            var query = _tableClient.QueryAsync<T>(i => i.PartitionKey == partitionKey);
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
@@ -50,22 +46,20 @@ namespace AdelaideFuel.TableStore.Repositories
             {
                 var pk = partitionKeys[i];
 
-                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, pk);
+                sb.AppendFormat("(PartitionKey eq '{0}')", pk);
 
                 if (i < partitionKeys.Count - 1)
-                    sb.AppendFormat(" {0} ", TableOperators.Or);
+                    sb.AppendFormat(" or ");
             }
 
-            var query = new TableQuery<T>().Where(sb.ToString());
+            var query = _tableClient.QueryAsync<T>(filter: sb.ToString());
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
         public async Task<T> GetEntityAsync(string partitionKey, string rowKey, CancellationToken cancellationToken)
         {
-            var retrieveOp = TableOperation.Retrieve<T>(partitionKey, rowKey);
-            var result = await _cloudTable.ExecuteAsync(retrieveOp, cancellationToken)
-                .ConfigureAwait(false);
-            return (T)result.Result;
+            var resp = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey).ConfigureAwait(false);
+            return resp.Value;
         }
 
         public Task<IList<T>> GetEntitiesAsync(IList<(string partitionKey, string rowKey)> keys, CancellationToken cancellationToken)
@@ -79,47 +73,40 @@ namespace AdelaideFuel.TableStore.Repositories
                 var k = keys[i];
 
                 sb.Append("(");
-                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, k.partitionKey);
-                sb.AppendFormat(" {0} ", TableOperators.And);
-                sb.AppendFormat("({0} {1} '{2}')", nameof(ITableEntity.RowKey), QueryComparisons.Equal, k.rowKey);
+                sb.AppendFormat("(PartitionKey eq '{0}')", k.partitionKey);
+                sb.Append(" and ");
+                sb.AppendFormat("(RowKey eq '{0}')", k.rowKey);
                 sb.Append(")");
 
                 if (i < keys.Count - 1)
-                    sb.AppendFormat(" {0} ", TableOperators.Or);
+                    sb.AppendFormat(" or ");
             }
 
-            var query = new TableQuery<T>().Where(sb.ToString());
+            var query = _tableClient.QueryAsync<T>(filter: sb.ToString());
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
         public Task<IList<T>> GetAllEntitiesAsync(CancellationToken cancellationToken)
         {
-            var query = new TableQuery<T>();
+            var query = _tableClient.QueryAsync<T>();
             return ExecuteQueryAsync(query, cancellationToken);
         }
 
         public Task DeleteAsync(IEnumerable<T> entities, ILogger logger, CancellationToken cancellationToken)
-            => BatchOpsAsync(entities, (bo, e) => bo.Delete(e), logger, cancellationToken);
+            => BatchActionAsync(entities, TableTransactionActionType.Delete, logger, cancellationToken);
 
         public Task InsertOrReplaceBulkAsync(IEnumerable<T> entities, ILogger logger, CancellationToken cancellationToken)
-            => BatchOpsAsync(entities, (bo, e) => bo.InsertOrReplace(e), logger, cancellationToken);
+            => BatchActionAsync(entities, TableTransactionActionType.UpsertReplace, logger, cancellationToken);
 
-        public async Task<IList<T>> ExecuteQueryAsync(TableQuery<T> query, CancellationToken cancellationToken)
+        public async Task<IList<T>> ExecuteQueryAsync(AsyncPageable<T> asyncQuery, CancellationToken cancellationToken)
         {
             var results = new List<T>();
-            // Initialize continuation token to start from the beginning of the table.
-            var continuationToken = default(TableContinuationToken);
 
-            do
+            await foreach (var page in asyncQuery.AsPages().ConfigureAwait(false))
             {
-                // Retrieve a segment (1000 entities)
-                var tableQueryResult = await _cloudTable.ExecuteQuerySegmentedAsync(query, continuationToken)
-                    .ConfigureAwait(false);
-                // Assign the new continuation token to tell the service where to
-                // continue on the next iteration (or null if it has reached the end)
-                continuationToken = tableQueryResult.ContinuationToken;
-                results.AddRange(tableQueryResult.Results);
-            } while (continuationToken != null && (cancellationToken == default || !cancellationToken.IsCancellationRequested));
+                cancellationToken.ThrowIfCancellationRequested();
+                results.AddRange(page.Values);
+            }
 
             return results;
         }
@@ -143,12 +130,12 @@ namespace AdelaideFuel.TableStore.Repositories
 
             var allPartitions = groupedEntities.Keys.Union(newEntities.Keys);
 
-            var batchOps = new List<TableBatchOperation>();
+            var batchActions = new Dictionary<string, IList<TableTransactionAction>>();
             foreach (var p in allPartitions)
             {
                 var oldPartition = groupedEntities.ContainsKey(p) ? groupedEntities[p] : new List<T>(0);
                 var newPartition = newEntities.ContainsKey(p) ? newEntities[p] : new List<T>(0);
-                batchOps.AddRange(ProcessPartition(p, oldPartition, newPartition, deleteDeactivations, logger));
+                batchActions[p] = GetActionsToSyncPartition(p, oldPartition, newPartition, deleteDeactivations, logger);
             }
 
             entityWatch.Stop();
@@ -156,67 +143,52 @@ namespace AdelaideFuel.TableStore.Repositories
             var opsWatch = new System.Diagnostics.Stopwatch();
             opsWatch.Start();
 
-            foreach (var bo in batchOps)
+            var batchCount = 1;
+            foreach (var ba in batchActions)
             {
-                logger.LogInformation($"Batch op {batchOps.IndexOf(bo) + 1} of {batchOps.Count} for '{_cloudTable.Name}'");
+                logger.LogInformation($"Batch {batchCount++} of {batchActions.Count} for '{_tableClient.Name}'");
 
                 if (!simulate)
                 {
-                    var result = await _cloudTable.ExecuteBatchAsync(bo, cancellationToken)
-                        .ConfigureAwait(false);
+                    for (var i = 0; i < ba.Value.Count; i += MaxBatchCount)
+                    {
+                        var batch = ba.Value.Skip(i).Take(MaxBatchCount);
+                        var result = await _tableClient.SubmitTransactionAsync(batch, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
 
             opsWatch.Stop();
 
-            logger.LogInformation($"Completed batch ops for '{_cloudTable.Name}' in {opsWatch.ElapsedMilliseconds}ms");
+            logger.LogInformation($"Completed batch actions for '{_tableClient.Name}' in {opsWatch.ElapsedMilliseconds}ms");
 
-            var changes = batchOps.SelectMany(bo => bo.Select(o => o.Entity)).OfType<T>().ToList();
-            return (changes, batchOps.Sum(bo => bo.Count));
+            var changes = batchActions.SelectMany(ba => ba.Value.Select(i => i.Entity)).OfType<T>().ToList();
+            return (changes, batchActions.Sum(ba => ba.Value.Count));
         }
 
-        private async Task BatchOpsAsync(IEnumerable<T> entities, Action<TableBatchOperation, T> batchOpAction, ILogger logger, CancellationToken cancellationToken)
+        private async Task BatchActionAsync(IEnumerable<T> entities, TableTransactionActionType actionType, ILogger logger, CancellationToken cancellationToken)
         {
-            var batchOps = new List<TableBatchOperation>();
+            logger.LogInformation($"Creating batch actions for '{_tableClient.Name}'");
 
-            logger.LogInformation($"Creating batch ops for '{_cloudTable.Name}'");
+            var batchActions = entities
+                .GroupBy(a => a.PartitionKey)
+                .ToDictionary(g => g.Key, g => g.Select(i => new TableTransactionAction(actionType, i)).ToList());
 
-            foreach (var g in entities.GroupBy(a => a.PartitionKey))
+            var batchCount = 1;
+            foreach (var ba in batchActions)
             {
-                var batchOp = new TableBatchOperation();
-                foreach (var e in g)
+                logger.LogInformation($"Batch {batchCount++} of {batchActions.Count} for '{_tableClient.Name}'");
+                for (var i = 0; i < ba.Value.Count; i += MaxBatchCount)
                 {
-                    batchOpAction.Invoke(batchOp, e);
-
-                    // Maximum operations in a batch
-                    if (batchOp.Count == 100)
-                    {
-                        batchOps.Add(batchOp);
-                        batchOp = new TableBatchOperation();
-                    }
+                    var batch = ba.Value.Skip(i).Take(MaxBatchCount);
+                    var result = await _tableClient.SubmitTransactionAsync(batch, cancellationToken).ConfigureAwait(false);
                 }
-
-                // Batch can only contain operations in the same partition
-                if (batchOp.Count > 0)
-                {
-                    batchOps.Add(batchOp);
-                }
-            }
-
-            // Prevents "storage conflict" in Azure, as the table can take a few seconds to actually be created
-            while (!await _cloudTable.ExistsAsync().ConfigureAwait(false)) ;
-
-            foreach (var bo in batchOps)
-            {
-                logger.LogInformation($"Batch {batchOps.IndexOf(bo) + 1} of {batchOps.Count} for '{_cloudTable.Name}'");
-                var result = await _cloudTable.ExecuteBatchAsync(bo, cancellationToken)
-                    .ConfigureAwait(false);
             }
         }
 
-        private IList<TableBatchOperation> ProcessPartition(string partition, IList<T> oldPartition, IList<T> newPartition, bool deleteDeactivations, ILogger logger)
+        private IList<TableTransactionAction> GetActionsToSyncPartition(string partition, IList<T> oldPartition, IList<T> newPartition, bool deleteDeactivations, ILogger logger)
         {
-            var batchOps = new List<TableBatchOperation>();
+            var batchActions = new List<TableTransactionAction>();
 
             try
             {
@@ -230,22 +202,20 @@ namespace AdelaideFuel.TableStore.Repositories
                     var entitiesExisting = newPartition.Intersect(oldPartition).ToList();
                     var entitiesToRemove = oldPartition.Except(entitiesExisting).ToList();
 
-                    var additions = new List<IEntity>();
-                    var updates = new List<IEntity>();
-                    var deactivations = new List<IEntity>();
+                    var additions = new List<ITableStoreEntity>();
+                    var updates = new List<ITableStoreEntity>();
+                    var deactivations = new List<ITableStoreEntity>();
 
                     if (entitiesToAdd.Count > 0 ||
                         entitiesExisting.Count > 0 ||
                         entitiesToRemove.Count > 0)
                     {
-                        var batchOp = new TableBatchOperation();
-
                         foreach (var e in entitiesToAdd)
                         {
                             // Save the new entity
                             var newEntity = newPartition.Single(i => i.Equals(e));
                             newEntity.IsActive = true;
-                            batchOp.InsertOrReplace(newEntity);
+                            batchActions.Add(new TableTransactionAction(TableTransactionActionType.UpsertReplace, newEntity));
 
                             additions.Add(newEntity);
                         }
@@ -258,8 +228,7 @@ namespace AdelaideFuel.TableStore.Repositories
                             newEntity.IsActive = true;
                             if (currentEntity.IsDifferent(newEntity))
                             {
-                                batchOp.InsertOrReplace(newEntity);
-
+                                batchActions.Add(new TableTransactionAction(TableTransactionActionType.UpsertReplace, newEntity));
                                 updates.Add(newEntity);
                             }
                         }
@@ -272,32 +241,14 @@ namespace AdelaideFuel.TableStore.Repositories
                             {
                                 currentEntity.IsActive = false;
 
-                                if (deleteDeactivations)
-                                    batchOp.Delete(currentEntity);
-                                else
-                                    batchOp.InsertOrReplace(currentEntity);
+                                batchActions.Add(new TableTransactionAction(
+                                    deleteDeactivations
+                                    ? TableTransactionActionType.Delete
+                                    : TableTransactionActionType.UpsertReplace,
+                                    currentEntity));
 
                                 deactivations.Add(currentEntity);
                             }
-                        }
-
-                        if (batchOp.Count > 100)
-                        {
-                            // Max 100 ops in a batch
-                            for (var i = 0; i < batchOp.Count; i += 100)
-                            {
-                                var ops = batchOp.Skip(i).Take(100);
-                                var bo = new TableBatchOperation();
-                                foreach (var op in ops)
-                                {
-                                    bo.Add(op);
-                                }
-                                batchOps.Add(bo);
-                            }
-                        }
-                        else if (batchOp.Count > 0)
-                        {
-                            batchOps.Add(batchOp);
                         }
                     }
 
@@ -322,7 +273,7 @@ namespace AdelaideFuel.TableStore.Repositories
                 logger.LogError(ex, $"Error processing partition '{partition}', for entity '{typeof(T).Name}'");
             }
 
-            return batchOps;
+            return batchActions;
         }
     }
 }

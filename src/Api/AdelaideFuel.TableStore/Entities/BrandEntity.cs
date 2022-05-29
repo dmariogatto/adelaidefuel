@@ -1,10 +1,10 @@
 ﻿using AdelaideFuel.Shared;
-using Microsoft.Azure.Cosmos.Table;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class BrandEntity : TableEntity, IEntity, IBrand
+    public class BrandEntity : BaseTableStoreEntity, IBrand
     {
         public BrandEntity() { }
 
@@ -14,12 +14,14 @@ namespace AdelaideFuel.TableStore.Entities
             Name = brand.Name;
         }
 
+        [IgnoreDataMember]
         public int BrandId
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
             set => PartitionKey = value.ToString(CultureInfo.InvariantCulture);
         }
 
+        [IgnoreDataMember]
         public string Name
         {
             get => System.Web.HttpUtility.UrlDecode(RowKey);
@@ -28,9 +30,7 @@ namespace AdelaideFuel.TableStore.Entities
 
         public int SortOrder { get; set; } = int.MaxValue;
 
-        public bool IsActive { get; set; }
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is BrandEntity other && Equals(other))
             {
