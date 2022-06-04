@@ -63,6 +63,9 @@
     <Compile Update="Views\MapPage.xaml.cs">
       <DependentUpon>Views\MapPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\SubscriptionPage.xaml.cs">
+      <DependentUpon>Views\SubscriptionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Templates\UserEntity\UserBrandTemplate.xaml.cs">
       <DependentUpon>UserBrandTemplate.xaml</DependentUpon>
     </Compile>
@@ -97,6 +100,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SubscriptonPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\Templates\UserEntity\UserBrandTemplate.xaml">

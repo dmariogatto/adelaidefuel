@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.Droid.Renderers;
+using AdelaideFuel.Services;
 using AdelaideFuel.UI.Controls;
 using Android.Content;
 using Android.Gms.Ads;
@@ -65,7 +66,11 @@ namespace AdelaideFuel.Droid.Renderers
 
             CleanUpBannerAd();
 
-            if (_adHolder is null &&
+            var subscriptionService = IoC.Resolve<ISubscriptionService>();
+            var adsEnabled = subscriptionService.BannerAdsAsync().Result;
+
+            if (adsEnabled &&
+                _adHolder is null &&
                 !string.IsNullOrEmpty(Element?.AdUnitId))
             {
                 _adHolder = BannerAdPool.Get(Element.AdUnitId);

@@ -11,6 +11,9 @@ if [ ! -f $settingsPath ] ; then
 fi
 
 sed -i.bak "s#{ApiUrlBase}#$API_BASE_URL#g" $settingsPath
+sed -i.bak "s#{ApiUrlIapBase}#$API_BASE_IAP_URL#g" $settingsPath
+
+sed -i.bak "s#{SubscriptionProductId}#$SUBSCRIPTION_PRODUCT_ID#g" $settingsPath
 
 sed -i.bak "s#{ApiKeyBrands}#$API_KEY_BRANDS#g" $settingsPath
 sed -i.bak "s#{ApiKeyFuels}#$API_KEY_FUELS#g" $settingsPath

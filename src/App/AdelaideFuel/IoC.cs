@@ -3,6 +3,7 @@ using AdelaideFuel.Api;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
 using Newtonsoft.Json;
+using Plugin.InAppBilling;
 using Plugin.StoreReview;
 using Plugin.StoreReview.Abstractions;
 using Refit;
@@ -31,6 +32,10 @@ namespace AdelaideFuel
             Container.RegisterSingleton(typeof(IAdelaideFuelApi),
                 () => RestService.For<IAdelaideFuelApi>(Constants.ApiUrlBase, new RefitSettings(new NewtonsoftJsonContentSerializer())));
 
+            Container.RegisterSingleton(typeof(IIapVerifyApi),
+                () => RestService.For<IIapVerifyApi>(Constants.ApiUrlIapBase, new RefitSettings(new NewtonsoftJsonContentSerializer())));
+
+            Container.RegisterSingleton(typeof(IInAppBilling), () => CrossInAppBilling.Current);
             Container.RegisterSingleton(typeof(IUserDialogs), () => UserDialogs.Instance);
             Container.RegisterSingleton(typeof(IStoreReview), () => CrossStoreReview.Current);
 
@@ -38,6 +43,8 @@ namespace AdelaideFuel
             Container.Register<ICacheService, CacheService>(Lifestyle.Singleton);
             Container.Register<IStoreFactory, StoreFactory>(Lifestyle.Singleton);
             Container.Register<IFuelService, FuelService>(Lifestyle.Singleton);
+            Container.Register<IIapVerifyService, IapVerifyService>(Lifestyle.Singleton);
+            Container.Register<ISubscriptionService, SubscriptionService>(Lifestyle.Singleton);
             Container.Register<IAppPreferences, AppPreferences>(Lifestyle.Singleton);
             Container.Register<IRetryPolicyFactory, RetryPolicyFactory>(Lifestyle.Singleton);
             Container.Register<IBvmConstructor, BvmConstructor>(Lifestyle.Singleton);

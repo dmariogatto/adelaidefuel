@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.iOS.Renderers;
+using AdelaideFuel.Services;
 using AdelaideFuel.UI.Controls;
 using Foundation;
 using Google.MobileAds;
@@ -61,7 +62,11 @@ namespace AdelaideFuel.iOS.Renderers
 
             CleanUpBannerAd();
 
-            if (_bannerView is null &&
+            var subscriptionService = IoC.Resolve<ISubscriptionService>();
+            var adsEnabled = subscriptionService.BannerAdsAsync().Result;
+
+            if (adsEnabled &&
+                _bannerView is null &&
                 !string.IsNullOrEmpty(Element?.AdUnitId) &&
                 GetRootViewController() is UIViewController rvc)
             {

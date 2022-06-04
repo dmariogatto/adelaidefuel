@@ -25,6 +25,8 @@ namespace AdelaideFuel
             var j = JsonSerializer.Create().Deserialize<JObject>(jtr);
 
             ApiUrlBase = j.Value<string>(nameof(ApiUrlBase));
+            ApiUrlIapBase = j.Value<string>(nameof(ApiUrlIapBase));
+            SubscriptionProductId = j.Value<string>(nameof(SubscriptionProductId));
             ApiKeyBrands = j.Value<string>(nameof(ApiKeyBrands));
             ApiKeyFuels = j.Value<string>(nameof(ApiKeyFuels));
             ApiKeySites = j.Value<string>(nameof(ApiKeySites));
@@ -46,6 +48,9 @@ namespace AdelaideFuel
         public const string FuelInfoForMotoristsUrl = "https://www.sa.gov.au/topics/driving-and-transport/fuel-pricing/fuel-pricing-information-for-motorists";
         public const string PriceErrorFormUrl = "https://forms.sa.gov.au/#/form/6029c6a9ad9c5a1dd463e6db";
 
+        public const string PrivacyUrl = "https://dgatto.com/privacy/";
+        public const string TermsOfUseUrl = "https://dgatto.com/terms-of-use/";
+
         public const string AuthHeader = "x-functions-key";
 
         public static readonly TimeZoneInfo AdelaideTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Australia/Adelaide");
@@ -59,6 +64,9 @@ namespace AdelaideFuel
         public static readonly TimeSpan AdPoolTime = TimeSpan.FromMinutes(5);
 
         public static readonly string ApiUrlBase;
+        public static readonly string ApiUrlIapBase;
+
+        public static readonly string SubscriptionProductId;
 
         public static readonly string ApiKeyBrands;
         public static readonly string ApiKeyFuels;
