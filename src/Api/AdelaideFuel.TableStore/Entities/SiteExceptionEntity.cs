@@ -12,6 +12,8 @@ namespace AdelaideFuel.TableStore.Entities
             BrandId = brandId;
             SiteId = siteId;
             Name = name;
+
+            IsActive = true;
         }
 
         [IgnoreDataMember]

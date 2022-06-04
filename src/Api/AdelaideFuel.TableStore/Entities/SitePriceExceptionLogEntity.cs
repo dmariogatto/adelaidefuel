@@ -20,6 +20,8 @@ namespace AdelaideFuel.TableStore.Entities
             TransactionDateUtc = sitePrice.TransactionDateUtc;
             OriginalPrice = sitePrice.Price;
             AdjustedPrice = adjustedPrice;
+
+            IsActive = true;
         }
 
         [IgnoreDataMember]
