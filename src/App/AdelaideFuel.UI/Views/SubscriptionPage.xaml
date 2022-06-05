@@ -42,7 +42,7 @@
                 <Setter Property="Padding" Value="6,0,6,0" />
                 <Setter Property="Margin" Value="0,4,0,4" />
                 <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="BackgroundColor" Value="#007AFF" />
+                <Setter Property="BackgroundColor" Value="#005005" />
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="FontAttributes" Value="Bold" />
             </Style>
