@@ -241,7 +241,7 @@ namespace AdelaideFuel.Services
                             if (validatedReceipt != null)
                             {
                                 if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
-                                    await _inAppBilling.AcknowledgePurchaseAsync(purchase.PurchaseToken).ConfigureAwait(false);
+                                    await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
                                 await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
                             }
                         }
@@ -282,7 +282,7 @@ namespace AdelaideFuel.Services
                         if (validatedReceipt != null)
                         {
                             if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
-                                await _inAppBilling.AcknowledgePurchaseAsync(purchase.PurchaseToken).ConfigureAwait(false);
+                                await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
                             await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
                         }
                     }
