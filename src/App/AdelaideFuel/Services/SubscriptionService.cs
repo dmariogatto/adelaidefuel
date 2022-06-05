@@ -240,7 +240,8 @@ namespace AdelaideFuel.Services
                             validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
                             if (validatedReceipt != null)
                             {
-                                await _inAppBilling.AcknowledgePurchaseAsync(purchase.PurchaseToken).ConfigureAwait(false);
+                                if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
+                                    await _inAppBilling.AcknowledgePurchaseAsync(purchase.PurchaseToken).ConfigureAwait(false);
                                 await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
                             }
                         }
@@ -280,6 +281,8 @@ namespace AdelaideFuel.Services
                         validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
                         if (validatedReceipt != null)
                         {
+                            if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
+                                await _inAppBilling.AcknowledgePurchaseAsync(purchase.PurchaseToken).ConfigureAwait(false);
                             await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
                         }
                     }
