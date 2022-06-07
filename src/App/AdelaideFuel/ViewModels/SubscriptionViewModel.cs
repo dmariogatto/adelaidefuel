@@ -100,8 +100,7 @@ namespace AdelaideFuel.ViewModels
             try
             {
                 await _subscriptionService.PurchaseAsync();
-                OnPropertyChanged(nameof(ExpiryDate));
-                OnPropertyChanged(nameof(HasValidSubscription));
+                UpdateProperties();
             }
             catch (Exception ex)
             {
@@ -124,8 +123,7 @@ namespace AdelaideFuel.ViewModels
             try
             {
                 await _subscriptionService.RestoreAsync();
-                OnPropertyChanged(nameof(ExpiryDate));
-                OnPropertyChanged(nameof(HasValidSubscription));
+                UpdateProperties();
             }
             catch (Exception ex)
             {
@@ -150,6 +148,13 @@ namespace AdelaideFuel.ViewModels
                 ? appleUrl
                 : string.Format(droidUrlFmt, Constants.SubscriptionProductId, _appInfo.PackageName);
             await _launcher.TryOpenAsync(url);
+        }
+
+        private void UpdateProperties()
+        {
+            OnPropertyChanged(nameof(ExpiryDate));
+            OnPropertyChanged(nameof(BannerAds));
+            OnPropertyChanged(nameof(HasValidSubscription));
         }
     }
 }
