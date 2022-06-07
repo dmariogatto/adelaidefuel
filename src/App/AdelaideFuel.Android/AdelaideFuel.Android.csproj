@@ -101,8 +101,8 @@
     <PackageReference Include="Xamarin.Forms.PancakeView" Version="2.3.0.763-beta" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.6.0" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.4.1.1" />
+    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.8.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.4.1.2" />
     <PackageReference Include="Plugin.InAppBilling">
       <Version>5.3.3-beta</Version>
     </PackageReference>
