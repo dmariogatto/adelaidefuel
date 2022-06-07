@@ -48,16 +48,16 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _subscriptionProduct, value);
         }
 
-        public DateTime? ExpiryDate => _subscriptionService.ExpiryDateUtcAsync().Result;
-        public bool HasValidSubscription => _subscriptionService.IsValidAsync().Result;
+        public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc;
+        public bool HasValidSubscription => _subscriptionService.HasValidSubscription;
 
         public bool BannerAds
         {
-            get => _subscriptionService.BannerAdsAsync().Result;
+            get => _subscriptionService.AdsEnabled;
             set
             {
-                _subscriptionService.BannerAdsAsync(value).Wait();
-                OnPropertyChanged(nameof(BannerAds));
+                _subscriptionService.AdsEnabled = value;
+                OnPropertyChanged();
             }
         }
 

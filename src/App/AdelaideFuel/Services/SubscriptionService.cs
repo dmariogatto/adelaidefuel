@@ -4,6 +4,7 @@ using Plugin.InAppBilling;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
@@ -13,8 +14,6 @@ namespace AdelaideFuel.Services
 {
     public class SubscriptionService : BaseService, ISubscriptionService
     {
-        private const int GraceDays = 3;
-
         private readonly string _productId;
 
         private readonly IDeviceInfo _deviceInfo;
@@ -51,95 +50,42 @@ namespace AdelaideFuel.Services
             _iapCache = storeFactory.GetCacheStore<InAppBillingProduct>();
         }
 
-        public async Task<DateTime?> ExpiryDateUtcAsync()
+        public bool HasValidSubscription
+            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) >= DateTime.UtcNow;
+
+        public DateTime? SubscriptionRestoreDateUtc
         {
-            var result = default(DateTime?);
-
-            try
+            get => GetDateTimeAsync(null).Result;
+            set
             {
-                var val = _deviceInfo.DeviceType != DeviceType.Virtual
-                    ? await _secureStorage.GetAsync(nameof(ExpiryDateUtcAsync)).ConfigureAwait(false)
-                    : _preferences.Get(nameof(ExpiryDateUtcAsync), string.Empty);
-                if (!string.IsNullOrEmpty(val) && long.TryParse(val, out var ticks) && ticks > 0)
+                if (SubscriptionRestoreDateUtc != value)
                 {
-                    result = new DateTime(ticks, DateTimeKind.Utc);
+                    SetDateTimeAsync(value).Wait();
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-
-            return result;
-        }
-
-        public async Task ExpiryDateUtcAsync(DateTime? expiryDateUtc)
-        {
-            try
-            {
-                var val = (expiryDateUtc?.Ticks ?? 0).ToString(CultureInfo.InvariantCulture);
-                if (_deviceInfo.DeviceType != DeviceType.Virtual)
-                {
-                    await _secureStorage.SetAsync(nameof(ExpiryDateUtcAsync), val)
-                        .ConfigureAwait(false);
-                }
-                else
-                {
-                    _preferences.Set(nameof(ExpiryDateUtcAsync), val);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
             }
         }
 
-        public async Task<bool> BannerAdsAsync()
+        public DateTime? SubscriptionExpiryDateUtc
         {
-            var result = true;
-
-            try
+            get => GetDateTimeAsync(null).Result;
+            set
             {
-                if (await IsValidAsync().ConfigureAwait(false))
+                if (SubscriptionExpiryDateUtc != value)
                 {
-                    var val = _deviceInfo.DeviceType != DeviceType.Virtual
-                        ? await _secureStorage.GetAsync(nameof(BannerAdsAsync)).ConfigureAwait(false)
-                        : _preferences.Get(nameof(BannerAdsAsync), string.Empty);
-                    if (!string.IsNullOrEmpty(val) && bool.TryParse(val, out var enabled))
-                    {
-                        result = enabled;
-                    }
+                    SetDateTimeAsync(value).Wait();
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-
-            return result;
         }
 
-        public async Task BannerAdsAsync(bool enabled)
+        public bool AdsEnabled
         {
-            try
+            get => !HasValidSubscription || GetBoolAsync(true).Result.Value;
+            set
             {
-                if (await IsValidAsync().ConfigureAwait(false))
+                if (HasValidSubscription && GetBoolAsync(true).Result != value)
                 {
-                    var val = enabled.ToString(CultureInfo.InvariantCulture);
-                    if (_deviceInfo.DeviceType != DeviceType.Virtual)
-                    {
-                        await _secureStorage.SetAsync(nameof(BannerAdsAsync), val)
-                            .ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        _preferences.Set(nameof(BannerAdsAsync), val);
-                    }
+                    SetBoolAsync(value).Wait();
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
             }
         }
 
@@ -149,12 +95,28 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var expiryDate = await ExpiryDateUtcAsync().ConfigureAwait(false);
-                if (expiryDate.HasValue &&
-                    DateTime.UtcNow.Date >= expiryDate.Value.Date.AddDays(-1) &&
-                    DateTime.UtcNow.Date <= expiryDate.Value.Date.AddDays(30))
+                var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
+                if (expiryDate > DateTime.MinValue)
                 {
-                    await RestoreAsync().ConfigureAwait(false);
+                    // Is expiring in a couple days, or
+                    // Has expiried in the last week
+                    var expiring =
+                        DateTime.UtcNow.Date >= expiryDate.Date.AddDays(-2) &&
+                        DateTime.UtcNow.Date <= expiryDate.Date.AddDays(7);
+
+                    // Lock out restores to once every couple weeks
+                    var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
+                    var canRestore =
+                        (DateTime.UtcNow - lastRestoreDate).TotalDays > 14;
+
+                    // Stop trying to restore once a subscription has been expired for a while
+                    // But ensure the latest restore date occurred after expiry
+                    var longExpired =
+                        (DateTime.UtcNow - expiryDate).TotalDays > 16 &&
+                        (lastRestoreDate > expiryDate);
+
+                    if (expiring || (canRestore && !longExpired))
+                        await RestoreAsync().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -165,12 +127,6 @@ namespace AdelaideFuel.Services
             return updated;
         }
 
-        public async Task<bool> IsValidAsync()
-        {
-            var expiryDate = await ExpiryDateUtcAsync().ConfigureAwait(false);
-            return expiryDate?.AddDays(GraceDays) >= DateTime.UtcNow;
-        }
-
         public async Task<InAppBillingProduct> GetProductAsync()
         {
             var cacheKey = $"{nameof(InAppBillingProduct)}_{_productId}";
@@ -178,19 +134,20 @@ namespace AdelaideFuel.Services
 
             product = await _iapCache.GetAsync(cacheKey, false, default).ConfigureAwait(false);
 
-            if (product == default)
+            if (product is null)
             {
                 await _iapSemaphore.WaitAsync().ConfigureAwait(false);
 
+                var connected = await ConnectIapAsync().ConfigureAwait(false);
+
                 try
                 {
-                    var connected = await _inAppBilling.ConnectAsync().ConfigureAwait(false);
                     if (connected)
                     {
                         var items = await _inAppBilling.GetProductInfoAsync(ItemType.Subscription, _productId).ConfigureAwait(false);
                         product = items?.FirstOrDefault();
 
-                        if (product != default)
+                        if (product is not null)
                         {
                             await _iapCache.UpsertAsync(cacheKey, product, TimeSpan.FromDays(7), default).ConfigureAwait(false);
                         }
@@ -203,7 +160,8 @@ namespace AdelaideFuel.Services
                 }
                 finally
                 {
-                    await _inAppBilling.DisconnectAsync().ConfigureAwait(false);
+                    if (connected)
+                        await DisconnectIapAsync();
                     _iapSemaphore.Release();
                 }
             }
@@ -225,25 +183,20 @@ namespace AdelaideFuel.Services
                 Logger.Error(ex);
             }
 
-            if (validatedReceipt == default || validatedReceipt.IsExpired)
+            if (validatedReceipt is null || validatedReceipt.IsExpired)
             {
                 await _iapSemaphore.WaitAsync().ConfigureAwait(false);
 
+                var connected = await ConnectIapAsync().ConfigureAwait(false);
+
                 try
                 {
-                    var connected = await _inAppBilling.ConnectAsync().ConfigureAwait(false);
                     if (connected)
                     {
                         var purchase = await _inAppBilling.PurchaseAsync(_productId, ItemType.Subscription).ConfigureAwait(false);
-                        if (purchase != null)
+                        if (purchase is not null)
                         {
-                            validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
-                            if (validatedReceipt != null)
-                            {
-                                if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
-                                    await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
-                                await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
-                            }
+                            await ValidatePurchaseAsync(purchase).ConfigureAwait(false);
                         }
                     }
                 }
@@ -254,7 +207,8 @@ namespace AdelaideFuel.Services
                 }
                 finally
                 {
-                    await _inAppBilling.DisconnectAsync().ConfigureAwait(false);
+                    if (connected)
+                        await DisconnectIapAsync();
                     _iapSemaphore.Release();
                 }
             }
@@ -268,23 +222,17 @@ namespace AdelaideFuel.Services
 
             await _iapSemaphore.WaitAsync().ConfigureAwait(false);
 
+            var connected = await ConnectIapAsync().ConfigureAwait(false);
+
             try
             {
-                var connected = await _inAppBilling.ConnectAsync().ConfigureAwait(false);
-
                 if (connected)
                 {
                     var purchases = await _inAppBilling.GetPurchasesAsync(ItemType.Subscription).ConfigureAwait(false);
                     var purchase = purchases?.OrderByDescending(p => p.TransactionDateUtc)?.FirstOrDefault(p => p.ProductId == _productId);
-                    if (purchase != null)
+                    if (purchase is not null)
                     {
-                        validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
-                        if (validatedReceipt != null)
-                        {
-                            if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
-                                await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
-                            await ExpiryDateUtcAsync(validatedReceipt.ExpiryUtc).ConfigureAwait(false);
-                        }
+                        await ValidatePurchaseAsync(purchase).ConfigureAwait(false);
                     }
                 }
             }
@@ -295,11 +243,174 @@ namespace AdelaideFuel.Services
             }
             finally
             {
-                await _inAppBilling.DisconnectAsync().ConfigureAwait(false);
+                if (connected)
+                    await DisconnectIapAsync();
                 _iapSemaphore.Release();
             }
 
             return validatedReceipt;
+        }
+
+        private int SubscriptionGraceDays
+        {
+            get => GetIntAsync(3).Result.Value;
+            set
+            {
+                if (SubscriptionGraceDays != value)
+                {
+                    SetIntAsync(value).Wait();
+                }
+            }
+        }
+
+        private async Task<bool> ValidatePurchaseAsync(InAppBillingPurchase purchase)
+        {
+            if (purchase is not null)
+            {
+                var validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
+                if (validatedReceipt is not null)
+                {
+                    if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
+                        await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
+
+                    SetIntAsync(validatedReceipt.GraceDays, nameof(SubscriptionGraceDays)).Wait();
+                    SubscriptionExpiryDateUtc = validatedReceipt.ExpiryUtc;
+                    SubscriptionRestoreDateUtc = DateTime.UtcNow;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<bool> ConnectIapAsync()
+        {
+            var success = false;
+
+            try
+            {
+                success = await _inAppBilling.ConnectAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> DisconnectIapAsync()
+        {
+            var success = false;
+
+            try
+            {
+                await _inAppBilling.DisconnectAsync().ConfigureAwait(false);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+
+            return success;
+        }
+
+        private async Task<int?> GetIntAsync(int? defaultValue, [CallerMemberName] string key = "")
+        {
+            var val = await GetValueAsync(key).ConfigureAwait(false);
+            if (int.TryParse(val, out var intValue))
+            {
+                return intValue;
+            }
+
+            return defaultValue;
+        }
+
+        private async Task SetIntAsync(int? value, [CallerMemberName] string key = "")
+        {
+            if (value.HasValue)
+                await SetValueAsync(key, value.Value.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            else
+                RemoveValue(key);
+        }
+
+        private async Task<DateTime?> GetDateTimeAsync(DateTime? defaultValue, [CallerMemberName] string key = "")
+        {
+            var result = defaultValue;
+
+            var val = await GetValueAsync(key).ConfigureAwait(false);
+            if (long.TryParse(val, out var binary))
+            {
+                result = DateTime.FromBinary(binary);
+            }
+
+            return result;
+        }
+
+        private async Task SetDateTimeAsync(DateTime? value, [CallerMemberName] string key = "")
+        {
+            if (value.HasValue)
+                await SetValueAsync(key, value.Value.ToBinary().ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            else
+                RemoveValue(key);
+        }
+
+        private async Task<bool?> GetBoolAsync(bool? defaultValue, [CallerMemberName] string key = "")
+        {
+            var val = await GetValueAsync(key).ConfigureAwait(false);
+            return bool.TryParse(val, out var result)
+                ? result
+                : defaultValue;
+        }
+
+        private async Task SetBoolAsync(bool? value, [CallerMemberName] string key = "")
+        {
+            if (value.HasValue)
+                await SetValueAsync(key, value.Value.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            else
+                RemoveValue(key);
+        }
+
+        private async Task<string> GetValueAsync(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return string.Empty;
+
+            return _deviceInfo.DeviceType != DeviceType.Virtual
+                ? await _secureStorage.GetAsync(key).ConfigureAwait(false)
+                : _preferences.Get(key, string.Empty);
+        }
+
+        private async Task SetValueAsync(string key, string value)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (_deviceInfo.DeviceType != DeviceType.Virtual)
+            {
+                await _secureStorage.SetAsync(key, value).ConfigureAwait(false);
+            }
+            else
+            {
+                _preferences.Set(key, value);
+            }
+        }
+
+        private void RemoveValue(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (_deviceInfo.DeviceType != DeviceType.Virtual)
+            {
+                _secureStorage.Remove(key);
+            }
+            else
+            {
+                _preferences.Remove(key);
+            }
         }
     }
 }

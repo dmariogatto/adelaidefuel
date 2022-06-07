@@ -94,7 +94,8 @@ namespace AdelaideFuel.UI
             {
                 var subscriptionService = IoC.Resolve<ISubscriptionService>();
 #if DEBUG
-                await subscriptionService.ExpiryDateUtcAsync(null).ConfigureAwait(false);
+                subscriptionService.SubscriptionRestoreDateUtc = DateTime.UtcNow.AddDays(-14);
+                subscriptionService.SubscriptionExpiryDateUtc = DateTime.UtcNow.AddDays(-10);
 #endif
                 await subscriptionService.UpdateSubscriptionAsync().ConfigureAwait(false);
             });

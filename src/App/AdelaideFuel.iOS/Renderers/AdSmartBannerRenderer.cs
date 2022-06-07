@@ -63,7 +63,7 @@ namespace AdelaideFuel.iOS.Renderers
             CleanUpBannerAd();
 
             var subscriptionService = IoC.Resolve<ISubscriptionService>();
-            var adsEnabled = subscriptionService.BannerAdsAsync().Result;
+            var adsEnabled = subscriptionService.AdsEnabled;
 
             if (adsEnabled &&
                 _bannerView is null &&

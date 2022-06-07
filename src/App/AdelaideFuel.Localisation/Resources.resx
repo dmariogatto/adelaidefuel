@@ -442,14 +442,8 @@ You can manage and cancel your subscriptions by going to your account settings i
   <data name="ItemPerYear" xml:space="preserve">
     <value>{0} per year</value>
   </data>
-  <data name="PrivacyPolicy" xml:space="preserve">
-    <value>Privacy Policy</value>
-  </data>
   <data name="Subscribe" xml:space="preserve">
     <value>Subscribe</value>
-  </data>
-  <data name="TermsOfUse" xml:space="preserve">
-    <value>Terms of Use</value>
   </data>
   <data name="GoogleSubscriptionDisclaimer" xml:space="preserve">
     <value>Payment will be charged to your Google account at the confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.
@@ -459,9 +453,6 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="SubscriptionThankyou" xml:space="preserve">
     <value>Thank you for your support! 😍</value>
   </data>
-  <data name="SubscriptionValidUntilFormat" xml:space="preserve">
-    <value>Your subscription is valid until {0:d}.</value>
-  </data>
   <data name="BannerAdsDescription" xml:space="preserve">
     <value>Turn them off, or leave them on, the power is yours</value>
   </data>
@@ -470,5 +461,11 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   </data>
   <data name="ShouldIFuelPremium" xml:space="preserve">
     <value>ShouldIFuel Premium</value>
+  </data>
+  <data name="SubscriptionIsValidUntilFormat" xml:space="preserve">
+    <value>Your subscription is valid until {0:d}.</value>
+  </data>
+  <data name="SubscriptionWasValidUntilFormat" xml:space="preserve">
+    <value>Your subscription was valid until {0:d}.</value>
   </data>
 </root>

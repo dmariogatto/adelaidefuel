@@ -61,13 +61,17 @@ namespace AdelaideFuel.Droid.Renderers
 
         private void AdUnitIdChanged()
         {
-            if (_disposed)
+            if (_disposed
+#if DEBUG
+                //|| DeviceInfo.DeviceType == DeviceType.Virtual
+#endif
+                )
                 return;
 
             CleanUpBannerAd();
 
             var subscriptionService = IoC.Resolve<ISubscriptionService>();
-            var adsEnabled = subscriptionService.BannerAdsAsync().Result;
+            var adsEnabled = subscriptionService.AdsEnabled;
 
             if (adsEnabled &&
                 _adHolder is null &&

@@ -7,13 +7,13 @@ namespace AdelaideFuel.Services
 {
     public interface ISubscriptionService
     {
-        Task<DateTime?> ExpiryDateUtcAsync();
-        Task ExpiryDateUtcAsync(DateTime? expiryDateUtc);
-        Task<bool> BannerAdsAsync();
-        Task BannerAdsAsync(bool enabled);
+        bool HasValidSubscription { get; }
+
+        DateTime? SubscriptionRestoreDateUtc { get; set; }
+        DateTime? SubscriptionExpiryDateUtc { get; set; }
+        bool AdsEnabled { get; set; }
 
         Task<bool> UpdateSubscriptionAsync();
-        Task<bool> IsValidAsync();
 
         Task<InAppBillingProduct> GetProductAsync();
         Task<IapValidatedReceipt> PurchaseAsync();

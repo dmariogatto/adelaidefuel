@@ -69,7 +69,16 @@
                     HorizontalTextAlignment="Center"
                     IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
                     Style="{DynamicResource LabelStyle}"
-                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionValidUntilFormat}}" />
+                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionIsValidUntilFormat}}">
+                    <View.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HasValidSubscription}"
+                            TargetType="Label"
+                            Value="False">
+                            <Setter Property="Text" Value="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionWasValidUntilFormat}}" />
+                        </DataTrigger>
+                    </View.Triggers>
+                </Label>
 
                 <Label
                     Margin="{StaticResource DefaultMargin}"
