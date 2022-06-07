@@ -89,6 +89,15 @@ namespace AdelaideFuel.UI
             // Handle when your app starts
 
             ThemeManager.LoadTheme();
+
+            Task.Run(async () =>
+            {
+                var subscriptionService = IoC.Resolve<ISubscriptionService>();
+#if DEBUG
+                await subscriptionService.ExpiryDateUtcAsync(null).ConfigureAwait(false);
+#endif
+                await subscriptionService.UpdateSubscriptionAsync().ConfigureAwait(false);
+            });
         }
 
         protected override void OnSleep()

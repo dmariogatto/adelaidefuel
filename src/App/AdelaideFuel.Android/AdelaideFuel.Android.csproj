@@ -103,6 +103,9 @@
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.0.2" />
     <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.4.1.1" />
+    <PackageReference Include="Plugin.InAppBilling">
+      <Version>5.3.3-beta</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProguardConfiguration Include="proguard.cfg" />

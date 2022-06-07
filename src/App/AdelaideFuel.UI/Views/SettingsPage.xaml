@@ -45,6 +45,10 @@
                     Title="{local:Translate OpenAppSettings}"
                     Command="{Binding OpenAppSettingsCommand}"
                     Description="{local:Translate OpenAppSettingsDescription}" />
+                <sv:CommandCell
+                    Title="{local:Translate ShouldIFuelPremium}"
+                    Command="{Binding GoToSubscriptionCommand}"
+                    Description="{local:Translate ControlAdsSupportDevelopment}" />
             </sv:Section>
             <sv:Section Title="{local:Translate Feedback}">
                 <sv:CommandCell

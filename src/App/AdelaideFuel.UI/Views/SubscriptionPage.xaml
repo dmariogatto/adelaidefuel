@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePage
+    x:Class="AdelaideFuel.UI.Views.SubscriptionPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:const="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
+    xmlns:controls="clr-namespace:AdelaideFuel.UI.Controls"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:local="clr-namespace:AdelaideFuel.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
+    Title="{Binding Title}"
+    x:DataType="viewModels:SubscriptionViewModel"
+    x:TypeArguments="viewModels:SubscriptionViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Shell.TabBarIsVisible="False"
+    mc:Ignorable="d">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <OnPlatform
+                x:Key="DefaultMargin"
+                x:TypeArguments="Thickness"
+                Android="12,4,12,4"
+                iOS="12,4,12,4" />
+            <OnPlatform
+                x:Key="ButtonHeight"
+                x:TypeArguments="x:Double"
+                Android="48"
+                iOS="36" />
+            <OnPlatform
+                x:Key="ButtonCornerRadius"
+                x:TypeArguments="x:Int32"
+                Android="24"
+                iOS="18" />
+
+            <Style x:Key="SubscriptionButton" TargetType="Button">
+                <Setter Property="HeightRequest" Value="{StaticResource ButtonHeight}" />
+                <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
+                <Setter Property="Padding" Value="6,0,6,0" />
+                <Setter Property="Margin" Value="0,4,0,4" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="BackgroundColor" Value="#005005" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout
+                Margin="0,6,0,6"
+                Spacing="0"
+                VerticalOptions="Start">
+                <Label
+                    Margin="{StaticResource DefaultMargin}"
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate SubscriptionThankyou}" />
+
+                <Label
+                    Margin="{StaticResource DefaultMargin}"
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionValidUntilFormat}}" />
+
+                <Label
+                    Margin="{StaticResource DefaultMargin}"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate SubscriptionDescription}" />
+
+                <Grid
+                    BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
+                    RowDefinitions="1,Auto,1,Auto,1"
+                    RowSpacing="0">
+                    <BoxView
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+
+                    <Grid
+                        Grid.Row="1"
+                        Padding="{StaticResource MediumThickness}"
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="0"
+                        RowDefinitions="Auto,Auto,Auto,Auto"
+                        RowSpacing="0">
+                        <controls:AppIconView
+                            Grid.RowSpan="4"
+                            HorizontalOptions="CenterAndExpand"
+                            IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            VerticalOptions="Center" />
+                        <controls:LoadingIndicator
+                            Grid.RowSpan="4"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" />
+
+                        <Label
+                            Grid.Column="1"
+                            HorizontalOptions="FillAndExpand"
+                            HorizontalTextAlignment="Center"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SubscriptionProduct.LocalizedPrice, StringFormat={local:Translate ItemPerYear}}" />
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Command="{Binding PurchaseCommand}"
+                            IsVisible="{Binding HasValidSubscription, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource SubscriptionButton}"
+                            Text="{local:Translate Subscribe}" />
+                        <Button
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Command="{Binding ManageSubscriptionsCommand}"
+                            IsVisible="{Binding HasValidSubscription}"
+                            Style="{StaticResource SubscriptionButton}"
+                            Text="{local:Translate ChangeOrCancelSubscription}" />
+                        <Button
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Command="{Binding RestorePurchasesCommand}"
+                            Style="{StaticResource SubscriptionButton}"
+                            Text="{local:Translate RestorePreviousPurchases}" />
+                    </Grid>
+
+                    <BoxView
+                        Grid.Row="2"
+                        Margin="12,0,0,0"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+
+                    <Grid
+                        Grid.Row="3"
+                        Margin="12,8,12,8"
+                        ColumnDefinitions="*,Auto"
+                        IsEnabled="{Binding HasValidSubscription}"
+                        Opacity="{StaticResource UnselectedOpacity}"
+                        RowDefinitions="Auto,Auto">
+                        <View.Triggers>
+                            <DataTrigger
+                                Binding="{Binding HasValidSubscription}"
+                                TargetType="View"
+                                Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </DataTrigger>
+                        </View.Triggers>
+
+                        <Label
+                            x:Name="BannerAdsLabel"
+                            FontSize="Medium"
+                            HorizontalOptions="StartAndExpand"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{local:Translate BannerAds}"
+                            VerticalOptions="CenterAndExpand" />
+                        <Label
+                            Grid.Row="1"
+                            FontSize="Caption"
+                            Text="{local:Translate BannerAdsDescription}"
+                            TextColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+                        <Switch
+                            Grid.RowSpan="2"
+                            Grid.Column="1"
+                            AutomationProperties.LabeledBy="BannerAdsLabel"
+                            HorizontalOptions="CenterAndExpand"
+                            IsToggled="{Binding BannerAds}"
+                            VerticalOptions="CenterAndExpand" />
+                    </Grid>
+
+                    <BoxView
+                        Grid.Row="4"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+                </Grid>
+
+                <Label
+                    x:Name="DisclaimerLabel"
+                    Margin="{StaticResource DefaultMargin}"
+                    Style="{DynamicResource LabelStyle}" />
+
+                <Button
+                    Margin="{StaticResource DefaultMargin}"
+                    BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
+                    Command="{Binding OpenUrlCommand}"
+                    CommandParameter="{x:Static const:Constants.PrivacyUrl}"
+                    Style="{StaticResource SubscriptionButton}"
+                    Text="{local:Translate PrivacyPolicy}"
+                    TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+                <Button
+                    Margin="{StaticResource DefaultMargin}"
+                    BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
+                    Command="{Binding OpenUrlCommand}"
+                    CommandParameter="{x:Static const:Constants.TermsOfUseUrl}"
+                    Style="{StaticResource SubscriptionButton}"
+                    Text="{local:Translate TermsOfUse}"
+                    TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</views:BasePage>

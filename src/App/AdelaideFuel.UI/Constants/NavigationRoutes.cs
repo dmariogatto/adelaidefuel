@@ -14,6 +14,7 @@ namespace AdelaideFuel.UI
         public const string Radii = "radii";
         public const string Settings = "settings";
         public const string About = "settings/about";
+        public const string Subscription = "settings/subscription";
 
         public static string ToAbsolute(string uri) => string.Format(AbsoluteFormat, uri);
         public static string ToAbsolute(string uri, params string[] queryProperties) => ToAbsolute(AppendQueryProperties(uri, queryProperties));

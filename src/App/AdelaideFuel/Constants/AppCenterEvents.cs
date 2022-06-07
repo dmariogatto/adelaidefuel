@@ -13,6 +13,7 @@ namespace AdelaideFuel
             public const string FuelsView = "fuels_view";
             public const string RadiiView = "radii_view";
             public const string SettingsView = "settings_view";
+            public const string SubscriptionView = "subscription_view";
         }
 
         public static class Setting
