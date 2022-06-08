@@ -73,13 +73,18 @@ namespace AdelaideFuel.ViewModels
         }
 
         #region Overrides
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            TrackEvent(AppCenterEvents.PageView.SettingsView);
+        }
+
         public override void OnAppearing()
         {
             base.OnAppearing();
 
             LoadSettingsCommand.Execute(null);
-
-            TrackEvent(AppCenterEvents.PageView.SettingsView);
         }
         #endregion
 

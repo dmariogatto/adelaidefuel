@@ -51,14 +51,19 @@ namespace AdelaideFuel.ViewModels
         }
 
         #region Overrides
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            TrackEvent(AppCenterEvents.PageView.HomeView);
+        }
+
         public override void OnAppearing()
         {
             base.OnAppearing();
 
             HasInternet = _connectivity.NetworkAccess == NetworkAccess.Internet;
             _connectivity.ConnectivityChanged += ConnectivityChanged;
-
-            TrackEvent(AppCenterEvents.PageView.HomeView);
         }
 
         public override void OnDisappearing()

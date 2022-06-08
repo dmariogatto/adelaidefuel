@@ -68,13 +68,18 @@ namespace AdelaideFuel.ViewModels
         }
 
         #region Overrides
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            TrackEvent(AppCenterEvents.PageView.MapView);
+        }
+
         public override void OnAppearing()
         {
             base.OnAppearing();
 
             CheckAndRequestLocationCommand.ExecuteAsync();
-
-            TrackEvent(AppCenterEvents.PageView.MapView);
         }
         #endregion
 

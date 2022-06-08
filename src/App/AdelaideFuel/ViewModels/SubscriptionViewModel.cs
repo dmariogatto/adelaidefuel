@@ -41,6 +41,15 @@ namespace AdelaideFuel.ViewModels
             ManageSubscriptionsCommand = new AsyncCommand(ManageSubscriptionsAsync);
         }
 
+        #region Overrides
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            TrackEvent(AppCenterEvents.PageView.SubscriptionView);
+        }
+        #endregion
+
         private InAppBillingProduct _subscriptionProduct;
         public InAppBillingProduct SubscriptionProduct
         {

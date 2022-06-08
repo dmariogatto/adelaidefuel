@@ -11,12 +11,5 @@ namespace AdelaideFuel.UI.Views
         {
             InitializeComponent();
         }
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-
-            ViewModel.TrackEvent(AppCenterEvents.PageView.SubscriptionView);
-        }
     }
 }
