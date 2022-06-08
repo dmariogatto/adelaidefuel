@@ -28,7 +28,7 @@ namespace AdelaideFuel.UI
 
         public string Text { get; set; }
 
-        public bool AllCaps { get; set; }
+        public TextTransform Transform { get; set; }
 
         public object ProvideValue(IServiceProvider serviceProvider)
         {
@@ -48,10 +48,12 @@ namespace AdelaideFuel.UI
 #endif
             }
 
-            if (AllCaps)
+            translation = Transform switch
             {
-                translation = translation.ToUpper();
-            }
+                TextTransform.Uppercase => translation.ToUpper(),
+                TextTransform.Lowercase => translation.ToLower(),
+                _ => translation
+            };
 
             return translation;
         }

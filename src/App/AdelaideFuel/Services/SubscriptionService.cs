@@ -51,7 +51,7 @@ namespace AdelaideFuel.Services
         }
 
         public bool HasValidSubscription
-            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) >= DateTime.UtcNow;
+            => !SubscriptionSuspended && IsSubscriptionExpiredForDate(DateTime.UtcNow);
 
         public DateTime? SubscriptionRestoreDateUtc
         {
@@ -77,6 +77,18 @@ namespace AdelaideFuel.Services
             }
         }
 
+        public bool SubscriptionSuspended
+        {
+            get => GetBoolAsync(false).Result.Value;
+            set
+            {
+                if (SubscriptionSuspended != value)
+                {
+                    SetBoolAsync(value).Wait();
+                }
+            }
+        }
+
         public bool AdsEnabled
         {
             get => !HasValidSubscription || GetBoolAsync(true).Result.Value;
@@ -88,6 +100,9 @@ namespace AdelaideFuel.Services
                 }
             }
         }
+
+        public bool IsSubscriptionExpiredForDate(DateTime dateTime)
+            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) >= dateTime.ToUniversalTime();
 
         public async Task<bool> UpdateSubscriptionAsync()
         {
@@ -276,6 +291,7 @@ namespace AdelaideFuel.Services
                     SetIntAsync(validatedReceipt.GraceDays, nameof(SubscriptionGraceDays)).Wait();
                     SubscriptionExpiryDateUtc = validatedReceipt.ExpiryUtc;
                     SubscriptionRestoreDateUtc = DateTime.UtcNow;
+                    SubscriptionSuspended = validatedReceipt.IsSuspended;
 
                     return true;
                 }

@@ -83,43 +83,33 @@ namespace AdelaideFuel.Services
             if (string.IsNullOrEmpty(transactionId) || string.IsNullOrEmpty(productId) || string.IsNullOrEmpty(purchaseToken))
                 return validated;
 
-            var cacheKey = CacheKey(transactionId);
-
-            if (!MemoryCache.TryGetValue(cacheKey, out validated))
+            var receipt = new IapReceipt()
             {
-                var receipt = new IapReceipt()
-                {
-                    BundleId = _appInfo.PackageName,
-                    ProductId = productId,
-                    TransactionId = transactionId,
-                    Token = purchaseToken,
-                    AppVersion = $"{_appInfo.VersionString} ({_appInfo.BuildString})"
-                };
+                BundleId = _appInfo.PackageName,
+                ProductId = productId,
+                TransactionId = transactionId,
+                Token = purchaseToken,
+                AppVersion = $"{_appInfo.VersionString} ({_appInfo.BuildString})"
+            };
 
-                try
+            try
+            {
+                if (_deviceInfo.Platform == DevicePlatform.iOS)
                 {
-                    if (_deviceInfo.Platform == DevicePlatform.iOS)
-                    {
-                        validated = await _retryPolicy.ExecuteAsync(
-                            async (ct) => await _iapVerifyApi.AppleAsync(receipt, ct).ConfigureAwait(false),
-                            default).ConfigureAwait(false);
-                    }
-                    else if (_deviceInfo.Platform == DevicePlatform.Android)
-                    {
-                        validated = await _retryPolicy.ExecuteAsync(
-                            async (ct) => await _iapVerifyApi.GoogleAsync(receipt, ct).ConfigureAwait(false),
-                            default).ConfigureAwait(false);
-                    }
-
-                    if (validated != null)
-                    {
-                        MemoryCache.SetAbsolute(cacheKey, validated, TimeSpan.FromMinutes(10));
-                    }
+                    validated = await _retryPolicy.ExecuteAsync(
+                        async (ct) => await _iapVerifyApi.AppleAsync(receipt, ct).ConfigureAwait(false),
+                        default).ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                else if (_deviceInfo.Platform == DevicePlatform.Android)
                 {
-                    Logger.Error(ex);
+                    validated = await _retryPolicy.ExecuteAsync(
+                        async (ct) => await _iapVerifyApi.GoogleAsync(receipt, ct).ConfigureAwait(false),
+                        default).ConfigureAwait(false);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
 
             return validated;

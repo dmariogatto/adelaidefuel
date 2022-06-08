@@ -10,10 +10,6 @@ namespace AdelaideFuel.UI.Views
         public SubscriptionPage() : base()
         {
             InitializeComponent();
-
-            DisclaimerLabel.Text = Device.RuntimePlatform == Device.iOS
-                ? Localisation.Resources.AppleSubscriptionDisclaimer
-                : Localisation.Resources.GoogleSubscriptionDisclaimer;
         }
 
         protected override void OnAppearing()

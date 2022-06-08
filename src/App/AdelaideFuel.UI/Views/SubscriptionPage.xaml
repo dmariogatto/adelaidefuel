@@ -65,18 +65,36 @@
 
                 <Label
                     Margin="{StaticResource DefaultMargin}"
-                    FontAttributes="Bold"
+                    FontFamily="{StaticResource BoldFontFamily}"
                     HorizontalTextAlignment="Center"
                     IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
                     Style="{DynamicResource LabelStyle}"
-                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionIsValidUntilFormat}}">
+                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionActiveUntilFormat}}">
                     <View.Triggers>
                         <DataTrigger
-                            Binding="{Binding HasValidSubscription}"
+                            Binding="{Binding HasExpired}"
                             TargetType="Label"
-                            Value="False">
-                            <Setter Property="Text" Value="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionWasValidUntilFormat}}" />
+                            Value="True">
+                            <Setter Property="Text" Value="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionExpiredOnFormat}}" />
                         </DataTrigger>
+                    </View.Triggers>
+                </Label>
+
+                <Label
+                    Margin="{StaticResource DefaultMargin}"
+                    FontFamily="{StaticResource BoldFontFamily}"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="False"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate SubscriptionSuspended}">
+                    <View.Triggers>
+                        <MultiTrigger TargetType="View">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding HasExpired}" Value="False" />
+                                <BindingCondition Binding="{Binding SubscriptionSuspended}" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="True" />
+                        </MultiTrigger>
                     </View.Triggers>
                 </Label>
 
@@ -103,7 +121,7 @@
                         RowSpacing="0">
                         <controls:AppIconView
                             Grid.RowSpan="4"
-                            HorizontalOptions="CenterAndExpand"
+                            HorizontalOptions="Center"
                             IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                             VerticalOptions="Center" />
                         <controls:LoadingIndicator
@@ -121,14 +139,14 @@
                             Grid.Row="1"
                             Grid.Column="1"
                             Command="{Binding PurchaseCommand}"
-                            IsVisible="{Binding HasValidSubscription, Converter={StaticResource InverseBoolConverter}}"
+                            IsVisible="{Binding HasExpired}"
                             Style="{StaticResource SubscriptionButton}"
                             Text="{local:Translate Subscribe}" />
                         <Button
                             Grid.Row="2"
                             Grid.Column="1"
                             Command="{Binding ManageSubscriptionsCommand}"
-                            IsVisible="{Binding HasValidSubscription}"
+                            IsVisible="{Binding HasExpired, Converter={StaticResource InverseBoolConverter}}"
                             Style="{StaticResource SubscriptionButton}"
                             Text="{local:Translate ChangeOrCancelSubscription}" />
                         <Button
@@ -191,9 +209,10 @@
                 </Grid>
 
                 <Label
-                    x:Name="DisclaimerLabel"
                     Margin="{StaticResource DefaultMargin}"
-                    Style="{DynamicResource LabelStyle}" />
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{OnPlatform Android={local:Translate GoogleSubscriptionDisclaimer},
+                                      iOS={local:Translate AppleSubscriptionDisclaimer}}" />
 
                 <Button
                     Margin="{StaticResource DefaultMargin}"

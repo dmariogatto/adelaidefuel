@@ -50,6 +50,8 @@ namespace AdelaideFuel.ViewModels
 
         public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc;
         public bool HasValidSubscription => _subscriptionService.HasValidSubscription;
+        public bool HasExpired => !_subscriptionService.IsSubscriptionExpiredForDate(DateTime.UtcNow);
+        public bool SubscriptionSuspended => _subscriptionService.SubscriptionSuspended;
 
         public bool BannerAds
         {
@@ -155,6 +157,8 @@ namespace AdelaideFuel.ViewModels
             OnPropertyChanged(nameof(ExpiryDate));
             OnPropertyChanged(nameof(BannerAds));
             OnPropertyChanged(nameof(HasValidSubscription));
+            OnPropertyChanged(nameof(HasExpired));
+            OnPropertyChanged(nameof(SubscriptionSuspended));
         }
     }
 }

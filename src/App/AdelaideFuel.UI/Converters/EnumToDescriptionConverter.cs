@@ -8,14 +8,38 @@ namespace AdelaideFuel.UI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is Enum enumValue
-                ? enumValue.GetDescription()
-                : string.Empty;
+            if (value is Enum e)
+            {
+                return e.GetDescription();
+            }
+
+            return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if (targetType is not null)
+            {
+                var enumType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+                if (value is string val && enumType?.IsEnum == true)
+                {
+                    try
+                    {
+                        foreach (Enum e in Enum.GetValues(enumType))
+                        {
+                            if (e.GetDescription() == val)
+                                return e;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

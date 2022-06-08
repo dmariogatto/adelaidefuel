@@ -16,6 +16,7 @@ namespace AdelaideFuel.Models
         public DateTime ServerUtc { get; set; }
         public int? GraceDays { get; set; }
         public bool IsExpired { get; set; }
+        public bool IsSuspended { get; set; }
 
         public string Token { get; set; }
     }

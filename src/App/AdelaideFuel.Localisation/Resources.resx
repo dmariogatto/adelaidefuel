@@ -462,10 +462,22 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="ShouldIFuelPremium" xml:space="preserve">
     <value>ShouldIFuel Premium</value>
   </data>
-  <data name="SubscriptionIsValidUntilFormat" xml:space="preserve">
-    <value>Your subscription is valid until {0:d}.</value>
+  <data name="GoToSubscription" xml:space="preserve">
+    <value>Go to Subscription</value>
   </data>
-  <data name="SubscriptionWasValidUntilFormat" xml:space="preserve">
-    <value>Your subscription was valid until {0:d}.</value>
+  <data name="SubscriptionActiveUntilFormat" xml:space="preserve">
+    <value>Your subscription is active until {0:d}.</value>
+  </data>
+  <data name="SubscriptionExpired" xml:space="preserve">
+    <value>Subscription Expired</value>
+  </data>
+  <data name="SubscriptionExpiredDescription" xml:space="preserve">
+    <value>Oh no, looks like your subscription has expired or could not be validated.</value>
+  </data>
+  <data name="SubscriptionExpiredOnFormat" xml:space="preserve">
+    <value>Your subscription expired on {0:d}.</value>
+  </data>
+  <data name="SubscriptionSuspended" xml:space="preserve">
+    <value>Subscription is currently suspended.</value>
   </data>
 </root>

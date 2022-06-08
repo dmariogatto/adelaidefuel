@@ -11,7 +11,10 @@ namespace AdelaideFuel.Services
 
         DateTime? SubscriptionRestoreDateUtc { get; set; }
         DateTime? SubscriptionExpiryDateUtc { get; set; }
+        bool SubscriptionSuspended { get; set; }
         bool AdsEnabled { get; set; }
+
+        bool IsSubscriptionExpiredForDate(DateTime dateTime);
 
         Task<bool> UpdateSubscriptionAsync();
 

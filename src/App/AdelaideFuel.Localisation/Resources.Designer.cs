@@ -456,6 +456,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go to Subscription.
+        /// </summary>
+        public static string GoToSubscription {
+            get {
+                return ResourceManager.GetString("GoToSubscription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         public static string Help {
@@ -926,6 +935,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your subscription is active until {0:d}..
+        /// </summary>
+        public static string SubscriptionActiveUntilFormat {
+            get {
+                return ResourceManager.GetString("SubscriptionActiveUntilFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ShouldIFuel Premium is an optional subscription to control banner ads, support future development and keep the servers running.
         ///
         ///No pressure, all features will remain free..
@@ -937,11 +955,38 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your subscription is valid until {0:d}..
+        ///   Looks up a localized string similar to Subscription Expired.
         /// </summary>
-        public static string SubscriptionIsValidUntilFormat {
+        public static string SubscriptionExpired {
             get {
-                return ResourceManager.GetString("SubscriptionIsValidUntilFormat", resourceCulture);
+                return ResourceManager.GetString("SubscriptionExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oh no, looks like your subscription has expired or could not be validated..
+        /// </summary>
+        public static string SubscriptionExpiredDescription {
+            get {
+                return ResourceManager.GetString("SubscriptionExpiredDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your subscription expired on {0:d}..
+        /// </summary>
+        public static string SubscriptionExpiredOnFormat {
+            get {
+                return ResourceManager.GetString("SubscriptionExpiredOnFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscription is currently suspended..
+        /// </summary>
+        public static string SubscriptionSuspended {
+            get {
+                return ResourceManager.GetString("SubscriptionSuspended", resourceCulture);
             }
         }
         
@@ -951,15 +996,6 @@ namespace AdelaideFuel.Localisation {
         public static string SubscriptionThankyou {
             get {
                 return ResourceManager.GetString("SubscriptionThankyou", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your subscription was valid until {0:d}..
-        /// </summary>
-        public static string SubscriptionWasValidUntilFormat {
-            get {
-                return ResourceManager.GetString("SubscriptionWasValidUntilFormat", resourceCulture);
             }
         }
         

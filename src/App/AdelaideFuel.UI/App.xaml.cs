@@ -64,7 +64,6 @@ namespace AdelaideFuel.UI
                 AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
 
             VersionTracking.Track();
-            UpdateDayCount();
 
             Resources.Add(Styles.Keys.CellDescriptionFontSize, Device.GetNamedSize(NamedSize.Caption, typeof(Label)));
 
@@ -88,16 +87,43 @@ namespace AdelaideFuel.UI
         {
             // Handle when your app starts
 
+            var prefService = IoC.Resolve<IAppPreferences>();
+            var lastDateOpened = prefService.LastDateOpened;
+
+            UpdateDayCount();
+
             ThemeManager.LoadTheme();
 
             Task.Run(async () =>
             {
                 var subscriptionService = IoC.Resolve<ISubscriptionService>();
+
 #if DEBUG
-                subscriptionService.SubscriptionRestoreDateUtc = DateTime.UtcNow.AddDays(-14);
-                subscriptionService.SubscriptionExpiryDateUtc = DateTime.UtcNow.AddDays(-10);
+                subscriptionService.SubscriptionRestoreDateUtc = null;
+                subscriptionService.SubscriptionExpiryDateUtc = null;
 #endif
+
+                var wasValid = subscriptionService.IsSubscriptionExpiredForDate(lastDateOpened);
                 await subscriptionService.UpdateSubscriptionAsync().ConfigureAwait(false);
+
+                if (wasValid && !subscriptionService.HasValidSubscription)
+                {
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        var goToSubscriptionPage = await Acr.UserDialogs.UserDialogs.Instance.ConfirmAsync(
+                                Localisation.Resources.SubscriptionExpiredDescription,
+                                Localisation.Resources.SubscriptionExpired,
+                                Localisation.Resources.GoToSubscription,
+                                Localisation.Resources.Cancel);
+
+                        if (goToSubscriptionPage)
+                        {
+                            var navService = IoC.Resolve<INavigationService>();
+                            await navService.NavigateToAsync<SettingsViewModel>(animated: false);
+                            await navService.NavigateToAsync<SubscriptionViewModel>(animated: false);
+                        }
+                    });
+                }
             });
         }
 
@@ -197,7 +223,7 @@ namespace AdelaideFuel.UI
 
             try
             {
-                var metroService = IoC.Resolve<IFuelService>();
+                var fuelService = IoC.Resolve<IFuelService>();
 
                 if (appPrefs.DayCount >= 14)
                 {
