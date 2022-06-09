@@ -58,9 +58,13 @@ namespace AdelaideFuel.Services
             get => GetDateTimeAsync(null).Result;
             set
             {
-                if (SubscriptionRestoreDateUtc != value)
+                var utc = value.HasValue && value.Value.Kind != DateTimeKind.Utc
+                    ? value.Value.ToUniversalTime()
+                    : value;
+
+                if (SubscriptionRestoreDateUtc != utc)
                 {
-                    SetDateTimeAsync(value).Wait();
+                    SetDateTimeAsync(utc).Wait();
                 }
             }
         }
@@ -70,9 +74,13 @@ namespace AdelaideFuel.Services
             get => GetDateTimeAsync(null).Result;
             set
             {
-                if (SubscriptionExpiryDateUtc != value)
+                var utc = value.HasValue && value.Value.Kind != DateTimeKind.Utc
+                   ? value.Value.ToUniversalTime()
+                   : value;
+
+                if (SubscriptionExpiryDateUtc != utc)
                 {
-                    SetDateTimeAsync(value).Wait();
+                    SetDateTimeAsync(utc).Wait();
                 }
             }
         }
