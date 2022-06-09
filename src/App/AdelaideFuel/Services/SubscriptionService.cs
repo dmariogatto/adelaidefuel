@@ -111,26 +111,25 @@ namespace AdelaideFuel.Services
             try
             {
                 var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
-                if (expiryDate > DateTime.MinValue)
+                var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
+                var hasRestoredLast24Hours = (DateTime.UtcNow - lastRestoreDate).TotalDays < 1;
+
+                if (expiryDate > DateTime.MinValue && !hasRestoredLast24Hours)
                 {
-                    // Is expiring in a couple days, or
-                    // Has expiried in the last week
-                    var expiring =
-                        DateTime.UtcNow.Date >= expiryDate.Date.AddDays(-2) &&
-                        DateTime.UtcNow.Date <= expiryDate.Date.AddDays(7);
+                    var inGrace =
+                        expiryDate <= DateTime.UtcNow &&
+                        (DateTime.UtcNow - expiryDate).TotalDays <= SubscriptionGraceDays;
 
                     // Lock out restores to once every couple weeks
-                    var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
-                    var canRestore =
-                        (DateTime.UtcNow - lastRestoreDate).TotalDays > 14;
+                    var canRestore = (DateTime.UtcNow - lastRestoreDate).TotalDays > 14;
 
-                    // Stop trying to restore once a subscription has been expired for a while
+                    // Stop trying to restore once a subscription is outside of grace period
                     // But ensure the latest restore date occurred after expiry
                     var longExpired =
-                        (DateTime.UtcNow - expiryDate).TotalDays > 16 &&
+                        (DateTime.UtcNow - expiryDate).TotalDays > SubscriptionGraceDays &&
                         (lastRestoreDate > expiryDate);
 
-                    if (expiring || (canRestore && !longExpired))
+                    if (inGrace || (canRestore && !longExpired))
                         await RestoreAsync().ConfigureAwait(false);
                 }
             }
@@ -249,6 +248,8 @@ namespace AdelaideFuel.Services
                     {
                         await ValidatePurchaseAsync(purchase).ConfigureAwait(false);
                     }
+
+                    SubscriptionRestoreDateUtc = DateTime.UtcNow;
                 }
             }
             catch (Exception ex)
@@ -290,7 +291,6 @@ namespace AdelaideFuel.Services
 
                     SetIntAsync(validatedReceipt.GraceDays, nameof(SubscriptionGraceDays)).Wait();
                     SubscriptionExpiryDateUtc = validatedReceipt.ExpiryUtc;
-                    SubscriptionRestoreDateUtc = DateTime.UtcNow;
                     SubscriptionSuspended = validatedReceipt.IsSuspended;
 
                     return true;

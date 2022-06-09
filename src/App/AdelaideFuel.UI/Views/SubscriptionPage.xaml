@@ -59,7 +59,7 @@
                     Margin="{StaticResource DefaultMargin}"
                     FontAttributes="Bold"
                     HorizontalTextAlignment="Center"
-                    IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
+                    IsVisible="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{local:Translate SubscriptionThankyou}" />
 
@@ -67,16 +67,18 @@
                     Margin="{StaticResource DefaultMargin}"
                     FontFamily="{StaticResource BoldFontFamily}"
                     HorizontalTextAlignment="Center"
-                    IsVisible="{Binding ExpiryDate, Converter={StaticResource NullToBoolConverter}}"
+                    IsVisible="False"
                     Style="{DynamicResource LabelStyle}"
                     Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionActiveUntilFormat}}">
                     <View.Triggers>
-                        <DataTrigger
-                            Binding="{Binding HasExpired}"
-                            TargetType="Label"
-                            Value="True">
-                            <Setter Property="Text" Value="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionExpiredOnFormat}}" />
-                        </DataTrigger>
+                        <MultiTrigger
+                            TargetType="View">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}" Value="True" />
+                                <BindingCondition Binding="{Binding HasExpired}" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="True" />
+                        </MultiTrigger>
                     </View.Triggers>
                 </Label>
 
@@ -86,7 +88,26 @@
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
                     Style="{DynamicResource LabelStyle}"
-                    Text="{local:Translate SubscriptionSuspended}">
+                    Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionExpiredOnFormat}}">
+                    <View.Triggers>
+                        <MultiTrigger
+                            TargetType="View">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}" Value="True" />
+                                <BindingCondition Binding="{Binding HasExpired}" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="True" />
+                        </MultiTrigger>
+                    </View.Triggers>
+                </Label>
+
+                <Label
+                    Margin="{StaticResource DefaultMargin}"
+                    FontFamily="{StaticResource BoldFontFamily}"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="False"
+                    Style="{DynamicResource LabelStyle}"
+                    Text="{local:Translate Suspended, Transform=Uppercase}">
                     <View.Triggers>
                         <MultiTrigger TargetType="View">
                             <MultiTrigger.Conditions>

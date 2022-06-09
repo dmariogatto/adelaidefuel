@@ -57,7 +57,7 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _subscriptionProduct, value);
         }
 
-        public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc;
+        public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc?.ToLocalTime();
         public bool HasValidSubscription => _subscriptionService.HasValidSubscription;
         public bool HasExpired => !_subscriptionService.IsSubscriptionExpiredForDate(DateTime.UtcNow);
         public bool SubscriptionSuspended => _subscriptionService.SubscriptionSuspended;

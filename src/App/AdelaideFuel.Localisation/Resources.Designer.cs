@@ -982,20 +982,20 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Subscription is currently suspended..
-        /// </summary>
-        public static string SubscriptionSuspended {
-            get {
-                return ResourceManager.GetString("SubscriptionSuspended", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Thank you for your support! 😍.
         /// </summary>
         public static string SubscriptionThankyou {
             get {
                 return ResourceManager.GetString("SubscriptionThankyou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suspended.
+        /// </summary>
+        public static string Suspended {
+            get {
+                return ResourceManager.GetString("Suspended", resourceCulture);
             }
         }
         

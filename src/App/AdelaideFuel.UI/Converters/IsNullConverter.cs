@@ -4,7 +4,7 @@ using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Converters
 {
-    public class NullToInverseBoolConverter : IValueConverter
+    public class IsNullConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

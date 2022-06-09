@@ -9,6 +9,8 @@ namespace AdelaideFuel.UI.Views
     [ContentProperty(nameof(MainContent))]
     public class BaseAdPage<T> : BasePage<T> where T : BaseViewModel
     {
+        private readonly ISubscriptionService _subscriptionService;
+
         private readonly Grid _mainGrid;
         private readonly AdSmartBanner _adBannerView;
 
@@ -16,36 +18,36 @@ namespace AdelaideFuel.UI.Views
 
         public BaseAdPage() : base()
         {
+            _subscriptionService = IoC.Resolve<ISubscriptionService>();
+
             _mainGrid = new Grid() { RowSpacing = 0 };
 
             _mainGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Star });
 
-            var adRowDefinition = new RowDefinition() { Height = 0 };
-            _mainGrid.RowDefinitions.Add(adRowDefinition);
+            if (_subscriptionService.AdsEnabled)
+            {
+                var adRowDefinition = new RowDefinition() { Height = 0 };
+                _mainGrid.RowDefinitions.Add(adRowDefinition);
 
-            _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
+                _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
 
-            var bannerContainer = new Grid();
+                var bannerContainer = new Grid();
+                var adSkeleton = new SkeletonView();
 
-            var background = new ContentView();
-            background.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
+                bannerContainer.Children.Add(adSkeleton);
+                bannerContainer.Children.Add(_adBannerView);
 
-            var adSkeleton = new SkeletonView();
+                _mainGrid.Children.Add(bannerContainer, 0, 1);
 
-            bannerContainer.Children.Add(background);
-            bannerContainer.Children.Add(adSkeleton);
-            bannerContainer.Children.Add(_adBannerView);
-
-            _mainGrid.Children.Add(bannerContainer, 0, 1);
-
-            adSkeleton.SetBinding(IsVisibleProperty,
-                new Binding(nameof(AdSmartBanner.AdStatus),
-                            converter: new AdNotLoadedConverter(),
-                            source: _adBannerView));
-            adRowDefinition.SetBinding(RowDefinition.HeightProperty,
-                new Binding(nameof(HeightRequest),
-                            converter: new DoubleToGridLengthConverter(),
-                            source: _adBannerView));
+                adSkeleton.SetBinding(IsVisibleProperty,
+                    new Binding(nameof(AdSmartBanner.AdStatus),
+                                converter: new AdNotLoadedConverter(),
+                                source: _adBannerView));
+                adRowDefinition.SetBinding(RowDefinition.HeightProperty,
+                    new Binding(nameof(HeightRequest),
+                                converter: new DoubleToGridLengthConverter(),
+                                source: _adBannerView));
+            }
 
             Content = _mainGrid;
         }
@@ -78,6 +80,12 @@ namespace AdelaideFuel.UI.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            if (_adBannerView?.AdStatus == AdLoadStatus.Loaded && !_subscriptionService.AdsEnabled)
+            {
+                _adBannerView.HeightRequest = 0;
+                _adBannerView.IsVisible = false;
+            }
         }
 
         protected override void OnDisappearing()

@@ -477,7 +477,7 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="SubscriptionExpiredOnFormat" xml:space="preserve">
     <value>Your subscription expired on {0:d}.</value>
   </data>
-  <data name="SubscriptionSuspended" xml:space="preserve">
-    <value>Subscription is currently suspended.</value>
+  <data name="Suspended" xml:space="preserve">
+    <value>Suspended</value>
   </data>
 </root>
