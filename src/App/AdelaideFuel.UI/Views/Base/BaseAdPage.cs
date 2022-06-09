@@ -24,7 +24,7 @@ namespace AdelaideFuel.UI.Views
             _mainGrid = new Grid() { RowSpacing = 0 };
             _mainGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Star });
 
-`            _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
+            _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
 
             var bannerContainer = new Grid();
             var adSkeleton = new SkeletonView();
@@ -82,11 +82,6 @@ namespace AdelaideFuel.UI.Views
             {
                 RemoveBannerAd();
             }
-        }
-
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
         }
 
         private void AddBannerAd()
