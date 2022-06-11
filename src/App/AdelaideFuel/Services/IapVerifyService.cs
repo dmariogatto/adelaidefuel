@@ -59,7 +59,7 @@ namespace AdelaideFuel.Services
                 throw new NotImplementedException();
 
             var validatedReceipt = await ValidateReceiptAsync(transactionId, productId, purchaseToken).ConfigureAwait(false);
-            return validatedReceipt != null;
+            return validatedReceipt is not null;
         }
 
         public Task<IapValidatedReceipt> ValidateReceiptAsync(InAppBillingPurchase purchase)
