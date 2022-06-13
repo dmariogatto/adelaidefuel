@@ -133,7 +133,7 @@ namespace AdelaideFuel.Services
 
                     // Stop trying to restore once expiry and last restore are outside of grace period
                     var longExpired =
-                        expiryDate < utcNow &&
+                        utcNow >= expiryDate &&
                         (utcNow - expiryDate).TotalDays > SubscriptionGraceDays &&
                         lastRestoreDate > expiryDate &&
                         (lastRestoreDate - expiryDate).TotalDays > SubscriptionGraceDays;
