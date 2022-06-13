@@ -121,9 +121,9 @@ namespace AdelaideFuel.Services
                 var utcNow = DateTime.UtcNow;
                 var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
                 var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
-                var hasRestoredLast24Hours = (utcNow - lastRestoreDate).TotalDays < 1;
+                var hasRestoredToday = lastRestoreDate.ToLocalTime().Date == DateTime.Today;
 
-                if (expiryDate > DateTime.MinValue && !hasRestoredLast24Hours)
+                if (expiryDate > DateTime.MinValue && !hasRestoredToday)
                 {
                     // Lock out restores to once every couple weeks, or
                     // when subscription has expired
