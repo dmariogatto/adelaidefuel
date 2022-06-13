@@ -14,7 +14,7 @@ namespace AdelaideFuel.Services
         bool SubscriptionSuspended { get; set; }
         bool AdsEnabled { get; set; }
 
-        bool IsSubscriptionExpiredForDate(DateTime dateTime);
+        bool IsSubscriptionValidForDate(DateTime dateTime);
 
         Task<bool> UpdateSubscriptionAsync();
 

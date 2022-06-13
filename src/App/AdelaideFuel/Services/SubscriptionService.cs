@@ -51,7 +51,7 @@ namespace AdelaideFuel.Services
         }
 
         public bool HasValidSubscription
-            => !SubscriptionSuspended && IsSubscriptionExpiredForDate(DateTime.UtcNow);
+            => !SubscriptionSuspended && IsSubscriptionValidForDate(DateTime.UtcNow);
 
         public DateTime? SubscriptionRestoreDateUtc
         {
@@ -109,8 +109,8 @@ namespace AdelaideFuel.Services
             }
         }
 
-        public bool IsSubscriptionExpiredForDate(DateTime dateTime)
-            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) >= dateTime.ToUniversalTime();
+        public bool IsSubscriptionValidForDate(DateTime dateTime)
+            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) > dateTime.ToUniversalTime();
 
         public async Task<bool> UpdateSubscriptionAsync()
         {

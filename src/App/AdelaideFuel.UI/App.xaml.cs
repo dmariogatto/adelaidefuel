@@ -103,7 +103,7 @@ namespace AdelaideFuel.UI
                 subscriptionService.SubscriptionExpiryDateUtc = null;
 #endif
 
-                var wasValid = !subscriptionService.SubscriptionSuspended && subscriptionService.IsSubscriptionExpiredForDate(lastDateOpened);
+                var wasValid = !subscriptionService.SubscriptionSuspended && subscriptionService.IsSubscriptionValidForDate(lastDateOpened);
                 await subscriptionService.UpdateSubscriptionAsync().ConfigureAwait(false);
 
                 if (wasValid && !subscriptionService.HasValidSubscription)
