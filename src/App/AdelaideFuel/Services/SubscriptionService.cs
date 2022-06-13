@@ -118,26 +118,27 @@ namespace AdelaideFuel.Services
 
             try
             {
+                var utcNow = DateTime.UtcNow;
                 var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
                 var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
-                var hasRestoredLast24Hours = (DateTime.UtcNow - lastRestoreDate).TotalDays < 1;
+                var hasRestoredLast24Hours = (utcNow - lastRestoreDate).TotalDays < 1;
 
                 if (expiryDate > DateTime.MinValue && !hasRestoredLast24Hours)
                 {
-                    var inGrace =
-                        expiryDate <= DateTime.UtcNow &&
-                        (DateTime.UtcNow - expiryDate).TotalDays <= SubscriptionGraceDays;
+                    // Lock out restores to once every couple weeks, or
+                    // when subscription has expired
+                    var canRestore = 
+                        (utcNow - lastRestoreDate).TotalDays > 14 ||
+                        !HasValidSubscription;
 
-                    // Lock out restores to once every couple weeks
-                    var canRestore = (DateTime.UtcNow - lastRestoreDate).TotalDays > 14;
-
-                    // Stop trying to restore once a subscription is outside of grace period
-                    // But ensure the latest restore date occurred after expiry
+                    // Stop trying to restore once expiry and last restore are outside of grace period
                     var longExpired =
-                        (DateTime.UtcNow - expiryDate).TotalDays > SubscriptionGraceDays &&
-                        (lastRestoreDate > expiryDate);
+                        expiryDate < utcNow &&
+                        (utcNow - expiryDate).TotalDays > SubscriptionGraceDays &&
+                        lastRestoreDate > expiryDate &&
+                        (lastRestoreDate - expiryDate).TotalDays > SubscriptionGraceDays;
 
-                    if (inGrace || (canRestore && !longExpired))
+                    if (canRestore && !longExpired)
                         await RestoreAsync().ConfigureAwait(false);
                 }
             }
