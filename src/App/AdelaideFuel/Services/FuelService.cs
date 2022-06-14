@@ -239,8 +239,9 @@ namespace AdelaideFuel.Services
                     var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
                     if (status == PermissionStatus.Granted)
                     {
+                        location ??= await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
                         location = await _geolocation.GetLocationAsync(
-                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5)), ct).ConfigureAwait(false);
+                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(6.5)), ct).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)

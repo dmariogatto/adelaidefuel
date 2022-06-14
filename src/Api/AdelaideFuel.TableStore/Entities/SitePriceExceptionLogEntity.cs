@@ -1,11 +1,11 @@
 ﻿using AdelaideFuel.Shared;
-using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace AdelaideFuel.TableStore.Entities
 {
-    public class SitePriceExceptionLogEntity : TableEntity, IEntity
+    public class SitePriceExceptionLogEntity : BaseTableStoreEntity, ITableStoreEntity
     {
         public SitePriceExceptionLogEntity() { }
 
@@ -20,8 +20,11 @@ namespace AdelaideFuel.TableStore.Entities
             TransactionDateUtc = sitePrice.TransactionDateUtc;
             OriginalPrice = sitePrice.Price;
             AdjustedPrice = adjustedPrice;
+
+            IsActive = true;
         }
 
+        [IgnoreDataMember]
         public int BrandId
         {
             get => int.TryParse(PartitionKey, out var id) ? id : -1;
@@ -64,9 +67,7 @@ namespace AdelaideFuel.TableStore.Entities
         public double OriginalPrice { get; set; }
         public double AdjustedPrice { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
-        public bool IsDifferent(IEntity entity)
+        public override bool IsDifferent(ITableStoreEntity entity)
         {
             if (entity is SitePriceExceptionLogEntity other && Equals(other))
             {

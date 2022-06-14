@@ -1,5 +1,8 @@
 {
   "ApiUrlBase": "{ApiUrlBase}",
+  "ApiUrlIapBase": "{ApiUrlIapBase}",
+
+  "SubscriptionProductId": "{SubscriptionProductId}",
 
   "ApiKeyBrands": "{ApiKeyBrands}",
   "ApiKeyFuels": "{ApiKeyFuels}",

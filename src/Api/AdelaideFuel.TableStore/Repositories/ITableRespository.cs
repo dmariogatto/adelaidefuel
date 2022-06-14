@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdelaideFuel.TableStore.Repositories
 {
-    public interface ITableRepository<T> where T : IEntity, new()
+    public interface ITableRepository<T> where T : ITableStoreEntity, new()
     {
         Task CreateIfNotExistsAsync(CancellationToken cancellationToken);
 
@@ -21,7 +21,7 @@ namespace AdelaideFuel.TableStore.Repositories
 
         Task InsertOrReplaceBulkAsync(IEnumerable<T> entities, ILogger logger, CancellationToken cancellationToken);
 
-        Task<IList<T>> ExecuteQueryAsync(TableQuery<T> query, CancellationToken cancellationToken);
+        Task<IList<T>> ExecuteQueryAsync(AsyncPageable<T> query, CancellationToken cancellationToken);
 
         Task<(IList<T> changes, int ops)> SyncPartitionsWithDeactivateAsync(Dictionary<string, List<T>> newEntities, ILogger logger, CancellationToken cancellationToken, bool simulate = false);
         Task<(IList<T> changes, int ops)> SyncPartitionsWithDeleteAsync(Dictionary<string, List<T>> newEntities, ILogger logger, CancellationToken cancellationToken, bool simulate = false);

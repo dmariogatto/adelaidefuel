@@ -417,4 +417,67 @@ distances from Adelaide CBD</value>
   <data name="ShowRadiiOnMap" xml:space="preserve">
     <value>Show radii on map</value>
   </data>
+  <data name="SubscriptionDescription" xml:space="preserve">
+    <value>ShouldIFuel Premium is an optional subscription to control banner ads, support future development and keep the servers running.
+
+No pressure, all features will remain free.</value>
+  </data>
+  <data name="RestorePreviousPurchases" xml:space="preserve">
+    <value>Restore Previous Purchases</value>
+  </data>
+  <data name="ChangeOrCancelSubscription" xml:space="preserve">
+    <value>Change or Cancel Subscription</value>
+  </data>
+  <data name="BannerAds" xml:space="preserve">
+    <value>Banner Ads</value>
+  </data>
+  <data name="AppleSubscriptionDisclaimer" xml:space="preserve">
+    <value>Payment will be charged to your Apple ID account at the confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.
+
+You can manage and cancel your subscriptions by going to your account settings in the App Store after purchase.</value>
+  </data>
+  <data name="CannotConnectStore" xml:space="preserve">
+    <value>Cannot connect to store</value>
+  </data>
+  <data name="ItemPerYear" xml:space="preserve">
+    <value>{0} per year</value>
+  </data>
+  <data name="Subscribe" xml:space="preserve">
+    <value>Subscribe</value>
+  </data>
+  <data name="GoogleSubscriptionDisclaimer" xml:space="preserve">
+    <value>Payment will be charged to your Google account at the confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.
+
+You can manage and cancel your subscriptions by going to your subscriptions in Google Play after purchase.</value>
+  </data>
+  <data name="SubscriptionThankyou" xml:space="preserve">
+    <value>Thank you for your support! 😍</value>
+  </data>
+  <data name="BannerAdsDescription" xml:space="preserve">
+    <value>Turn them off, or leave them on, the power is yours</value>
+  </data>
+  <data name="ControlAdsSupportDevelopment" xml:space="preserve">
+    <value>Control ads and support development</value>
+  </data>
+  <data name="ShouldIFuelPremium" xml:space="preserve">
+    <value>ShouldIFuel Premium</value>
+  </data>
+  <data name="GoToSubscription" xml:space="preserve">
+    <value>Go to Subscription</value>
+  </data>
+  <data name="SubscriptionActiveUntilFormat" xml:space="preserve">
+    <value>Your subscription is active until {0:d}.</value>
+  </data>
+  <data name="SubscriptionExpired" xml:space="preserve">
+    <value>Subscription Expired</value>
+  </data>
+  <data name="SubscriptionExpiredDescription" xml:space="preserve">
+    <value>Oh no, looks like your subscription has expired or could not be validated.</value>
+  </data>
+  <data name="SubscriptionExpiredOnFormat" xml:space="preserve">
+    <value>Your subscription expired on {0:d}.</value>
+  </data>
+  <data name="Suspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
 </root>

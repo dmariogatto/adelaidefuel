@@ -23,7 +23,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:BytesToKbConverter x:Key="bytesToKbConverter" />
-            <converters:EnumToStringConverter x:Key="enumToStringConverter" />
+            <converters:EnumToDescriptionConverter x:Key="enumToDescriptionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
@@ -46,6 +46,12 @@
                     Command="{Binding OpenAppSettingsCommand}"
                     Description="{local:Translate OpenAppSettingsDescription}" />
             </sv:Section>
+            <sv:Section Title="{local:Translate Extras}">
+                <sv:CommandCell
+                    Title="{local:Translate ShouldIFuelPremium}"
+                    Command="{Binding GoToSubscriptionCommand}"
+                    Description="{local:Translate ControlAdsSupportDevelopment}" />
+            </sv:Section>
             <sv:Section Title="{local:Translate Feedback}">
                 <sv:CommandCell
                     Title="{local:Translate SendFeedback}"
@@ -58,7 +64,7 @@
                     x:Name="ThemePicker"
                     Title="{local:Translate Theme}"
                     Items="{Binding Themes}"
-                    SelectedItem="{Binding AppTheme, Converter={StaticResource enumToStringConverter}, ConverterParameter={x:Type services:Theme}}"
+                    SelectedItem="{Binding AppTheme, Converter={StaticResource enumToDescriptionConverter}}"
                     ValueTextFontSize="Medium" />
             </sv:Section>
             <sv:Section x:Name="AttributionSection" Title="{local:Translate Attributions}">

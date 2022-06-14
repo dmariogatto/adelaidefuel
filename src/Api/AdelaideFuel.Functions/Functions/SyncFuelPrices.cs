@@ -1,7 +1,6 @@
 ﻿using AdelaideFuel.Api;
 using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
-using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.Azure.WebJobs;

@@ -97,14 +97,14 @@
                         CornerRadius="2"
                         HeightRequest="4"
                         HorizontalOptions="Center"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
                         WidthRequest="60" />
 
                     <Label
                         Margin="{StaticResource SmallBottomThickness}"
                         FontFamily="{StaticResource BoldFontFamily}"
                         HorizontalTextAlignment="Center"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNullConverter}}"
                         Style="{DynamicResource LabelStyle}"
                         Text="{local:Translate Prices}">
                         <View.Triggers>
@@ -117,11 +117,11 @@
                         </View.Triggers>
                     </Label>
 
-                    <controls:FuelCategoriesView FuelCategories="{Binding FuelCategories}" IsVisible="{Binding SelectedSite, Converter={StaticResource NullToInverseBoolConverter}}" />
+                    <controls:FuelCategoriesView FuelCategories="{Binding FuelCategories}" IsVisible="{Binding SelectedSite, Converter={StaticResource IsNullConverter}}" />
 
                     <Grid
                         ColumnDefinitions="Auto,*,Auto"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
                         RowDefinitions="Auto,Auto">
                         <yummy:PancakeView
                             Grid.RowSpan="3"
@@ -184,7 +184,7 @@
                         Padding="{StaticResource MediumLeftThickness}"
                         ColumnDefinitions="*,*"
                         ColumnSpacing="0"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource NullToBoolConverter}}">
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}">
                         <Button
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"

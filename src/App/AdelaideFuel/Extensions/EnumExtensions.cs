@@ -12,8 +12,7 @@ namespace AdelaideFuel
 
             var attributes = fi.GetCustomAttributes(
                 typeof(DescriptionAttribute),
-                false).OfType<DescriptionAttribute>()
-                      .ToList();
+                false).OfType<DescriptionAttribute>();
 
             return attributes.Any()
                     ? attributes.First().Description

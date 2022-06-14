@@ -58,6 +58,7 @@ namespace AdelaideFuel.ViewModels
             SendFeedbackCommand = new AsyncCommand(SendFeedbackAsync);
             RateAppCommand = new Command(RateApp);
             OpenAppSettingsCommand = new Command(_appInfo.ShowSettingsUI);
+            GoToSubscriptionCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SubscriptionViewModel>());
             GoToBrandsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
             GoToFuelsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<FuelsViewModel>());
             GoToRadiiCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
@@ -72,13 +73,18 @@ namespace AdelaideFuel.ViewModels
         }
 
         #region Overrides
+        public override void OnCreate()
+        {
+            base.OnCreate();
+
+            TrackEvent(AppCenterEvents.PageView.SettingsView);
+        }
+
         public override void OnAppearing()
         {
             base.OnAppearing();
 
             LoadSettingsCommand.Execute(null);
-
-            TrackEvent(AppCenterEvents.PageView.SettingsView);
         }
         #endregion
 
@@ -125,6 +131,7 @@ namespace AdelaideFuel.ViewModels
         public AsyncCommand SendFeedbackCommand { get; private set; }
         public Command RateAppCommand { get; private set; }
         public Command OpenAppSettingsCommand { get; private set; }
+        public AsyncCommand GoToSubscriptionCommand { get; private set; }
         public AsyncCommand GoToBrandsCommand { get; private set; }
         public AsyncCommand GoToFuelsCommand { get; private set; }
         public AsyncCommand GoToRadiiCommand { get; private set; }

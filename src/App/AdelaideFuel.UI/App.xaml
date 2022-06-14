@@ -93,8 +93,8 @@
             <Thickness x:Key="ItemMargin">8,4,8,4</Thickness>
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
-            <converters:NullToInverseBoolConverter x:Key="NullToInverseBoolConverter" />
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <converters:IsNullConverter x:Key="IsNullConverter" />
             <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
             <converters:EqualityConverter x:Key="EqualityConverter" />
             <converters:HexToColorConverter x:Key="HexToColorConverter" />

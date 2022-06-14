@@ -115,6 +115,17 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Payment will be charged to your Apple ID account at the confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.
+        ///
+        ///You can manage and cancel your subscriptions by going to your account settings in the App Store after purchase..
+        /// </summary>
+        public static string AppleSubscriptionDisclaimer {
+            get {
+                return ResourceManager.GetString("AppleSubscriptionDisclaimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attributions.
         /// </summary>
         public static string Attributions {
@@ -129,6 +140,24 @@ namespace AdelaideFuel.Localisation {
         public static string Back {
             get {
                 return ResourceManager.GetString("Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Banner Ads.
+        /// </summary>
+        public static string BannerAds {
+            get {
+                return ResourceManager.GetString("BannerAds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turn them off, or leave them on, the power is yours.
+        /// </summary>
+        public static string BannerAdsDescription {
+            get {
+                return ResourceManager.GetString("BannerAdsDescription", resourceCulture);
             }
         }
         
@@ -196,6 +225,24 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot connect to store.
+        /// </summary>
+        public static string CannotConnectStore {
+            get {
+                return ResourceManager.GetString("CannotConnectStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change or Cancel Subscription.
+        /// </summary>
+        public static string ChangeOrCancelSubscription {
+            get {
+                return ResourceManager.GetString("ChangeOrCancelSubscription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to cheapest &amp; closest in {0}.
         /// </summary>
         public static string CheapestAndClosestInItem {
@@ -237,6 +284,15 @@ namespace AdelaideFuel.Localisation {
         public static string Closed {
             get {
                 return ResourceManager.GetString("Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Control ads and support development.
+        /// </summary>
+        public static string ControlAdsSupportDevelopment {
+            get {
+                return ResourceManager.GetString("ControlAdsSupportDevelopment", resourceCulture);
             }
         }
         
@@ -389,6 +445,26 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Payment will be charged to your Google account at the confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.
+        ///
+        ///You can manage and cancel your subscriptions by going to your subscriptions in Google Play after purchase..
+        /// </summary>
+        public static string GoogleSubscriptionDisclaimer {
+            get {
+                return ResourceManager.GetString("GoogleSubscriptionDisclaimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to Subscription.
+        /// </summary>
+        public static string GoToSubscription {
+            get {
+                return ResourceManager.GetString("GoToSubscription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         public static string Help {
@@ -466,6 +542,15 @@ namespace AdelaideFuel.Localisation {
         public static string ItemParenthesesItem {
             get {
                 return ResourceManager.GetString("ItemParenthesesItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} per year.
+        /// </summary>
+        public static string ItemPerYear {
+            get {
+                return ResourceManager.GetString("ItemPerYear", resourceCulture);
             }
         }
         
@@ -733,6 +818,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restore Previous Purchases.
+        /// </summary>
+        public static string RestorePreviousPurchases {
+            get {
+                return ResourceManager.GetString("RestorePreviousPurchases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SA.
         /// </summary>
         public static string SA {
@@ -805,6 +899,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ShouldIFuel Premium.
+        /// </summary>
+        public static string ShouldIFuelPremium {
+            get {
+                return ResourceManager.GetString("ShouldIFuelPremium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show radii on map.
         /// </summary>
         public static string ShowRadiiOnMap {
@@ -819,6 +922,80 @@ namespace AdelaideFuel.Localisation {
         public static string Stations {
             get {
                 return ResourceManager.GetString("Stations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscribe.
+        /// </summary>
+        public static string Subscribe {
+            get {
+                return ResourceManager.GetString("Subscribe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your subscription is active until {0:d}..
+        /// </summary>
+        public static string SubscriptionActiveUntilFormat {
+            get {
+                return ResourceManager.GetString("SubscriptionActiveUntilFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ShouldIFuel Premium is an optional subscription to control banner ads, support future development and keep the servers running.
+        ///
+        ///No pressure, all features will remain free..
+        /// </summary>
+        public static string SubscriptionDescription {
+            get {
+                return ResourceManager.GetString("SubscriptionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscription Expired.
+        /// </summary>
+        public static string SubscriptionExpired {
+            get {
+                return ResourceManager.GetString("SubscriptionExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oh no, looks like your subscription has expired or could not be validated..
+        /// </summary>
+        public static string SubscriptionExpiredDescription {
+            get {
+                return ResourceManager.GetString("SubscriptionExpiredDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your subscription expired on {0:d}..
+        /// </summary>
+        public static string SubscriptionExpiredOnFormat {
+            get {
+                return ResourceManager.GetString("SubscriptionExpiredOnFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thank you for your support! 😍.
+        /// </summary>
+        public static string SubscriptionThankyou {
+            get {
+                return ResourceManager.GetString("SubscriptionThankyou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suspended.
+        /// </summary>
+        public static string Suspended {
+            get {
+                return ResourceManager.GetString("Suspended", resourceCulture);
             }
         }
         

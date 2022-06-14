@@ -18,19 +18,19 @@ namespace AdelaideFuel.ViewModels
         public IBrowser Browser { get; }
 
         public BvmConstructor(
-            IFuelService metroService,
+            IFuelService fuelService,
             INavigationService navigationService,
             IAppPreferences appPrefs,
             IUserDialogs userDialogs,
-            ILogger metroLog,
+            ILogger log,
             IThemeService themeService,
             IBrowser browser) : base()
         {
-            FuelService = metroService;
+            FuelService = fuelService;
             NavigationService = navigationService;
             AppPrefs = appPrefs;
             UserDialogs = userDialogs;
-            Logger = metroLog;
+            Logger = log;
 
             ThemeService = themeService;
 
