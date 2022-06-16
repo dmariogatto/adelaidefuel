@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AdelaideFuel
 {
@@ -28,12 +26,14 @@ namespace AdelaideFuel
 
         public static int FirstIndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
         {
-            var items = enumerable.ToList();
+            var idx = 0;
 
-            for (var i = 0; i < items.Count; i++)
+            foreach (var i in enumerable)
             {
-                if (predicate(items[i]))
-                    return i;
+                if (predicate(i))
+                    return idx;
+
+                idx++;
             }
 
             return -1;
