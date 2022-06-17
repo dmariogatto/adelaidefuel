@@ -2,7 +2,6 @@
 using AdelaideFuel.UI.Controls;
 using AdelaideFuel.UI.Converters;
 using AdelaideFuel.ViewModels;
-using System.Linq;
 using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Views
@@ -32,6 +31,9 @@ namespace AdelaideFuel.UI.Views
             bannerContainer.Children.Add(adSkeleton);
             bannerContainer.Children.Add(_adBannerView);
 
+            adSkeleton.SetBinding(SkeletonView.HeightRequestProperty,
+                new Binding(nameof(AdSmartBanner.HeightRequest),
+                            source: _adBannerView));
             adSkeleton.SetBinding(SkeletonView.IsVisibleProperty,
                 new Binding(nameof(AdSmartBanner.AdStatus),
                             converter: new AdNotLoadedConverter(),
@@ -88,13 +90,7 @@ namespace AdelaideFuel.UI.Views
         {
             if (_adBannerView?.Parent is View container && container.Parent is null)
             {
-                var adRowDefinition = new RowDefinition() { Height = 0 };
-                adRowDefinition.SetBinding(RowDefinition.HeightProperty,
-                    new Binding(nameof(HeightRequest),
-                                converter: new DoubleToGridLengthConverter(),
-                                source: _adBannerView));
-
-                _mainGrid.RowDefinitions.Add(adRowDefinition);
+                _mainGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 _mainGrid.Children.Add(container, 0, 1);
             }
         }
@@ -104,7 +100,6 @@ namespace AdelaideFuel.UI.Views
             if (_adBannerView?.Parent is View container && ReferenceEquals(container.Parent, _mainGrid))
             {
                 _mainGrid.Children.Remove(container);
-                _mainGrid.RowDefinitions.Last().RemoveBinding(RowDefinition.HeightProperty);
                 _mainGrid.RowDefinitions.RemoveAt(_mainGrid.RowDefinitions.Count - 1);
             }
         }
