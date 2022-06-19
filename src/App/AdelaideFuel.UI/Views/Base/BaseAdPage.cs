@@ -26,15 +26,23 @@ namespace AdelaideFuel.UI.Views
             _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
 
             var bannerContainer = new Grid();
+            var boxView = new BoxView();
             var adSkeleton = new SkeletonView();
 
+            bannerContainer.Children.Add(boxView);
             bannerContainer.Children.Add(adSkeleton);
             bannerContainer.Children.Add(_adBannerView);
 
-            adSkeleton.SetBinding(SkeletonView.HeightRequestProperty,
-                new Binding(nameof(AdSmartBanner.HeightRequest),
-                            source: _adBannerView));
-            adSkeleton.SetBinding(SkeletonView.IsVisibleProperty,
+            boxView.SetDynamicResource(BoxView.BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
+            boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
+
+            boxView.SetBinding(HeightRequestProperty,
+                new Binding(nameof(HeightRequest), source: adSkeleton));
+            boxView.SetBinding(IsVisibleProperty,
+                new Binding(nameof(IsVisible), source: adSkeleton));
+            adSkeleton.SetBinding(HeightRequestProperty,
+                new Binding(nameof(HeightRequest), source: _adBannerView));
+            adSkeleton.SetBinding(IsVisibleProperty,
                 new Binding(nameof(AdSmartBanner.AdStatus),
                             converter: new AdNotLoadedConverter(),
                             source: _adBannerView));
