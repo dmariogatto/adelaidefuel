@@ -13,9 +13,9 @@ namespace AdelaideFuel.ViewModels
         }
 
         #region Overrides
-        public override void OnCreate()
+        public override void OnAppearing()
         {
-            base.OnCreate();
+            base.OnAppearing();
 
             TrackEvent(AppCenterEvents.PageView.BrandsView);
         }
