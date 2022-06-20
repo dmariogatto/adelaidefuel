@@ -238,7 +238,7 @@ namespace AdelaideFuel.ViewModels
                     {
                         var priceLookup = prices
                             .GroupBy(i => i.SiteId)
-                            .ToDictionary(g => g.Key, g => g.ToList());
+                            .ToDictionary(g => g.Key, g => g);
                         var fuelPrices = prices
                             .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
                             .Select(i => i.PriceInCents).ToList();
