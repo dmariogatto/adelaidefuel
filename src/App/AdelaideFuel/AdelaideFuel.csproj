@@ -30,7 +30,7 @@
     <PackageReference Include="Refit" Version="5.2.4" />
     <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
-    <PackageReference Include="Xamarin.Essentials.Interfaces" Version="1.7.3.1" />
+    <PackageReference Include="Xamarin.Essentials.Interfaces" Version="1.7.3.2" />
     <PackageReference Include="Plugin.InAppBilling" Version="5.3.3-beta" />
   </ItemGroup>
 
