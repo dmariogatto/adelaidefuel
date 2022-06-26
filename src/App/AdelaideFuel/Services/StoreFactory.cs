@@ -224,7 +224,7 @@ namespace AdelaideFuel.Services
                 var di = new DirectoryInfo(Path.GetDirectoryName(dbPath));
                 var fileName = Path.GetFileNameWithoutExtension(dbPath);
 
-                var files = di.GetFiles().Where(f => f.Name.StartsWith(fileName)).ToList();
+                var files = di.GetFiles().Where(f => f.Name.StartsWith(fileName, StringComparison.Ordinal)).ToList();
                 foreach (var f in files)
                     File.Delete(f.FullName);
 

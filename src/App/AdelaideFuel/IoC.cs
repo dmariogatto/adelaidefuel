@@ -67,7 +67,7 @@ namespace AdelaideFuel
             var essentialImpls = typeof(IEssentialsImplementation)
                 .Assembly
                 .GetTypes()
-                .Where(t => t.IsClass && t.Namespace.EndsWith(nameof(Xamarin.Essentials.Implementation)));
+                .Where(t => t.IsClass && t.Namespace.EndsWith(nameof(Xamarin.Essentials.Implementation), StringComparison.Ordinal));
 
             foreach (var impl in essentialImpls)
             {
