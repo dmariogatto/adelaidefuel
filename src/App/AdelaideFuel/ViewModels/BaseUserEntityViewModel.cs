@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdelaideFuel.ViewModels
 {
-    public class BaseUserEntityViewModel<T> : BaseViewModel where T : IUserSortableEntity
+    public abstract class BaseUserEntityViewModel<T> : BaseViewModel where T : IUserSortableEntity
     {
         private readonly ObservableRangeCollection<IUserEntity> _originalEntities;
 

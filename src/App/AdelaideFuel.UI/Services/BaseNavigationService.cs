@@ -2,6 +2,7 @@ using AdelaideFuel.Services;
 using AdelaideFuel.UI.Views;
 using AdelaideFuel.ViewModels;
 using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 
 namespace AdelaideFuel.UI.Services
@@ -10,6 +11,8 @@ namespace AdelaideFuel.UI.Services
     {
         protected readonly ILogger Logger;
 
+        private readonly Dictionary<Type, Type> _vmToPageTypes = new Dictionary<Type, Type>();
+
         public BaseNavigationService(ILogger logger)
         {
             Logger = logger;
@@ -17,15 +20,20 @@ namespace AdelaideFuel.UI.Services
 
         public bool IsBusy { get; protected set; }
 
-        protected static Page CreatePage<T>() where T : IViewModel
+        protected Page CreatePage<T>() where T : IViewModel
             => CreatePage(typeof(T));
 
-        protected static Page CreatePage(Type vmType)
+        protected Page CreatePage(Type vmType)
         {
-            if (!typeof(IViewModel).IsAssignableFrom(vmType))
-                throw new ArgumentException($"Must be an instance of '{nameof(IViewModel)}'", nameof(vmType));
+            if (!_vmToPageTypes.TryGetValue(vmType, out var pageType))
+            {
+                if (!typeof(IViewModel).IsAssignableFrom(vmType))
+                    throw new ArgumentException($"Must be an instance of '{nameof(IViewModel)}'", nameof(vmType));
 
-            var pageType = GetPageType(vmType);
+                pageType = GetPageType(vmType);
+                _vmToPageTypes[vmType] = pageType;
+            }
+
             return Activator.CreateInstance(pageType) as Page;
         }
 

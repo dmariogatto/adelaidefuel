@@ -241,7 +241,8 @@ namespace AdelaideFuel.ViewModels
                             .ToDictionary(g => g.Key, g => g);
                         var fuelPrices = prices
                             .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
-                            .Select(i => i.PriceInCents).ToList();
+                            .Select(i => i.PriceInCents)
+                            .ToList();
 
                         var validCategories = default(IList<FuelCategory>);
 
