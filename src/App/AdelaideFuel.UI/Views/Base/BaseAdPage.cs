@@ -37,14 +37,16 @@ namespace AdelaideFuel.UI.Views
             boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
 
             boxView.SetBinding(HeightRequestProperty,
-                new Binding(nameof(HeightRequest), source: adSkeleton));
+                new Binding(nameof(HeightRequest), source: _adBannerView));
             boxView.SetBinding(IsVisibleProperty,
-                new Binding(nameof(IsVisible), source: adSkeleton));
+                new Binding(nameof(IsVisible), source: _adBannerView));
+
             adSkeleton.SetBinding(HeightRequestProperty,
                 new Binding(nameof(HeightRequest), source: _adBannerView));
             adSkeleton.SetBinding(IsVisibleProperty,
                 new Binding(nameof(AdSmartBanner.AdStatus),
-                            converter: new AdNotLoadedConverter(),
+                            converter: new InverseEqualityConverter(),
+                            converterParameter: AdLoadStatus.Loaded,
                             source: _adBannerView));
 
             if (_subscriptionService.AdsEnabled)
