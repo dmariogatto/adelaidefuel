@@ -244,7 +244,7 @@ namespace AdelaideFuel.ViewModels
                             .Select(i => i.PriceInCents)
                             .ToList();
 
-                        var validCategories = default(IList<FuelCategory>);
+                        var validCategories = default(IEnumerable<FuelCategory>);
 
                         var fns = Statistics.FiveNumberSummary(fuelPrices);
 
@@ -257,7 +257,7 @@ namespace AdelaideFuel.ViewModels
 
                         if (fuelPrices.Count == 0)
                         {
-                            validCategories = Array.Empty<FuelCategory>();
+                            validCategories = Enumerable.Empty<FuelCategory>();
                         }
                         else if (fuelPrices.Count < Statistics.MinLengthForFns)
                         {
@@ -295,7 +295,7 @@ namespace AdelaideFuel.ViewModels
 
                             validCategories = _fuelCategories
                                 .Values
-                                .Where(i => i.LowerBound != i.UpperBound).ToList();
+                                .Where(i => i.LowerBound != i.UpperBound);
                         }
 
                         FuelCategories.ReplaceRange(validCategories);
