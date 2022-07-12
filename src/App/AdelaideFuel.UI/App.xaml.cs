@@ -40,7 +40,7 @@ namespace AdelaideFuel.UI
                 if (Current is App app)
                 {
                     var id = args.AppAction.Id;
-                    if (id.StartsWith(nameof(UserFuel)) && id.LastIndexOf("_") is int idx && idx > 0)
+                    if (id.StartsWith(nameof(UserFuel), StringComparison.Ordinal) && id.LastIndexOf("_", StringComparison.Ordinal) is int idx && idx > 0)
                     {
                         var fuelId = id.Substring(idx + 1, id.Length - idx - 1);
                         app.SendOnAppLinkRequestReceived(new Uri(string.Format(uriFormat, Scheme, $"{Map}?{NavigationKeys.FuelIdQueryProperty}={fuelId}")));
@@ -131,8 +131,10 @@ namespace AdelaideFuel.UI
         {
             // Handle when your app sleeps
 
+#if DEBUG
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
+#endif
 
             var appShortcutsTask = SetupAppShortcutsAsync();
 
@@ -146,9 +148,8 @@ namespace AdelaideFuel.UI
 
             appShortcutsTask.Wait();
 
-            sw.Stop();
-
 #if DEBUG
+            sw.Stop();
             System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: completed in {sw.ElapsedMilliseconds}ms");
 #endif
         }

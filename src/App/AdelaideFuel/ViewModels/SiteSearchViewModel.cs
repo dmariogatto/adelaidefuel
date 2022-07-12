@@ -143,8 +143,8 @@ namespace AdelaideFuel.ViewModels
                     var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
                     var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     filtered = sites
-                        .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.IgnoreCase) >= 0 || p == i.Postcode) ||
-                                    parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.IgnoreCase) >= 0));
+                        .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.OrdinalIgnoreCase) >= 0 || p == i.Postcode) ||
+                                    parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.OrdinalIgnoreCase) >= 0));
                 }
 
                 var filteredSiteIds = new HashSet<int>(filtered.Select(i => i.SiteId));

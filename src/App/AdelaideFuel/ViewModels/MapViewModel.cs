@@ -238,12 +238,13 @@ namespace AdelaideFuel.ViewModels
                     {
                         var priceLookup = prices
                             .GroupBy(i => i.SiteId)
-                            .ToDictionary(g => g.Key, g => g.ToList());
+                            .ToDictionary(g => g.Key, g => g);
                         var fuelPrices = prices
                             .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
-                            .Select(i => i.PriceInCents).ToList();
+                            .Select(i => i.PriceInCents)
+                            .ToList();
 
-                        var validCategories = default(IList<FuelCategory>);
+                        var validCategories = Enumerable.Empty<FuelCategory>();
 
                         var fns = Statistics.FiveNumberSummary(fuelPrices);
 
@@ -254,47 +255,46 @@ namespace AdelaideFuel.ViewModels
                         var q375 = (q1 + q2) / 2d;
                         var q625 = (q2 + q3) / 2d;
 
-                        if (fuelPrices.Count == 0)
+                        if (fuelPrices.Count > 0)
                         {
-                            validCategories = Array.Empty<FuelCategory>();
-                        }
-                        else if (fuelPrices.Count < Statistics.MinLengthForFns)
-                        {
-                            // set this for the categorisation below
-                            q1 = fuelPrices.Last();
+                            if (fuelPrices.Count < Statistics.MinLengthForFns)
+                            {
+                                // set this for the categorisation below
+                                q1 = fuelPrices.Last();
 
-                            _fuelCategories[PriceCategory.Lowest].LowerBound = (int)fuelPrices.First();
-                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
+                                _fuelCategories[PriceCategory.Lowest].LowerBound = (int)fuelPrices.First();
+                                _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
 
-                            validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
-                        }
-                        else if (q1.FuzzyEquals(q3, 0.1))
-                        {
-                            _fuelCategories[PriceCategory.Lowest].LowerBound =
-                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
+                                validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
+                            }
+                            else if (q1.FuzzyEquals(q3, 0.1))
+                            {
+                                _fuelCategories[PriceCategory.Lowest].LowerBound =
+                                _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
 
-                            validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
-                        }
-                        else
-                        {
-                            _fuelCategories[PriceCategory.Lowest].LowerBound = 0;
-                            _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
+                                validCategories = new[] { _fuelCategories[PriceCategory.Lowest] };
+                            }
+                            else
+                            {
+                                _fuelCategories[PriceCategory.Lowest].LowerBound = 0;
+                                _fuelCategories[PriceCategory.Lowest].UpperBound = (int)q1;
 
-                            _fuelCategories[PriceCategory.Low].LowerBound = (int)q1;
-                            _fuelCategories[PriceCategory.Low].UpperBound = (int)q375;
+                                _fuelCategories[PriceCategory.Low].LowerBound = (int)q1;
+                                _fuelCategories[PriceCategory.Low].UpperBound = (int)q375;
 
-                            _fuelCategories[PriceCategory.Average].LowerBound = (int)q375;
-                            _fuelCategories[PriceCategory.Average].UpperBound = (int)q625;
+                                _fuelCategories[PriceCategory.Average].LowerBound = (int)q375;
+                                _fuelCategories[PriceCategory.Average].UpperBound = (int)q625;
 
-                            _fuelCategories[PriceCategory.High].LowerBound = (int)q625;
-                            _fuelCategories[PriceCategory.High].UpperBound = (int)q3;
+                                _fuelCategories[PriceCategory.High].LowerBound = (int)q625;
+                                _fuelCategories[PriceCategory.High].UpperBound = (int)q3;
 
-                            _fuelCategories[PriceCategory.Highest].LowerBound = (int)q3;
-                            _fuelCategories[PriceCategory.Highest].UpperBound = 0;
+                                _fuelCategories[PriceCategory.Highest].LowerBound = (int)q3;
+                                _fuelCategories[PriceCategory.Highest].UpperBound = 0;
 
-                            validCategories = _fuelCategories
-                                .Values
-                                .Where(i => i.LowerBound != i.UpperBound).ToList();
+                                validCategories = _fuelCategories
+                                    .Values
+                                    .Where(i => i.LowerBound != i.UpperBound);
+                            }
                         }
 
                         FuelCategories.ReplaceRange(validCategories);
