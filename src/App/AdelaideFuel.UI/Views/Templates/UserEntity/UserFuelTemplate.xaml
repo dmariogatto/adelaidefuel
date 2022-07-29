@@ -29,7 +29,7 @@
                     Grid.Column="1"
                     HorizontalTextAlignment="Start"
                     Style="{DynamicResource LabelTitleStyle}"
-                    Text="{Binding Name}"
+                    Text="{Binding Name, Mode=OneTime}"
                     VerticalTextAlignment="Center" />
 
                 <controls:TintImage
