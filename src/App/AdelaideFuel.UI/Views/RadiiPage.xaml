@@ -39,7 +39,7 @@
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
                 ItemsSource="{Binding Entities, Mode=OneWay}"
-                TapCommand="{Binding EntityTappedCommand}" />
+                TapCommand="{Binding EntityTappedCommand, Mode=OneTime}" />
 
             <controls:LoadingIndicator HorizontalOptions="Center" VerticalOptions="Start" />
         </Grid>

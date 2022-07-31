@@ -30,20 +30,20 @@
                     Grid.Column="1"
                     HorizontalTextAlignment="Start"
                     Style="{DynamicResource LabelTitleStyle}"
-                    Text="{Binding Name}"
+                    Text="{Binding Name, Mode=OneTime}"
                     VerticalTextAlignment="Center" />
 
                 <ContentView Grid.Column="2">
                     <View.Triggers>
                         <DataTrigger
-                            Binding="{Binding Id}"
+                            Binding="{Binding Id, Mode=OneTime}"
                             TargetType="View"
                             Value="{x:Static x:Int32.MaxValue}">
                             <Setter Property="IsVisible" Value="False" />
                         </DataTrigger>
                     </View.Triggers>
                     <View.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding EntityRemoveCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:RadiiViewModel}}}" CommandParameter="{Binding .}" />
+                        <TapGestureRecognizer Command="{Binding EntityRemoveCommand, Mode=OneTime, Source={x:RelativeSource AncestorType={x:Type viewModels:RadiiViewModel}}}" CommandParameter="{Binding ., Mode=OneTime}" />
                     </View.GestureRecognizers>
                     <controls:TintImage
                         HeightRequest="28"

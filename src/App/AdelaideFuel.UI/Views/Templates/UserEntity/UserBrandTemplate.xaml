@@ -40,14 +40,14 @@
                     <ffimg:CachedImage
                         LoadingDelay="200"
                         LoadingPlaceholder="{StaticResource FuelImg}"
-                        Source="{Binding Id, Converter={StaticResource BrandIdToIconConverter}}" />
+                        Source="{Binding Id, Mode=OneTime, Converter={StaticResource BrandIdToIconConverter}}" />
                 </yummy:PancakeView>
 
                 <Label
                     Grid.Column="2"
                     HorizontalTextAlignment="Start"
                     Style="{DynamicResource LabelTitleStyle}"
-                    Text="{Binding Name}"
+                    Text="{Binding Name, Mode=OneTime}"
                     VerticalTextAlignment="Center" />
 
                 <controls:TintImage

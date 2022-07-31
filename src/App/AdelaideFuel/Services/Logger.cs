@@ -13,9 +13,10 @@ namespace AdelaideFuel.Services
     public class Logger : ILogger
     {
         private const string LogFileName = "fuel_log.txt";
+        
+        private static readonly object LogLock = new object();
 
         private readonly IDeviceInfo _deviceInfo;
-
         private readonly string _logFilePath;
 
         public Logger(
@@ -73,11 +74,9 @@ namespace AdelaideFuel.Services
             {
                 try
                 {
-                    using (var stream = File.OpenRead(_logFilePath))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        result = await reader.ReadToEndAsync().ConfigureAwait(false);
-                    }
+                    using var stream = File.OpenRead(_logFilePath);
+                    using var reader = new StreamReader(stream);
+                    result = await reader.ReadToEndAsync().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -94,7 +93,7 @@ namespace AdelaideFuel.Services
             {
                 try
                 {
-                    lock (_logFilePath)
+                    lock (LogLock)
                     {
                         File.Delete(_logFilePath);
                     }
@@ -108,7 +107,7 @@ namespace AdelaideFuel.Services
 
         private void WriteToLog(Exception ex, string msg, IDictionary<string, string> data)
         {
-            if (ex != null &&
+            if (ex is not null &&
                 ex.GetType() != typeof(TaskCanceledException) &&
                 ex.GetType() != typeof(OperationCanceledException) &&
                 _deviceInfo.DeviceType != DeviceType.Virtual)
@@ -122,18 +121,18 @@ namespace AdelaideFuel.Services
 
             var logEntry = new List<string>
             {
-                $"[{DateTime.UtcNow.ToString("o")}]"
+                $"[{DateTime.UtcNow:o}]"
             };
 
             if (!string.IsNullOrEmpty(msg))
                 logEntry.Add(msg);
-            if (ex != null)
+            if (ex is not null)
                 logEntry.Add(ex.ToString());
             if (data?.Any() == true)
                 foreach (var d in data)
                     logEntry.Add($"{d.Key} : {d.Value}");
 
-            lock (_logFilePath)
+            lock (LogLock)
             {
                 File.AppendAllLines(_logFilePath, logEntry);
             }
