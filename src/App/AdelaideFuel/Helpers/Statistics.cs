@@ -8,61 +8,36 @@ namespace AdelaideFuel
     {
         public const int MinLengthForFns = 2;
 
+        private static readonly double[] Percentages = new[] { 0.00d, 0.25d, 0.50d, 0.75d, 1.00d };
+
         public static double[] FiveNumberSummary(IList<double> values, bool sorted = true)
         {
-            if (values.Count < MinLengthForFns) return new[] { 0d, 0d, 0d, 0d, 0d };
+            var fns = new[] { 0d, 0d, 0d, 0d, 0d };
+
+            if (values.Count < MinLengthForFns)
+                return fns;
+
             if (!sorted)
+                values = values.OrderBy(i => i).ToList();
+
+            fns[0] = values.First();
+            fns[4] = values.Last();            
+
+            for (var i = 1; i < Percentages.Length - 1; i++)
             {
-                switch (values)
-                {
-                    case double[] array:
-                        Array.Sort(array);
-                        break;
-                    case List<double> list:
-                        list.Sort();
-                        break;
-                    default:
-                        values = values.OrderBy(i => i).ToList();
-                        break;
-                }
-            }
+                var position = (values.Count + 1) * Percentages[i] - 1;
+                var idx = Math.Min(values.Count - 1, Math.Max(0, position));
 
-            var percentages = new[] { 0d, 25d, 50d, 75d, 100d };
-            var fns = new double[percentages.Length];
-
-            for (var i = 0; i < percentages.Length; i++)
-            {
-                var p = percentages[i];
-
-                if (p >= 100)
-                {
-                    fns[i] = values[values.Count - 1];
-                    continue;
-                }
-
-                var position = (values.Count + 1) * p / 100d;
-                var leftNum = 0d;
-                var rightNum = 0d;
-
-                var n = p / 100d * (values.Count - 1) + 1d;
-
-                if (position >= 1)
-                {
-                    leftNum = values[(int)Math.Floor(n) - 1];
-                    rightNum = values[(int)Math.Floor(n)];
-                }
-                else
-                {
-                    leftNum = values[0];
-                    rightNum = values[1];
-                }
+                var leftNum = values[(int)Math.Floor(idx)];
+                var rightNum = values[(int)Math.Ceiling(idx)];
 
                 if (leftNum == rightNum)
+                {
                     fns[i] = leftNum;
+                }
                 else
                 {
-                    var part = n - Math.Floor(n);
-                    fns[i] = leftNum + part * (rightNum - leftNum);
+                    fns[i] = (leftNum + rightNum) / 2d;
                 }
             }
 

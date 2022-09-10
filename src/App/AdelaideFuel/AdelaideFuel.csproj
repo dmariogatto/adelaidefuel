@@ -35,7 +35,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Xamarin.Essentials.Interfaces" Version="1.7.3.2" />
-    <PackageReference Include="Plugin.InAppBilling" Version="5.3.3-beta" />
+    <PackageReference Include="Plugin.InAppBilling" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
