@@ -21,7 +21,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <AndroidLinkMode>Full</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
     <AndroidKeyStore>false</AndroidKeyStore>
     <AndroidSigningKeyStore>
     </AndroidSigningKeyStore>
@@ -49,7 +49,7 @@
     <MandroidI18n />
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
