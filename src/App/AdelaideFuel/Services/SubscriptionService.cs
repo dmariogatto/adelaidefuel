@@ -292,11 +292,11 @@ namespace AdelaideFuel.Services
         {
             if (purchase is not null)
             {
+                await AckPurchaseAsync(purchase).ConfigureAwait(false);
+                
                 var validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
                 if (validatedReceipt is not null)
                 {
-                    await AckPurchaseAsync(purchase).ConfigureAwait(false);
-
                     SetIntAsync(validatedReceipt.GraceDays, nameof(SubscriptionGraceDays)).Wait();
                     SubscriptionExpiryDateUtc = validatedReceipt.ExpiryUtc;
                     SubscriptionSuspended = validatedReceipt.IsSuspended;
