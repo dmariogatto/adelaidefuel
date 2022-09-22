@@ -34,7 +34,7 @@
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchFastDev>true</MtouchFastDev>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
-    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB --linkskip=Essential.Interfaces</MtouchExtraArgs>
+    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB</MtouchExtraArgs>
     <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -47,7 +47,7 @@
     <MtouchArch>x86_64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <MtouchFloat32>true</MtouchFloat32>
-    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB --linkskip=Essential.Interfaces</MtouchExtraArgs>
+    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB</MtouchExtraArgs>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <OptimizePNGs>true</OptimizePNGs>
     <EnableCodeSigning>false</EnableCodeSigning>
@@ -65,7 +65,7 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB --linkskip=Essential.Interfaces</MtouchExtraArgs>
+    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB</MtouchExtraArgs>
     <MtouchLink>None</MtouchLink>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <OptimizePNGs>false</OptimizePNGs>
@@ -85,7 +85,7 @@
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Distribution</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB --linkskip=Essential.Interfaces</MtouchExtraArgs>
+    <MtouchExtraArgs>--linkskip=Refit --linkskip=LiteDB</MtouchExtraArgs>
     <MtouchLink>Full</MtouchLink>
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
     <OptimizePNGs>true</OptimizePNGs>
