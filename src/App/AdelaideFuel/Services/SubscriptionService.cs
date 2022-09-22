@@ -127,7 +127,7 @@ namespace AdelaideFuel.Services
                 {
                     // Lock out restores to once every couple weeks, or
                     // when subscription has expired
-                    var canRestore = 
+                    var canRestore =
                         (utcNow - lastRestoreDate).TotalDays > 14 ||
                         !HasValidSubscription;
 
@@ -295,8 +295,7 @@ namespace AdelaideFuel.Services
                 var validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
                 if (validatedReceipt is not null)
                 {
-                    if (_deviceInfo.Platform == DevicePlatform.Android && !purchase.IsAcknowledged)
-                        await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
+                    await AckPurchaseAsync(purchase).ConfigureAwait(false);
 
                     SetIntAsync(validatedReceipt.GraceDays, nameof(SubscriptionGraceDays)).Wait();
                     SubscriptionExpiryDateUtc = validatedReceipt.ExpiryUtc;
@@ -337,6 +336,26 @@ namespace AdelaideFuel.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> AckPurchaseAsync(InAppBillingPurchase purchase)
+        {
+            if (string.IsNullOrEmpty(purchase?.TransactionIdentifier))
+                return false;
+
+            var success = false;
+
+            try
+            {
+                await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
 
             return success;
