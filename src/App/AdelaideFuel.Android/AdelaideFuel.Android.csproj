@@ -70,7 +70,7 @@
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <AndroidUseDefaultAotProfile>false</AndroidUseDefaultAotProfile>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
     <EnableLLVM>true</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidPackageFormat>aab</AndroidPackageFormat>
