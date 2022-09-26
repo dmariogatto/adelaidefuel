@@ -50,6 +50,7 @@
                     </View.GestureRecognizers>
                     <Frame
                         Grid.RowSpan="3"
+                        BackgroundColor="Transparent"
                         CornerRadius="22"
                         HeightRequest="44"
                         HorizontalOptions="Center"

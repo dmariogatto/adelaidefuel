@@ -68,6 +68,7 @@
                                     RowSpacing="{StaticResource XSmallSpacing}">
                                     <Frame
                                         Grid.RowSpan="2"
+                                        BackgroundColor="Transparent"
                                         CornerRadius="20"
                                         HeightRequest="40"
                                         HorizontalOptions="Center"
