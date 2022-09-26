@@ -9,11 +9,10 @@
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:sho="http://sharpnado.com"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
-    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     x:DataType="models:UserRadius"
     mc:Ignorable="d">
     <ContentView>
-        <yummy:PancakeView Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+        <Frame Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
             <View.Triggers>
                 <DataTrigger
                     Binding="{Binding IsActive}"
@@ -54,6 +53,6 @@
                 </ContentView>
 
             </Grid>
-        </yummy:PancakeView>
+        </Frame>
     </ContentView>
 </sho:DraggableViewCell>

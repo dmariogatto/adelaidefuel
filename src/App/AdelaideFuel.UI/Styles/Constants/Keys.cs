@@ -24,7 +24,7 @@ namespace AdelaideFuel.UI.Styles
         public const string SecondaryTextColor = nameof(SecondaryTextColor);
         public const string CardBackgroundColor = nameof(CardBackgroundColor);
 
-        public const string CardYummyBorder = nameof(CardYummyBorder);
+        public const string CardBorderColor = nameof(CardBorderColor);
 
         public const string TintColor = nameof(TintColor);
         public const string LinkColor = nameof(LinkColor);

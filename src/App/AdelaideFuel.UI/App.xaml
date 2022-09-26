@@ -8,7 +8,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:sv="clr-namespace:AiForms.Renderers;assembly=SettingsView"
-    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
@@ -103,6 +102,11 @@
 
             <converters:BrandIdToIconConverter x:Key="BrandIdToIconConverter" />
 
+            <Style TargetType="Frame">
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
             <Style x:Key="BaseTabbedPageStyle" TargetType="TabbedPage">
                 <Setter Property="BarBackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="SelectedTabColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
@@ -142,7 +146,7 @@
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
             </Style>
 
-            <Style x:Key="CardStyle" TargetType="yummy:PancakeView">
+            <Style x:Key="CardStyle" TargetType="Frame">
                 <Setter Property="Margin">
                     <OnPlatform x:TypeArguments="Thickness">
                         <On Platform="Android">6,4,6,4</On>
@@ -153,8 +157,8 @@
                 <Setter Property="CornerRadius" Value="6" />
                 <Setter Property="IsClippedToBounds" Value="False" />
                 <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
-                <Setter Property="Border" Value="{DynamicResource {x:Static styles:Keys.CardYummyBorder}}" />
-                <Setter Property="Shadow" Value="{yummy:ShadowMarkup BlurRadius=2}" />
+                <Setter Property="BorderColor" Value="{DynamicResource {x:Static styles:Keys.CardBorderColor}}" />
+                <Setter Property="HasShadow" Value="True" />
             </Style>
 
             <Style TargetType="sv:SettingsView">

@@ -9,12 +9,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
     xmlns:sho="http://sharpnado.com"
-    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     x:DataType="models:UserBrand"
     mc:Ignorable="d">
 
     <ContentView>
-        <yummy:PancakeView
+        <Frame
             Margin="{StaticResource ItemMargin}"
             Padding="{StaticResource XSmallThickness}"
             Style="{DynamicResource CardStyle}">
@@ -30,7 +29,7 @@
 
                 <CheckBox IsChecked="{Binding IsActive}" />
 
-                <yummy:PancakeView
+                <Frame
                     Grid.Column="1"
                     CornerRadius="20"
                     HeightRequest="40"
@@ -41,7 +40,7 @@
                         LoadingDelay="200"
                         LoadingPlaceholder="{StaticResource FuelImg}"
                         Source="{Binding Id, Mode=OneTime, Converter={StaticResource BrandIdToIconConverter}}" />
-                </yummy:PancakeView>
+                </Frame>
 
                 <Label
                     Grid.Column="2"
@@ -58,6 +57,6 @@
                     TintColor="{StaticResource PrimaryAccentColor}"
                     VerticalOptions="Center" />
             </Grid>
-        </yummy:PancakeView>
+        </Frame>
     </ContentView>
 </sho:DraggableViewCell>

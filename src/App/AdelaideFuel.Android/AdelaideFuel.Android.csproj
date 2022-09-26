@@ -97,7 +97,6 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.4.0" />
-    <PackageReference Include="Xamarin.Forms.PancakeView" Version="2.3.0.763-beta" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="121.1.0" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.0.2.2" />
     <PackageReference Include="Xamarin.AndroidX.Core" Version="1.9.0" />
@@ -111,6 +110,7 @@
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
+    <Compile Include="Renderers\CustomFrameRenderer.cs" />
     <Compile Include="SplashActivity.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />

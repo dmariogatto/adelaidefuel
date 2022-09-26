@@ -1,10 +1,9 @@
 ﻿using AdelaideFuel.ViewModels;
 using Xamarin.Forms;
-using Xamarin.Forms.PancakeView;
 
 namespace AdelaideFuel.UI.Controls
 {
-    public class LoadingIndicator : PancakeView
+    public class LoadingIndicator : Frame
     {
         public static readonly BindableProperty IsBusyProperty =
           BindableProperty.Create(
@@ -22,6 +21,8 @@ namespace AdelaideFuel.UI.Controls
             SetDynamicResource(MarginProperty, Styles.Keys.MediumThickness);
             SetDynamicResource(PaddingProperty, Styles.Keys.XSmallThickness);
             SetDynamicResource(StyleProperty, Styles.Keys.CardStyle);
+
+            HasShadow = false;
 
             var activityIndicator = new ActivityIndicator()
             {
