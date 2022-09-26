@@ -31,6 +31,7 @@
 
                 <Frame
                     Grid.Column="1"
+                    BackgroundColor="Transparent"
                     CornerRadius="20"
                     HeightRequest="40"
                     HorizontalOptions="Center"
