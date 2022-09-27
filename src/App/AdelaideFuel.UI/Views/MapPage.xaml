@@ -124,8 +124,10 @@
                         RowDefinitions="Auto,Auto">
                         <Frame
                             Grid.RowSpan="3"
+                            BackgroundColor="Transparent"
                             CornerRadius="22"
                             HeightRequest="44"
+                            IsClippedToBounds="True"
                             VerticalOptions="Center"
                             WidthRequest="44">
                             <ffimg:CachedImage
