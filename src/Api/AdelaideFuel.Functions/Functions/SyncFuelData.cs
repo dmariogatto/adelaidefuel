@@ -97,10 +97,11 @@ namespace AdelaideFuel.Functions
                 _geographicRegionRepository.CreateIfNotExistsAsync(ct),
                 _siteRepository.CreateIfNotExistsAsync(ct));
 
-            await _brandRepository.SyncPartitionsWithDeactivateAsync(brandEntities, log, ct);
-            await _fuelRepository.SyncPartitionsWithDeactivateAsync(fuelEntities, log, ct);
-            await _geographicRegionRepository.SyncPartitionsWithDeactivateAsync(geographicRegionEntities, log, ct);
-            await _siteRepository.SyncPartitionsWithDeactivateAsync(siteEntities, log, ct);
+            await Task.WhenAll(
+                _brandRepository.SyncPartitionsWithDeactivateAsync(brandEntities, log, ct),
+                _fuelRepository.SyncPartitionsWithDeactivateAsync(fuelEntities, log, ct),
+                _geographicRegionRepository.SyncPartitionsWithDeactivateAsync(geographicRegionEntities, log, ct),
+                _siteRepository.SyncPartitionsWithDeactivateAsync(siteEntities, log, ct));
 
             sw.Stop();
             log.LogInformation($"Finished sync of entities in {sw.ElapsedMilliseconds}.");
