@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.iOS.Renderers;
+using CoreGraphics;
 using Foundation;
 using System.ComponentModel;
 using System.Drawing;
@@ -13,39 +14,16 @@ namespace AdelaideFuel.iOS.Renderers
     [Preserve(AllMembers = true)]
     public class CustomFrameRenderer : FrameRenderer
     {
-        protected override void OnElementChanged(ElementChangedEventArgs<Frame> e)
+        public override void Draw(CGRect rect)
         {
-            base.OnElementChanged(e);
-
-            ApplyShadow();
-        }
-
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == Xamarin.Forms.Frame.HasShadowProperty.PropertyName)
-            {
-                ApplyShadow();
-            }
-            else
-            {
-                base.OnElementPropertyChanged(sender, e);
-            }
-        }
-
-        private void ApplyShadow()
-        {
-            Layer.ShadowOpacity = 0;
-
             if (Element is not null && Element.HasShadow)
             {
-                Layer.ShadowColor = UIColor.Black.CGColor;
+                Layer.ShadowRadius = 1.0f;
                 Layer.ShadowOpacity = 0.4f;
-                Layer.ShadowRadius = 2.0f;
                 Layer.ShadowOffset = new SizeF(1.0f, 1.0f);
             }
 
-            Layer.RasterizationScale = UIScreen.MainScreen.Scale;
-            Layer.ShouldRasterize = true;
+            base.Draw(rect);
         }
     }
 }
