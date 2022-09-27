@@ -54,7 +54,6 @@
                         CornerRadius="22"
                         HeightRequest="44"
                         HorizontalOptions="Center"
-                        IsClippedToBounds="True"
                         VerticalOptions="Center"
                         WidthRequest="44">
                         <ffimg:CachedImage

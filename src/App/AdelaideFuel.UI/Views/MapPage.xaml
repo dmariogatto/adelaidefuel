@@ -127,7 +127,6 @@
                             BackgroundColor="Transparent"
                             CornerRadius="22"
                             HeightRequest="44"
-                            IsClippedToBounds="True"
                             VerticalOptions="Center"
                             WidthRequest="44">
                             <ffimg:CachedImage
