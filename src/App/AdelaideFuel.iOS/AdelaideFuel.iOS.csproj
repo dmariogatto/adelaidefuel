@@ -104,7 +104,6 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Renderers\CustomMapRenderer.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
-    <Compile Include="Renderers\CustomFrameRenderer.cs" />
     <Compile Include="Renderers\CustomNavigationPageRenderer.cs" />
     <Compile Include="Renderers\CustomPageRenderer.cs" />
     <Compile Include="Renderers\ViewCellCustomRenderer.cs" />

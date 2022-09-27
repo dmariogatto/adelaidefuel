@@ -160,7 +160,12 @@
                 <Setter Property="IsClippedToBounds" Value="False" />
                 <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="BorderColor" Value="{DynamicResource {x:Static styles:Keys.CardBorderColor}}" />
-                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="HasShadow">
+                    <OnPlatform x:TypeArguments="x:Boolean">
+                        <On Platform="Android">True</On>
+                        <On Platform="iOS">False</On>
+                    </OnPlatform>
+                </Setter>
             </Style>
 
             <Style TargetType="sv:SettingsView">
