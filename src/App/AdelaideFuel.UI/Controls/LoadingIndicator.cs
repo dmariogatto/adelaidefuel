@@ -22,8 +22,6 @@ namespace AdelaideFuel.UI.Controls
             SetDynamicResource(PaddingProperty, Styles.Keys.XSmallThickness);
             SetDynamicResource(StyleProperty, Styles.Keys.CardStyle);
 
-            HasShadow = false;
-
             var activityIndicator = new ActivityIndicator()
             {
                 WidthRequest = 24,
