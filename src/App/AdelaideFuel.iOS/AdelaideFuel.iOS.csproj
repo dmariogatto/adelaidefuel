@@ -73,7 +73,7 @@
     <MtouchFastDev>true</MtouchFastDev>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
-    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnableCodeSigning>true</EnableCodeSigning>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -92,7 +92,7 @@
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchFloat32>true</MtouchFloat32>
     <MtouchFastDev>false</MtouchFastDev>
-    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnableCodeSigning>true</EnableCodeSigning>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Effects\SafeAreaInsetEffect_iOS.cs" />
