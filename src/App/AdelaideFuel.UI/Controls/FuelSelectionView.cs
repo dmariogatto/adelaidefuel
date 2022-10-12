@@ -7,11 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Xamarin.Forms.PancakeView;
 
 namespace AdelaideFuel.UI.Controls
 {
-    public class FuelSelectionView : PancakeView
+    public class FuelSelectionView : Frame
     {
         public static readonly BindableProperty SelectedFuelProperty =
           BindableProperty.Create(
@@ -35,15 +34,15 @@ namespace AdelaideFuel.UI.Controls
 
         public FuelSelectionView()
         {
-            SetDynamicResource(PancakeView.StyleProperty, Styles.Keys.CardStyle);
+            SetDynamicResource(Frame.StyleProperty, Styles.Keys.CardStyle);
 
             Margin = new Thickness(0);
             Padding = (Thickness)App.Current.Resources[Styles.Keys.SmallThickness];
             HorizontalOptions = LayoutOptions.Center;
 
-            SetBinding(PancakeView.CornerRadiusProperty, new Binding(
+            SetBinding(Frame.CornerRadiusProperty, new Binding(
                 nameof(Height),
-                converter: new MultiplyByConverter(),
+                converter: new MultiplyByConverter(0, double.MaxValue),
                 converterParameter: 0.5d,
                 source: this));
 

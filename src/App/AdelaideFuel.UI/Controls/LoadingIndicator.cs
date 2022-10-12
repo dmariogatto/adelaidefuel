@@ -1,10 +1,9 @@
 ﻿using AdelaideFuel.ViewModels;
 using Xamarin.Forms;
-using Xamarin.Forms.PancakeView;
 
 namespace AdelaideFuel.UI.Controls
 {
-    public class LoadingIndicator : PancakeView
+    public class LoadingIndicator : Frame
     {
         public static readonly BindableProperty IsBusyProperty =
           BindableProperty.Create(

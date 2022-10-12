@@ -15,13 +15,13 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <TargetFrameworkVersion>v12.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v12.1</TargetFrameworkVersion>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <AndroidLinkMode>Full</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
     <AndroidKeyStore>false</AndroidKeyStore>
     <AndroidSigningKeyStore>
     </AndroidSigningKeyStore>
@@ -49,10 +49,11 @@
     <MandroidI18n />
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AotAssemblies>false</AotAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -69,8 +70,8 @@
     <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
     <AndroidUseDefaultAotProfile>false</AndroidUseDefaultAotProfile>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;Essential.Interfaces;</AndroidLinkSkip>
-    <EnableLLVM>true</EnableLLVM>
+    <AndroidLinkSkip>Refit;Xamarin.Android.Google.BillingClient;LiteDB;</AndroidLinkSkip>
+    <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidPackageFormat>aab</AndroidPackageFormat>
     <AndroidUseAapt2>true</AndroidUseAapt2>
@@ -96,12 +97,11 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.4.0" />
-    <PackageReference Include="Xamarin.Forms.PancakeView" Version="2.3.0.763-beta" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="120.5.0" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.7.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.4.1.1" />
-    <PackageReference Include="Plugin.InAppBilling" Version="6.4.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="121.1.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.1.0" />
+    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.9.0" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.5.1" />
+    <PackageReference Include="Plugin.InAppBilling" Version="6.6.1" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAotProfile Include="$(MSBuildThisFileDirectory)custom.aprof" />
@@ -110,6 +110,7 @@
     <Compile Include="Ads\BannerAdListener.cs" />
     <Compile Include="Ads\BannerAdHolder.cs" />
     <Compile Include="Ads\BannerAdPool.cs" />
+    <Compile Include="Renderers\CustomFrameRenderer.cs" />
     <Compile Include="SplashActivity.cs" />
     <Compile Include="Renderers\AdSmartBannerRenderer.cs" />
     <Compile Include="Renderers\ButtonCustomRenderer.cs" />

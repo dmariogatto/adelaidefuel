@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using Xamarin.Forms;
-using Xamarin.Forms.PancakeView;
 
 namespace AdelaideFuel.UI.Controls
 {
-    public class AppIconView : PancakeView
+    public class AppIconView : Frame
     {
         public static readonly BindableProperty IsBouncingProperty =
           BindableProperty.Create(
@@ -30,6 +29,7 @@ namespace AdelaideFuel.UI.Controls
             CornerRadius = 8;
             HeightRequest = WidthRequest = 60;
             HorizontalOptions = VerticalOptions = LayoutOptions.Center;
+            Margin = Padding = 0;
 
             var icon = new Image() { Source = Application.Current.Resources[Styles.Keys.TwoToneFuelImg] as string };
             icon.HeightRequest = icon.WidthRequest = 48;

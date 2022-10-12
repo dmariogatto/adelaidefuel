@@ -15,7 +15,6 @@
     x:DataType="viewModels:FuelsViewModel"
     x:TypeArguments="viewModels:FuelsViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Icon="{StaticResource FuelImg}"
     mc:Ignorable="d">
 
     <ContentPage.Resources>

@@ -14,7 +14,6 @@
     xmlns:styles="clr-namespace:AdelaideFuel.UI.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.UI.Views"
-    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     Title="{Binding Title}"
     x:DataType="viewModels:MapViewModel"
     x:TypeArguments="viewModels:MapViewModel"
@@ -60,7 +59,7 @@
                 <controls:LoadingIndicator />
             </StackLayout>
 
-            <yummy:PancakeView
+            <Frame
                 x:Name="SearchButtonLayout"
                 Margin="{StaticResource XSmallThickness}"
                 Padding="0"
@@ -79,7 +78,7 @@
                     AutomationProperties.HelpText="{local:Translate Search}"
                     Source="{StaticResource SearchImg}"
                     TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
-            </yummy:PancakeView>
+            </Frame>
 
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"
@@ -123,8 +122,9 @@
                         ColumnDefinitions="Auto,*,Auto"
                         IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
                         RowDefinitions="Auto,Auto">
-                        <yummy:PancakeView
+                        <Frame
                             Grid.RowSpan="3"
+                            BackgroundColor="Transparent"
                             CornerRadius="22"
                             HeightRequest="44"
                             VerticalOptions="Center"
@@ -133,7 +133,7 @@
                                 LoadingDelay="200"
                                 LoadingPlaceholder="{StaticResource FuelImg}"
                                 Source="{Binding SelectedSite.BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
-                        </yummy:PancakeView>
+                        </Frame>
                         <Label
                             Grid.Column="1"
                             FontFamily="{StaticResource BoldFontFamily}"
