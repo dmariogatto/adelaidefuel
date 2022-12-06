@@ -17,7 +17,7 @@
     x:DataType="viewModels:SettingsViewModel"
     x:TypeArguments="viewModels:SettingsViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Icon="{StaticResource CogImg}"
+    IconImageSource="{StaticResource CogImg}"
     mc:Ignorable="d">
 
     <ContentPage.Resources>

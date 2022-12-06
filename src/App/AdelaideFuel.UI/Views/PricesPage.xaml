@@ -18,7 +18,7 @@
     x:DataType="viewModels:PricesViewModel"
     x:TypeArguments="viewModels:PricesViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Icon="{StaticResource FuelImg}"
+    IconImageSource="{StaticResource FuelImg}"
     mc:Ignorable="d">
 
     <ContentPage.Resources>

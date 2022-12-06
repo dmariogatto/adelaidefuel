@@ -20,21 +20,20 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <OnPlatform
-                x:Key="DefaultMargin"
-                x:TypeArguments="Thickness"
-                Android="12,4,12,4"
-                iOS="12,4,12,4" />
-            <OnPlatform
-                x:Key="ButtonHeight"
-                x:TypeArguments="x:Double"
-                Android="48"
-                iOS="36" />
-            <OnPlatform
-                x:Key="ButtonCornerRadius"
-                x:TypeArguments="x:Int32"
-                Android="24"
-                iOS="18" />
+            <Thickness x:Key="DefaultMargin">12,4,12,4</Thickness>
+
+            <OnPlatform x:Key="ButtonHeight" x:TypeArguments="x:Double">
+                <OnPlatform.Platforms>
+                    <On Platform="Android" Value="48" />
+                    <On Platform="iOS" Value="36" />
+                </OnPlatform.Platforms>
+            </OnPlatform>
+            <OnPlatform x:Key="ButtonCornerRadius" x:TypeArguments="x:Int32">
+                <OnPlatform.Platforms>
+                    <On Platform="Android" Value="24" />
+                    <On Platform="iOS" Value="18" />
+                </OnPlatform.Platforms>
+            </OnPlatform>
 
             <Style x:Key="SubscriptionButton" TargetType="Button">
                 <Setter Property="HeightRequest" Value="{StaticResource ButtonHeight}" />
@@ -71,8 +70,7 @@
                     Style="{DynamicResource LabelStyle}"
                     Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionActiveUntilFormat}}">
                     <View.Triggers>
-                        <MultiTrigger
-                            TargetType="View">
+                        <MultiTrigger TargetType="View">
                             <MultiTrigger.Conditions>
                                 <BindingCondition Binding="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}" Value="True" />
                                 <BindingCondition Binding="{Binding HasExpired}" Value="False" />
@@ -90,8 +88,7 @@
                     Style="{DynamicResource LabelStyle}"
                     Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionExpiredOnFormat}}">
                     <View.Triggers>
-                        <MultiTrigger
-                            TargetType="View">
+                        <MultiTrigger TargetType="View">
                             <MultiTrigger.Conditions>
                                 <BindingCondition Binding="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}" Value="True" />
                                 <BindingCondition Binding="{Binding HasExpired}" Value="True" />
@@ -107,7 +104,8 @@
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
                     Style="{DynamicResource LabelStyle}"
-                    Text="{local:Translate Suspended, Transform=Uppercase}">
+                    Text="{local:Translate Suspended,
+                                           Transform=Uppercase}">
                     <View.Triggers>
                         <MultiTrigger TargetType="View">
                             <MultiTrigger.Conditions>

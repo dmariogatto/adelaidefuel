@@ -18,7 +18,7 @@
     x:DataType="viewModels:MapViewModel"
     x:TypeArguments="viewModels:MapViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Icon="{StaticResource MapImg}"
+    IconImageSource="{StaticResource MapImg}"
     NavigationPage.HasNavigationBar="False"
     mc:Ignorable="d">
 
