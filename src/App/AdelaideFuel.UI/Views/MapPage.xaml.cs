@@ -118,6 +118,9 @@ namespace AdelaideFuel.UI.Views
                         return false;
                     }
 
+                    if (ViewModel.IsBusy)
+                        return true;
+
                     ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
                     return true;
                 });
