@@ -36,8 +36,8 @@ namespace AdelaideFuel.iOS.Renderers
                 var margins = MapNative.LayoutMarginsGuide;
                 NSLayoutConstraint.ActivateConstraints(new[]
                 {
-                    UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, 48),
-                    UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -3),
+                    UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, 60),
+                    UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -8),
                     UserTrackingButton.WidthAnchor.ConstraintEqualTo(utSize),
                     UserTrackingButton.HeightAnchor.ConstraintEqualTo(UserTrackingButton.WidthAnchor),
                 });
