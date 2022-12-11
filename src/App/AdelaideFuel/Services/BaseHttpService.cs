@@ -14,7 +14,7 @@ namespace AdelaideFuel.Services
 
         protected static T DeserializeJsonFromStream<T>(Stream stream)
         {
-            if (stream == null || stream.CanRead == false)
+            if (stream is null || stream.CanRead == false)
                 return default;
 
             using var sr = new StreamReader(stream);
