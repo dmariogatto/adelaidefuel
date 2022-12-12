@@ -18,8 +18,11 @@ namespace AdelaideFuel.UI.Controls
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.End;
 
-            SetDynamicResource(MarginProperty, Styles.Keys.MediumThickness);
-            SetDynamicResource(PaddingProperty, Styles.Keys.XSmallThickness);
+            Margin = new Thickness(
+                (double)App.Current.Resources[Styles.Keys.MediumSpacing],
+                (double)App.Current.Resources[Styles.Keys.LargeSpacing]);
+            Padding = (Thickness)App.Current.Resources[Styles.Keys.XSmallThickness];
+
             SetDynamicResource(StyleProperty, Styles.Keys.CardStyle);
 
             var activityIndicator = new ActivityIndicator()

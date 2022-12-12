@@ -80,6 +80,9 @@ namespace AdelaideFuel.UI.Views
                         return false;
                     }
 
+                    if (ViewModel.IsBusy)
+                        return true;
+
                     ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
                     return true;
                 });

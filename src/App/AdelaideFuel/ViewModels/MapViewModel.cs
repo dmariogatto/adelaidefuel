@@ -130,12 +130,19 @@ namespace AdelaideFuel.ViewModels
             get => _selectedSite;
             set
             {
-                if (SetProperty(ref _selectedSite, value) && value is not null)
+                if (SetProperty(ref _selectedSite, value) && value is Site site)
                 {
-                    _geolocation.GetLocationAsync().ContinueWith(r =>
+                    _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>().ContinueWith(r =>
                     {
-                        if (r.Result is not null)
-                            value.LastKnownDistanceKm = r.Result.CalculateDistance(value.Latitude, value.Longitude, DistanceUnits.Kilometers);
+                        if (r.Result == PermissionStatus.Granted)
+                        {
+                            _geolocation.GetLastKnownLocationAsync().ContinueWith(r =>
+                            {
+                                site.LastKnownDistanceKm = r.Result is not null
+                                    ? r.Result.CalculateDistance(site.Latitude, site.Longitude, DistanceUnits.Kilometers)
+                                    : -1;
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
@@ -194,6 +201,7 @@ namespace AdelaideFuel.ViewModels
 
             var localCancelCopy = _sitesCancellation;
             _sitesCancellation = new CancellationTokenSource();
+
             var ct = _sitesCancellation.Token;
             localCancelCopy?.Cancel();
 
@@ -205,13 +213,8 @@ namespace AdelaideFuel.ViewModels
 
                 try
                 {
-                    var locationTask = _geolocation.GetLocationAsync(ct);
                     var pricesTask = FuelService.GetSitePricesAsync(ct);
                     var userBrandsTask = FuelService.GetUserBrandsAsync(ct);
-
-#if DEBUG
-                    //await Task.Delay(2500);
-#endif
 
                     if (!Sites.Any())
                     {
@@ -219,7 +222,7 @@ namespace AdelaideFuel.ViewModels
                         Sites.ReplaceRange(sites.Select(i => new Site(i)));
                     }
 
-                    await Task.WhenAll(locationTask, pricesTask, userBrandsTask);
+                    await Task.WhenAll(pricesTask, userBrandsTask);
 
                     // Don't care if sort order changed, just active state
                     var brandIds = userBrandsTask.Result
@@ -301,9 +304,6 @@ namespace AdelaideFuel.ViewModels
 
                         foreach (var s in Sites)
                         {
-                            s.LastKnownDistanceKm =
-                                locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
-
                             if (priceLookup.TryGetValue(s.Id, out var sitePrices))
                             {
                                 s.Prices.ReplaceRange(sitePrices);
@@ -347,14 +347,6 @@ namespace AdelaideFuel.ViewModels
 
                         LastLoadedUtc = DateTime.UtcNow;
                         ModifiedUtc = modifiedUtc;
-                    }
-                    else if (!ct.IsCancellationRequested)
-                    {
-                        foreach (var s in Sites)
-                        {
-                            s.LastKnownDistanceKm =
-                                locationTask.Result?.CalculateDistance(s.Latitude, s.Longitude, DistanceUnits.Kilometers) ?? -1;
-                        }
                     }
 
                     if (!ct.IsCancellationRequested)
