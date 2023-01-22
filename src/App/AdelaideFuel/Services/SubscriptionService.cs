@@ -139,7 +139,7 @@ namespace AdelaideFuel.Services
                         (lastRestoreDate - expiryDate).TotalDays > SubscriptionGraceDays;
 
                     if (canRestore && !longExpired)
-                        await RestoreAsync().ConfigureAwait(false);
+                        updated = (await RestoreAsync().ConfigureAwait(false)) is not null;
                 }
             }
             catch (Exception ex)
