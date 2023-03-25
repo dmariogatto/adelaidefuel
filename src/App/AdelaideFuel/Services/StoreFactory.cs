@@ -166,7 +166,7 @@ namespace AdelaideFuel.Services
                 {
                     if (_versionTracking.IsFirstLaunchForCurrentBuild && File.Exists(_cachePath))
                     {
-                        // Sometime the cache corrupts, this will hopefully help
+                        // Sometimes the cache corrupts, this will hopefully help
                         DeleteLiteDatabase(_cachePath);
                     }
 
@@ -199,6 +199,13 @@ namespace AdelaideFuel.Services
                       {
                           db = new LiteDatabase(connectionString);
                           db.Pragma("UTC_DATE", true);
+
+                          var collections = db.GetCollectionNames();
+                          foreach (var name in collections)
+                          {
+                              // Checking for a "LiteDB ENSURE" exception (i.e. data corruption)
+                              db.GetCollection(name).EnsureIndex(nameof(IStoreItem.DateExpires));
+                          }
                       });
             }
             catch (Exception ex)
