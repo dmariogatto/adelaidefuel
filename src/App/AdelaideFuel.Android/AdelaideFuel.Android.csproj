@@ -51,7 +51,6 @@
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-    <AndroidUseDefaultAotProfile>false</AndroidUseDefaultAotProfile>
     <EnableLLVM>false</EnableLLVM>
     <AotAssemblies>false</AotAssemblies>
   </PropertyGroup>
@@ -76,7 +75,6 @@
     <AndroidLinkMode>Full</AndroidLinkMode>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-    <AndroidUseDefaultAotProfile>true</AndroidUseDefaultAotProfile>
     <EnableLLVM>true</EnableLLVM>
     <AotAssemblies>true</AotAssemblies>
   </PropertyGroup>
