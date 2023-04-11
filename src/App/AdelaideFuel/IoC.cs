@@ -9,6 +9,7 @@ using Refit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using TinyIoC;
 using Xamarin.Essentials.Implementation;
 using Xamarin.Essentials.Interfaces;
@@ -83,8 +84,24 @@ namespace AdelaideFuel
             };
 
             var refitNewtonsoftSettings = new RefitSettings(new NewtonsoftJsonContentSerializer());
-            Container.Register((c, e) => RestService.For<IAdelaideFuelApi>(Constants.ApiUrlBase, refitNewtonsoftSettings)).AsSingleton();
-            Container.Register((c, e) => RestService.For<IIapVerifyApi>(Constants.ApiUrlIapBase, refitNewtonsoftSettings)).AsSingleton();
+            Container.Register((c, e) =>
+            {
+                var client = new HttpClient()
+                {
+                    BaseAddress = new Uri(Constants.ApiUrlBase),
+                };
+                var metroApi = RestService.For<IAdelaideFuelApi>(client, refitNewtonsoftSettings);
+                return metroApi;
+            }).AsSingleton();
+            Container.Register((c, e) =>
+            {
+                var client = new HttpClient()
+                {
+                    BaseAddress = new Uri(Constants.ApiUrlIapBase),
+                };
+                var iapApi = RestService.For<IIapVerifyApi>(client, refitNewtonsoftSettings);
+                return iapApi;
+            }).AsSingleton();
 
             Container.Register((c, e) => CrossInAppBilling.Current).AsSingleton();
             Container.Register((c, e) => UserDialogs.Instance).AsSingleton();
