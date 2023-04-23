@@ -58,7 +58,6 @@ namespace AdelaideFuel.ViewModels
                 if (SetProperty(ref _searchText, value?.Trim()))
                 {
                     _searchCancellation?.Cancel();
-                    _searchCancellation?.Dispose();
                     _searchCancellation = null;
 
                     _searchCancellation = new CancellationTokenSource();

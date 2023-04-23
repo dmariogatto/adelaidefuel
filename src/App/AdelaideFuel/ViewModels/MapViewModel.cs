@@ -366,7 +366,6 @@ namespace AdelaideFuel.ViewModels
             }
 
             _sitesSemaphore.Release();
-            localCancelCopy?.Dispose();
 
             if (!ct.IsCancellationRequested && !_sitesCancellation.IsCancellationRequested)
             {
