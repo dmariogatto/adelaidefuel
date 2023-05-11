@@ -158,7 +158,7 @@ namespace AdelaideFuel.ViewModels
 
         private async Task EntityTappedAsync(IUserSortableEntity entity)
         {
-            if (entity == null || (entity is UserRadius ur && ur.Id == int.MaxValue))
+            if (entity is null || (entity is UserRadius ur && ur.Id == int.MaxValue))
                 return;
 
             try
@@ -184,7 +184,7 @@ namespace AdelaideFuel.ViewModels
 
         private async Task EntityRemoveAsync(IUserSortableEntity entity)
         {
-            if (entity == null || (entity is UserRadius ur && ur.Id == int.MaxValue))
+            if (entity is null || (entity is UserRadius ur && ur.Id == int.MaxValue))
                 return;
 
             try

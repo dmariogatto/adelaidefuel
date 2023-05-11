@@ -38,7 +38,7 @@ namespace AdelaideFuel.Droid.Renderers
 
         private void ApplyTintColor()
         {
-            if (Control != null && Element is TintImage tintImage)
+            if (Control is not null && Element is TintImage tintImage)
             {
                 if (tintImage.TintColor == Color.Transparent)
                 {

@@ -135,17 +135,17 @@ namespace AdelaideFuel.Services
         #region Database Init
         private void InitUserDb()
         {
-            if (_userDb != null)
+            if (_userDb is not null)
                 return;
 
             lock (_dbLock)
             {
-                if (_userDb == null)
+                if (_userDb is null)
                 {
                     var connectionString = $"Filename={_userPath};Upgrade=true;";
                     _userDb = GetLiteDatabase(connectionString);
 
-                    if (_userDb == null)
+                    if (_userDb is null)
                     {
                         // Oh boy... user database is corrupt
                         // try to recreate
@@ -157,12 +157,12 @@ namespace AdelaideFuel.Services
 
         private void InitCacheDb()
         {
-            if (_cacheDb != null)
+            if (_cacheDb is not null)
                 return;
 
             lock (_dbLock)
             {
-                if (_cacheDb == null)
+                if (_cacheDb is null)
                 {
                     if (_versionTracking.IsFirstLaunchForCurrentBuild && File.Exists(_cachePath))
                     {
@@ -173,7 +173,7 @@ namespace AdelaideFuel.Services
                     var connectionString = $"Filename={_cachePath};";
                     _cacheDb = GetLiteDatabase(connectionString);
 
-                    if (_cacheDb == null)
+                    if (_cacheDb is null)
                     {
                         DeleteLiteDatabase(_cachePath);
                         _cacheDb = GetLiteDatabase(connectionString);
@@ -252,7 +252,7 @@ namespace AdelaideFuel.Services
             DeleteLiteDatabase(_userPath);
             _userDb = GetLiteDatabase(connectionString);
 
-            if (_userDb != null)
+            if (_userDb is not null)
             {
                 try
                 {

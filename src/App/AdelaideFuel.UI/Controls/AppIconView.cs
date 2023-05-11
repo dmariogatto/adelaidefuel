@@ -46,7 +46,7 @@ namespace AdelaideFuel.UI.Controls
 
         private static void IsBouncingChanged(AppIconView view, bool oldVal, bool newVal)
         {
-            if (view != null)
+            if (view is not null)
             {
                 if (newVal)
                 {

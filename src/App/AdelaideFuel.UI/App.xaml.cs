@@ -183,7 +183,7 @@ namespace AdelaideFuel.UI
                         mapVm.When(vm => !vm.IsBusy && vm.Fuels.Count > 0, () =>
                         {
                             var fuel = mapVm.Fuels.FirstOrDefault(f => f.Id == id);
-                            if (fuel != null)
+                            if (fuel is not null)
                             {
                                 mapVm.Fuel = fuel;
                             }

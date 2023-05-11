@@ -145,7 +145,7 @@ namespace AdelaideFuel.UI.Views
                 ViewModel.When(vm => !vm.IsBusy && vm.Fuels.Count > 0, () =>
                 {
                     var fuel = ViewModel.Fuels.FirstOrDefault(f => f.Id == fuelId);
-                    if (fuel != null)
+                    if (fuel is not null)
                     {
                         ViewModel.Fuel = fuel;
 
@@ -155,7 +155,7 @@ namespace AdelaideFuel.UI.Views
                             {
                                 var sitePin = SiteMap.Pins
                                     .FirstOrDefault(p => p.BindingContext is Site s && s.Id == siteId);
-                                if (sitePin != null)
+                                if (sitePin is not null)
                                 {
                                     SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(sitePin.Position, Distance.FromKilometers(1)));
                                     SiteMap.SelectedPin = sitePin;
@@ -190,7 +190,7 @@ namespace AdelaideFuel.UI.Views
                     SiteMap.VisibleRegion.Radius.Meters,
                     SiteMap.VisibleRegion.Bearing);
 
-                if (SiteMap.SelectedPin != null)
+                if (SiteMap.SelectedPin is not null)
                 {
                     _skipSelectedPinChange = true;
                     var pin = SiteMap.SelectedPin;
@@ -204,7 +204,7 @@ namespace AdelaideFuel.UI.Views
                 ViewModel.SelectedSite = SiteMap.SelectedPin?.BindingContext as Site;
 
                 var handle = BottomDrawerHandle;
-                if (BottomDrawerControl.ExpandedPercentage == 0 && ViewModel.SelectedSite != null)
+                if (BottomDrawerControl.ExpandedPercentage == 0 && ViewModel.SelectedSite is not null)
                 {
                     new Animation
                     {
@@ -300,7 +300,7 @@ namespace AdelaideFuel.UI.Views
 
             heightAcc += drawer.Padding.Bottom;
 
-            if (ViewModel.SelectedSite != null)
+            if (ViewModel.SelectedSite is not null)
                 lockStates.Add((heightAcc - offset) / MainContentLayout.Height);
 
             var expIdx = drawer.LockStates.Length == lockStates.Count

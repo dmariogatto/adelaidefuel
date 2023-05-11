@@ -235,7 +235,7 @@ namespace AdelaideFuel.Storage
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             var success = false;
@@ -271,7 +271,7 @@ namespace AdelaideFuel.Storage
             try
             {
                 var storeItems = items
-                    .Where(i => !string.IsNullOrWhiteSpace(i.key) && i.data != null)
+                    .Where(i => !string.IsNullOrWhiteSpace(i.key) && i.data is not null)
                     .Select(i => new StoreItem<T>
                     {
                         Id = i.key,
@@ -297,7 +297,7 @@ namespace AdelaideFuel.Storage
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             var success = false;
