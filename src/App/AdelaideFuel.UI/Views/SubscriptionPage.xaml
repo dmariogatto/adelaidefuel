@@ -40,7 +40,7 @@
                 <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
                 <Setter Property="Padding" Value="6,0,6,0" />
                 <Setter Property="Margin" Value="0,4,0,4" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
                 <Setter Property="BackgroundColor" Value="#005005" />
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="FontAttributes" Value="Bold" />
@@ -128,7 +128,7 @@
                     RowSpacing="0">
                     <BoxView
                         HeightRequest="1"
-                        HorizontalOptions="FillAndExpand"
+                        HorizontalOptions="Fill"
                         Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <Grid
@@ -150,7 +150,7 @@
 
                         <Label
                             Grid.Column="1"
-                            HorizontalOptions="FillAndExpand"
+                            HorizontalOptions="Fill"
                             HorizontalTextAlignment="Center"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding SubscriptionProduct.LocalizedPrice, StringFormat={local:Translate ItemPerYear}}" />
@@ -180,7 +180,7 @@
                         Grid.Row="2"
                         Margin="12,0,0,0"
                         HeightRequest="1"
-                        HorizontalOptions="FillAndExpand"
+                        HorizontalOptions="Fill"
                         Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <Grid
@@ -202,10 +202,10 @@
                         <Label
                             x:Name="BannerAdsLabel"
                             FontSize="Medium"
-                            HorizontalOptions="StartAndExpand"
+                            HorizontalOptions="Start"
                             Style="{DynamicResource LabelStyle}"
                             Text="{local:Translate BannerAds}"
-                            VerticalOptions="CenterAndExpand" />
+                            VerticalOptions="Center" />
                         <Label
                             Grid.Row="1"
                             FontSize="Caption"
@@ -215,15 +215,15 @@
                             Grid.RowSpan="2"
                             Grid.Column="1"
                             AutomationProperties.LabeledBy="BannerAdsLabel"
-                            HorizontalOptions="CenterAndExpand"
+                            HorizontalOptions="Center"
                             IsToggled="{Binding BannerAds}"
-                            VerticalOptions="CenterAndExpand" />
+                            VerticalOptions="Center" />
                     </Grid>
 
                     <BoxView
                         Grid.Row="4"
                         HeightRequest="1"
-                        HorizontalOptions="FillAndExpand"
+                        HorizontalOptions="Fill"
                         Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 </Grid>
 
