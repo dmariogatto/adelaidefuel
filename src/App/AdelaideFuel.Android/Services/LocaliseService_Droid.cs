@@ -51,7 +51,7 @@ namespace AdelaideFuel.Droid.Services
                     }
                 }
 
-                if (ci != null)
+                if (ci is not null)
                     _cultures.Add(netLanguage, ci);
             }
 

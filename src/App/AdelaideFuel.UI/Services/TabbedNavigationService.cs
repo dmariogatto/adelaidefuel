@@ -36,7 +36,7 @@ namespace AdelaideFuel.UI.Services
 
         public void Init()
         {
-            if (Application.Current.MainPage == null)
+            if (Application.Current.MainPage is null)
             {
                 var tabbedPage = new TabbedPage();
                 tabbedPage.SetDynamicResource(TabbedPage.StyleProperty, Styles.Keys.BaseTabbedPageStyle);
@@ -113,7 +113,7 @@ namespace AdelaideFuel.UI.Services
                     navFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
-                if (navigatedPage != null && parameters?.Any() == true)
+                if (navigatedPage is not null && parameters?.Any() == true)
                 {
                     var pageType = navigatedPage.GetType();
                     var qProps = pageType.GetCustomAttributes(false).OfType<QueryPropertyAttribute>();
@@ -187,17 +187,17 @@ namespace AdelaideFuel.UI.Services
             if (sender is TabbedPage tabbedPage &&
                 tabbedPage.CurrentPage is NavigationPage navPage)
             {
-                if (navPage.RootPage == null)
+                if (navPage.RootPage is null)
                     LoadTab(tabbedPage, navPage);
 
-                if (tabbedPage.Children.OfType<NavigationPage>().All(np => np.RootPage != null))
+                if (tabbedPage.Children.OfType<NavigationPage>().All(np => np.RootPage is not null))
                     tabbedPage.CurrentPageChanged -= CurrentPageChanged;
             }
         }
 
         private Page LoadTab(TabbedPage tabbedPage, NavigationPage navPage)
         {
-            if (navPage.RootPage == null && tabbedPage.Children.Count == _tabViewModels.Length)
+            if (navPage.RootPage is null && tabbedPage.Children.Count == _tabViewModels.Length)
             {
                 var index = tabbedPage.Children.IndexOf(navPage);
                 if (index >= 0)

@@ -37,7 +37,7 @@ namespace AdelaideFuel.UI
 
             var translation = ResMgr.Value.GetString(Text, _ci);
 
-            if (translation == null)
+            if (translation is null)
             {
 #if DEBUG
                 throw new ArgumentException(

@@ -15,7 +15,7 @@ namespace AdelaideFuel.iOS.Renderers
     {
         protected override void UpdateShowUserLocationButton()
         {
-            if (MapModel.ShowUserLocationButton && UserTrackingButton == null)
+            if (MapModel.ShowUserLocationButton && UserTrackingButton is null)
             {
                 const float utSize = 38f;
 
@@ -42,7 +42,7 @@ namespace AdelaideFuel.iOS.Renderers
                     UserTrackingButton.HeightAnchor.ConstraintEqualTo(UserTrackingButton.WidthAnchor),
                 });
             }
-            else if (!MapModel.ShowUserLocationButton && UserTrackingButton != null)
+            else if (!MapModel.ShowUserLocationButton && UserTrackingButton is not null)
             {
                 UserTrackingButton.RemoveFromSuperview();
                 UserTrackingButton.Dispose();

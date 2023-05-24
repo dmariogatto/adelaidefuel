@@ -32,7 +32,7 @@ namespace AdelaideFuel.iOS.Renderers
 
         private void ApplyTintColor()
         {
-            if (Control?.Image != null && Element is TintImage tintImage)
+            if (Control?.Image is not null && Element is TintImage tintImage)
             {
                 if (tintImage.TintColor == Color.Transparent)
                 {

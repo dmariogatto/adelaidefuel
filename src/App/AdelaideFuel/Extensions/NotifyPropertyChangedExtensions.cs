@@ -9,7 +9,7 @@ namespace AdelaideFuel
     {
         public static void When<T>(this T obj, Func<T, bool> predicate, Action action, int timeoutMs = 3000) where T : INotifyPropertyChanged
         {
-            if (obj == null || predicate == null || action == null)
+            if (obj is null || predicate is null || action is null)
                 return;
 
             if (predicate.Invoke(obj))

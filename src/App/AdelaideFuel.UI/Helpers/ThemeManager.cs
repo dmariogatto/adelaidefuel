@@ -50,7 +50,7 @@ namespace AdelaideFuel.UI
                 : CurrentTheme;
 
             var mergedDictionaries = Application.Current?.Resources?.MergedDictionaries;
-            if (mergedDictionaries != null &&
+            if (mergedDictionaries is not null &&
                 (theme != ResolvedTheme || !mergedDictionaries.Any()))
             {
                 mergedDictionaries.Clear();

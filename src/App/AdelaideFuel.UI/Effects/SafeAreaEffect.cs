@@ -45,7 +45,7 @@ namespace AdelaideFuel.UI.Effects
             {
                 // Automatically add the effect to the view once the property is attached
                 var toRemove = element.Effects.FirstOrDefault(e => e is SafeAreaInsetEffect);
-                if (toRemove != null)
+                if (toRemove is not null)
                 {
                     element.Effects.Remove(toRemove);
                 }

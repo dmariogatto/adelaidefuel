@@ -30,7 +30,7 @@ namespace AdelaideFuel.UI.Services
 
         public void Init()
         {
-            if (Application.Current.MainPage == null)
+            if (Application.Current.MainPage is null)
             {
                 var mainNavPage = new NavigationPage(GetMainPage<PricesViewModel>());
                 Application.Current.MainPage = mainNavPage;
@@ -64,7 +64,7 @@ namespace AdelaideFuel.UI.Services
                     navFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
-                if (navigatedPage != null && parameters?.Any() == true)
+                if (navigatedPage is not null && parameters?.Any() == true)
                 {
                     var pageType = navigatedPage.GetType();
                     var qProps = pageType.GetCustomAttributes(false).OfType<QueryPropertyAttribute>();

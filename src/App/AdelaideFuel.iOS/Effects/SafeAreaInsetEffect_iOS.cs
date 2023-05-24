@@ -137,8 +137,8 @@ namespace AdelaideFuel.iOS.Effects
                     // Make sure we've got a view with Padding support
                     var type = Element.GetType();
                     if (type.GetProperty(nameof(Layout.Padding)) is PropertyInfo pi &&
-                        pi.GetMethod != null &&
-                        pi.SetMethod != null)
+                        pi.GetMethod is not null &&
+                        pi.SetMethod is not null)
                     {
                         _paddingInfo = pi;
                     }

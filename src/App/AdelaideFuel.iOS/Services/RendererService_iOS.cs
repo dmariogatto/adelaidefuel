@@ -18,15 +18,15 @@ namespace AdelaideFuel.iOS.Services
 
         public bool HasRenderer(VisualElement element)
         {
-            return GetRenderer(element) != null;
+            return GetRenderer(element) is not null;
         }
 
         public void OnRendererSet(VisualElement element, Action<VisualElement, object> callback)
         {
-            if (element != null && callback != null)
+            if (element is not null && callback is not null)
             {
                 var renderer = GetRenderer(element);
-                if (renderer != null)
+                if (renderer is not null)
                 {
                     callback.Invoke(element, renderer);
                 }

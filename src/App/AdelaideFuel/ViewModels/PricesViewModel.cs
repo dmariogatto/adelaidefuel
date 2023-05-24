@@ -39,7 +39,7 @@ namespace AdelaideFuel.ViewModels
             FuelPriceGroups = new ObservableRangeCollection<SiteFuelPriceItemGroup>();
 
             LoadFuelPriceGroupsCommand = new AsyncCommand<CancellationToken>(LoadFuelPriceGroupsAsync);
-            FuelPriceTappedCommand = new AsyncCommand<SiteFuelPriceItem>((fp) => fp?.SiteId != null
+            FuelPriceTappedCommand = new AsyncCommand<SiteFuelPriceItem>((fp) => fp?.SiteId is not null
                 ? NavigationService.NavigateToAsync<MapViewModel>(new Dictionary<string, string>()
                 {
                     { NavigationKeys.SiteIdQueryProperty, fp.SiteId.ToString() },
