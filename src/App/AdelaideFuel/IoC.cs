@@ -191,9 +191,9 @@ namespace AdelaideFuel
             Container.Register(serviceType, implementationType).AsSingleton();
         }
 
-        public static void RegisterSingleton(Type serviceType, Func<object> instanceCreator)
+        public static void RegisterSingleton<T>(Func<T> instanceCreator) where T : class
         {
-            Container.Register(serviceType, instanceCreator).AsSingleton();
+            Container.Register((_, _) => instanceCreator()).AsSingleton();
         }
 
         public static void RegisterTransient<TService, TImplementation>() where TService : class where TImplementation : class, TService
