@@ -13,9 +13,9 @@ namespace AdelaideFuel.Droid
 {
     public static class UmpConsent
     {
-        private static IConsentInformation _instance;
+        private static IConsentInformation ConsentInformation;
         internal static IConsentInformation Instance
-            => _instance ?? UserMessagingPlatform.GetConsentInformation(Platform.AppContext);
+            => ConsentInformation ?? UserMessagingPlatform.GetConsentInformation(Platform.AppContext);
 
         private static ConsentDebugSettings DebugSettings;
 
