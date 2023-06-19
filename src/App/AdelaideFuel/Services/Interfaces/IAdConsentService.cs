@@ -24,6 +24,10 @@ namespace AdelaideFuel.Services
         public ConsentInfoUpdateException(string message) : base(message)
         {
         }
+
+        public ConsentInfoUpdateException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 
     public class ConsentFormLoadException : Exception
@@ -31,11 +35,19 @@ namespace AdelaideFuel.Services
         public ConsentFormLoadException(string message) : base(message)
         {
         }
+
+        public ConsentFormLoadException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 
     public class ConsentFormPresentException : Exception
     {
         public ConsentFormPresentException(string message) : base(message)
+        {
+        }
+
+        public ConsentFormPresentException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

@@ -1,7 +1,5 @@
 ﻿using AdelaideFuel.Services;
-using Foundation;
 using Google.UserMessagingPlatform;
-using ObjCRuntime;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +10,6 @@ namespace AdelaideFuel.iOS
     public static class UmpConsent
     {
         private static DebugSettings DebugSettings;
-        private static TaskCompletionSource<ConsentStatus> Tcs;
 
         internal static ConsentInformation Instance => ConsentInformation.SharedInstance;
 
@@ -34,100 +31,58 @@ namespace AdelaideFuel.iOS
         public static Task<ConsentStatus> RequestAsync(bool underAge)
             => RequestAsync(underAge, DebugSettings);
 
-        private static Task<ConsentStatus> RequestAsync(bool underAge, DebugSettings debugSettings)
+        private static async Task<ConsentStatus> RequestAsync(bool underAge, DebugSettings debugSettings)
         {
-            if (Tcs?.Task is Task<ConsentStatus> task && !task.IsCompleted)
-                return task;
+            var parameters = new RequestParameters()
+            {
+                TagForUnderAgeOfConsent = underAge
+            };
 
-            Tcs = new TaskCompletionSource<ConsentStatus>();
+            if (debugSettings is not null)
+            {
+                parameters.DebugSettings = debugSettings;
+            }
 
             try
             {
-                var parameters = new RequestParameters()
-                {
-                    TagForUnderAgeOfConsent = underAge
-                };
-
-                if (debugSettings is not null)
-                {
-                    parameters.DebugSettings = debugSettings;
-                }
-
-                Instance.RequestConsentInfoUpdateWithParameters(
-                    parameters,
-                    RequestHandler);
+                await Instance.RequestConsentInfoUpdateWithParametersAsync(parameters);
             }
             catch (Exception ex)
             {
-                Tcs.TrySetException(ex);
+                throw new ConsentInfoUpdateException(ex.Message, ex);
             }
 
-            return Tcs.Task;
-        }
-
-        [MonoPInvokeCallback(typeof(ConsentInformationUpdateCompletionHandler))]
-        private static void RequestHandler(NSError error)
-        {
-            try
+            if (Instance.FormStatus == FormStatus.Available)
             {
-                if (error is not null)
-                    throw new ConsentInfoUpdateException(error.LocalizedDescription);
+                var form = default(ConsentForm);
 
-                if (Instance.FormStatus == FormStatus.Available)
+                try
                 {
-                    ConsentForm.LoadWithCompletionHandler(LoadFormHandler);
+                    form = await ConsentForm.LoadWithCompletionHandlerAsync();
                 }
-                else
+                catch (Exception ex)
                 {
-                    Tcs.TrySetResult(Instance.ConsentStatus);
+                    throw new ConsentFormLoadException(ex.Message, ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                Tcs.TrySetException(ex);
-            }
-        }
 
-        [MonoPInvokeCallback(typeof(ConsentFormLoadCompletionHandler))]
-        private static void LoadFormHandler(ConsentForm consentForm, NSError error)
-        {
-            try
-            {
-                if (error is not null)
-                    throw new ConsentFormLoadException(error.LocalizedDescription);
-                if (consentForm is null)
-                    throw new ArgumentNullException(nameof(consentForm), "ConsentForm is null");
+                if (form is null)
+                    throw new ArgumentNullException(nameof(form), "ConsentForm is null");
 
                 if (Instance.ConsentStatus == ConsentStatus.Required)
                 {
                     var vc = GetRootViewController() ?? throw new ArgumentNullException("viewController", "RootViewController is null");
-                    consentForm.PresentFromViewController(vc, PresentFormHandler);
+                    try
+                    {
+                        await form.PresentFromViewControllerAsync(vc);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ConsentFormPresentException(ex.Message, ex);
+                    }
                 }
-                else
-                {
-                    Tcs.TrySetResult(Instance.ConsentStatus);
-                }
             }
-            catch (Exception ex)
-            {
-                Tcs.TrySetException(ex);
-            }
-        }
 
-        [MonoPInvokeCallback(typeof(ConsentFormPresentCompletionHandler))]
-        private static void PresentFormHandler(NSError error)
-        {
-            try
-            {
-                if (error is not null)
-                    throw new ConsentFormPresentException(error.LocalizedDescription);
-
-                Tcs.TrySetResult(Instance.ConsentStatus);
-            }
-            catch (Exception ex)
-            {
-                Tcs.TrySetException(ex);
-            }
+            return Instance.ConsentStatus;
         }
 
         private static UIViewController GetRootViewController()
