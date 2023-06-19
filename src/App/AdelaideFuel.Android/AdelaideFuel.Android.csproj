@@ -96,7 +96,7 @@
     <PackageReference Include="Sharpnado.CollectionView" Version="2.1.0" />
     <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.6" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.5.0" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="122.1.0.1" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.1.0.2" />
