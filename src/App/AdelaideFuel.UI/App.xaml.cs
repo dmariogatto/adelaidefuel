@@ -77,6 +77,7 @@ namespace AdelaideFuel.UI
             culture.DateTimeFormat.SetTimePatterns(localise.Is24Hour);
             localise.SetLocale(culture);
 
+            _ = RequestAdConsentAsync();
             _ = Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
 
             IoC.Resolve<INavigationService>().Init();
@@ -265,6 +266,28 @@ namespace AdelaideFuel.UI
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+            }
+        }
+
+        private async Task RequestAdConsentAsync()
+        {
+            try
+            {
+                var subscriptionService = IoC.Resolve<ISubscriptionService>();
+                if (!subscriptionService.AdsEnabled)
+                    return;
+
+                var adConsentService = IoC.Resolve<IAdConsentService>();
+                var consent = await adConsentService.RequestAsync(default);
+                IoC.Resolve<ILogger>().Event(
+                    AppCenterEvents.Action.AdConsent, new Dictionary<string, string>()
+                    {
+                        { nameof(consent) , consent.ToString() }
+                    });
+            }
+            catch (Exception ex)
+            {
+                IoC.Resolve<ILogger>().Error(ex);
             }
         }
     }

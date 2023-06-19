@@ -25,13 +25,7 @@ namespace AdelaideFuel.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // Linker
-            var types = new[]
-            {
-                // AdMob
-                typeof(JavaScriptCore.JSContext)
-            };
-
+            IoC.RegisterSingleton<IAdConsentService, AdConsentService_iOS>();
             IoC.RegisterSingleton<ILocalise, LocaliseService_iOS>();
             IoC.RegisterSingleton<IEnvironmentService, EnvironmentService_iOS>();
             IoC.RegisterSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyService_iOS>();
@@ -80,6 +74,16 @@ namespace AdelaideFuel.iOS
         public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler)
         {
             Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);
+        }
+
+        [Preserve]
+        private static void Linker()
+        {
+            var types = new[]
+            {
+                // AdMob
+                typeof(JavaScriptCore.JSContext)
+            };
         }
     }
 }

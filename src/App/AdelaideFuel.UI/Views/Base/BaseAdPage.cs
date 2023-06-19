@@ -9,6 +9,7 @@ namespace AdelaideFuel.UI.Views
     [ContentProperty(nameof(MainContent))]
     public class BaseAdPage<T> : BasePage<T> where T : BaseViewModel
     {
+        private readonly IAdConsentService _adConsentService;
         private readonly ISubscriptionService _subscriptionService;
 
         private readonly Grid _mainGrid;
@@ -18,6 +19,7 @@ namespace AdelaideFuel.UI.Views
 
         public BaseAdPage() : base()
         {
+            _adConsentService = IoC.Resolve<IAdConsentService>();
             _subscriptionService = IoC.Resolve<ISubscriptionService>();
 
             _mainGrid = new Grid() { RowSpacing = 0 };
@@ -86,7 +88,7 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            if (_subscriptionService.AdsEnabled)
+            if (_subscriptionService.AdsEnabled && _adConsentService.CanServeAds)
             {
                 AddBannerAd();
             }

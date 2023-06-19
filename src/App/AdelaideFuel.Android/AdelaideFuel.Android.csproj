@@ -103,6 +103,7 @@
     <PackageReference Include="Xamarin.AndroidX.Core" Version="1.10.1.1" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.6.1.2" />
     <PackageReference Include="Plugin.InAppBilling" Version="6.7.0" />
+    <PackageReference Include="Xamarin.Google.UserMessagingPlatform" Version="2.0.0.4" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAotProfile Include="$(MSBuildThisFileDirectory)custom.aprof" />
@@ -127,6 +128,8 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AdConsentService_Droid.cs" />
+    <Compile Include="Ads\UmpConsent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="appcenter-pre-build.sh" />

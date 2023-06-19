@@ -5,7 +5,6 @@ using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
-
 namespace AdelaideFuel.iOS.Services
 {
     [Preserve(AllMembers = true)]
