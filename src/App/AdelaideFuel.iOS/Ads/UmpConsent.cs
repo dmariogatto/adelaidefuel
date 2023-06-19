@@ -1,9 +1,9 @@
 ﻿using AdelaideFuel.Services;
 using Foundation;
 using Google.UserMessagingPlatform;
+using ObjCRuntime;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using UIKit;
 
@@ -11,9 +11,10 @@ namespace AdelaideFuel.iOS
 {
     public static class UmpConsent
     {
-        internal static ConsentInformation Instance => ConsentInformation.SharedInstance;
-
         private static DebugSettings DebugSettings;
+        private static TaskCompletionSource<ConsentStatus> Tcs;
+
+        internal static ConsentInformation Instance => ConsentInformation.SharedInstance;
 
         public static void SetDebugSettings(string[] testDeviceIdentifiers, DebugGeography debugGeography)
         {
@@ -30,12 +31,15 @@ namespace AdelaideFuel.iOS
 
         public static void Reset() => Instance.Reset();
 
-        public static Task<ConsentStatus> RequestAsync(bool underAge, CancellationToken cancellationToken)
-            => RequestAsync(underAge, DebugSettings, cancellationToken);
+        public static Task<ConsentStatus> RequestAsync(bool underAge)
+            => RequestAsync(underAge, DebugSettings);
 
-        private static Task<ConsentStatus> RequestAsync(bool underAge, DebugSettings debugSettings, CancellationToken cancellationToken)
+        private static Task<ConsentStatus> RequestAsync(bool underAge, DebugSettings debugSettings)
         {
-            var tcs = new TaskCompletionSource<ConsentStatus>();
+            if (Tcs?.Task is Task<ConsentStatus> task && !task.IsCompleted)
+                return task;
+
+            Tcs = new TaskCompletionSource<ConsentStatus>();
 
             try
             {
@@ -51,61 +55,56 @@ namespace AdelaideFuel.iOS
 
                 Instance.RequestConsentInfoUpdateWithParameters(
                     parameters,
-                    (error) => RequestHandler(error, tcs, cancellationToken));
+                    RequestHandler);
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                Tcs.TrySetException(ex);
             }
 
-            return tcs.Task;
+            return Tcs.Task;
         }
 
-        private static void LoadForm(TaskCompletionSource<ConsentStatus> tcs, CancellationToken cancellationToken)
+        private static void LoadForm()
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                ConsentForm.LoadWithCompletionHandler(
-                    (form, error) => LoadFormHandler(form, error, tcs, cancellationToken));
+                ConsentForm.LoadWithCompletionHandler(LoadFormHandler);
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                Tcs.TrySetException(ex);
             }
         }
 
-        private static void RequestHandler(NSError error, TaskCompletionSource<ConsentStatus> tcs, CancellationToken cancellationToken)
+        [MonoPInvokeCallback(typeof(ConsentInformationUpdateCompletionHandler))]
+        private static void RequestHandler(NSError error)
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 if (error is not null)
                     throw new ConsentInfoUpdateException(error.LocalizedDescription);
 
                 if (Instance.FormStatus == FormStatus.Available)
                 {
-                    LoadForm(tcs, cancellationToken);
+                    LoadForm();
                 }
                 else
                 {
-                    tcs.TrySetResult(Instance.ConsentStatus);
+                    Tcs.TrySetResult(Instance.ConsentStatus);
                 }
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                Tcs.TrySetException(ex);
             }
         }
 
-        private static void LoadFormHandler(ConsentForm form, NSError error, TaskCompletionSource<ConsentStatus> tcs, CancellationToken cancellationToken)
+        [MonoPInvokeCallback(typeof(ConsentFormLoadCompletionHandler))]
+        private static void LoadFormHandler(ConsentForm form, NSError error)
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 if (error is not null)
                     throw new ConsentFormLoadException(error.LocalizedDescription);
                 if (form is null)
@@ -114,35 +113,32 @@ namespace AdelaideFuel.iOS
                 if (Instance.ConsentStatus == ConsentStatus.Required)
                 {
                     var vc = GetRootViewController() ?? throw new ArgumentNullException("viewController", "RootViewController is null");
-                    form.PresentFromViewController(
-                        vc,
-                        (error) => PresentFormHandler(error, tcs, cancellationToken));
+                    form.PresentFromViewController(vc, PresentFormHandler);
                 }
                 else
                 {
-                    tcs.TrySetResult(Instance.ConsentStatus);
+                    Tcs.TrySetResult(Instance.ConsentStatus);
                 }
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                Tcs.TrySetException(ex);
             }
         }
 
-        private static void PresentFormHandler(NSError error, TaskCompletionSource<ConsentStatus> tcs, CancellationToken cancellationToken)
+        [MonoPInvokeCallback(typeof(ConsentFormPresentCompletionHandler))]
+        private static void PresentFormHandler(NSError error)
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 if (error is not null)
                     throw new ConsentFormPresentException(error.LocalizedDescription);
 
-                tcs.TrySetResult(Instance.ConsentStatus);
+                Tcs.TrySetResult(Instance.ConsentStatus);
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                Tcs.TrySetException(ex);
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AdelaideFuel.Services
@@ -17,7 +16,7 @@ namespace AdelaideFuel.Services
         AdConsentStatus Status { get; }
         bool CanServeAds { get; }
 
-        Task<AdConsentStatus> RequestAsync(CancellationToken cancellationToken);
+        Task<AdConsentStatus> RequestAsync();
     }
 
     public class ConsentInfoUpdateException : Exception

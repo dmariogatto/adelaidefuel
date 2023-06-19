@@ -1,6 +1,5 @@
 ﻿using AdelaideFuel.Services;
 using Android.Runtime;
-using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Google.UserMesssagingPlatform;
 
@@ -23,9 +22,9 @@ namespace AdelaideFuel.Droid.Services
                 _ => false,
             };
 
-        public async Task<AdConsentStatus> RequestAsync(CancellationToken cancellationToken)
+        public async Task<AdConsentStatus> RequestAsync()
         {
-            var consent = await UmpConsent.RequestAsync(false, cancellationToken);
+            var consent = await UmpConsent.RequestAsync(false);
             return ConvertStatus(consent);
         }
 

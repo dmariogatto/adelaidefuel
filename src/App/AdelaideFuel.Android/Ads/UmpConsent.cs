@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Google.UserMesssagingPlatform;
 using static Xamarin.Google.UserMesssagingPlatform.UserMessagingPlatform;
-using CancellationToken = System.Threading.CancellationToken;
 using Exception = System.Exception;
 
 namespace AdelaideFuel.Droid
@@ -14,10 +13,10 @@ namespace AdelaideFuel.Droid
     public static class UmpConsent
     {
         private static IConsentInformation ConsentInformation;
+        private static ConsentDebugSettings DebugSettings;
+
         internal static IConsentInformation Instance
             => ConsentInformation ?? UserMessagingPlatform.GetConsentInformation(Platform.AppContext);
-
-        private static ConsentDebugSettings DebugSettings;
 
         public static void SetDebugSettings(string[] testDeviceHashedIds, int debugGeography)
         {
@@ -40,10 +39,10 @@ namespace AdelaideFuel.Droid
 
         public static void Reset() => Instance.Reset();
 
-        public static Task<int> RequestAsync(bool underAge, CancellationToken cancellationToken)
-            => RequestAsync(underAge, DebugSettings, cancellationToken);
+        public static Task<int> RequestAsync(bool underAge)
+            => RequestAsync(underAge, DebugSettings);
 
-        private static Task<int> RequestAsync(bool underAge, ConsentDebugSettings debugSettings, CancellationToken cancellationToken)
+        private static Task<int> RequestAsync(bool underAge, ConsentDebugSettings debugSettings)
         {
             var tcs = new TaskCompletionSource<int>();
 
@@ -57,7 +56,7 @@ namespace AdelaideFuel.Droid
                     parameters = parameters.SetConsentDebugSettings(debugSettings);
                 }
 
-                var listner = new ConsentListener(tcs, cancellationToken);
+                var listner = new ConsentListener(tcs);
                 Instance.RequestConsentInfoUpdate(
                     Platform.CurrentActivity,
                     parameters.Build(),
@@ -81,12 +80,10 @@ namespace AdelaideFuel.Droid
             IConsentFormOnConsentFormDismissedListener
         {
             private readonly TaskCompletionSource<int> _tcs;
-            private readonly CancellationToken _cancellationToken;
 
-            public ConsentListener(TaskCompletionSource<int> tcs, CancellationToken cancellationToken)
+            public ConsentListener(TaskCompletionSource<int> tcs)
             {
                 _tcs = tcs;
-                _cancellationToken = cancellationToken;
             }
 
             public ConsentListener(IntPtr handle, JniHandleOwnership transfer)
@@ -98,8 +95,6 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-
                     if (Instance.IsConsentFormAvailable)
                         UserMessagingPlatform.LoadConsentForm(Platform.AppContext, this, this);
                 }
@@ -113,8 +108,6 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-
                     throw new ConsentInfoUpdateException(p0.Message);
                 }
                 catch (Exception ex)
@@ -127,8 +120,6 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-
                     if (p0 is null)
                         throw new ArgumentNullException(nameof(p0), "ConsentForm is null");
 
@@ -151,8 +142,6 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-
                     throw new ConsentFormLoadException(p0.Message);
                 }
                 catch (Exception ex)
@@ -165,8 +154,6 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-
                     if (p0 is not null)
                         throw new ConsentFormPresentException(p0.Message);
 

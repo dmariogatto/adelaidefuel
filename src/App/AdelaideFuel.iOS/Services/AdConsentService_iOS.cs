@@ -1,8 +1,6 @@
 ﻿using AdelaideFuel.Services;
 using Foundation;
 using Google.UserMessagingPlatform;
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AdelaideFuel.iOS.Services
@@ -24,9 +22,9 @@ namespace AdelaideFuel.iOS.Services
                 _ => false,
             };
 
-        public async Task<AdConsentStatus> RequestAsync(CancellationToken cancellationToken)
+        public async Task<AdConsentStatus> RequestAsync()
         {
-            var consent = await UmpConsent.RequestAsync(false, cancellationToken);
+            var consent = await UmpConsent.RequestAsync(false);
             return ConvertStatus(consent);
         }
 
