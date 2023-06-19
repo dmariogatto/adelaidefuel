@@ -65,18 +65,6 @@ namespace AdelaideFuel.iOS
             return Tcs.Task;
         }
 
-        private static void LoadForm()
-        {
-            try
-            {
-                ConsentForm.LoadWithCompletionHandler(LoadFormHandler);
-            }
-            catch (Exception ex)
-            {
-                Tcs.TrySetException(ex);
-            }
-        }
-
         [MonoPInvokeCallback(typeof(ConsentInformationUpdateCompletionHandler))]
         private static void RequestHandler(NSError error)
         {
@@ -87,7 +75,7 @@ namespace AdelaideFuel.iOS
 
                 if (Instance.FormStatus == FormStatus.Available)
                 {
-                    LoadForm();
+                    ConsentForm.LoadWithCompletionHandler(LoadFormHandler);
                 }
                 else
                 {
@@ -101,19 +89,19 @@ namespace AdelaideFuel.iOS
         }
 
         [MonoPInvokeCallback(typeof(ConsentFormLoadCompletionHandler))]
-        private static void LoadFormHandler(ConsentForm form, NSError error)
+        private static void LoadFormHandler(ConsentForm consentForm, NSError error)
         {
             try
             {
                 if (error is not null)
                     throw new ConsentFormLoadException(error.LocalizedDescription);
-                if (form is null)
-                    throw new ArgumentNullException(nameof(form), "ConsentForm is null");
+                if (consentForm is null)
+                    throw new ArgumentNullException(nameof(consentForm), "ConsentForm is null");
 
                 if (Instance.ConsentStatus == ConsentStatus.Required)
                 {
                     var vc = GetRootViewController() ?? throw new ArgumentNullException("viewController", "RootViewController is null");
-                    form.PresentFromViewController(vc, PresentFormHandler);
+                    consentForm.PresentFromViewController(vc, PresentFormHandler);
                 }
                 else
                 {
