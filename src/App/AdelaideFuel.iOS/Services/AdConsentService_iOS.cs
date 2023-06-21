@@ -13,7 +13,7 @@ namespace AdelaideFuel.iOS.Services
         }
 
         public AdConsentStatus Status
-            => ConvertStatus(UmpConsent.Status);
+            => ConvertStatus(UmpConsent.Instance.ConsentStatus);
 
         public bool CanServeAds
             => Status switch

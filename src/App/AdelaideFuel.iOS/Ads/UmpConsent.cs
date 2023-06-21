@@ -11,7 +11,7 @@ namespace AdelaideFuel.iOS
     {
         private static DebugSettings DebugSettings;
 
-        public static ConsentStatus Status => ConsentInformation.SharedInstance.ConsentStatus;
+        internal static ConsentInformation Instance => ConsentInformation.SharedInstance;
 
         public static void SetDebugSettings(string[] testDeviceIdentifiers, DebugGeography debugGeography)
         {
@@ -26,7 +26,7 @@ namespace AdelaideFuel.iOS
             DebugSettings = null;
         }
 
-        public static void Reset() => ConsentInformation.SharedInstance.Reset();
+        public static void Reset() => Instance.Reset();
 
         public static Task<ConsentStatus> RequestAsync(bool underAge)
             => RequestAsync(underAge, DebugSettings);
@@ -45,14 +45,14 @@ namespace AdelaideFuel.iOS
 
             try
             {
-                await ConsentInformation.SharedInstance.RequestConsentInfoUpdateWithParametersAsync(parameters);
+                await Instance.RequestConsentInfoUpdateWithParametersAsync(parameters);
             }
             catch (Exception ex)
             {
                 throw new ConsentInfoUpdateException(ex.Message, ex);
             }
 
-            if (ConsentInformation.SharedInstance.FormStatus == FormStatus.Available)
+            if (Instance.FormStatus == FormStatus.Available)
             {
                 var form = default(ConsentForm);
 
@@ -68,7 +68,7 @@ namespace AdelaideFuel.iOS
                 if (form is null)
                     throw new ArgumentNullException(nameof(form), "ConsentForm is null");
 
-                if (ConsentInformation.SharedInstance.ConsentStatus == ConsentStatus.Required)
+                if (Instance.ConsentStatus == ConsentStatus.Required)
                 {
                     var vc = GetRootViewController() ?? throw new ArgumentNullException("viewController", "RootViewController is null");
                     try
@@ -82,7 +82,7 @@ namespace AdelaideFuel.iOS
                 }
             }
 
-            return ConsentInformation.SharedInstance.ConsentStatus;
+            return Instance.ConsentStatus;
         }
 
         private static UIViewController GetRootViewController()
