@@ -54,7 +54,7 @@ namespace AdelaideFuel.iOS
                 throw new ConsentInfoUpdateException(ex.Message, ex);
             }
 
-            if (Instance.FormStatus == FormStatus.Available)
+            if (Status == ConsentStatus.Required && Instance.FormStatus == FormStatus.Available)
             {
                 var form = default(ConsentForm);
 
@@ -70,7 +70,7 @@ namespace AdelaideFuel.iOS
                 if (form is null)
                     throw new ArgumentNullException(nameof(form), "ConsentForm is null");
 
-                if (Instance.ConsentStatus == ConsentStatus.Required)
+                if (Status == ConsentStatus.Required)
                 {
                     var vc = GetRootViewController() ?? throw new ArgumentNullException("viewController", "RootViewController is null");
                     try
@@ -84,7 +84,7 @@ namespace AdelaideFuel.iOS
                 }
             }
 
-            return Instance.ConsentStatus;
+            return Status;
         }
 
         private static UIViewController GetRootViewController()

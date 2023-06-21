@@ -97,8 +97,14 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    if (Instance.IsConsentFormAvailable)
+                    if (Status == ConsentInformationConsentStatus.Required && Instance.IsConsentFormAvailable)
+                    {
                         UserMessagingPlatform.LoadConsentForm(Platform.AppContext, this, this);
+                    }
+                    else
+                    {
+                        _tcs.TrySetResult(Status);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -125,13 +131,13 @@ namespace AdelaideFuel.Droid
                     if (p0 is null)
                         throw new ArgumentNullException(nameof(p0), "ConsentForm is null");
 
-                    if (Instance.ConsentStatus == ConsentInformationConsentStatus.Required)
+                    if (Status == ConsentInformationConsentStatus.Required)
                     {
                         p0.Show(Platform.CurrentActivity, this);
                     }
                     else
                     {
-                        _tcs.TrySetResult(Instance.ConsentStatus);
+                        _tcs.TrySetResult(Status);
                     }
                 }
                 catch (Exception ex)
@@ -159,7 +165,7 @@ namespace AdelaideFuel.Droid
                     if (p0 is not null)
                         throw new ConsentFormPresentException(p0.Message);
 
-                    _tcs.TrySetResult(Instance.ConsentStatus);
+                    _tcs.TrySetResult(Status);
                 }
                 catch (Exception ex)
                 {
