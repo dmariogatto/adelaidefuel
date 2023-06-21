@@ -278,13 +278,17 @@ namespace AdelaideFuel.UI
                     return;
 
                 var adConsentService = IoC.Resolve<IAdConsentService>();
-                var consent = await adConsentService.RequestAsync();
+                var oldConsent = adConsentService.Status;
+                var newConsent = await adConsentService.RequestAsync();
 
-                IoC.Resolve<ILogger>().Event(
-                    AppCenterEvents.Action.AdConsent, new Dictionary<string, string>()
-                    {
-                        { nameof(consent) , consent.ToString() }
-                    });
+                if (oldConsent != newConsent)
+                {
+                    IoC.Resolve<ILogger>().Event(
+                        AppCenterEvents.Action.AdConsent, new Dictionary<string, string>()
+                        {
+                            { nameof(newConsent) , newConsent.ToString() }
+                        });
+                }
             }
             catch (Exception ex)
             {
