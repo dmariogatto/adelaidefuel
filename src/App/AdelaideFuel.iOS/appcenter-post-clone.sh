@@ -12,4 +12,5 @@ dotnet tool install --global boots
 export PATH="$PATH:~/.dotnet/tools"
 export DOTNET_ROOT="$(dirname "$(readlink "$(command -v dotnet)")")"
 
+boots --stable Mono
 boots --stable Xamarin.iOS
