@@ -132,6 +132,7 @@
     <Compile Include="Ads\UmpConsent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="appcenter-post-clone.sh" />
     <None Include="appcenter-pre-build.sh" />
     <AndroidAsset Include="Assets\map.style.dark.json" />
     <AndroidAsset Include="Assets\map.style.light.json" />
