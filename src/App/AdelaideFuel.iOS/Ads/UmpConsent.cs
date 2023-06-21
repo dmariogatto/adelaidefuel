@@ -49,7 +49,6 @@ namespace AdelaideFuel.iOS
             }
             catch (Exception ex)
             {
-                _ = DumbDebug();
                 throw new ConsentInfoUpdateException(ex.Message, ex);
             }
 
@@ -91,17 +90,5 @@ namespace AdelaideFuel.iOS
                 .Where(w => w.RootViewController is not null)
                 .Select(w => w.RootViewController)
                 .FirstOrDefault();
-
-        private static async Task DumbDebug()
-        {
-            try
-            {
-                var form = await ConsentForm.LoadWithCompletionHandlerAsync();
-            }
-            catch (Exception ex)
-            {
-                IoC.Resolve<ILogger>().Error(new ConsentFormLoadException(ex.Message, ex));
-            }
-        }
     }
 }
