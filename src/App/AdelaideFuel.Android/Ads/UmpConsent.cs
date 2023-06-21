@@ -18,6 +18,8 @@ namespace AdelaideFuel.Droid
         internal static IConsentInformation Instance
             => ConsentInformation ?? UserMessagingPlatform.GetConsentInformation(Platform.AppContext);
 
+        public static int Status => Instance.ConsentStatus;
+
         public static void SetDebugSettings(string[] testDeviceHashedIds, int debugGeography)
         {
             var debugSettings = new ConsentDebugSettings.Builder(Platform.AppContext)

@@ -13,6 +13,8 @@ namespace AdelaideFuel.iOS
 
         internal static ConsentInformation Instance => ConsentInformation.SharedInstance;
 
+        public static ConsentStatus Status => Instance.ConsentStatus;
+
         public static void SetDebugSettings(string[] testDeviceIdentifiers, DebugGeography debugGeography)
         {
             var debugSettings = new DebugSettings();
