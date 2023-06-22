@@ -436,7 +436,7 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var today = DateTime.Today;
+                var today = DateTime.UtcNow.LocaliseUtc().Date;
 
 #if DEBUG
                 today = DateTime.MaxValue;

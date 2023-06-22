@@ -8,7 +8,7 @@ namespace AdelaideFuel.UI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((DateTime)value).ToLocalTime();
+            return ((DateTime)value).LocaliseUtc();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Shared;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,13 +11,16 @@ namespace AdelaideFuel.UI.Converters
 {
     public class OpeningHoursToStringConverter : IValueConverter
     {
+        private static readonly DateTimeZone AdelaideTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull("Australia/Adelaide");
+        private static DateTime AdelaideNow => SystemClock.Instance.GetCurrentInstant().InZone(AdelaideTimeZone).ToDateTimeUnspecified();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var result = Resources.Closed;
 
             if (value is IDictionary<DayOfWeek, OpeningHour> openingHours)
             {
-                var adlNow = Constants.AdelaideNow;
+                var adlNow = AdelaideNow;
 
                 if (openingHours.All(kv => kv.Value.OpenAllDay()))
                     result = Resources.TwentyFourHours;

@@ -41,7 +41,7 @@ namespace AdelaideFuel.Services
 
         public DateTime LastDateOpened
         {
-            get => _preferences.Get(nameof(LastDateOpened), DateTime.Today.AddDays(-1));
+            get => _preferences.Get(nameof(LastDateOpened), DateTime.UtcNow.LocaliseUtc().Date.AddDays(-1));
             set
             {
                 if (LastDateOpened != value.Date)

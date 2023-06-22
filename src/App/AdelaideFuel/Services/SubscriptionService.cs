@@ -121,7 +121,7 @@ namespace AdelaideFuel.Services
                 var utcNow = DateTime.UtcNow;
                 var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
                 var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
-                var hasRestoredToday = lastRestoreDate.ToLocalTime().Date == DateTime.Today;
+                var hasRestoredToday = lastRestoreDate.LocaliseUtc().Date == DateTime.UtcNow.LocaliseUtc().Date;
 
                 if (expiryDate > DateTime.MinValue && !hasRestoredToday)
                 {
@@ -293,7 +293,7 @@ namespace AdelaideFuel.Services
             if (purchase is not null)
             {
                 await AckPurchaseAsync(purchase).ConfigureAwait(false);
-                
+
                 var validatedReceipt = await _iapVerifyService.ValidateReceiptAsync(purchase).ConfigureAwait(false);
                 if (validatedReceipt is not null)
                 {
