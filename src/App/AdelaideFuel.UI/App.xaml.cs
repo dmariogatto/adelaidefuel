@@ -207,8 +207,9 @@ namespace AdelaideFuel.UI
 
         private void UpdateDayCount()
         {
+            var clock = IoC.Resolve<IAppClock>();
             var prefService = IoC.Resolve<IAppPreferences>();
-            var today = DateTime.UtcNow.LocaliseUtc().Date;
+            var today = clock.Today;
             if (prefService.LastDateOpened < today)
             {
                 prefService.LastDateOpened = today;

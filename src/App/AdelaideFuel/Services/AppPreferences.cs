@@ -6,10 +6,14 @@ namespace AdelaideFuel.Services
 {
     public class AppPreferences : ObservableObject, IAppPreferences
     {
+        private readonly IAppClock _clock;
         private readonly IPreferences _preferences;
 
-        public AppPreferences(IPreferences preferences)
+        public AppPreferences(
+            IAppClock clock,
+            IPreferences preferences)
         {
+            _clock = clock;
             _preferences = preferences;
         }
 
@@ -41,7 +45,7 @@ namespace AdelaideFuel.Services
 
         public DateTime LastDateOpened
         {
-            get => _preferences.Get(nameof(LastDateOpened), DateTime.UtcNow.LocaliseUtc().Date.AddDays(-1));
+            get => _preferences.Get(nameof(LastDateOpened), _clock.Today.AddDays(-1));
             set
             {
                 if (LastDateOpened != value.Date)

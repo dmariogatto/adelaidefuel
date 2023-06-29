@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using AdelaideFuel.Shared;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
@@ -17,6 +18,8 @@ namespace AdelaideFuel.ViewModels
     public class MapViewModel : BaseViewModel
     {
         public readonly double InitialRadiusMetres;
+
+        private readonly IAppClock _clock;
 
         private readonly IPermissions _permissions;
         private readonly IGeolocation _geolocation;
@@ -37,6 +40,7 @@ namespace AdelaideFuel.ViewModels
         };
 
         public MapViewModel(
+            IAppClock clock,
             IDeviceInfo deviceInfo,
             IPermissions permissions,
             IGeolocation geolocation,
@@ -46,6 +50,8 @@ namespace AdelaideFuel.ViewModels
             Title = Resources.Map;
 
             InitialRadiusMetres = deviceInfo.Idiom == DeviceIdiom.Tablet ? 4800d : 2600d;
+
+            _clock = clock;
 
             _permissions = permissions;
             _geolocation = geolocation;
@@ -345,7 +351,7 @@ namespace AdelaideFuel.ViewModels
                         FilteredSites.RemoveRange(toRemove, NotifyCollectionChangedAction.Remove);
                         FilteredSites.AddRange(toAdd);
 
-                        LastLoadedUtc = DateTime.UtcNow;
+                        LastLoadedUtc = _clock.UtcNow;
                         ModifiedUtc = modifiedUtc;
                     }
 

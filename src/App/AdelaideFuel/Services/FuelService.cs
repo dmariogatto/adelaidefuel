@@ -26,6 +26,8 @@ namespace AdelaideFuel.Services
 
         private readonly int[] _defaultRadii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
 
+        private readonly IAppClock _clock;
+
         private readonly IConnectivity _connectivity;
         private readonly IGeolocation _geolocation;
         private readonly IPermissions _permissions;
@@ -47,6 +49,7 @@ namespace AdelaideFuel.Services
         private readonly SemaphoreSlim _syncAllSemaphore = new SemaphoreSlim(1, 1);
 
         public FuelService(
+            IAppClock clock,
             IConnectivity connectivity,
             IGeolocation geolocation,
             IPermissions permissions,
@@ -57,6 +60,8 @@ namespace AdelaideFuel.Services
             IRetryPolicyFactory retryPolicyFactory,
             ILogger logger) : base(cacheService, logger)
         {
+            _clock = clock;
+
             _connectivity = connectivity;
             _geolocation = geolocation;
             _permissions = permissions;
@@ -140,7 +145,7 @@ namespace AdelaideFuel.Services
             async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime modifiedUtc, CancellationToken ct)
             {
                 if (MemoryCache.TryGetValue(lastCheckCacheKey, out DateTime lastCheck) &&
-                    (DateTime.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
+                    (_clock.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
                     return false;
 
                 var newModifiedUtc = DateTime.MaxValue;
@@ -161,7 +166,7 @@ namespace AdelaideFuel.Services
                 var hasChanged = newModifiedUtc > modifiedUtc;
 
                 if (!hasChanged)
-                    MemoryCache.SetAbsolute(lastCheckCacheKey, DateTime.UtcNow, CachePricesExpireTimeSpan);
+                    MemoryCache.SetAbsolute(lastCheckCacheKey, _clock.UtcNow, CachePricesExpireTimeSpan);
 
                 return hasChanged;
             }
@@ -215,7 +220,7 @@ namespace AdelaideFuel.Services
                         if (result.prices.Any())
                         {
                             MemoryCache.SetAbsolute(cacheKey, result, CachePricesExpireTimeSpan);
-                            MemoryCache.SetAbsolute(lastCheckCacheKey, DateTime.UtcNow, CachePricesExpireTimeSpan);
+                            MemoryCache.SetAbsolute(lastCheckCacheKey, _clock.UtcNow, CachePricesExpireTimeSpan);
 
                             _ = diskCache.UpsertAsync(cacheKey, result.prices, TimeSpan.FromDays(3), default);
                         }
@@ -436,7 +441,7 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var today = DateTime.UtcNow.LocaliseUtc().Date;
+                var today = _clock.Today;
 
 #if DEBUG
                 today = DateTime.MaxValue;
@@ -704,7 +709,7 @@ namespace AdelaideFuel.Services
 
             var modifiedUtc = response.Content.Headers.LastModified is not null
                 ? response.Content.Headers.LastModified.Value.UtcDateTime
-                : DateTime.UtcNow;
+                : _clock.UtcNow;
 
             var result = default(IList<SitePriceDto>);
             if (httpMethod == HttpMethod.Get)

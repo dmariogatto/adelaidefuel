@@ -16,6 +16,8 @@ namespace AdelaideFuel.Services
     {
         private readonly string _productId;
 
+        private readonly IAppClock _clock;
+
         private readonly IDeviceInfo _deviceInfo;
         private readonly IConnectivity _connectivity;
         private readonly ISecureStorage _secureStorage;
@@ -28,6 +30,7 @@ namespace AdelaideFuel.Services
         private SemaphoreSlim _iapSemaphore = new SemaphoreSlim(1, 1);
 
         public SubscriptionService(
+            IAppClock clock,
             IDeviceInfo deviceInfo,
             IConnectivity connectivity,
             ISecureStorage secureStorage,
@@ -40,6 +43,8 @@ namespace AdelaideFuel.Services
         {
             _productId = Constants.SubscriptionProductId;
 
+            _clock = clock;
+
             _deviceInfo = deviceInfo;
             _connectivity = connectivity;
             _secureStorage = secureStorage;
@@ -51,7 +56,7 @@ namespace AdelaideFuel.Services
         }
 
         public bool HasValidSubscription
-            => !SubscriptionSuspended && IsSubscriptionValidForDate(DateTime.UtcNow);
+            => !SubscriptionSuspended && IsSubscriptionValidForDate(_clock.UtcNow);
 
         public DateTime? SubscriptionRestoreDateUtc
         {
@@ -59,7 +64,7 @@ namespace AdelaideFuel.Services
             set
             {
                 var utc = value.HasValue && value.Value.Kind != DateTimeKind.Utc
-                    ? value.Value.ToUniversalTime()
+                    ? _clock.ToUniversal(value.Value)
                     : value;
 
                 if (SubscriptionRestoreDateUtc != utc)
@@ -75,7 +80,7 @@ namespace AdelaideFuel.Services
             set
             {
                 var utc = value.HasValue && value.Value.Kind != DateTimeKind.Utc
-                   ? value.Value.ToUniversalTime()
+                   ? _clock.ToUniversal(value.Value)
                    : value;
 
                 if (SubscriptionExpiryDateUtc != utc)
@@ -110,7 +115,7 @@ namespace AdelaideFuel.Services
         }
 
         public bool IsSubscriptionValidForDate(DateTime dateTime)
-            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) > dateTime.ToUniversalTime();
+            => SubscriptionExpiryDateUtc?.AddDays(SubscriptionGraceDays) > _clock.ToUniversal(dateTime);
 
         public async Task<bool> UpdateSubscriptionAsync()
         {
@@ -118,10 +123,10 @@ namespace AdelaideFuel.Services
 
             try
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = _clock.UtcNow;
                 var expiryDate = SubscriptionExpiryDateUtc ?? DateTime.MinValue;
                 var lastRestoreDate = SubscriptionRestoreDateUtc ?? DateTime.MinValue;
-                var hasRestoredToday = lastRestoreDate.LocaliseUtc().Date == DateTime.UtcNow.LocaliseUtc().Date;
+                var hasRestoredToday = _clock.ToLocal(lastRestoreDate).Date == _clock.Today;
 
                 if (expiryDate > DateTime.MinValue && !hasRestoredToday)
                 {
@@ -258,7 +263,7 @@ namespace AdelaideFuel.Services
                         await ValidatePurchaseAsync(purchase).ConfigureAwait(false);
                     }
 
-                    SubscriptionRestoreDateUtc = DateTime.UtcNow;
+                    SubscriptionRestoreDateUtc = _clock.UtcNow;
                 }
             }
             catch (Exception ex)

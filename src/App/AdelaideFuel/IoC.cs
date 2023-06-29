@@ -108,6 +108,7 @@ namespace AdelaideFuel
             Container.Register((c, e) => CrossStoreReview.Current).AsSingleton();
 
             Container.Register<ILogger, Logger>().AsSingleton();
+            Container.Register<IAppClock, AppClock>().AsSingleton();
             Container.Register<ICacheService, CacheService>().AsSingleton();
             Container.Register<IStoreFactory, StoreFactory>().AsSingleton();
             Container.Register<IFuelService, FuelService>().AsSingleton();
