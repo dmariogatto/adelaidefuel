@@ -1,6 +1,7 @@
 ﻿using AdelaideFuel.Services;
 using Foundation;
 using Google.UserMessagingPlatform;
+using System;
 using System.Threading.Tasks;
 
 namespace AdelaideFuel.iOS.Services
@@ -11,6 +12,8 @@ namespace AdelaideFuel.iOS.Services
         public AdConsentService_iOS()
         {
         }
+
+        public event EventHandler<AdConsentStatusChangedEventArgs> AdConsentStatusChanged;
 
         public AdConsentStatus Status
             => ConvertStatus(UmpConsent.Status);
@@ -24,7 +27,20 @@ namespace AdelaideFuel.iOS.Services
 
         public async Task<AdConsentStatus> RequestAsync()
         {
+            var oldCanServeAds = CanServeAds;
+            var oldStatus = Status;
+
             var consent = await UmpConsent.RequestAsync(false);
+
+            if (oldCanServeAds != CanServeAds || oldStatus != Status)
+            {
+                AdConsentStatusChanged?.Invoke(this, new AdConsentStatusChangedEventArgs(
+                    oldCanServeAds,
+                    CanServeAds,
+                    oldStatus,
+                    Status));
+            }
+
             return ConvertStatus(consent);
         }
 

@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Services;
 using Android.Runtime;
+using System;
 using System.Threading.Tasks;
 using Xamarin.Google.UserMesssagingPlatform;
 
@@ -11,6 +12,8 @@ namespace AdelaideFuel.Droid.Services
         public AdConsentService_Droid()
         {
         }
+
+        public event EventHandler<AdConsentStatusChangedEventArgs> AdConsentStatusChanged;
 
         public AdConsentStatus Status
             => ConvertStatus(UmpConsent.Status);
@@ -24,7 +27,20 @@ namespace AdelaideFuel.Droid.Services
 
         public async Task<AdConsentStatus> RequestAsync()
         {
+            var oldCanServeAds = CanServeAds;
+            var oldStatus = Status;
+
             var consent = await UmpConsent.RequestAsync(false);
+
+            if (oldCanServeAds != CanServeAds || oldStatus != Status)
+            {
+                AdConsentStatusChanged?.Invoke(this, new AdConsentStatusChangedEventArgs(
+                    oldCanServeAds,
+                    CanServeAds,
+                    oldStatus,
+                    Status));
+            }
+
             return ConvertStatus(consent);
         }
 

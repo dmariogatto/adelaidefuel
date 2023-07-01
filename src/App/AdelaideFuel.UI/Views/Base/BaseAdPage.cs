@@ -88,6 +88,22 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
+            _adConsentService.AdConsentStatusChanged += AdConsentStatusChanged;
+            AddRemoveBannerAd();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            _adConsentService.AdConsentStatusChanged -= AdConsentStatusChanged;
+        }
+
+        private void AdConsentStatusChanged(object sender, AdConsentStatusChangedEventArgs e)
+            => AddRemoveBannerAd();
+
+        private void AddRemoveBannerAd()
+        {
             if (_subscriptionService.AdsEnabled && _adConsentService.CanServeAds)
             {
                 AddBannerAd();
