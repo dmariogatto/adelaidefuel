@@ -77,7 +77,6 @@ namespace AdelaideFuel.UI
             culture.DateTimeFormat.SetTimePatterns(localise.Is24Hour);
             localise.SetLocale(culture);
 
-            _ = RequestAdConsentAsync();
             _ = Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
 
             IoC.Resolve<INavigationService>().Init();
@@ -126,6 +125,8 @@ namespace AdelaideFuel.UI
                     });
                 }
             });
+
+            Device.InvokeOnMainThreadAsync(RequestAdConsentAsync);
         }
 
         protected override void OnSleep()
