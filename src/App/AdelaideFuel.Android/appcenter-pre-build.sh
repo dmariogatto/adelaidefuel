@@ -1,10 +1,10 @@
 ﻿#!/bin/bash
 
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+#export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
-dotnet tool install --global boots
-boots --stable Mono
-boots --stable Xamarin.Android
+#dotnet tool install --global boots
+#boots --stable Mono
+#boots --stable Xamarin.Android
 
 manifestPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel.Android/Properties/AndroidManifest.xml"
 buildNumber=$APPCENTER_BUILD_ID

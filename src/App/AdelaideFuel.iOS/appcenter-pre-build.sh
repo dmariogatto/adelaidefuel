@@ -1,10 +1,10 @@
 ﻿#!/bin/bash
 
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+#export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
-dotnet tool install --global boots
-boots --stable Mono
-boots --stable Xamarin.iOS
+#dotnet tool install --global boots
+#boots --stable Mono
+#boots --stable Xamarin.iOS
 
 scriptPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel.iOS/appcenter-update-bundle-version.sh"
 appPlistPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel.iOS/Info.plist"
