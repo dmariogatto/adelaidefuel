@@ -1,10 +1,10 @@
 ﻿#!/bin/bash
 
-#export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 
-#dotnet tool install --global boots
-#boots --stable Mono
-#boots --stable Xamarin.iOS
+dotnet tool install --global boots
+boots --stable Mono
+boots https://download.visualstudio.microsoft.com/download/pr/5f9ea8f6-0afe-46b3-b8e8-5dee4c2dd14c/b357a2b833ba86598aaff58fc013f06c/xamarin.ios-16.2.0.5.pkg
 
 scriptPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel.iOS/appcenter-update-bundle-version.sh"
 appPlistPath="${BUILD_REPOSITORY_LOCALPATH}/src/App/AdelaideFuel.iOS/Info.plist"
