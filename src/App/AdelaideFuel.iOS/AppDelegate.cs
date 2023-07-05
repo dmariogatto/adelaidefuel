@@ -3,6 +3,11 @@ using AdelaideFuel.Services;
 using AdelaideFuel.UI;
 using AdelaideFuel.UI.Services;
 using Foundation;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using System;
+using System.Collections.Generic;
 using UIKit;
 using Xamarin.Forms;
 
@@ -35,23 +40,47 @@ namespace AdelaideFuel.iOS
 
             App.IoCRegister();
 
-            global::Xamarin.Forms.Forms.Init();
+            var appCenterId = Constants.AppCenterSecret;
+            if (!string.IsNullOrEmpty(appCenterId))
+                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
 
-            FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
-            Sharpnado.CollectionView.iOS.Initializer.Initialize();
-            AiForms.Renderers.iOS.SettingsViewInit.Init();
-            Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
-            Google.MobileAds.MobileAds.SharedInstance.Start(null);
+            var formsApp = default(App);
+            var lineNum = string.Empty;
+
+            try
+            {
+                lineNum = "1";
+                global::Xamarin.Forms.Forms.Init();
+                lineNum = "2";
+                FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
+                lineNum = "3";
+                Sharpnado.CollectionView.iOS.Initializer.Initialize();
+                lineNum = "4";
+                AiForms.Renderers.iOS.SettingsViewInit.Init();
+                lineNum = "5";
+                Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
+                lineNum = "6";
+                Google.MobileAds.MobileAds.SharedInstance.Start(null);
+                lineNum = "7";
 
 #if DEBUG
-            Google.MobileAds.MobileAds.SharedInstance.RequestConfiguration.TestDeviceIdentifiers =
-                new string[] { "Simulator" };
-            UmpConsent.Reset();
-            UmpConsent.SetDebugSettings(new[] { "" }, Google.UserMessagingPlatform.DebugGeography.Eea);
+                Google.MobileAds.MobileAds.SharedInstance.RequestConfiguration.TestDeviceIdentifiers =
+                    new string[] { "Simulator" };
+                UmpConsent.Reset();
+                UmpConsent.SetDebugSettings(new[] { "" }, Google.UserMessagingPlatform.DebugGeography.Eea);
 #endif
 
-            var formsApp = new App();
-            LoadApplication(formsApp);
+                formsApp = new App();
+                lineNum = "8";
+            }
+            catch (Exception ex)
+            {
+                var logger = IoC.Resolve<ILogger>();
+                logger.Error(ex, new Dictionary<string, string>()
+                {
+                    { "line_num", lineNum }
+                });
+            }
 
             // Not even worth asking 🙄
             //if (false &&
@@ -70,6 +99,7 @@ namespace AdelaideFuel.iOS
             // <key>NSUserTrackingUsageDescription</key>
             // <string>Personalised ads for the best experience.</string>
 
+            LoadApplication(formsApp ??= new App(true));
             return base.FinishedLaunching(app, options);
         }
 

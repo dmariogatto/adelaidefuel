@@ -51,17 +51,17 @@ namespace AdelaideFuel.UI
             };
         }
 
-        public App()
+        private readonly bool _skipUmp;
+
+        public App(bool skipUmp = false)
         {
+            _skipUmp = skipUmp;
+
             Device.SetFlags(new string[] { });
 
             InitializeComponent();
 
             Sharpnado.CollectionView.Initializer.Initialize(false, true);
-
-            var appCenterId = Constants.AppCenterSecret;
-            if (!string.IsNullOrEmpty(appCenterId))
-                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
 
             VersionTracking.Track();
 
@@ -273,6 +273,9 @@ namespace AdelaideFuel.UI
 
         private async Task RequestAdConsentAsync()
         {
+            if (_skipUmp)
+                return;
+
             try
             {
                 var subscriptionService = IoC.Resolve<ISubscriptionService>();
