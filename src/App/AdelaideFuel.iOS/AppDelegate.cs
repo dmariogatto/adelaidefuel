@@ -35,17 +35,19 @@ namespace AdelaideFuel.iOS
 
             App.IoCRegister();
 
+            global::Xamarin.Forms.Forms.Init();
+
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
             Sharpnado.CollectionView.iOS.Initializer.Initialize();
             AiForms.Renderers.iOS.SettingsViewInit.Init();
             Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
             Google.MobileAds.MobileAds.SharedInstance.Start(null);
 
-            global::Xamarin.Forms.Forms.Init();
-
 #if DEBUG
             Google.MobileAds.MobileAds.SharedInstance.RequestConfiguration.TestDeviceIdentifiers =
                 new string[] { "Simulator" };
+            UmpConsent.Reset();
+            UmpConsent.SetDebugSettings(new[] { "" }, Google.UserMessagingPlatform.DebugGeography.Eea);
 #endif
 
             var formsApp = new App();
