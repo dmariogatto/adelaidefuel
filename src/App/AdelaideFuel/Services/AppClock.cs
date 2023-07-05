@@ -46,6 +46,10 @@ namespace AdelaideFuel.Services
         {
             if (dateTime.Kind == DateTimeKind.Utc)
                 return dateTime;
+            if (dateTime == DateTime.MinValue)
+                return dateTime;
+            if (dateTime == DateTime.MaxValue)
+                return dateTime;
 
             var ldt = LocalDateTime.FromDateTime(dateTime);
             var zdt = ldt.InZoneLeniently(DateTimeZoneProviders.Tzdb.GetSystemDefault());
@@ -57,6 +61,10 @@ namespace AdelaideFuel.Services
         {
             if (dateTime.Kind == DateTimeKind.Local)
                 return dateTime;
+            if (dateTime == DateTime.MinValue)
+                return dateTime;
+            if (dateTime == DateTime.MaxValue)
+                return dateTime;
 
             var tz = DateTimeZoneProviders.Tzdb.GetSystemDefault();
             var instant = Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
@@ -66,6 +74,11 @@ namespace AdelaideFuel.Services
 
         public DateTimeOffset ToLocal(DateTimeOffset dateTimeOffset)
         {
+            if (dateTimeOffset == DateTimeOffset.MinValue)
+                return dateTimeOffset;
+            if (dateTimeOffset == DateTimeOffset.MaxValue)
+                return dateTimeOffset;
+
             var tz = DateTimeZoneProviders.Tzdb.GetSystemDefault();
             var instant = Instant.FromDateTimeOffset(dateTimeOffset);
             var result = instant.InZone(tz).ToDateTimeOffset();
