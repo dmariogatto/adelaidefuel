@@ -61,15 +61,15 @@ namespace AdelaideFuel.Functions
             fileName = fileName?.ToLowerInvariant();
 
             if (!string.IsNullOrEmpty(fileName) &&
-                ValidPostfix.Any(i => fileName.EndsWith(i)) &&
-                int.TryParse(fileName.Substring(0, fileName.IndexOf("@")), out var brandId))
+                ValidPostfix.Any(fileName.EndsWith) &&
+                int.TryParse(fileName[..fileName.IndexOf("@")], out var brandId))
             {
                 var basePath = Path.Combine("brands", "imgs");
 
                 var blobImgPath = Path.Combine(basePath, fileName);
                 if (!await _blobService.ExistsAsync(blobImgPath, ct))
                 {
-                    fileName = $"default{fileName.Substring(fileName.IndexOf("@"))}";
+                    fileName = $"default{fileName[fileName.IndexOf("@")..]}";
                     blobImgPath = Path.Combine(basePath, fileName);
                 }
 
