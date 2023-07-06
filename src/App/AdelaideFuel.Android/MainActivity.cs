@@ -5,9 +5,8 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using System.Collections.Generic;
-using Xamarin.Forms;
 
-[assembly: ResolutionGroupName("AdelaideFuel.Effects")]
+[assembly: Xamarin.Forms.ResolutionGroupName("AdelaideFuel.Effects")]
 
 namespace AdelaideFuel.Droid
 {
@@ -41,9 +40,9 @@ namespace AdelaideFuel.Droid
             Android.Gms.Ads.MobileAds.Initialize(ApplicationContext);
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
-            if (Device.Idiom == TargetIdiom.Phone)
+            if (Xamarin.Forms.Device.Idiom == Xamarin.Forms.TargetIdiom.Phone)
                 RequestedOrientation = ScreenOrientation.UserPortrait;
 
 #if DEBUG

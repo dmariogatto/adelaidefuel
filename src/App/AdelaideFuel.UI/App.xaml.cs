@@ -2,9 +2,6 @@
 using AdelaideFuel.Services;
 using AdelaideFuel.UI.Services;
 using AdelaideFuel.ViewModels;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using Plugin.StoreReview;
 using System;
 using System.Collections.Generic;
