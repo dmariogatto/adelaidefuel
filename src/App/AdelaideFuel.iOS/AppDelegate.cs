@@ -3,9 +3,6 @@ using AdelaideFuel.Services;
 using AdelaideFuel.UI;
 using AdelaideFuel.UI.Services;
 using Foundation;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using UIKit;
 
 [assembly: Xamarin.Forms.ResolutionGroupName("AdelaideFuel.Effects")]
@@ -36,10 +33,6 @@ namespace AdelaideFuel.iOS
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_iOS>();
 
             App.IoCRegister();
-
-            var appCenterId = Constants.AppCenterSecret;
-            if (!string.IsNullOrEmpty(appCenterId))
-                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
 
             Xamarin.Forms.Forms.Init();
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();

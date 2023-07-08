@@ -4,9 +4,6 @@ using AdelaideFuel.UI;
 using AdelaideFuel.UI.Services;
 using Android.App;
 using Android.Runtime;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using System;
 
 [assembly: MetaData("com.google.android.gms.version", Value = "@integer/google_play_services_version")]
@@ -37,10 +34,6 @@ namespace AdelaideFuel.Droid
             IoC.RegisterSingleton<IRetryPolicyService, RetryPolicyService_Droid>();
 
             App.IoCRegister();
-
-            var appCenterId = Constants.AppCenterSecret;
-            if (!string.IsNullOrEmpty(appCenterId))
-                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
         }
     }
 }

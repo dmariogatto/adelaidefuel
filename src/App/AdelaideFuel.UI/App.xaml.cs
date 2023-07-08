@@ -2,6 +2,9 @@
 using AdelaideFuel.Services;
 using AdelaideFuel.UI.Services;
 using AdelaideFuel.ViewModels;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Plugin.StoreReview;
 using System;
 using System.Collections.Generic;
@@ -26,6 +29,10 @@ namespace AdelaideFuel.UI
         {
             IoC.RegisterSingleton<INavigationService, TabbedNavigationService>();
             IoC.RegisterSingleton<IThemeService, ThemeService>();
+
+            var appCenterId = Constants.AppCenterSecret;
+            if (!string.IsNullOrEmpty(appCenterId))
+                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
         }
 
         static App()
