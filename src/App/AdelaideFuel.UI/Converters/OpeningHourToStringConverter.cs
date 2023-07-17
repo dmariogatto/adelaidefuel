@@ -16,9 +16,9 @@ namespace AdelaideFuel.UI.Converters
             {
                 result = oh.OpenAllDay()
                     ? Resources.TwentyFourHours
-                    : result = string.Format(Resources.ItemDashItem,
-                        DateTime.Today.Add(oh.Open).ToShortTimeString(),
-                        DateTime.Today.Add(oh.Close).ToShortTimeString());
+                    : string.Format(Resources.ItemDashItem,
+                        DateTime.MinValue.Date.Add(oh.Open).ToShortTimeString(),
+                        DateTime.MinValue.Date.Add(oh.Close).ToShortTimeString());
             }
 
             return result;

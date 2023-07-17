@@ -2,11 +2,12 @@
 using AdelaideFuel.UI.Controls;
 using Android.Content;
 using Android.Content.Res;
+using Android.Widget;
 using Xamarin.Forms;
 using Xamarin.Forms.BetterMaps.Android;
 using Xamarin.Forms.Internals;
-using AndroidViews = Android.Views;
-using AndroidWidget = Android.Widget;
+using AView = Android.Views.View;
+using RL = Android.Widget.RelativeLayout;
 
 [assembly: ExportRenderer(typeof(FuelMap), typeof(MapCustomRenderer))]
 namespace AdelaideFuel.Droid.Renderers
@@ -22,22 +23,20 @@ namespace AdelaideFuel.Droid.Renderers
         {
             base.OnAttachedToWindow();
 
-            if (FindViewById(1)?.Parent is AndroidViews.View parent)
-            {
-                if (parent.FindViewById(2) is AndroidViews.View myLocation &&
-                   parent.FindViewById(5) is AndroidViews.View compass)
-                {
-                    var rlp = new AndroidWidget.RelativeLayout.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
-                    rlp.AddRule(AndroidWidget.LayoutRules.Below, myLocation.Id);
-                    rlp.AddRule(AndroidWidget.LayoutRules.AlignParentRight);
+            if (FindViewWithTag("GoogleMapMyLocationButton") is not AView myLocation)
+                return;
+            if (FindViewWithTag("GoogleMapCompass") is not AView compass)
+                return;
 
-                    var topMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
-                    var rightMargin = (int)(10 * Resources.System.DisplayMetrics.Density);
-                    rlp.SetMargins(0, topMargin, rightMargin, 0);
+            var rlp = new RL.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
+            rlp.AddRule(LayoutRules.Below, myLocation.Id);
+            rlp.AddRule(LayoutRules.AlignParentRight);
 
-                    compass.LayoutParameters = rlp;
-                }
-            }
+            var topMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
+            var rightMargin = (int)(10 * Resources.System.DisplayMetrics.Density);
+            rlp.SetMargins(0, topMargin, rightMargin, 0);
+
+            compass.LayoutParameters = rlp;
         }
     }
 }

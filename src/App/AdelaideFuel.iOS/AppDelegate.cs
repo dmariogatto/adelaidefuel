@@ -4,9 +4,8 @@ using AdelaideFuel.UI;
 using AdelaideFuel.UI.Services;
 using Foundation;
 using UIKit;
-using Xamarin.Forms;
 
-[assembly: ResolutionGroupName("AdelaideFuel.Effects")]
+[assembly: Xamarin.Forms.ResolutionGroupName("AdelaideFuel.Effects")]
 
 namespace AdelaideFuel.iOS
 {
@@ -25,13 +24,7 @@ namespace AdelaideFuel.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // Linker
-            var types = new[]
-            {
-                // AdMob
-                typeof(JavaScriptCore.JSContext)
-            };
-
+            IoC.RegisterSingleton<IAdConsentService, AdConsentService_iOS>();
             IoC.RegisterSingleton<ILocalise, LocaliseService_iOS>();
             IoC.RegisterSingleton<IEnvironmentService, EnvironmentService_iOS>();
             IoC.RegisterSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyService_iOS>();
@@ -41,17 +34,18 @@ namespace AdelaideFuel.iOS
 
             App.IoCRegister();
 
+            Xamarin.Forms.Forms.Init();
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
             Sharpnado.CollectionView.iOS.Initializer.Initialize();
             AiForms.Renderers.iOS.SettingsViewInit.Init();
             Xamarin.FormsBetterMaps.Init(new Xamarin.Forms.BetterMaps.MapCache());
             Google.MobileAds.MobileAds.SharedInstance.Start(null);
 
-            global::Xamarin.Forms.Forms.Init();
-
 #if DEBUG
             Google.MobileAds.MobileAds.SharedInstance.RequestConfiguration.TestDeviceIdentifiers =
                 new string[] { "Simulator" };
+            UmpConsent.Reset();
+            UmpConsent.SetDebugSettings(new[] { "" }, Google.UserMessagingPlatform.DebugGeography.Eea);
 #endif
 
             var formsApp = new App();
@@ -80,6 +74,16 @@ namespace AdelaideFuel.iOS
         public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler)
         {
             Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);
+        }
+
+        [Preserve]
+        private static void Linker()
+        {
+            var types = new[]
+            {
+                // AdMob
+                typeof(JavaScriptCore.JSContext)
+            };
         }
     }
 }

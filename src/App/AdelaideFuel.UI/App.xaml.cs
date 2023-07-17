@@ -29,6 +29,10 @@ namespace AdelaideFuel.UI
         {
             IoC.RegisterSingleton<INavigationService, TabbedNavigationService>();
             IoC.RegisterSingleton<IThemeService, ThemeService>();
+
+            var appCenterId = Constants.AppCenterSecret;
+            if (!string.IsNullOrEmpty(appCenterId))
+                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
         }
 
         static App()
@@ -51,17 +55,17 @@ namespace AdelaideFuel.UI
             };
         }
 
-        public App()
+        private readonly bool _skipUmp;
+
+        public App(bool skipUmp = false)
         {
+            _skipUmp = skipUmp;
+
             Device.SetFlags(new string[] { });
 
             InitializeComponent();
 
             Sharpnado.CollectionView.Initializer.Initialize(false, true);
-
-            var appCenterId = Constants.AppCenterSecret;
-            if (!string.IsNullOrEmpty(appCenterId))
-                AppCenter.Start(appCenterId, typeof(Analytics), typeof(Crashes));
 
             VersionTracking.Track();
 
@@ -125,6 +129,8 @@ namespace AdelaideFuel.UI
                     });
                 }
             });
+
+            Device.InvokeOnMainThreadAsync(RequestAdConsentAsync);
         }
 
         protected override void OnSleep()
@@ -206,8 +212,9 @@ namespace AdelaideFuel.UI
 
         private void UpdateDayCount()
         {
+            var clock = IoC.Resolve<IAppClock>();
             var prefService = IoC.Resolve<IAppPreferences>();
-            var today = DateTime.Now.Date;
+            var today = clock.Today;
             if (prefService.LastDateOpened < today)
             {
                 prefService.LastDateOpened = today;
@@ -265,6 +272,36 @@ namespace AdelaideFuel.UI
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+            }
+        }
+
+        private async Task RequestAdConsentAsync()
+        {
+            if (_skipUmp)
+                return;
+
+            try
+            {
+                var subscriptionService = IoC.Resolve<ISubscriptionService>();
+                if (!subscriptionService.AdsEnabled)
+                    return;
+
+                var adConsentService = IoC.Resolve<IAdConsentService>();
+                var oldConsent = adConsentService.Status;
+                var newConsent = await adConsentService.RequestAsync();
+
+                if (oldConsent != newConsent)
+                {
+                    IoC.Resolve<ILogger>().Event(
+                        AppCenterEvents.Action.AdConsent, new Dictionary<string, string>()
+                        {
+                            { nameof(newConsent) , newConsent.ToString() }
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                IoC.Resolve<ILogger>().Error(ex);
             }
         }
     }

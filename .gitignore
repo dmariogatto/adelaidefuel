@@ -335,3 +335,6 @@ ASALocalRun/
 
 # local settings file
 local.settings.json
+
+# macOS
+.DS_Store

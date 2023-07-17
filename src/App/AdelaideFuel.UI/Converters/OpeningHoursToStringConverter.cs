@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.Localisation;
+using AdelaideFuel.Services;
 using AdelaideFuel.Shared;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,15 @@ namespace AdelaideFuel.UI.Converters
 {
     public class OpeningHoursToStringConverter : IValueConverter
     {
+        private static readonly Lazy<IAppClock> Clock = new Lazy<IAppClock>(IoC.Resolve<IAppClock>);
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var result = Resources.Closed;
 
             if (value is IDictionary<DayOfWeek, OpeningHour> openingHours)
             {
-                var adlNow = Constants.AdelaideNow;
+                var adlNow = Clock.Value.AdelaideNow;
 
                 if (openingHours.All(kv => kv.Value.OpenAllDay()))
                     result = Resources.TwentyFourHours;

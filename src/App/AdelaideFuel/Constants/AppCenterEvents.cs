@@ -26,6 +26,7 @@ namespace AdelaideFuel
             public const string FuelSetup = "fuel_setup";
             public const string ReviewRequested = "review_requested";
             public const string AppAction = "app_action";
+            public const string AdConsent = "ad_consent";
         }
 
         public static class Data

@@ -19,7 +19,7 @@ namespace AdelaideFuel.Api
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var path = request.RequestUri.AbsolutePath;
-            if (path.StartsWith("/Subscriber") || path.StartsWith("/Price"))
+            if (path.StartsWith("/Subscriber", StringComparison.Ordinal) || path.StartsWith("/Price", StringComparison.Ordinal))
                 request.Headers.Add("Authorization", $"FPDAPI SubscriberToken={_subscriberToken}");
 
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);

@@ -9,6 +9,7 @@ namespace AdelaideFuel.UI.Views
     [ContentProperty(nameof(MainContent))]
     public class BaseAdPage<T> : BasePage<T> where T : BaseViewModel
     {
+        private readonly IAdConsentService _adConsentService;
         private readonly ISubscriptionService _subscriptionService;
 
         private readonly Grid _mainGrid;
@@ -18,6 +19,7 @@ namespace AdelaideFuel.UI.Views
 
         public BaseAdPage() : base()
         {
+            _adConsentService = IoC.Resolve<IAdConsentService>();
             _subscriptionService = IoC.Resolve<ISubscriptionService>();
 
             _mainGrid = new Grid() { RowSpacing = 0 };
@@ -86,7 +88,23 @@ namespace AdelaideFuel.UI.Views
         {
             base.OnAppearing();
 
-            if (_subscriptionService.AdsEnabled)
+            AddRemoveBannerAd();
+            _adConsentService.AdConsentStatusChanged += AdConsentStatusChanged;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            _adConsentService.AdConsentStatusChanged -= AdConsentStatusChanged;
+        }
+
+        private void AdConsentStatusChanged(object sender, AdConsentStatusChangedEventArgs e)
+            => AddRemoveBannerAd();
+
+        private void AddRemoveBannerAd()
+        {
+            if (_subscriptionService.AdsEnabled && _adConsentService.CanServeAds)
             {
                 AddBannerAd();
             }

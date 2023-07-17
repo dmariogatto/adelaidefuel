@@ -11,6 +11,8 @@ namespace AdelaideFuel.ViewModels
 {
     public class SubscriptionViewModel : BaseViewModel
     {
+        private readonly IAppClock _clock;
+
         private readonly IAppInfo _appInfo;
         private readonly IDeviceInfo _deviceInfo;
         private readonly ILauncher _launcher;
@@ -18,6 +20,7 @@ namespace AdelaideFuel.ViewModels
         private readonly ISubscriptionService _subscriptionService;
 
         public SubscriptionViewModel(
+            IAppClock clock,
             IAppInfo appInfo,
             IDeviceInfo deviceInfo,
             ILauncher launcher,
@@ -25,6 +28,8 @@ namespace AdelaideFuel.ViewModels
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             Title = Resources.ShouldIFuel;
+
+            _clock = clock;
 
             _appInfo = appInfo;
             _deviceInfo = deviceInfo;
@@ -57,9 +62,11 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _subscriptionProduct, value);
         }
 
-        public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc?.ToLocalTime();
+        public DateTime? ExpiryDate => _subscriptionService.SubscriptionExpiryDateUtc.HasValue
+            ? _clock.ToLocal(_subscriptionService.SubscriptionExpiryDateUtc.Value)
+            : null;
         public bool HasValidSubscription => _subscriptionService.HasValidSubscription;
-        public bool HasExpired => !_subscriptionService.IsSubscriptionValidForDate(DateTime.UtcNow);
+        public bool HasExpired => !_subscriptionService.IsSubscriptionValidForDate(_clock.UtcNow);
         public bool SubscriptionSuspended => _subscriptionService.SubscriptionSuspended;
 
         public bool BannerAds

@@ -115,10 +115,13 @@
     <Compile Include="Services\EnvironmentService_iOS.cs" />
     <Compile Include="Services\LocaliseService_iOS.cs" />
     <None Include="appcenter-update-bundle-version.sh" />
+    <None Include="appcenter-post-clone.sh" />
     <None Include="appcenter-pre-build.sh" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ads\UmpConsent.cs" />
+    <Compile Include="Services\AdConsentService_iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
@@ -181,7 +184,7 @@
       <Version>1.3.33</Version>
     </PackageReference>
     <PackageReference Include="Plugin.StoreReview">
-      <Version>5.0.1</Version>
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Sharpnado.CollectionView">
       <Version>2.1.0</Version>
@@ -190,15 +193,18 @@
       <Version>2.4.11.982</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.7" />
     <PackageReference Include="Xamarin.Forms.BetterMaps">
       <Version>1.5.0</Version>
     </PackageReference>
     <PackageReference Include="Cats.iOS.AdMob">
-      <Version>10.5.0</Version>
+      <Version>10.7.0</Version>
     </PackageReference>
     <PackageReference Include="Plugin.InAppBilling">
       <Version>6.7.0</Version>
+    </PackageReference>
+    <PackageReference Include="Cats.iOS.UserMessagingPlatform">
+      <Version>2.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
