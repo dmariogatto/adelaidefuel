@@ -18,6 +18,13 @@ namespace AdelaideFuel.Droid.Services
         public AdConsentStatus Status
             => ConvertStatus(UmpConsent.Status);
 
+        public bool ShouldRequest
+            => Status switch
+            {
+                AdConsentStatus.Unknown or AdConsentStatus.Required => true,
+                _ => false,
+            };
+
         public bool CanServeAds
             => Status switch
             {
