@@ -116,7 +116,7 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    throw new ConsentInfoUpdateException(p0.Message);
+                    throw new ConsentInfoUpdateException(FormErrorToString(p0));
                 }
                 catch (Exception ex)
                 {
@@ -150,7 +150,7 @@ namespace AdelaideFuel.Droid
             {
                 try
                 {
-                    throw new ConsentFormLoadException(p0.Message);
+                    throw new ConsentFormLoadException(FormErrorToString(p0));
                 }
                 catch (Exception ex)
                 {
@@ -163,7 +163,7 @@ namespace AdelaideFuel.Droid
                 try
                 {
                     if (p0 is not null)
-                        throw new ConsentFormPresentException(p0.Message);
+                        throw new ConsentFormPresentException(FormErrorToString(p0));
 
                     _tcs.TrySetResult(Status);
                 }
@@ -172,6 +172,9 @@ namespace AdelaideFuel.Droid
                     _tcs.TrySetException(ex);
                 }
             }
+
+            private static string FormErrorToString(FormError err)
+                => $"Message: '{err.Message}', ErrorCode: {err.ErrorCodeData()}";
         }
     }
 }

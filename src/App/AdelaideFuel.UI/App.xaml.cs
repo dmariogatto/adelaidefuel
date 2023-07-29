@@ -6,9 +6,11 @@ using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Plugin.StoreReview;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Xamarin.Essentials;
@@ -56,6 +58,7 @@ namespace AdelaideFuel.UI
         }
 
         private readonly bool _skipUmp;
+        private readonly SemaphoreSlim _umpSemaphore = new SemaphoreSlim(1, 1);
 
         public App(bool skipUmp = false)
         {
@@ -165,6 +168,8 @@ namespace AdelaideFuel.UI
             // Handle when your app resumes
 
             UpdateDayCount();
+
+            Device.InvokeOnMainThreadAsync(RequestAdConsentAsync);
         }
 
         protected override void OnAppLinkRequestReceived(Uri uri)
@@ -280,6 +285,8 @@ namespace AdelaideFuel.UI
             if (_skipUmp)
                 return;
 
+            await _umpSemaphore.WaitAsync();
+
             try
             {
                 var subscriptionService = IoC.Resolve<ISubscriptionService>();
@@ -287,21 +294,36 @@ namespace AdelaideFuel.UI
                     return;
 
                 var adConsentService = IoC.Resolve<IAdConsentService>();
+                if (!adConsentService.ShouldRequest)
+                    return;
+
+                var retryPolicy = Policy
+                    .Handle<ConsentException>()
+                    .WaitAndRetryAsync
+                    (
+                        retryCount: 3,
+                        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                    );
+
                 var oldConsent = adConsentService.Status;
-                var newConsent = await adConsentService.RequestAsync();
+                var newConsent = await retryPolicy.ExecuteAsync(adConsentService.RequestAsync);
 
                 if (oldConsent != newConsent)
                 {
                     IoC.Resolve<ILogger>().Event(
                         AppCenterEvents.Action.AdConsent, new Dictionary<string, string>()
                         {
-                            { nameof(newConsent) , newConsent.ToString() }
+                            { "consent" , newConsent.ToString() }
                         });
                 }
             }
             catch (Exception ex)
             {
                 IoC.Resolve<ILogger>().Error(ex);
+            }
+            finally
+            {
+                _umpSemaphore.Release();
             }
         }
     }

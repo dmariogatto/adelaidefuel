@@ -16,6 +16,7 @@ namespace AdelaideFuel.Services
         event EventHandler<AdConsentStatusChangedEventArgs> AdConsentStatusChanged;
 
         AdConsentStatus Status { get; }
+        bool ShouldRequest { get; }
         bool CanServeAds { get; }
 
         Task<AdConsentStatus> RequestAsync();
@@ -42,7 +43,18 @@ namespace AdelaideFuel.Services
         }
     }
 
-    public class ConsentInfoUpdateException : Exception
+    public abstract class ConsentException : Exception
+    {
+        public ConsentException(string message) : base(message)
+        {
+        }
+
+        public ConsentException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    public class ConsentInfoUpdateException : ConsentException
     {
         public ConsentInfoUpdateException(string message) : base(message)
         {
@@ -53,7 +65,7 @@ namespace AdelaideFuel.Services
         }
     }
 
-    public class ConsentFormLoadException : Exception
+    public class ConsentFormLoadException : ConsentException
     {
         public ConsentFormLoadException(string message) : base(message)
         {
@@ -64,7 +76,7 @@ namespace AdelaideFuel.Services
         }
     }
 
-    public class ConsentFormPresentException : Exception
+    public class ConsentFormPresentException : ConsentException
     {
         public ConsentFormPresentException(string message) : base(message)
         {
