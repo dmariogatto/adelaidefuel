@@ -68,7 +68,7 @@ namespace AdelaideFuel.Functions
             ILogger log,
             CancellationToken ct)
         {
-            log.LogInformation($"Starting sync of fuel prices...");
+            log.LogInformation("Starting sync of fuel prices...");
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -90,7 +90,7 @@ namespace AdelaideFuel.Functions
                 _siteExceptionRepository.CreateIfNotExistsAsync(ct),
                 _sitePriceExceptionLogRepository.CreateIfNotExistsAsync(ct));
 
-            log.LogInformation($"Finished API call in {sw.ElapsedMilliseconds}...");
+            log.LogInformation("Finished API call in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
 
             var apiPricesOrdered = apiPricesTask.Result
                 ?.SitePrices
@@ -182,13 +182,13 @@ namespace AdelaideFuel.Functions
 
                 await Task.WhenAll(updateTasks);
 
-                log.LogInformation($"Finished sync of fuel prices in {sw.ElapsedMilliseconds}.");
+                log.LogInformation("Finished sync of fuel prices in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
             }
 
             sw.Stop();
 
-            log.LogInformation($"Finished sync in {sw.ElapsedMilliseconds}ms");
-            log.LogInformation($"Have a nice day 😋");
+            log.LogInformation("Finished sync in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
+            log.LogInformation("Have a nice day 😋");
         }
 
         private async Task<IDictionary<int, int>> GetSiteToBrandMapAsync(CancellationToken ct)
