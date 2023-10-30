@@ -102,7 +102,7 @@
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.1.0.4" />
     <PackageReference Include="Xamarin.AndroidX.Core" Version="1.12.0.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.6.2.2" />
-    <PackageReference Include="Plugin.InAppBilling" Version="7.1.0-beta" />
+    <PackageReference Include="Plugin.InAppBilling" Version="7.1.0" />
     <PackageReference Include="Xamarin.Google.UserMessagingPlatform" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
