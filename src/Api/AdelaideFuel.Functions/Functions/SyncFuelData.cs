@@ -43,7 +43,7 @@ namespace AdelaideFuel.Functions
             ILogger log,
             CancellationToken ct)
         {
-            log.LogInformation($"Starting sync of static fuel data...");
+            log.LogInformation("Starting sync of static fuel data...");
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -60,7 +60,7 @@ namespace AdelaideFuel.Functions
             var activeSiteIds = new HashSet<int>(pricesTask.Result.SitePrices.Select(i => i.SiteId));
 
             sw.Stop();
-            log.LogInformation($"Finished API calls in {sw.ElapsedMilliseconds}...");
+            log.LogInformation("Finished API calls in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
             sw.Start();
 
             var brandEntities =
@@ -104,8 +104,8 @@ namespace AdelaideFuel.Functions
                 _siteRepository.SyncPartitionsWithDeactivateAsync(siteEntities, log, ct));
 
             sw.Stop();
-            log.LogInformation($"Finished sync of entities in {sw.ElapsedMilliseconds}.");
-            log.LogInformation($"Have a nice day 😋");
+            log.LogInformation("Finished sync of entities in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
+            log.LogInformation("Have a nice day 😋");
         }
     }
 }
