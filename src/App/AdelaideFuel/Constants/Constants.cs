@@ -42,8 +42,9 @@ namespace AdelaideFuel
         }
 
         public const string Email = "outtaapps@gmail.com";
-        public const string AndroidId = "com.dgatto.adelaidefuel";
-        public const string AppleId = "1565760343";
+
+        private const string AndroidId = "com.dgatto.adelaidefuel";
+        private const string AppleId = "1565760343";
 
         public const string FuelInfoForMotoristsUrl = "https://www.sa.gov.au/topics/driving-and-transport/fuel-pricing/fuel-pricing-information-for-motorists";
         public const string PriceErrorFormUrl = "https://forms.sa.gov.au/#/form/6029c6a9ad9c5a1dd463e6db";
@@ -71,14 +72,14 @@ namespace AdelaideFuel
         public static readonly string ApiKeySitePrices;
         public static readonly string ApiKeyBrandImg;
 
-        public static readonly string AppCenterAndroidSecret;
-        public static readonly string AppCenterIosSecret;
+        private static readonly string AppCenterAndroidSecret;
+        private static readonly string AppCenterIosSecret;
 
-        public static readonly string AdMobPublisherId;
-        public static readonly string AdMobPricesAndroidUnitId;
-        public static readonly string AdMobPricesIosUnitId;
-        public static readonly string AdMobMapAndroidUnitId;
-        public static readonly string AdMobMapIosUnitId;
+        private static readonly string AdMobPublisherId;
+        private static readonly string AdMobPricesAndroidUnitId;
+        private static readonly string AdMobPricesIosUnitId;
+        private static readonly string AdMobMapAndroidUnitId;
+        private static readonly string AdMobMapIosUnitId;
 
         public static string AppId => ValueForPlatform(AndroidId, AppleId);
 
