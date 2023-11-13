@@ -32,7 +32,7 @@ namespace AdelaideFuel.Droid.Services
 
             try
             {
-                var prefs = context.GetSharedPreferences(Constants.AndroidId, Android.Content.FileCreationMode.Private);
+                var prefs = context.GetSharedPreferences(Constants.AppId, Android.Content.FileCreationMode.Private);
                 var editor = prefs.Edit();
 
                 var entities = await _storeFactory.GetUserStore<T>().AllAsync(true, default).ConfigureAwait(false);

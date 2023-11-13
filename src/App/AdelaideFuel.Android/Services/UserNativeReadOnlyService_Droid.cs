@@ -30,7 +30,7 @@ namespace AdelaideFuel.Droid.Services
 
             try
             {
-                var prefs = context.GetSharedPreferences(Constants.AndroidId, Android.Content.FileCreationMode.Private);
+                var prefs = context.GetSharedPreferences(Constants.AppId, Android.Content.FileCreationMode.Private);
                 var json = prefs.GetString(typeof(T).Name, string.Empty);
 
                 if (!string.IsNullOrWhiteSpace(json))
