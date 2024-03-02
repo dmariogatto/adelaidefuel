@@ -98,12 +98,13 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2622" />
     <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
     <PackageReference Include="Xamarin.Forms.BetterMaps" Version="1.5.0" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="122.3.0.1" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.1.0.5" />
-    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.12.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.6.2.2" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="122.3.0.2" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="118.2.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.Core" Version="1.12.0.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.7.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.7.0.1" />
     <PackageReference Include="Plugin.InAppBilling" Version="7.1.0" />
-    <PackageReference Include="Xamarin.Google.UserMessagingPlatform" Version="2.1.0.1" />
+    <PackageReference Include="Xamarin.Google.UserMessagingPlatform" Version="2.1.0.2" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAotProfile Include="$(MSBuildThisFileDirectory)custom.aprof" />
