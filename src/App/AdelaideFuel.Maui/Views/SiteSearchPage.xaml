@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseSearchPage
+    x:Class="AdelaideFuel.Maui.Views.SiteSearchPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
+    xmlns:ffimg="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Compat.Maui"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:local="clr-namespace:AdelaideFuel.Maui"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
+    xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
+    Title="{Binding Title}"
+    ios:Page.UseSafeArea="True"
+    x:DataType="viewModels:SiteSearchViewModel"
+    x:TypeArguments="viewModels:SiteSearchViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Query="{Binding SearchText}">
+
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*">
+            <ListView
+                Grid.Row="1"
+                CachingStrategy="RecycleElement"
+                HasUnevenRows="True"
+                IsGroupingEnabled="True"
+                ItemTapped="ListViewItemTapped"
+                ItemsSource="{Binding FilteredSites}"
+                SelectionMode="None"
+                SeparatorVisibility="None">
+                <ListView.Footer>
+                    <ContentView Padding="{StaticResource XSmallThickness}" />
+                </ListView.Footer>
+                <ListView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="{x:Null}">
+                        <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">
+                            <StackLayout
+                                Padding="{StaticResource SmallThickness}"
+                                Orientation="Horizontal"
+                                Spacing="{StaticResource XSmallSpacing}">
+                                <controls:TintImage
+                                    HeightRequest="24"
+                                    Source="{StaticResource FuelImg}"
+                                    TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}"
+                                    VerticalOptions="Center"
+                                    WidthRequest="24" />
+                                <Label
+                                    Style="{DynamicResource LabelTitleStyle}"
+                                    Text="{Binding Key.Name}"
+                                    VerticalTextAlignment="Center" />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.GroupHeaderTemplate>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SiteFuelPrice">
+                        <ViewCell>
+                            <Frame Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+                                <Grid
+                                    ColumnDefinitions="48,*,Auto"
+                                    ColumnSpacing="{StaticResource XSmallSpacing}"
+                                    RowDefinitions="Auto,Auto"
+                                    RowSpacing="{StaticResource XSmallSpacing}">
+                                    <Frame
+                                        Grid.RowSpan="2"
+                                        BackgroundColor="Transparent"
+                                        CornerRadius="20"
+                                        HeightRequest="40"
+                                        HorizontalOptions="Center"
+                                        IsClippedToBounds="True"
+                                        VerticalOptions="Center"
+                                        WidthRequest="40">
+                                        <ffimg:CachedImage
+                                            LoadingDelay="200"
+                                            LoadingPlaceholder="{StaticResource FuelImg}"
+                                            Source="{Binding BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
+                                    </Frame>
+                                    <Label
+                                        Grid.Column="1"
+                                        Style="{DynamicResource LabelTitleStyle}"
+                                        Text="{Binding SiteName}" />
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                                        Style="{DynamicResource LabelStyle}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0}, {1}">
+                                                <Binding Path="SiteAddress" />
+                                                <Binding Path="SitePostcode" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                    <Label
+                                        Grid.RowSpan="2"
+                                        Grid.Column="2"
+                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
+                                        HorizontalTextAlignment="End"
+                                        Style="{DynamicResource LabelStyle}"
+                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                        VerticalTextAlignment="Center">
+                                        <View.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding PriceInCents}"
+                                                TargetType="View"
+                                                Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
+                                                <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                                            </DataTrigger>
+                                        </View.Triggers>
+                                    </Label>
+                                </Grid>
+                            </Frame>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <SearchBar
+                x:Name="Search"
+                ios:SearchBar.SearchBarStyle="Minimal"
+                CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
+                PlaceholderColor="{DynamicResource PrimaryTextColor}"
+                TextColor="{DynamicResource PrimaryTextColor}"
+                WidthRequest="{Binding Width, Source={x:RelativeSource AncestorType={x:Type Grid}}}" />
+
+            <Label
+                Grid.Row="1"
+                Margin="{StaticResource MediumTopThickness}"
+                HorizontalTextAlignment="Center"
+                IsVisible="False"
+                Style="{DynamicResource LabelStyle}"
+                Text="{local:Translate NoResults}">
+                <View.Triggers>
+                    <MultiTrigger TargetType="View">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
+                            <BindingCondition Binding="{Binding InitialLoadComplete}" Value="True" />
+                            <BindingCondition Binding="{Binding IsBusy}" Value="False" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </View.Triggers>
+            </Label>
+
+            <controls:LoadingIndicator Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+
+</views:BaseSearchPage>

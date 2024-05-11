@@ -501,6 +501,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There was an issue opening the URL &apos;{0}&apos;..
+        /// </summary>
+        public static string IssueOpeningUrlItem {
+            get {
+                return ResourceManager.GetString("IssueOpeningUrlItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0},.
         /// </summary>
         public static string ItemComma {

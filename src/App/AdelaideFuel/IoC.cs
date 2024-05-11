@@ -1,215 +1,130 @@
-﻿using Acr.UserDialogs;
-using AdelaideFuel.Api;
+﻿using AdelaideFuel.Api;
+using AdelaideFuel.Essentials;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.ApplicationModel.Communication;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Authentication;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Devices.Sensors;
+using Microsoft.Maui.Media;
+using Microsoft.Maui.Networking;
+using Microsoft.Maui.Storage;
 using Plugin.InAppBilling;
 using Plugin.StoreReview;
+using Plugin.StoreReview.Abstractions;
 using Refit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using TinyIoC;
-using Xamarin.Essentials.Implementation;
-using Xamarin.Essentials.Interfaces;
 
 [assembly: AdelaideFuel.Attributes.Preserve]
 namespace AdelaideFuel
 {
     public static class IoC
     {
-        #region Type Maps
-        private static readonly Dictionary<Type, Type> EssentialTypes = new Dictionary<Type, Type>()
+        public static IServiceProvider Services { get; private set; }
+
+        public static void Init(IServiceProvider services)
         {
-            { typeof(IAccelerometer), typeof(AccelerometerImplementation) },
-            { typeof(IAppActions), typeof(AppActionsImplementation) },
-            { typeof(IAppInfo), typeof(AppInfoImplementation) },
-            { typeof(IBarometer), typeof(BarometerImplementation) },
-            { typeof(IBattery), typeof(BatteryImplementation) },
-            { typeof(IBrowser), typeof(BrowserImplementation) },
-            { typeof(IClipboard), typeof(ClipboardImplementation) },
-            { typeof(ICompass), typeof(CompassImplementation) },
-            { typeof(IConnectivity), typeof(ConnectivityImplementation) },
-            { typeof(IContacts), typeof(ContactsImplementation) },
-            { typeof(IDeviceDisplay), typeof(DeviceDisplayImplementation) },
-            { typeof(IDeviceInfo), typeof(DeviceInfoImplementation) },
-            { typeof(IEmail), typeof(EmailImplementation) },
-            { typeof(IFilePicker), typeof(FilePickerImplementation) },
-            { typeof(IFileSystem), typeof(FileSystemImplementation) },
-            { typeof(IFlashlight), typeof(FlashlightImplementation) },
-            { typeof(IGeocoding), typeof(GeocodingImplementation) },
-            { typeof(IGeolocation), typeof(GeolocationImplementation) },
-            { typeof(IGyroscope), typeof(GyroscopeImplementation) },
-            { typeof(IHapticFeedback), typeof(HapticFeedbackImplementation) },
-            { typeof(ILauncher), typeof(LauncherImplementation) },
-            { typeof(IMagnetometer), typeof(MagnetometerImplementation) },
-            { typeof(IMainThread), typeof(MainThreadImplementation) },
-            { typeof(IMap), typeof(MapImplementation) },
-            { typeof(IMediaPicker), typeof(MediaPickerImplementation) },
-            { typeof(IOrientationSensor), typeof(OrientationSensorImplementation) },
-            { typeof(IPermissions), typeof(PermissionsImplementation) },
-            { typeof(IPhoneDialer), typeof(PhoneDialerImplementation) },
-            { typeof(IPreferences), typeof(PreferencesImplementation) },
-            { typeof(IScreenshot), typeof(ScreenshotImplementation) },
-            { typeof(ISecureStorage), typeof(SecureStorageImplementation) },
-            { typeof(IShare), typeof(ShareImplementation) },
-            { typeof(ISms), typeof(SmsImplementation) },
-            { typeof(ITextToSpeech), typeof(TextToSpeechImplementation) },
-            { typeof(IVersionTracking), typeof(VersionTrackingImplementation) },
-            { typeof(IVibration), typeof(VibrationImplementation) },
-            { typeof(IWebAuthenticator), typeof(WebAuthenticatorImplementation) }
-        };
+            if (Services is not null)
+                throw new InvalidOperationException("Init can only be called once!");
 
-        private static readonly List<Type> ViewModelTypes = new List<Type>()
+            Services = services;
+        }
+
+        public static void ConfigureIoC(this IServiceCollection services)
         {
-            typeof(BrandsViewModel),
-            typeof(FuelsViewModel),
-            typeof(MapViewModel),
-            typeof(PricesViewModel),
-            typeof(RadiiViewModel),
-            typeof(SettingsViewModel),
-            typeof(SiteSearchViewModel),
-            typeof(SubscriptionViewModel),
-        };
-        #endregion
-
-        private static readonly TinyIoCContainer Container = new TinyIoCContainer();
-
-        static IoC()
-        {
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
-            {
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            };
-
-            var refitNewtonsoftSettings = new RefitSettings(new NewtonsoftJsonContentSerializer());
-            Container.Register((c, e) =>
+            services.AddSingleton<IAdelaideFuelApi>(_ =>
             {
                 var client = new HttpClient()
                 {
                     BaseAddress = new Uri(Constants.ApiUrlBase),
                 };
-                var metroApi = RestService.For<IAdelaideFuelApi>(client, refitNewtonsoftSettings);
+                var metroApi = RestService.For<IAdelaideFuelApi>(client);
                 return metroApi;
-            }).AsSingleton();
-            Container.Register((c, e) =>
+            });
+            services.AddSingleton<IIapVerifyApi>(_ =>
             {
                 var client = new HttpClient()
                 {
                     BaseAddress = new Uri(Constants.ApiUrlIapBase),
                 };
-                var iapApi = RestService.For<IIapVerifyApi>(client, refitNewtonsoftSettings);
+                var iapApi = RestService.For<IIapVerifyApi>(client);
                 return iapApi;
-            }).AsSingleton();
+            });
 
-            Container.Register((c, e) => CrossInAppBilling.Current).AsSingleton();
-            Container.Register((c, e) => UserDialogs.Instance).AsSingleton();
-            Container.Register((c, e) => CrossStoreReview.Current).AsSingleton();
+            services.AddSingleton<IInAppBilling>(_ => CrossInAppBilling.Current);
+            services.AddSingleton<IStoreReview>(_ => CrossStoreReview.Current);
 
-            Container.Register<ILogger, Logger>().AsSingleton();
-            Container.Register<IAppClock, AppClock>().AsSingleton();
-            Container.Register<ICacheService, CacheService>().AsSingleton();
-            Container.Register<IStoreFactory, StoreFactory>().AsSingleton();
-            Container.Register<IFuelService, FuelService>().AsSingleton();
-            Container.Register<IIapVerifyService, IapVerifyService>().AsSingleton();
-            Container.Register<ISubscriptionService, SubscriptionService>().AsSingleton();
-            Container.Register<IAppPreferences, AppPreferences>().AsSingleton();
-            Container.Register<IRetryPolicyFactory, RetryPolicyFactory>().AsSingleton();
-            Container.Register<IBvmConstructor, BvmConstructor>().AsSingleton();
+            services.AddSingleton<IAppClock, AppClock>();
+            services.AddSingleton<ICacheService, CacheService>();
+            services.AddSingleton<IStoreFactory, StoreFactory>();
+            services.AddSingleton<IFuelService, FuelService>();
+            services.AddSingleton<IIapVerifyService, IapVerifyService>();
+            services.AddSingleton<ISubscriptionService, SubscriptionService>();
+            services.AddSingleton<IAppPreferences, AppPreferences>();
+            services.AddSingleton<IRetryPolicyFactory, RetryPolicyFactory>();
+            services.AddSingleton<IBvmConstructor, BvmConstructor>();
 
-#if DEBUG
-            var reflectedEssentials = GetEssentialInterfaceAndImplementations();
-            if (!reflectedEssentials.DictionaryEqual(EssentialTypes))
-            {
-                foreach (var i in reflectedEssentials)
-                    System.Diagnostics.Debug.WriteLine($"{{ typeof({i.Key.Name}), typeof({i.Value.Name}) }},");
-                throw new Exception("Essential Types do not match!");
-            }
-
-            var reflectedViewModels = GetViewModelTypes();
-            if (!reflectedViewModels.SequenceEqual(ViewModelTypes))
-            {
-                foreach (var i in reflectedViewModels)
-                    System.Diagnostics.Debug.WriteLine($"{{ typeof({i.Name}) }},");
-                throw new Exception("ViewModel Types do not match!");
-            }
-#endif
-
-            foreach (var e in EssentialTypes)
-                Container.Register(e.Key, e.Value).AsSingleton();
-
-            foreach (var vmType in ViewModelTypes)
-                Container.Register(vmType).AsMultiInstance();
-        }
-
-        public static IDictionary<Type, Type> GetEssentialInterfaceAndImplementations()
-        {
-            var result = new Dictionary<Type, Type>();
-
-            var essentialImpls = typeof(IEssentialsImplementation)
-                .Assembly
-                .GetTypes()
-                .Where(t => t.IsClass && t.Namespace.EndsWith(nameof(Xamarin.Essentials.Implementation), StringComparison.Ordinal));
-
-            foreach (var impl in essentialImpls)
-            {
-                var implInterface = impl.GetInterfaces().First(i => i != typeof(IEssentialsImplementation));
-                result.Add(implInterface, impl);
-            }
-
-            return result;
-        }
-
-        public static IList<Type> GetViewModelTypes()
-        {
-            return typeof(BaseViewModel)
-                .Assembly
-                .GetTypes()
-                .Where(t => t.IsClass &&
-                            !t.IsAbstract &&
-                            t.GetInterfaces().Contains(typeof(IViewModel)))
-                .ToList();
+            services.RegisterEssentials();
+            services.RegisterViewModels();
         }
 
         public static T Resolve<T>() where T : class
+            => Services.GetService<T>();
+
+        private static void RegisterEssentials(this IServiceCollection services)
         {
-            return Container.Resolve<T>();
+            services.AddSingleton<IAccelerometer>(_ => Accelerometer.Default);
+            services.AddSingleton<IAppActions>(_ => AppActions.Current);
+            services.AddSingleton<IAppInfo>(_ => AppInfo.Current);
+            services.AddSingleton<IBarometer>(_ => Barometer.Default);
+            services.AddSingleton<IBattery>(_ => Battery.Default);
+            services.AddSingleton<IBrowser>(_ => Browser.Default);
+            services.AddSingleton<IClipboard>(_ => Clipboard.Default);
+            services.AddSingleton<ICompass>(_ => Compass.Default);
+            services.AddSingleton<IConnectivity>(_ => Connectivity.Current);
+            services.AddSingleton<IContacts>(_ => Contacts.Default);
+            services.AddSingleton<IDeviceDisplay>(_ => DeviceDisplay.Current);
+            services.AddSingleton<IDeviceInfo>(_ => DeviceInfo.Current);
+            services.AddSingleton<IEmail>(_ => Email.Default);
+            services.AddSingleton<IFilePicker>(_ => FilePicker.Default);
+            services.AddSingleton<IFileSystem>(_ => FileSystem.Current);
+            services.AddSingleton<IFlashlight>(_ => Flashlight.Default);
+            services.AddSingleton<IGeocoding>(_ => Geocoding.Default);
+            services.AddSingleton<IGeolocation>(_ => Geolocation.Default);
+            services.AddSingleton<IGyroscope>(_ => Gyroscope.Default);
+            services.AddSingleton<IHapticFeedback>(_ => HapticFeedback.Default);
+            services.AddSingleton<ILauncher>(_ => Launcher.Default);
+            services.AddSingleton<IMagnetometer>(_ => Magnetometer.Default);
+            services.AddSingleton<IMap>(_ => Map.Default);
+            services.AddSingleton<IMediaPicker>(_ => MediaPicker.Default);
+            services.AddSingleton<IOrientationSensor>(_ => OrientationSensor.Default);
+            services.AddSingleton<IPermissions>(_ => new PermissionsImplementation());
+            services.AddSingleton<IPhoneDialer>(_ => PhoneDialer.Default);
+            services.AddSingleton<IPreferences>(_ => Preferences.Default);
+            services.AddSingleton<IScreenshot>(_ => Screenshot.Default);
+            services.AddSingleton<ISecureStorage>(_ => SecureStorage.Default);
+            services.AddSingleton<IShare>(_ => Share.Default);
+            services.AddSingleton<ISms>(_ => Sms.Default);
+            services.AddSingleton<ITextToSpeech>(_ => TextToSpeech.Default);
+            services.AddSingleton<IVersionTracking>(_ => VersionTracking.Default);
+            services.AddSingleton<IVibration>(_ => Vibration.Default);
+            services.AddSingleton<IWebAuthenticator>(_ => WebAuthenticator.Default);
         }
 
-        public static TViewModel ResolveViewModel<TViewModel>() where TViewModel : class, IViewModel
+        private static void RegisterViewModels(this IServiceCollection services)
         {
-            return Container.Resolve<TViewModel>();
-        }
-
-        public static void RegisterSingleton<TService, TImplementation>() where TService : class where TImplementation : class, TService
-        {
-            Container.Register<TService, TImplementation>().AsSingleton();
-        }
-
-        public static void RegisterSingleton(Type serviceType, Type implementationType)
-        {
-            Container.Register(serviceType, implementationType).AsSingleton();
-        }
-
-        public static void RegisterSingleton<T>(Func<T> instanceCreator) where T : class
-        {
-            Container.Register((_, _) => instanceCreator()).AsSingleton();
-        }
-
-        public static void RegisterTransient<TService, TImplementation>() where TService : class where TImplementation : class, TService
-        {
-            Container.Register<TService, TImplementation>().AsMultiInstance();
-        }
-
-        public static void RegisterTransient(Type serviceType, Type implementationType)
-        {
-            Container.Register(serviceType, implementationType).AsMultiInstance();
-        }
-
-        public static void RegisterTransient(Type serviceType, Func<object> instanceCreator)
-        {
-            Container.Register(serviceType, instanceCreator).AsMultiInstance();
+            services.AddTransient<BrandsViewModel>();
+            services.AddTransient<FuelsViewModel>();
+            services.AddTransient<MapViewModel>();
+            services.AddTransient<PricesViewModel>();
+            services.AddTransient<RadiiViewModel>();
+            services.AddTransient<SettingsViewModel>();
+            services.AddTransient<SiteSearchViewModel>();
+            services.AddTransient<SubscriptionViewModel>();
         }
     }
 }

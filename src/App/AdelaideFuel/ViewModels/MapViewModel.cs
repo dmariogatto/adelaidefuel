@@ -1,7 +1,11 @@
-﻿using AdelaideFuel.Localisation;
+﻿using AdelaideFuel.Essentials;
+using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
 using AdelaideFuel.Shared;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Devices.Sensors;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
@@ -10,8 +14,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
@@ -80,7 +82,7 @@ namespace AdelaideFuel.ViewModels
 
             CheckAndRequestLocationCommand.ExecuteAsync();
 
-            TrackEvent(AppCenterEvents.PageView.MapView);
+            TrackEvent(Events.PageView.MapView);
         }
         #endregion
 

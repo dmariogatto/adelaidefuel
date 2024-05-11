@@ -6,8 +6,8 @@ namespace AdelaideFuel.Services
 {
     public interface ILogger
     {
-        void Error(Exception ex, IDictionary<string, string> data = null);
-        void Event(string eventName, IDictionary<string, string> properties = null);
+        void Error(Exception ex, IReadOnlyDictionary<string, string> data = null);
+        void Event(string eventName, IReadOnlyDictionary<string, string> properties = null);
 
         long LogInBytes();
         Task<string> GetLog();

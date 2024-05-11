@@ -10,8 +10,7 @@
   "ApiKeySitePrices": "{ApiKeySitePrices}",
   "ApiKeyBrandImg": "{ApiKeyBrandImg}",
 
-  "AppCenterAndroidSecret": "{AppCenterAndroidSecret}",
-  "AppCenterIosSecret": "{AppCenterIosSecret}",
+  "SentryDsn": "{SentryDsn}",
 
   "AdMobPublisherId": "{AdMobPublisherId}",
   "AdMobPricesAndroidUnitId": "{AdMobPricesAndroidUnitId}",

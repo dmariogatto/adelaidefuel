@@ -17,7 +17,7 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
-            TrackEvent(AppCenterEvents.PageView.FuelsView);
+            TrackEvent(Events.PageView.FuelsView);
         }
         #endregion
     }

@@ -1,6 +1,8 @@
 ﻿using AdelaideFuel.Models;
 using AdelaideFuel.Storage;
 using LiteDB;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
 using Polly;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +10,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.Services
 {
@@ -280,7 +281,7 @@ namespace AdelaideFuel.Services
 
                     _userDb.UserVersion = UserDbVersion;
 
-                    _logger.Event(AppCenterEvents.Data.UserDbReconstruction, new Dictionary<string, string>()
+                    _logger.Event(Events.Data.UserDbReconstruction, new Dictionary<string, string>()
                     {
                         { "brands", (userBrands?.Count ?? -1).ToString() },
                         { "fuels", (userFuels?.Count ?? -1).ToString() },

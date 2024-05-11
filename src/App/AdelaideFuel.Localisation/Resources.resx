@@ -480,4 +480,7 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="Suspended" xml:space="preserve">
     <value>Suspended</value>
   </data>
+  <data name="IssueOpeningUrlItem" xml:space="preserve">
+    <value>There was an issue opening the URL '{0}'.</value>
+  </data>
 </root>

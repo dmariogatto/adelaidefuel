@@ -21,7 +21,7 @@ namespace AdelaideFuel
                 values = values.OrderBy(i => i).ToList();
 
             fns[0] = values.First();
-            fns[4] = values.Last();            
+            fns[4] = values.Last();
 
             for (var i = 1; i < Percentages.Length - 1; i++)
             {

@@ -1,6 +1,9 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Services;
-using Microsoft.AppCenter.Crashes;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.ApplicationModel.Communication;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Devices;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using Plugin.StoreReview.Abstractions;
@@ -8,8 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
@@ -64,7 +65,7 @@ namespace AdelaideFuel.ViewModels
             GoToRadiiCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
             GenerateTestCrashCommand = new Command(() =>
             {
-                try { Crashes.GenerateTestCrash(); }
+                try { throw new Exception("Test Crash"); }
                 catch (Exception ex) { Logger.Error(ex); }
             });
             ViewLogCommand = new AsyncCommand(ViewLogAsync);
@@ -79,7 +80,7 @@ namespace AdelaideFuel.ViewModels
 
             LoadSettingsCommand.Execute(null);
 
-            TrackEvent(AppCenterEvents.PageView.SettingsView);
+            TrackEvent(Events.PageView.SettingsView);
         }
         #endregion
 
@@ -102,7 +103,7 @@ namespace AdelaideFuel.ViewModels
 
                     OnPropertyChanged(nameof(AppTheme));
 
-                    TrackEventWithOldAndNew(AppCenterEvents.Setting.AppTheme, oldVal, value);
+                    TrackEventWithOldAndNew(Events.Setting.AppTheme, oldVal, value);
                 }
             }
         }
