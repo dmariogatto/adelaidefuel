@@ -121,12 +121,12 @@ jobs:
       shell: bash
       run: |
         dotnet publish ${{ inputs.project-file }} \
-        -c ${{ inputs.build-config }} \
-        -f ${{ inputs.dotnet-version-target }}-ios \
-        -r ios-arm64 \
-        -p:ArchiveOnBuild=true  \
-        -p:SentryOrg=${{ secrets.sentry-org }} \
-        -p:SentryProject=${{ secrets.sentry-project }}
+           -c ${{ inputs.build-config }} \
+           -f ${{ inputs.dotnet-version-target }}-ios \
+           -r ios-arm64 \
+           -p:ArchiveOnBuild=true  \
+           -p:SentryOrg=${{ secrets.sentry-org }} \
+           -p:SentryProject=${{ secrets.sentry-project }}
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
 
