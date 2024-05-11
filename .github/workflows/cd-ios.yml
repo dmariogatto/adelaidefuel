@@ -105,7 +105,7 @@ jobs:
       run: |
         chmod +x ./src/scripts/replace-settings.sh
         ./src/scripts/replace-settings.sh \
-        "${{ inputs.project-folder }}/../${{ inputs.project-file }}/settings.json" \
+        "${{ inputs.project-folder }}/../${{ inputs.project-name }}/settings.json" \
         '${{ secrets.settings-json }}'
 
     - name: Setup .NET Core SDK
@@ -133,7 +133,7 @@ jobs:
     - name: Upload to TestFlight
       uses: apple-actions/upload-testflight-build@v1
       with:
-        app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-file }}.Maui.ipa
+        app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-name }}.Maui.ipa
         issuer-id: ${{ secrets.appstore-issuer }}
         api-key-id: ${{ secrets.appstore-keyid }}
         api-private-key: ${{ secrets.appstore-private-key }}
