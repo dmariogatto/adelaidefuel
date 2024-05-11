@@ -1,0 +1,133 @@
+name: Build and Publish Android
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+      project-folder:
+        required: true
+        type: string
+      project-file:
+        required: true
+        type: string
+      project-name:
+        required: true
+        type: string
+      dotnet-version:
+        required: true
+        type: string
+      dotnet-version-target:
+        required: true
+        type: string   
+      build-config:
+        required: true
+        type: string
+      build-number:
+        required: true
+        type: string
+      build-offset:
+        required: true
+        type: string
+    secrets:
+      keystore:
+        required: true  
+      keystore-password:
+        required: true
+      keystore-alias:
+        required: true
+      keystore-key-password:
+        required: true
+      playstore-service-account:
+        required: true
+      settings-json:
+        required: true
+      admob-app-id:
+        required: true
+      google-maps-api-key:
+        required: true
+      sentry-auth-token:
+        required: true
+      sentry-org:
+        required: true
+      sentry-project:
+        required: true
+
+jobs:
+  maui-android:
+    runs-on: macos-13
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Decode Android Keystore
+      shell: bash
+      run: |
+        keystorePath="${{ inputs.project-folder }}/keystore.keystore"
+        (echo "${{ secrets.keystore }}" | base64 -d) > "$keystorePath"
+        if [ ! -f $keystorePath ] ; then
+          echo " [!] Keystore doesn't exist at specified path: $keystorePath"
+          exit 1
+        fi
+
+    - name: Set App Version and Target Framework
+      shell: bash
+      run: |
+        chmod +x ./src/scripts/set-version-codes.sh
+        ./src/scripts/set-version-codes.sh \
+        "${{ inputs.project-file }}" \
+        "${{ inputs.build-number }}" \
+        "${{ inputs.build-offset }}" \
+        "${{ inputs.project-folder }}/Platforms/Android/AndroidManifest.xml" \
+        "${{ secrets.admob-app-id }}" \
+        "${{ secrets.google-maps-api-key }}" \
+        "" \
+        ""
+                
+        sed -r -i".bak" "s#<TargetFrameworks>.*</TargetFrameworks>#<TargetFrameworks>${{ inputs.dotnet-version-target }}-android</TargetFrameworks>#g" "${{ inputs.project-file }}"
+
+    - name: Replace Settings
+      shell: bash
+      run: |
+        chmod +x ./src/scripts/replace-settings.sh
+        ./src/scripts/replace-settings.sh \
+        "${{ inputs.project-folder }}/../${{ inputs.project-name }}/settings.json" \
+        '${{ secrets.settings-json }}'
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Install MAUI Workload
+      shell: bash
+      run: dotnet workload install maui-android --ignore-failed-sources
+
+    - name: Publish Android
+      shell: bash
+      run: |
+        dotnet publish ${{ inputs.project-file }} \
+           -c ${{ inputs.build-config }} \
+           -f ${{ inputs.dotnet-version-target }}-android \
+           -p:AndroidPackageFormats=aab \
+           -p:AndroidKeyStore=true \
+           -p:AndroidSigningKeyAlias=${{ secrets.keystore-alias }} \
+           -p:AndroidSigningKeyPass=${{ secrets.keystore-key-password }} \
+           -p:AndroidSigningKeyStore=keystore.keystore \
+           -p:AndroidSigningStorePass=${{ secrets.keystore-password }} \
+           -p:SentryOrg=${{ secrets.sentry-org }} \
+           -p:SentryProject=${{ secrets.sentry-project }}
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
+
+    - name: Upload Android Artifact to Play Console
+      uses: r0adkll/upload-google-play@v1.1.3      
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.playstore-service-account }}
+        packageName: ${{ inputs.package-name }}
+        releaseFiles: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-android/${{ inputs.package-name }}-Signed.aab
+        track: beta
+        whatsNewDirectory: ./src/whatsnew
+

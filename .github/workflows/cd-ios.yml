@@ -1,0 +1,139 @@
+name: Build and Publish iOS
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+      project-folder:
+        required: true
+        type: string
+      project-file:
+        required: true
+        type: string
+      project-name:
+        required: true
+        type: string 
+      dotnet-version:
+        required: true
+        type: string
+      dotnet-version-target:
+        required: true
+        type: string
+      xcode-version:
+        required: true
+        type: string      
+      build-config:
+        required: true
+        type: string
+      build-number:
+        required: true
+        type: string
+      build-offset:
+        required: true
+        type: string
+    secrets:      
+      p12-cert:
+        required: true
+      p12-cert-password:
+        required: true
+      appstore-issuer:
+        required: true
+      appstore-keyid:
+        required: true
+      appstore-private-key:
+        required: true
+      settings-json:
+        required: true
+      admob-app-id:
+        required: true
+      sentry-auth-token:
+        required: true
+      sentry-org:
+        required: true
+      sentry-project:
+        required: true
+
+jobs:
+  maui-ios:
+    runs-on: macos-13
+    steps:
+
+    - name: Set XCode version
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: ${{ inputs.xcode-version }}
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Import Distribution Certificate
+      uses: apple-actions/import-codesign-certs@v2
+      with: 
+        p12-file-base64: ${{ secrets.p12-cert }}
+        p12-password: ${{ secrets.p12-cert-password }}
+
+    - name: Download Provisioning Profiles
+      id: provisioning_app
+      uses: apple-actions/download-provisioning-profiles@v1
+      with: 
+        bundle-id: ${{ inputs.package-name }}
+        profile-type: 'IOS_APP_STORE'
+        issuer-id: ${{ secrets.appstore-issuer }}
+        api-key-id: ${{ secrets.appstore-keyid }}
+        api-private-key: ${{ secrets.appstore-private-key }}
+
+    - name: Set App Version and Target Framework
+      shell: bash
+      run: |
+        chmod +x ./src/scripts/set-version-codes.sh
+        ./src/scripts/set-version-codes.sh \
+        "${{ inputs.project-file }}" \
+        "${{ inputs.build-number }}" \
+        "${{ inputs.build-offset }}" \
+        "" \
+        "" \
+        "" \
+        "${{ inputs.project-folder }}/Platforms/iOS/Info.plist" \
+        "${{ secrets.admob-app-id }}"
+
+        sed -r -i".bak" "s#<TargetFrameworks>.*</TargetFrameworks>#<TargetFrameworks>${{ inputs.dotnet-version-target }}-ios</TargetFrameworks>#g" "${{ inputs.project-file }}"
+
+    - name: Replace Settings
+      shell: bash
+      run: |
+        chmod +x ./src/scripts/replace-settings.sh
+        ./src/scripts/replace-settings.sh \
+        "${{ inputs.project-folder }}/../${{ inputs.project-file }}/settings.json" \
+        '${{ secrets.settings-json }}'
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Install MAUI Workload
+      shell: bash
+      run: dotnet workload install maui-ios --ignore-failed-sources
+
+    - name: Publish iOS
+      shell: bash
+      run: |
+        dotnet publish ${{ inputs.project-file }} \
+        -c ${{ inputs.build-config }} \
+        -f ${{ inputs.dotnet-version-target }}-ios \
+        -r ios-arm64 \
+        -p:ArchiveOnBuild=true  \
+        -p:SentryOrg=${{ secrets.sentry-org }} \
+        -p:SentryProject=${{ secrets.sentry-project }}
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
+
+    - name: Upload to TestFlight
+      uses: apple-actions/upload-testflight-build@v1
+      with:
+        app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-file }}.Maui.ipa
+        issuer-id: ${{ secrets.appstore-issuer }}
+        api-key-id: ${{ secrets.appstore-keyid }}
+        api-private-key: ${{ secrets.appstore-private-key }}

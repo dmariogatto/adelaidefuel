@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sho:DraggableViewCell
+    x:Class="AdelaideFuel.Maui.Views.UserFuelTemplate"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
+    xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
+    xmlns:sho="http://sharpnado.com"
+    x:DataType="models:UserFuel">
+    <ContentView>
+        <Frame Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+            <View.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsActive}"
+                    TargetType="View"
+                    Value="false">
+                    <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                </DataTrigger>
+            </View.Triggers>
+            <Grid ColumnDefinitions="36,*,48" ColumnSpacing="{StaticResource DefaultSpacing}">
+
+                <CheckBox IsChecked="{Binding IsActive}" />
+
+                <Label
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    Style="{DynamicResource LabelTitleStyle}"
+                    Text="{Binding Name, Mode=OneTime}"
+                    VerticalTextAlignment="Center" />
+
+                <controls:TintImage
+                    Grid.Column="2"
+                    HeightRequest="40"
+                    HorizontalOptions="Center"
+                    Source="{StaticResource DragIndicatorImg}"
+                    TintColor="{StaticResource PrimaryAccentColor}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Frame>
+    </ContentView>
+</sho:DraggableViewCell>

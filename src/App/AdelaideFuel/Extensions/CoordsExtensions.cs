@@ -1,5 +1,5 @@
 ﻿using AdelaideFuel.Models;
-using Xamarin.Essentials;
+using Microsoft.Maui.Devices.Sensors;
 
 namespace AdelaideFuel
 {

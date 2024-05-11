@@ -4,8 +4,7 @@ using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,41 +20,44 @@ namespace AdelaideFuel.Functions
         private const string BrandFuncName = nameof(Brands);
         private const string BrandImgFuncName = "BrandImg";
 
-        private static readonly string[] ValidPostfix = new[] { "2x.png", "3x.png" };
+        private static readonly string[] ValidPostfix = ["2x.png", "3x.png"];
 
         private readonly ITableRepository<BrandEntity> _brandRepository;
 
         private readonly IBlobService _blobService;
 
+        private readonly ILogger _logger;
+
         public Brands(
             ITableRepository<BrandEntity> brandRepository,
-            IBlobService blobService)
+            IBlobService blobService,
+            ILoggerFactory loggerFactory)
         {
             _brandRepository = brandRepository;
 
             _blobService = blobService;
+            _logger = loggerFactory.CreateLogger<Brands>();
         }
 
-        [FunctionName(BrandFuncName)]
-        public async Task<IList<BrandDto>> GetBrands(
+        [Function(BrandFuncName)]
+        public async Task<IActionResult> GetBrands(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Brands")] HttpRequest req,
-            ILogger log,
             CancellationToken ct)
         {
             var brands = await _brandRepository.GetAllEntitiesAsync(ct);
-            return brands
+            var projected = brands
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.SortOrder)
                 .ThenBy(s => s.Name)
                 .ThenBy(s => s.BrandId)
-                .Select(s => s.ToBrand()).ToList();
+                .Select(s => s.ToBrand());
+            return new JsonResult(projected);
         }
 
-        [FunctionName(BrandImgFuncName)]
+        [Function(BrandImgFuncName)]
         public async Task<IActionResult> GetBrandImg(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Brand/Img/{fileName}")] HttpRequest req,
             string fileName,
-            ILogger log,
             CancellationToken ct)
         {
             fileName = fileName?.ToLowerInvariant();

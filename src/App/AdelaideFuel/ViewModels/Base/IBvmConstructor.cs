@@ -1,6 +1,6 @@
 ﻿using Acr.UserDialogs;
 using AdelaideFuel.Services;
-using Xamarin.Essentials.Interfaces;
+using Microsoft.Maui.ApplicationModel;
 
 namespace AdelaideFuel.ViewModels
 {

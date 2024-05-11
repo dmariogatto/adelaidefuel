@@ -1,7 +1,11 @@
 ﻿using AdelaideFuel.Api;
+using AdelaideFuel.Essentials;
 using AdelaideFuel.Models;
 using AdelaideFuel.Shared;
 using AdelaideFuel.Storage;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices.Sensors;
+using Microsoft.Maui.Networking;
 using Polly;
 using Polly.Retry;
 using Refit;
@@ -14,8 +18,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.Services
 {
@@ -715,7 +717,7 @@ namespace AdelaideFuel.Services
             if (httpMethod == HttpMethod.Get)
             {
                 using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                result = DeserializeJsonFromStream<List<SitePriceDto>>(s);
+                result = await DeserializeJsonFromStreamAsync<List<SitePriceDto>>(s).ConfigureAwait(false);
             }
 
             return (result, modifiedUtc);

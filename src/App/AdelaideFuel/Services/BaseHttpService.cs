@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace AdelaideFuel.Services
 {
@@ -12,15 +13,12 @@ namespace AdelaideFuel.Services
 
         protected readonly static HttpClient HttpClient = new HttpClient();
 
-        protected static T DeserializeJsonFromStream<T>(Stream stream)
+        protected static async Task<T> DeserializeJsonFromStreamAsync<T>(Stream stream)
         {
             if (stream is null || stream.CanRead == false)
                 return default;
 
-            using var sr = new StreamReader(stream);
-            using var jtr = new JsonTextReader(sr);
-
-            var result = JsonSerializer.CreateDefault().Deserialize<T>(jtr);
+            var result = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
             return result;
         }
     }

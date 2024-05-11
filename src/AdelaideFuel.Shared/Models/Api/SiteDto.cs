@@ -1,92 +1,92 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace AdelaideFuel.Shared
 {
     public class SiteDto : ISite
     {
-        [JsonProperty("S")]
+        [JsonPropertyName("S")]
         public int SiteId { get; set; }
 
-        [JsonProperty("A")]
+        [JsonPropertyName("A")]
         public string Address { get; set; }
 
-        [JsonProperty("N")]
+        [JsonPropertyName("N")]
         public string Name { get; set; }
 
-        [JsonProperty("B")]
+        [JsonPropertyName("B")]
         public int BrandId { get; set; }
 
-        [JsonProperty("P")]
+        [JsonPropertyName("P")]
         public string Postcode { get; set; }
 
-        [JsonProperty("G1")]
+        [JsonPropertyName("G1")]
         public int GeographicRegionLevel1 { get; set; }
 
-        [JsonProperty("G2")]
+        [JsonPropertyName("G2")]
         public int GeographicRegionLevel2 { get; set; }
 
-        [JsonProperty("G3")]
+        [JsonPropertyName("G3")]
         public int GeographicRegionLevel3 { get; set; }
 
-        [JsonProperty("G4")]
+        [JsonPropertyName("G4")]
         public int GeographicRegionLevel4 { get; set; }
 
-        [JsonProperty("G5")]
+        [JsonPropertyName("G5")]
         public int GeographicRegionLevel5 { get; set; }
 
-        [JsonProperty("Lat")]
+        [JsonPropertyName("Lat")]
         public double Latitude { get; set; }
 
-        [JsonProperty("Lng")]
+        [JsonPropertyName("Lng")]
         public double Longitude { get; set; }
 
-        [JsonProperty("M")]
+        [JsonPropertyName("M"), JsonConverter(typeof(DateUtcJsonConverter))]
         public DateTime LastModifiedUtc { get; set; }
 
-        [JsonProperty("GPI")]
+        [JsonPropertyName("GPI")]
         public string GooglePlaceId { get; set; }
 
-        [JsonProperty("MO")]
+        [JsonPropertyName("MO")]
         public string MondayOpen { get; set; }
 
-        [JsonProperty("MC")]
+        [JsonPropertyName("MC")]
         public string MondayClose { get; set; }
 
-        [JsonProperty("TO")]
+        [JsonPropertyName("TO")]
         public string TuesdayOpen { get; set; }
 
-        [JsonProperty("TC")]
+        [JsonPropertyName("TC")]
         public string TuesdayClose { get; set; }
 
-        [JsonProperty("WO")]
+        [JsonPropertyName("WO")]
         public string WednesdayOpen { get; set; }
 
-        [JsonProperty("WC")]
+        [JsonPropertyName("WC")]
         public string WednesdayClose { get; set; }
 
-        [JsonProperty("THO")]
+        [JsonPropertyName("THO")]
         public string ThursdayOpen { get; set; }
 
-        [JsonProperty("THC")]
+        [JsonPropertyName("THC")]
         public string ThursdayClose { get; set; }
 
-        [JsonProperty("FO")]
+        [JsonPropertyName("FO")]
         public string FridayOpen { get; set; }
 
-        [JsonProperty("FC")]
+        [JsonPropertyName("FC")]
         public string FridayClose { get; set; }
 
-        [JsonProperty("SO")]
+        [JsonPropertyName("SO")]
         public string SaturdayOpen { get; set; }
 
-        [JsonProperty("SC")]
+        [JsonPropertyName("SC")]
         public string SaturdayClose { get; set; }
 
-        [JsonProperty("SUO")]
+        [JsonPropertyName("SUO")]
         public string SundayOpen { get; set; }
 
-        [JsonProperty("SUC")]
+        [JsonPropertyName("SUC")]
         public string SundayClose { get; set; }
     }
 }

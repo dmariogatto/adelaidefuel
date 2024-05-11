@@ -1,13 +1,13 @@
 ﻿using AdelaideFuel.Api;
 using AdelaideFuel.Models;
-using Newtonsoft.Json.Linq;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
 using Plugin.InAppBilling;
 using Polly;
 using Polly.Retry;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.Services
 {
@@ -54,7 +54,10 @@ namespace AdelaideFuel.Services
             if (_deviceInfo.Platform == DevicePlatform.iOS)
                 purchaseToken = _inAppBilling.ReceiptData;
             else if (_deviceInfo.Platform == DevicePlatform.Android)
-                purchaseToken = JObject.Parse(signedData).Property(purchaseTokenProperty).Value.Value<string>();
+                purchaseToken = JsonSerializer
+                    .Deserialize<JsonElement>(signedData)
+                    .GetProperty(purchaseTokenProperty)
+                    .GetString();
             else
                 throw new NotImplementedException();
 

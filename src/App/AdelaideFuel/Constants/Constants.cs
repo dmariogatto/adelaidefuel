@@ -1,12 +1,9 @@
 ﻿using AdelaideFuel.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.Maui.Devices;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
+using System.Text.Json;
 
 namespace AdelaideFuel
 {
@@ -18,27 +15,8 @@ namespace AdelaideFuel
             var resName = assembly.GetManifestResourceNames()
                 ?.FirstOrDefault(r => r.EndsWith("settings.json", StringComparison.OrdinalIgnoreCase));
 
-            using var file = assembly.GetManifestResourceStream(resName);
-            using var sr = new StreamReader(file);
-            using var jtr = new JsonTextReader(sr);
-
-            var j = JsonSerializer.Create().Deserialize<JObject>(jtr);
-
-            ApiUrlBase = j.Value<string>(nameof(ApiUrlBase));
-            ApiUrlIapBase = j.Value<string>(nameof(ApiUrlIapBase));
-            SubscriptionProductId = j.Value<string>(nameof(SubscriptionProductId));
-            ApiKeyBrands = j.Value<string>(nameof(ApiKeyBrands));
-            ApiKeyFuels = j.Value<string>(nameof(ApiKeyFuels));
-            ApiKeySites = j.Value<string>(nameof(ApiKeySites));
-            ApiKeySitePrices = j.Value<string>(nameof(ApiKeySitePrices));
-            ApiKeyBrandImg = j.Value<string>(nameof(ApiKeyBrandImg));
-            AppCenterAndroidSecret = j.Value<string>(nameof(AppCenterAndroidSecret));
-            AppCenterIosSecret = j.Value<string>(nameof(AppCenterIosSecret));
-            AdMobPublisherId = j.Value<string>(nameof(AdMobPublisherId));
-            AdMobPricesAndroidUnitId = j.Value<string>(nameof(AdMobPricesAndroidUnitId));
-            AdMobPricesIosUnitId = j.Value<string>(nameof(AdMobPricesIosUnitId));
-            AdMobMapAndroidUnitId = j.Value<string>(nameof(AdMobMapAndroidUnitId));
-            AdMobMapIosUnitId = j.Value<string>(nameof(AdMobMapIosUnitId));
+            using var stream = assembly.GetManifestResourceStream(resName);
+            Values = JsonSerializer.Deserialize<Settings>(stream);
         }
 
         public const string Email = "outtaapps@gmail.com";
@@ -61,32 +39,21 @@ namespace AdelaideFuel
 
         public static readonly TimeSpan AdPoolTime = TimeSpan.FromMinutes(5);
 
-        public static readonly string ApiUrlBase;
-        public static readonly string ApiUrlIapBase;
+        public static string ApiUrlBase => Values.ApiUrlBase;
+        public static string ApiUrlIapBase => Values.ApiUrlIapBase;
+        public static string SubscriptionProductId => Values.SubscriptionProductId;
 
-        public static readonly string SubscriptionProductId;
-
-        public static readonly string ApiKeyBrands;
-        public static readonly string ApiKeyFuels;
-        public static readonly string ApiKeySites;
-        public static readonly string ApiKeySitePrices;
-        public static readonly string ApiKeyBrandImg;
-
-        private static readonly string AppCenterAndroidSecret;
-        private static readonly string AppCenterIosSecret;
-
-        private static readonly string AdMobPublisherId;
-        private static readonly string AdMobPricesAndroidUnitId;
-        private static readonly string AdMobPricesIosUnitId;
-        private static readonly string AdMobMapAndroidUnitId;
-        private static readonly string AdMobMapIosUnitId;
+        public static string ApiKeyBrands => Values.ApiKeyBrands;
+        public static string ApiKeyFuels => Values.ApiKeyFuels;
+        public static string ApiKeySites => Values.ApiKeySites;
+        public static string ApiKeySitePrices => Values.ApiKeySitePrices;
+        public static string ApiKeyBrandImg => Values.ApiKeyBrandImg;
 
         public static string AppId => ValueForPlatform(AndroidId, AppleId);
+        public static string SentryDsn => Values.SentryDsn;
 
-        public static string AppCenterSecret => ValueForPlatform(AppCenterAndroidSecret, AppCenterIosSecret);
-
-        public static string AdMobPricesUnitId => AdUnitId(ValueForPlatform(AdMobPricesAndroidUnitId, AdMobPricesIosUnitId));
-        public static string AdMobMapUnitId => AdUnitId(ValueForPlatform(AdMobMapAndroidUnitId, AdMobMapIosUnitId));
+        public static string AdMobPricesUnitId => AdUnitId(ValueForPlatform(Values.AdMobPricesAndroidUnitId, Values.AdMobPricesIosUnitId));
+        public static string AdMobMapUnitId => AdUnitId(ValueForPlatform(Values.AdMobMapAndroidUnitId, Values.AdMobMapIosUnitId));
 
         private static Lazy<DevicePlatform> Platform => new Lazy<DevicePlatform>(() => IoC.Resolve<IDeviceInfo>().Platform);
         private static string ValueForPlatform(string android, string ios)
@@ -100,6 +67,26 @@ namespace AdelaideFuel
         }
 
         private static string AdUnitId(string adUnitId)
-            => $"{AdMobPublisherId}/{adUnitId}";
+            => $"{Values.AdMobPublisherId}/{adUnitId}";
+
+        private static readonly Settings Values;
+
+        private record Settings
+        {
+            public string ApiUrlBase { get; init; }
+            public string ApiUrlIapBase { get; init; }
+            public string SubscriptionProductId { get; init; }
+            public string ApiKeyBrands { get; init; }
+            public string ApiKeyFuels { get; init; }
+            public string ApiKeySites { get; init; }
+            public string ApiKeySitePrices { get; init; }
+            public string ApiKeyBrandImg { get; init; }
+            public string SentryDsn { get; init; }
+            public string AdMobPublisherId { get; init; }
+            public string AdMobPricesAndroidUnitId { get; init; }
+            public string AdMobPricesIosUnitId { get; init; }
+            public string AdMobMapAndroidUnitId { get; init; }
+            public string AdMobMapIosUnitId { get; init; }
+        }
     }
 }

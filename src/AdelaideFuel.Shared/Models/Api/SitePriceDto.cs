@@ -1,26 +1,26 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace AdelaideFuel.Shared
 {
     public class SitePriceDto : ISitePrice
     {
-        [JsonProperty("BrandId")]
+        [JsonPropertyName("BrandId")]
         public int BrandId { get; set; }
 
-        [JsonProperty("SiteId")]
+        [JsonPropertyName("SiteId")]
         public int SiteId { get; set; }
 
-        [JsonProperty("FuelId")]
+        [JsonPropertyName("FuelId")]
         public int FuelId { get; set; }
 
-        [JsonProperty("CollectionMethod")]
+        [JsonPropertyName("CollectionMethod")]
         public string CollectionMethod { get; set; }
 
-        [JsonProperty("TransactionDateUtc")]
+        [JsonPropertyName("TransactionDateUtc"), JsonConverter(typeof(DateUtcJsonConverter))]
         public DateTime TransactionDateUtc { get; set; }
 
-        [JsonProperty("Price")]
+        [JsonPropertyName("Price")]
         public double Price { get; set; }
 
         public double PriceInCents() => Price / 10d;

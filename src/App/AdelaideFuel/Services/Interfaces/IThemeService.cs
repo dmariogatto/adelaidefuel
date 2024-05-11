@@ -11,5 +11,7 @@ namespace AdelaideFuel.Services
         Color PrimaryColor { get; }
         Color PrimaryDarkColor { get; }
         Color PrimaryAccentColor { get; }
+
+        Color ContrastColor { get; }
     }
 }

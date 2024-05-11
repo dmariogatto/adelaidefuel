@@ -1,9 +1,11 @@
-﻿using System;
+﻿using AdelaideFuel.Essentials;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Devices.Sensors;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
-using BasePermission = Xamarin.Essentials.Permissions.BasePermission;
+using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace AdelaideFuel
 {

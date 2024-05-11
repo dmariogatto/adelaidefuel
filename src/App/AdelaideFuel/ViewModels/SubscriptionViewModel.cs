@@ -1,11 +1,11 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Services;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
 using MvvmHelpers.Commands;
 using Plugin.InAppBilling;
 using System;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
@@ -51,7 +51,7 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
-            TrackEvent(AppCenterEvents.PageView.SubscriptionView);
+            TrackEvent(Events.PageView.SubscriptionView);
         }
         #endregion
 

@@ -1,12 +1,12 @@
 ﻿using AdelaideFuel.Shared;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace AdelaideFuel.Api
 {
     public class BrandsRoot
     {
-        [JsonProperty("Brands")]
+        [JsonPropertyName("Brands")]
         public List<BrandDto> Brands { get; set; }
     }
 }

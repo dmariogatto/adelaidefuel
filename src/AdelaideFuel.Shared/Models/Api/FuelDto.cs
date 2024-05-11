@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace AdelaideFuel.Shared
 {
@@ -7,10 +7,10 @@ namespace AdelaideFuel.Shared
         [JsonIgnore]
         public int Id => FuelId;
 
-        [JsonProperty("FuelId")]
+        [JsonPropertyName("FuelId")]
         public int FuelId { get; set; }
 
-        [JsonProperty("Name")]
+        [JsonPropertyName("Name")]
         public string Name { get; set; }
     }
 }

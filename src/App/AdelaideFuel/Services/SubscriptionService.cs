@@ -1,5 +1,8 @@
 ﻿using AdelaideFuel.Models;
 using AdelaideFuel.Storage;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Networking;
+using Microsoft.Maui.Storage;
 using Plugin.InAppBilling;
 using System;
 using System.Globalization;
@@ -7,8 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.Services
 {

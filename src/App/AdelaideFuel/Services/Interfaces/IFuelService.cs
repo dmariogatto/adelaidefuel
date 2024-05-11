@@ -1,10 +1,10 @@
 ﻿using AdelaideFuel.Models;
 using AdelaideFuel.Shared;
+using Microsoft.Maui.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
 
 namespace AdelaideFuel.Services
 {

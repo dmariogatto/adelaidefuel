@@ -1,5 +1,8 @@
-﻿using AdelaideFuel.Localisation;
+﻿using AdelaideFuel.Essentials;
+using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Networking;
 using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
@@ -7,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Essentials.Interfaces;
 
 namespace AdelaideFuel.ViewModels
 {
@@ -58,7 +59,7 @@ namespace AdelaideFuel.ViewModels
             HasInternet = _connectivity.NetworkAccess == NetworkAccess.Internet;
             _connectivity.ConnectivityChanged += ConnectivityChanged;
 
-            TrackEvent(AppCenterEvents.PageView.HomeView);
+            TrackEvent(Events.PageView.HomeView);
         }
 
         public override void OnDisappearing()
@@ -153,7 +154,7 @@ namespace AdelaideFuel.ViewModels
                     if (config)
                         await NavigationService.NavigateToAsync<FuelsViewModel>();
 
-                    Logger.Event(AppCenterEvents.Action.FuelSetup, new Dictionary<string, string>()
+                    Logger.Event(Events.Action.FuelSetup, new Dictionary<string, string>()
                     {
                         { nameof(config), config.ToString() }
                     });

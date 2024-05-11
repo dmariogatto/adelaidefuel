@@ -1,7 +1,7 @@
 ﻿using AdelaideFuel.Api;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +20,16 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SiteEntity> _siteRepository;
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
 
+        private ILogger _logger;
+
         public SyncFuelData(
             ISaFuelPricingApi saFuelPricingApi,
             ITableRepository<BrandEntity> brandRepository,
             ITableRepository<FuelEntity> fuelRepository,
             ITableRepository<GeographicRegionEntity> geographicRegionRepository,
             ITableRepository<SiteEntity> siteRepository,
-            ITableRepository<SitePriceEntity> sitePriceRepository)
+            ITableRepository<SitePriceEntity> sitePriceRepository,
+            ILoggerFactory loggerFactory)
         {
             _saFuelPricingApi = saFuelPricingApi;
 
@@ -35,15 +38,16 @@ namespace AdelaideFuel.Functions
             _geographicRegionRepository = geographicRegionRepository;
             _siteRepository = siteRepository;
             _sitePriceRepository = sitePriceRepository;
+
+            _logger = loggerFactory.CreateLogger<SyncFuelData>();
         }
 
-        [FunctionName(nameof(SyncFuelData))]
+        [Function(nameof(SyncFuelData))]
         public async Task Run(
             [TimerTrigger("0 30 12 * * *")] TimerInfo myTimer,
-            ILogger log,
             CancellationToken ct)
         {
-            log.LogInformation("Starting sync of static fuel data...");
+            _logger.LogInformation("Starting sync of static fuel data...");
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -60,7 +64,7 @@ namespace AdelaideFuel.Functions
             var activeSiteIds = new HashSet<int>(pricesTask.Result.SitePrices.Select(i => i.SiteId));
 
             sw.Stop();
-            log.LogInformation("Finished API calls in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
+            _logger.LogInformation("Finished API calls in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
             sw.Start();
 
             var brandEntities =
@@ -98,14 +102,14 @@ namespace AdelaideFuel.Functions
                 _siteRepository.CreateIfNotExistsAsync(ct));
 
             await Task.WhenAll(
-                _brandRepository.SyncPartitionsWithDeactivateAsync(brandEntities, log, ct),
-                _fuelRepository.SyncPartitionsWithDeactivateAsync(fuelEntities, log, ct),
-                _geographicRegionRepository.SyncPartitionsWithDeactivateAsync(geographicRegionEntities, log, ct),
-                _siteRepository.SyncPartitionsWithDeactivateAsync(siteEntities, log, ct));
+                _brandRepository.SyncPartitionsWithDeactivateAsync(brandEntities, _logger, ct),
+                _fuelRepository.SyncPartitionsWithDeactivateAsync(fuelEntities, _logger, ct),
+                _geographicRegionRepository.SyncPartitionsWithDeactivateAsync(geographicRegionEntities, _logger, ct),
+                _siteRepository.SyncPartitionsWithDeactivateAsync(siteEntities, _logger, ct));
 
             sw.Stop();
-            log.LogInformation("Finished sync of entities in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
-            log.LogInformation("Have a nice day 😋");
+            _logger.LogInformation("Finished sync of entities in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
+            _logger.LogInformation("Have a nice day 😋");
         }
     }
 }

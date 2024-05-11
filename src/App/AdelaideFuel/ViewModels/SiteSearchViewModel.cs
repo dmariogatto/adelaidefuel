@@ -38,7 +38,7 @@ namespace AdelaideFuel.ViewModels
 
             LoadCommand.ExecuteAsync();
 
-            TrackEvent(AppCenterEvents.PageView.SiteSearchView);
+            TrackEvent(Events.PageView.SiteSearchView);
         }
         #endregion
 
@@ -81,6 +81,8 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
+                var delayTask = Task.Delay(250);
+
                 var sitesTask = FuelService.GetSitesAsync(default);
                 var sitePricesTask = FuelService.GetSitePricesAsync(default);
 
@@ -102,6 +104,8 @@ namespace AdelaideFuel.ViewModels
                         SortOrder = g.First().FuelSortOrder,
                         IsActive = true
                     }] = g.ToList();
+
+                await delayTask;
 
                 FilteredSites.ReplaceRange(
                     _sitePrices.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)));

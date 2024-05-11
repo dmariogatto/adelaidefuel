@@ -2,8 +2,8 @@ using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,31 +17,34 @@ namespace AdelaideFuel.Functions
         private readonly ITableRepository<SiteEntity> _siteRepository;
         private readonly ITableRepository<SitePriceEntity> _sitePriceRepository;
 
+        private readonly ILogger _logger;
+
         public Sites(
             ITableRepository<SiteEntity> siteRepository,
-            ITableRepository<SitePriceEntity> sitePriceRepository)
+            ITableRepository<SitePriceEntity> sitePriceRepository,
+            ILoggerFactory loggerFactory)
         {
             _siteRepository = siteRepository;
             _sitePriceRepository = sitePriceRepository;
+            _logger = loggerFactory.CreateLogger<Sites>();
         }
 
-        [FunctionName(nameof(Sites))]
-        public async Task<IList<SiteDto>> Run(
+        [Function(nameof(Sites))]
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Sites/{brandId?}")] HttpRequest req,
             string brandId,
-            ILogger log,
             CancellationToken ct)
         {
             var sites = string.IsNullOrWhiteSpace(brandId)
                 ? await _siteRepository.GetAllEntitiesAsync(ct)
                 : await _siteRepository.GetPartitionAsync(brandId, ct);
-            return sites.Where(s => s.IsActive).Select(s => s.ToSite()).ToList();
+            var projected = sites.Where(s => s.IsActive).Select(s => s.ToSite());
+            return new JsonResult(projected);
         }
 
-        [FunctionName(nameof(EmptySites))]
-        public async Task<IList<SiteDto>> EmptySites(
+        [Function(nameof(EmptySites))]
+        public async Task<IActionResult> EmptySites(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Sites/Empty")] HttpRequest req,
-            ILogger log,
             CancellationToken ct)
         {
             var sitesTask = _siteRepository.GetAllEntitiesAsync(ct);
@@ -55,9 +58,9 @@ namespace AdelaideFuel.Functions
 
             var emptySites = sitesTask.Result
                 .Where(i => i.IsActive && !activeSiteIds.Contains(i.SiteId))
-                .ToList();
+                .Select(i => i.ToSite());
 
-            return emptySites.Select(i => i.ToSite()).ToList();
+            return new JsonResult(emptySites);
         }
     }
 }

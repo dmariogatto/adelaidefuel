@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseAdPage
+    x:Class="AdelaideFuel.Maui.Views.MapPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
+    xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
+    xmlns:effects="clr-namespace:AdelaideFuel.Maui.Effects"
+    xmlns:ffimg="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Compat.Maui"
+    xmlns:local="clr-namespace:AdelaideFuel.Maui"
+    xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
+    xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
+    xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
+    xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
+    Title="{Binding Title}"
+    x:DataType="viewModels:MapViewModel"
+    x:TypeArguments="viewModels:MapViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    IconImageSource="{StaticResource MapImg}"
+    NavigationPage.HasNavigationBar="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:KmToStringConverter x:Key="kmToStringConverter" />
+            <converters:PriceCategoryToColorConverter x:Key="priceCategoryToColorConverter" />
+            <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
+            <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
+            <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
+
+            <views:MapPinDataTemplateSelector x:Key="mapPinDataSelector" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <views:BaseAdPage.MainContent>
+        <Grid x:Name="MainGrid" SizeChanged="MainGridSizeChanged">
+            <controls:FuelMap
+                x:Name="SiteMap"
+                IsShowingUser="{Binding EnableMyLocation}"
+                ItemTemplateSelector="{StaticResource mapPinDataSelector}"
+                ItemsSource="{Binding FilteredSites}"
+                PropertyChanged="SiteMapPropertyChanged"
+                ShowUserLocationButton="{Binding EnableMyLocation}" />
+
+            <VerticalStackLayout
+                Margin="{StaticResource XSmallTopThickness}"
+                Padding="{StaticResource XLargeTopThickness}"
+                effects:SafeAreaInsetEffect.Insets="Left,Top,Right"
+                CascadeInputTransparent="False"
+                HorizontalOptions="Center"
+                InputTransparent="True"
+                Spacing="{StaticResource SmallSpacing}">
+                <controls:FuelSelectionView
+                    FuelsSource="{Binding Fuels}"
+                    IsVisible="{Binding InitialLoadComplete}"
+                    SelectedFuel="{Binding Fuel}" />
+                <controls:LoadingIndicator />
+            </VerticalStackLayout>
+
+            <Frame
+                x:Name="SearchButtonLayout"
+                Margin="{StaticResource XSmallThickness}"
+                Padding="0"
+                CornerRadius="18"
+                HeightRequest="36"
+                HorizontalOptions="End"
+                IsVisible="{Binding InitialLoadComplete}"
+                Style="{DynamicResource CardStyle}"
+                VerticalOptions="Center"
+                WidthRequest="36">
+                <View.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToSiteSearchCommand}" />
+                </View.GestureRecognizers>
+                <controls:TintImage
+                    Margin="{StaticResource SmallThickness}"
+                    SemanticProperties.Description="{local:Translate Search}"
+                    Source="{StaticResource SearchImg}"
+                    TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
+            </Frame>
+
+            <controls:BottomDrawer
+                x:Name="BottomDrawerControl"
+                Margin="0,1000,0,-1000"
+                Padding="{StaticResource SmallThickness}"
+                IsVisible="{Binding InitialLoadComplete}"
+                PropertyChanged="BottomDrawerControlPropertyChanged">
+                <VerticalStackLayout SizeChanged="BottomSheetSizeChanged" VerticalOptions="Start">
+                    <BoxView
+                        x:Name="BottomDrawerHandle"
+                        Margin="0,8,0,10"
+                        CornerRadius="2"
+                        HeightRequest="4"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
+                        WidthRequest="60"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
+
+                    <Label
+                        Margin="{StaticResource SmallBottomThickness}"
+                        FontFamily="{StaticResource BoldFontFamily}"
+                        HorizontalTextAlignment="Center"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNullConverter}}"
+                        Style="{DynamicResource LabelStyle}"
+                        Text="{local:Translate Prices}">
+                        <View.Triggers>
+                            <DataTrigger
+                                Binding="{Binding FuelCategories.Count}"
+                                TargetType="Label"
+                                Value="0">
+                                <Setter Property="Text" Value="{local:Translate NoStationsFound}" />
+                            </DataTrigger>
+                        </View.Triggers>
+                    </Label>
+
+                    <controls:FuelCategoriesView FuelCategories="{Binding FuelCategories}" IsVisible="{Binding SelectedSite, Converter={StaticResource IsNullConverter}}" />
+
+                    <Grid
+                        ColumnDefinitions="Auto,*,Auto"
+                        ColumnSpacing="{StaticResource DefaultSpacing}"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
+                        RowDefinitions="Auto,Auto"
+                        RowSpacing="{StaticResource DefaultSpacing}">
+                        <Frame
+                            Grid.RowSpan="3"
+                            BackgroundColor="Transparent"
+                            CornerRadius="22"
+                            HeightRequest="44"
+                            VerticalOptions="Center"
+                            WidthRequest="44">
+                            <ffimg:CachedImage
+                                LoadingDelay="200"
+                                LoadingPlaceholder="{StaticResource FuelImg}"
+                                Source="{Binding SelectedSite.BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
+                        </Frame>
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource BoldFontFamily}"
+                            LineBreakMode="TailTruncation"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SelectedSite.Label}" />
+                        <Label
+                            Grid.Column="2"
+                            FontFamily="{StaticResource BoldItalicFontFamily}"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
+                            HorizontalTextAlignment="Start"
+                            Style="{DynamicResource LabelTitleStyle}"
+                            Text="{Binding SelectedSite.OpeningHours, Converter={StaticResource openingHoursToStringConverter}}"
+                            VerticalTextAlignment="Center" />
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            FontFamily="{StaticResource BoldItalicFontFamily}"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                            HorizontalOptions="Start"
+                            LineBreakMode="TailTruncation"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SelectedSite.Address}"
+                            TextColor="{DynamicResource {x:Static styles:Keys.LinkColor}}">
+                            <View.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LaunchMapCommand}" CommandParameter="{Binding SelectedSite}" />
+                            </View.GestureRecognizers>
+                        </Label>
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
+                            HorizontalTextAlignment="End"
+                            Style="{DynamicResource LabelTitleStyle}"
+                            Text="{Binding SelectedSite.LastKnownDistanceKm, Converter={StaticResource kmToStringConverter}}"
+                            VerticalTextAlignment="Center" />
+                    </Grid>
+
+                    <BoxView
+                        x:Name="BottomSheetDivider"
+                        Margin="{StaticResource MediumLeftTopThickness}"
+                        BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
+                        HeightRequest="1" />
+
+                    <controls:PricesBoardView Padding="{StaticResource MediumLeftTopThickness}" SiteFuelPrices="{Binding SelectedSite.Prices}" />
+
+                    <Grid
+                        Padding="{StaticResource MediumLeftThickness}"
+                        ColumnDefinitions="*,*"
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}">
+                        <Button
+                            Padding="0,6,0,6"
+                            Command="{Binding OpenUrlCommand}"
+                            CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                            HorizontalOptions="Start"
+                            Style="{DynamicResource ButtonStyle}"
+                            Text="{local:Translate ReportPriceError}"
+                            VerticalOptions="Center" />
+                        <Label
+                            Grid.Column="1"
+                            FontFamily="{StaticResource ItalicFontFamily}"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                            HorizontalOptions="End"
+                            Style="{DynamicResource LabelStyle}"
+                            Text="{Binding SelectedSite.LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </controls:BottomDrawer>
+        </Grid>
+    </views:BaseAdPage.MainContent>
+</views:BaseAdPage>
