@@ -1,9 +1,9 @@
 ﻿using AdelaideFuel.Functions.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
-using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,9 +30,8 @@ namespace AdelaideFuel.Functions.Services
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
 
-            using var writer = new StreamWriter(await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false));
-            using var jw = new JsonTextWriter(writer);
-            JsonSerializer.CreateDefault().Serialize(jw, data);
+            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(stream, data).ConfigureAwait(false);
         }
 
         public async Task<T> DeserialiseAsync<T>(string localFilePath, CancellationToken cancellationToken)
@@ -44,9 +43,8 @@ namespace AdelaideFuel.Functions.Services
 
             if (await blob.ExistsAsync(cancellationToken).ConfigureAwait(false))
             {
-                using var reader = new StreamReader(await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false));
-                using var jr = new JsonTextReader(reader);
-                result = JsonSerializer.CreateDefault().Deserialize<T>(jr);
+                using var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                result = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
             }
 
             return result;

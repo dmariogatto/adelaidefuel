@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace AdelaideFuel.Shared
 {
     public class GeographicRegionDto : IGeographicRegion
     {
-        [JsonProperty("GeoRegionLevel")]
+        [JsonPropertyName("GeoRegionLevel")]
         public int GeoRegionLevel { get; set; }
 
-        [JsonProperty("GeoRegionId")]
+        [JsonPropertyName("GeoRegionId")]
         public int GeoRegionId { get; set; }
 
-        [JsonProperty("Name")]
+        [JsonPropertyName("Name")]
         public string Name { get; set; }
 
-        [JsonProperty("Abbrev")]
+        [JsonPropertyName("Abbrev")]
         public string Abbrev { get; set; }
 
-        [JsonProperty("GeoRegionParentId")]
+        [JsonPropertyName("GeoRegionParentId")]
         public int? GeoRegionParentId { get; set; }
     }
 }

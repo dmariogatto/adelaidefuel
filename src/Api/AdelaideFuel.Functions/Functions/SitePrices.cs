@@ -4,8 +4,7 @@ using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,27 +27,30 @@ namespace AdelaideFuel.Functions
         private readonly ICacheService _cacheService;
         private readonly IBlobService _blobService;
 
+        private ILogger _logger;
+
         public SitePrices(
             ITableRepository<SitePriceEntity> sitePriceRepository,
             ICacheService cacheService,
-            IBlobService blobService)
+            IBlobService blobService,
+            ILoggerFactory loggerFactory)
         {
             _sitePricesRepository = sitePriceRepository;
 
             _cacheService = cacheService;
             _blobService = blobService;
+            _logger = loggerFactory.CreateLogger<SitePrices>();
         }
 
-        [FunctionName(nameof(SitePrices))]
+        [Function(nameof(SitePrices))]
         public async Task<IActionResult> GetSitePrices(
-            [HttpTrigger(AuthorizationLevel.Function, Route = null)] HttpRequest req,
-            ILogger log,
+            [HttpTrigger(AuthorizationLevel.Function, "head", "get")] HttpRequest req,
             CancellationToken ct)
         {
             if (long.TryParse(await _blobService.ReadAllTextAsync(SitePrices.PricesTicksTxt, ct), out var ticks))
             {
                 var lastModified = new DateTime(ticks, DateTimeKind.Utc);
-                req.HttpContext.Response.Headers.Add(LastModifiedHeader, lastModified.ToString("R"));
+                req.HttpContext.Response.Headers.Append(LastModifiedHeader, lastModified.ToString("R"));
             }
 
             if (req.Method == HttpMethods.Head)
@@ -70,12 +72,12 @@ namespace AdelaideFuel.Functions
                     if (int.TryParse(i, out var id)) fuelIds.Add(id);
 
             var prices =
-                (from sp in await GetSitePriceDtosAsync(log, ct)
+                (from sp in await GetSitePriceDtosAsync(_logger, ct)
                  where (!brandIds.Any() || brandIds.Contains(sp.BrandId)) &&
                        (!fuelIds.Any() || fuelIds.Contains(sp.FuelId))
                  select sp);
 
-            return new OkObjectResult(prices ?? Enumerable.Empty<SitePriceDto>());
+            return new JsonResult(prices ?? []);
         }
 
         private async Task<IList<SitePriceDto>> GetSitePriceDtosAsync(ILogger log, CancellationToken ct)

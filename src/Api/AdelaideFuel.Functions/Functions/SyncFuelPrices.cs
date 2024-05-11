@@ -3,7 +3,7 @@ using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
@@ -36,6 +36,8 @@ namespace AdelaideFuel.Functions
         private readonly IBlobService _blobService;
         private readonly ISendGridService _sendGridService;
 
+        private readonly ILogger _logger;
+
         public SyncFuelPrices(
             ISaFuelPricingApi saFuelPricingApi,
             ITableRepository<FuelEntity> fuelRepository,
@@ -46,7 +48,8 @@ namespace AdelaideFuel.Functions
             ITableRepository<SitePriceExceptionLogEntity> sitePriceExceptionLogRepository,
             ICacheService cacheService,
             IBlobService blobService,
-            ISendGridService sendGridService)
+            ISendGridService sendGridService,
+            ILoggerFactory loggerFactory)
         {
             _saFuelPricingApi = saFuelPricingApi;
 
@@ -60,15 +63,16 @@ namespace AdelaideFuel.Functions
             _cacheService = cacheService;
             _blobService = blobService;
             _sendGridService = sendGridService;
+
+            _logger = loggerFactory.CreateLogger<SyncFuelPrices>();
         }
 
-        [FunctionName(nameof(SyncFuelPrices))]
+        [Function(nameof(SyncFuelPrices))]
         public async Task Run(
             [TimerTrigger("0 */10 * * * *")] TimerInfo myTimer,
-            ILogger log,
             CancellationToken ct)
         {
-            log.LogInformation("Starting sync of fuel prices...");
+            _logger.LogInformation("Starting sync of fuel prices...");
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -90,7 +94,7 @@ namespace AdelaideFuel.Functions
                 _siteExceptionRepository.CreateIfNotExistsAsync(ct),
                 _sitePriceExceptionLogRepository.CreateIfNotExistsAsync(ct));
 
-            log.LogInformation("Finished API call in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
+            _logger.LogInformation("Finished API call in {ElapsedMilliseconds}ms...", sw.ElapsedMilliseconds);
 
             var apiPricesOrdered = apiPricesTask.Result
                 ?.SitePrices
@@ -122,7 +126,7 @@ namespace AdelaideFuel.Functions
                     .Distinct()
                     .Select(i => new SiteExceptionEntity(i.BrandId, i.SiteId, i.SiteName))
                     .ToList();
-                await _siteExceptionRepository.InsertOrReplaceBulkAsync(newSiteExceptions, log, ct);
+                await _siteExceptionRepository.InsertOrReplaceBulkAsync(newSiteExceptions, _logger, ct);
                 foreach (var i in newSiteExceptions)
                     exceptionSiteIds.Add(i.SiteId);
 
@@ -173,22 +177,22 @@ namespace AdelaideFuel.Functions
                 {
                     _blobService.SerialiseAsync(sitePriceDtos, SitePrices.PricesJson, ct),
                     _blobService.WriteAllTextAsync(sitePriceDtos.First().TransactionDateUtc.Ticks.ToString(), SitePrices.PricesTicksTxt, ct),
-                    _sitePriceRepository.InsertOrReplaceBulkAsync(toUpdate, log, ct),
-                    _sitePriceRepository.DeleteAsync(toDelete, log, ct),
-                    _sitePriceExceptionLogRepository.InsertOrReplaceBulkAsync(exceptionLogEntries, log, ct),
-                    _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(toArchive, log, ct),
+                    _sitePriceRepository.InsertOrReplaceBulkAsync(toUpdate, _logger, ct),
+                    _sitePriceRepository.DeleteAsync(toDelete, _logger, ct),
+                    _sitePriceExceptionLogRepository.InsertOrReplaceBulkAsync(exceptionLogEntries, _logger, ct),
+                    _sitePriceArchiveRepository.InsertOrReplaceBulkAsync(toArchive, _logger, ct),
                     exEmailTask
                 };
 
                 await Task.WhenAll(updateTasks);
 
-                log.LogInformation("Finished sync of fuel prices in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
+                _logger.LogInformation("Finished sync of fuel prices in {ElapsedMilliseconds}ms.", sw.ElapsedMilliseconds);
             }
 
             sw.Stop();
 
-            log.LogInformation("Finished sync in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
-            log.LogInformation("Have a nice day 😋");
+            _logger.LogInformation("Finished sync in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
+            _logger.LogInformation("Have a nice day 😋");
         }
 
         private async Task<IDictionary<int, int>> GetSiteToBrandMapAsync(CancellationToken ct)
