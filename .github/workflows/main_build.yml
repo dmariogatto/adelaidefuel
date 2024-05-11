@@ -34,31 +34,31 @@ jobs:
       - run: echo "Exposing env vars, because they can't be passed to nested workflows."
 
 
-  build-ios:
-    needs: vars 
-    uses: ./.github/workflows/cd-ios.yml
-    with:
-      package-name: ${{ needs.vars.outputs.packageName }}
-      project-folder: ${{ needs.vars.outputs.projectFolder }}
-      project-file: ${{ needs.vars.outputs.projectFile }}
-      project-name: ${{ needs.vars.outputs.projectName }}
-      dotnet-version: ${{ needs.vars.outputs.dotnetVersion }}
-      dotnet-version-target: ${{ needs.vars.outputs.dotnetVersionTarget }}
-      xcode-version: ${{ needs.vars.outputs.xcodeVersion }}
-      build-config: 'Release'
-      build-number: ${{ github.run_number }}
-      build-offset: ${{ vars.IOS_BUILD_OFFSET }}
-    secrets:
-      p12-cert: ${{ secrets.IOS_P12_B64 }}
-      p12-cert-password: ${{ secrets.IOS_P12_PASSWORD }}
-      appstore-issuer: ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore-keyid: ${{ secrets.APPSTORE_KEY_ID }}
-      appstore-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
-      settings-json: ${{ secrets.IOS_SETTINGS_JSON }}
-      admob-app-id: ${{ secrets.IOS_ADMOB_APPLICATION_ID }}
-      sentry-auth-token: ${{ secrets.SENTRY_AUTH_TOKEN  }}
-      sentry-org: ${{ secrets.SENTRY_ORG  }}
-      sentry-project: ${{ secrets.SENTRY_PROJECT  }}
+  # build-ios:
+  #   needs: vars 
+  #   uses: ./.github/workflows/cd-ios.yml
+  #   with:
+  #     package-name: ${{ needs.vars.outputs.packageName }}
+  #     project-folder: ${{ needs.vars.outputs.projectFolder }}
+  #     project-file: ${{ needs.vars.outputs.projectFile }}
+  #     project-name: ${{ needs.vars.outputs.projectName }}
+  #     dotnet-version: ${{ needs.vars.outputs.dotnetVersion }}
+  #     dotnet-version-target: ${{ needs.vars.outputs.dotnetVersionTarget }}
+  #     xcode-version: ${{ needs.vars.outputs.xcodeVersion }}
+  #     build-config: 'Release'
+  #     build-number: ${{ github.run_number }}
+  #     build-offset: ${{ vars.IOS_BUILD_OFFSET }}
+  #   secrets:
+  #     p12-cert: ${{ secrets.IOS_P12_B64 }}
+  #     p12-cert-password: ${{ secrets.IOS_P12_PASSWORD }}
+  #     appstore-issuer: ${{ secrets.APPSTORE_ISSUER_ID }}
+  #     appstore-keyid: ${{ secrets.APPSTORE_KEY_ID }}
+  #     appstore-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+  #     settings-json: ${{ secrets.IOS_SETTINGS_JSON }}
+  #     admob-app-id: ${{ secrets.IOS_ADMOB_APPLICATION_ID }}
+  #     sentry-auth-token: ${{ secrets.SENTRY_AUTH_TOKEN  }}
+  #     sentry-org: ${{ secrets.SENTRY_ORG  }}
+  #     sentry-project: ${{ secrets.SENTRY_PROJECT  }}
 
   build-droid:
     needs: vars 
