@@ -20,15 +20,16 @@ namespace AdelaideFuel.Maui;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
+    public static MauiApp CreateMauiApp()
+    {
         AppActions.OnAppAction += OnAppAction;
         VersionTracking.Track();
 
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseSentry(options => {
+            .UseSentry(options =>
+            {
                 options.Dsn = Constants.SentryDsn;
 #if DEBUG
                 options.Debug = false;
@@ -93,7 +94,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-		var mauiApp = builder.Build();
+        var mauiApp = builder.Build();
 
         IoC.Init(mauiApp.Services);
 
@@ -105,7 +106,7 @@ public static class MauiProgram
         _ = Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
 
         return mauiApp;
-	}
+    }
 
     private static void OnAppAction(object sender, AppActionEventArgs args)
     {
