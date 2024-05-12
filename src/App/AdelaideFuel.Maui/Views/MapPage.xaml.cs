@@ -287,7 +287,7 @@ namespace AdelaideFuel.Maui.Views
 
         private void CalculateLockStates(BottomDrawer drawer)
         {
-            static bool isViewHeightValid(View v) => !double.IsNaN(v.Height) && v.Height >= 0 ;
+            static bool isViewHeightValid(View v) => !double.IsNaN(v.Height) && v.Height >= 0;
             static double getViewHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
 
             if (!drawer.IsVisible)
