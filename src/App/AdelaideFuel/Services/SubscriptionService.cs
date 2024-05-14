@@ -27,7 +27,7 @@ namespace AdelaideFuel.Services
         private readonly IInAppBilling _inAppBilling;
         private readonly IIapVerifyService _iapVerifyService;
 
-        private IStore<InAppBillingProduct> _iapCache;
+        private ICacheStore<InAppBillingProduct> _iapCache;
         private SemaphoreSlim _iapSemaphore = new SemaphoreSlim(1, 1);
 
         public SubscriptionService(

@@ -90,7 +90,6 @@
                 <sv:ButtonCell Title="{local:Translate ViewLog}" Command="{Binding ViewLogCommand}" />
                 <sv:ButtonCell Title="{local:Translate ClearLog}" Command="{Binding DeleteLogCommand}" />
                 <sv:LabelCell Title="{local:Translate CacheData}" ValueText="{Binding CacheDataSize, Converter={StaticResource bytesToKbConverter}}" />
-                <sv:LabelCell Title="{local:Translate UserData}" ValueText="{Binding UserDataSize, Converter={StaticResource bytesToKbConverter}}" />
                 <sv:ButtonCell Title="{local:Translate ClearCache}" Command="{Binding ClearCacheCommand}" />
             </sv:Section>
         </sv:SettingsView>

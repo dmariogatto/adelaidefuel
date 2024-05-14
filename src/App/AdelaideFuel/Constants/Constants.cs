@@ -50,6 +50,7 @@ namespace AdelaideFuel
         public static string ApiKeyBrandImg => Values.ApiKeyBrandImg;
 
         public static string AppId => ValueForPlatform(AndroidId, AppleId);
+        public static string SharedGroupName => ValueForPlatform(AppId, string.Empty);
         public static string SentryDsn => Values.SentryDsn;
 
         public static string AdMobPricesUnitId => AdUnitId(ValueForPlatform(Values.AdMobPricesAndroidUnitId, Values.AdMobPricesIosUnitId));

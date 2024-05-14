@@ -1108,15 +1108,6 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User Data.
-        /// </summary>
-        public static string UserData {
-            get {
-                return ResourceManager.GetString("UserData", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
         public static string Version {

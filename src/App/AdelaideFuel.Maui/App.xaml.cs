@@ -80,15 +80,6 @@ public partial class App : Application
 #endif
 
         var appShortcutsTask = SetupAppShortcutsAsync();
-
-        // insurance policy
-        IoC.Resolve<IUserNativeService>().SyncUserBrandsAsync().Wait();
-        IoC.Resolve<IUserNativeService>().SyncUserFuelsAsync().Wait();
-        IoC.Resolve<IUserNativeService>().SyncUserRadiiAsync().Wait();
-
-        IoC.Resolve<IStoreFactory>().UserCheckpoint();
-        IoC.Resolve<IStoreFactory>().CacheCheckpoint();
-
         appShortcutsTask.Wait();
 
 #if DEBUG
