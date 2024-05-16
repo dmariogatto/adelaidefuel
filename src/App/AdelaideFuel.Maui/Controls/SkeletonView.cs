@@ -8,7 +8,7 @@
 
         public SkeletonView()
         {
-            BackgroundColor = ThemeManager.ResolvedTheme == AdelaideFuel.Services.Theme.Dark
+            Color = ThemeManager.ResolvedTheme == AdelaideFuel.Services.Theme.Dark
                 ? Colors.DarkGray
                 : Colors.LightGray;
 

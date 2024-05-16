@@ -70,7 +70,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Technology &amp; attributions.
+        ///   Looks up a localized string similar to Attributions.
         /// </summary>
         public static string AboutDescription {
             get {
@@ -1009,15 +1009,6 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Technology.
-        /// </summary>
-        public static string Technology {
-            get {
-                return ResourceManager.GetString("Technology", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Terms of Use.
         /// </summary>
         public static string TermsOfUse {
@@ -1104,15 +1095,6 @@ namespace AdelaideFuel.Localisation {
         public static string UnableToSendEmail {
             get {
                 return ResourceManager.GetString("UnableToSendEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User Data.
-        /// </summary>
-        public static string UserData {
-            get {
-                return ResourceManager.GetString("UserData", resourceCulture);
             }
         }
         

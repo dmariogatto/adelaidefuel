@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace AdelaideFuel.Storage
 {
-    public enum ItemState
+    public enum ItemCacheState
     {
         None = 0,
         Expired = 1,
         Active = 2
     }
 
-    public interface IStore
+    public interface ICacheStore
     {
         string Name { get; }
 
@@ -23,7 +23,7 @@ namespace AdelaideFuel.Storage
         Task<int> EmptyExpiredAsync(CancellationToken cancellationToken);
 
         Task<bool> ExistsAsync(string key, bool includeExpired, CancellationToken cancellationToken);
-        Task<IList<(string, ItemState)>> GetKeysAsync(CancellationToken cancellationToken);
+        Task<IList<(string, ItemCacheState)>> GetKeysAsync(CancellationToken cancellationToken);
 
         Task<DateTime?> GetExpirationAsync(string key, CancellationToken cancellationToken);
 
@@ -31,7 +31,7 @@ namespace AdelaideFuel.Storage
         Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken);
     }
 
-    public interface IStore<T> : IStore where T : class
+    public interface ICacheStore<T> : ICacheStore where T : class
     {
         Task<bool> UpsertAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken);
         Task<int> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken);

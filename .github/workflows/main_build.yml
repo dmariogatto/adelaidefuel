@@ -2,14 +2,6 @@ name: Build MAUI Project
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - '.github/workflows/main_build.yml'
-      - '.github/workflows/cd-droid.yml'
-      - '.github/workflows/cd-ios.yml'
 
 env:
   PACKAGE_NAME: "com.dgatto.adelaidefuel"

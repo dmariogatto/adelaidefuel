@@ -38,27 +38,15 @@
 
             <DataTemplate x:Key="FuelPriceTemplate" x:DataType="models:SiteFuelPriceItem">
                 <Grid
-                    ColumnDefinitions="Auto,*,Auto"
+                    ColumnDefinitions="44,*,Auto"
                     ColumnSpacing="{StaticResource DefaultSpacing}"
                     IsVisible="{Binding IsClear, Converter={StaticResource InverseBoolConverter}}"
-                    RowDefinitions="Auto,Auto,Auto,Auto"
+                    RowDefinitions="Auto,Auto,Auto,1"
                     RowSpacing="{StaticResource XSmallSpacing}">
                     <View.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding FuelPriceTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:PricesViewModel}}}" CommandParameter="{Binding}" />
                     </View.GestureRecognizers>
-                    <Frame
-                        Grid.RowSpan="3"
-                        BackgroundColor="Transparent"
-                        CornerRadius="22"
-                        HeightRequest="44"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        WidthRequest="44">
-                        <ffimg:CachedImage
-                            LoadingDelay="200"
-                            LoadingPlaceholder="{StaticResource FuelImg}"
-                            Source="{Binding BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
-                    </Frame>
+                    <controls:BrandIconView Grid.RowSpan="3" BrandId="{Binding BrandId}" />
                     <Label
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
@@ -100,9 +88,9 @@
                         Grid.Row="3"
                         Grid.ColumnSpan="3"
                         Margin="{StaticResource MediumLeftThickness}"
-                        BackgroundColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         HeightRequest="1"
-                        HorizontalOptions="Fill" />
+                        HorizontalOptions="Fill"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>

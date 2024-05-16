@@ -84,8 +84,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILogger, Logger>();
         builder.Services.AddSingleton<ILocalise, LocalisePlatformService>();
         builder.Services.AddSingleton<IEnvironmentService, EnvironmentPlatformService>();
-        builder.Services.AddSingleton<IUserNativeReadOnlyService, UserNativeReadOnlyPlatformService>();
-        builder.Services.AddSingleton<IUserNativeService, UserNativePlatformService>();
         builder.Services.AddSingleton<IRetryPolicyService, RetryPolicyPlatformService>();
         builder.Services.AddSingleton<INavigationService, TabbedNavigationService>();
         builder.Services.AddSingleton<IThemeService, ThemeService>();

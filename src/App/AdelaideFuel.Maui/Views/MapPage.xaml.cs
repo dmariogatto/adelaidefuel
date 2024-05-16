@@ -87,16 +87,6 @@ namespace AdelaideFuel.Maui.Views
             BottomDrawerControl.FadeTo(0);
         }
 
-        protected override void OnSizeAllocated(double width, double height)
-        {
-            base.OnSizeAllocated(width, height);
-
-#if IOS || MACCATALYST
-            var insets = WindowStateManager.Default.GetCurrentUIWindow().SafeAreaInsets;
-            SiteMap.Margin = new Thickness(0, -insets.Top, 0, 0);
-#endif
-        }
-
         private void SetupAutoRefresh()
         {
             _timerCancellation?.Cancel();

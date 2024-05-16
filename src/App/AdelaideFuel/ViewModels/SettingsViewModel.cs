@@ -53,7 +53,6 @@ namespace AdelaideFuel.ViewModels
             {
                 OnPropertyChanged(nameof(LogDataSize));
                 OnPropertyChanged(nameof(CacheDataSize));
-                OnPropertyChanged(nameof(UserDataSize));
             });
 
             SendFeedbackCommand = new AsyncCommand(SendFeedbackAsync);
@@ -89,7 +88,6 @@ namespace AdelaideFuel.ViewModels
 
         public long LogDataSize => Logger.LogInBytes();
         public long CacheDataSize => _storeFactory.CacheSizeInBytes();
-        public long UserDataSize => _storeFactory.UserSizeInBytes();
 
         public Theme AppTheme
         {
@@ -204,8 +202,6 @@ namespace AdelaideFuel.ViewModels
             try
             {
                 _storeFactory.CacheEmptyAll();
-                _storeFactory.CacheCheckpoint();
-                _storeFactory.CacheRebuild();
             }
             catch (Exception ex)
             {
