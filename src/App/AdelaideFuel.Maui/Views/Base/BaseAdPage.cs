@@ -22,7 +22,7 @@ namespace AdelaideFuel.Maui.Views
             _adConsentService = IoC.Resolve<IAdConsentService>();
             _subscriptionService = IoC.Resolve<ISubscriptionService>();
 
-            _mainGrid = new Grid();
+            _mainGrid = new Grid() { IgnoreSafeArea = true };
             _mainGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Star });
 
             _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
@@ -35,7 +35,7 @@ namespace AdelaideFuel.Maui.Views
             bannerContainer.Children.Add(adSkeleton);
             bannerContainer.Children.Add(_adBannerView);
 
-            boxView.SetDynamicResource(BoxView.BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
+            boxView.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PageBackgroundColor);
             boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
 
             boxView.SetBinding(HeightRequestProperty,

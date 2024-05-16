@@ -87,16 +87,6 @@ namespace AdelaideFuel.Maui.Views
             BottomDrawerControl.FadeTo(0);
         }
 
-        protected override void OnSizeAllocated(double width, double height)
-        {
-            base.OnSizeAllocated(width, height);
-
-#if IOS || MACCATALYST
-            var insets = WindowStateManager.Default.GetCurrentUIWindow().SafeAreaInsets;
-            SiteMap.Margin = new Thickness(0, -insets.Top, 0, 0);
-#endif
-        }
-
         private void SetupAutoRefresh()
         {
             _timerCancellation?.Cancel();
@@ -287,7 +277,7 @@ namespace AdelaideFuel.Maui.Views
 
         private void CalculateLockStates(BottomDrawer drawer)
         {
-            static bool isViewHeightValid(View v) => !double.IsNaN(v.Height) && v.Height >= 0 ;
+            static bool isViewHeightValid(View v) => !double.IsNaN(v.Height) && v.Height >= 0;
             static double getViewHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
 
             if (!drawer.IsVisible)

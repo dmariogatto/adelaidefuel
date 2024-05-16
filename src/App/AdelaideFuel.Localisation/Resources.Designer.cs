@@ -70,7 +70,7 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Technology &amp; attributions.
+        ///   Looks up a localized string similar to Attributions.
         /// </summary>
         public static string AboutDescription {
             get {
@@ -1005,15 +1005,6 @@ namespace AdelaideFuel.Localisation {
         public static string Suspended {
             get {
                 return ResourceManager.GetString("Suspended", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Technology.
-        /// </summary>
-        public static string Technology {
-            get {
-                return ResourceManager.GetString("Technology", resourceCulture);
             }
         }
         

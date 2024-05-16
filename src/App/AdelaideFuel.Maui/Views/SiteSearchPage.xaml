@@ -36,10 +36,7 @@
                 <ListView.GroupHeaderTemplate>
                     <DataTemplate x:DataType="{x:Null}">
                         <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">
-                            <StackLayout
-                                Padding="{StaticResource SmallThickness}"
-                                Orientation="Horizontal"
-                                Spacing="{StaticResource XSmallSpacing}">
+                            <HorizontalStackLayout Padding="{StaticResource SmallThickness}" Spacing="{StaticResource XSmallSpacing}">
                                 <controls:TintImage
                                     HeightRequest="24"
                                     Source="{StaticResource FuelImg}"
@@ -50,7 +47,7 @@
                                     Style="{DynamicResource LabelTitleStyle}"
                                     Text="{Binding Key.Name}"
                                     VerticalTextAlignment="Center" />
-                            </StackLayout>
+                            </HorizontalStackLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.GroupHeaderTemplate>
@@ -63,20 +60,10 @@
                                     ColumnSpacing="{StaticResource XSmallSpacing}"
                                     RowDefinitions="Auto,Auto"
                                     RowSpacing="{StaticResource XSmallSpacing}">
-                                    <Frame
-                                        Grid.RowSpan="2"
-                                        BackgroundColor="Transparent"
-                                        CornerRadius="20"
-                                        HeightRequest="40"
-                                        HorizontalOptions="Center"
-                                        IsClippedToBounds="True"
-                                        VerticalOptions="Center"
-                                        WidthRequest="40">
-                                        <ffimg:CachedImage
-                                            LoadingDelay="200"
-                                            LoadingPlaceholder="{StaticResource FuelImg}"
-                                            Source="{Binding BrandId, Converter={StaticResource BrandIdToIconConverter}}" />
-                                    </Frame>
+                                    <controls:BrandIconView
+                                        Grid.RowSpan="3"
+                                        BrandId="{Binding BrandId}"
+                                        Size="40" />
                                     <Label
                                         Grid.Column="1"
                                         Style="{DynamicResource LabelTitleStyle}"
