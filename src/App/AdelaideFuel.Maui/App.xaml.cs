@@ -16,8 +16,8 @@ public partial class App : Application
     private readonly SemaphoreSlim _umpSemaphore = new SemaphoreSlim(1, 1);
 
     public App()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
 
         ThemeManager.LoadTheme();
         RequestedThemeChanged += (_, _) => ThemeManager.OsThemeChanged();

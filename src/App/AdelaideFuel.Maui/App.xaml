@@ -101,8 +101,6 @@
             <converters:MultiplyByConverter x:Key="MultiplyByConverter" />
             <converters:DivideByConverter x:Key="DivideByConverter" />
 
-            <converters:BrandIdToIconConverter x:Key="BrandIdToIconConverter" />
-
             <Style TargetType="Frame">
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="0" />

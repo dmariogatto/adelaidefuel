@@ -29,7 +29,7 @@ namespace AdelaideFuel.Maui.Converters
         {
             return System.Convert.ChangeType(
                 System.Convert.ToDouble(value) / System.Convert.ToDouble(parameter),
-                targetType); 
+                targetType);
         }
     }
 }

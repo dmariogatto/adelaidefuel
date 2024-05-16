@@ -19,7 +19,8 @@ string SubscriberToken = Environment.GetEnvironmentVariable(nameof(SubscriberTok
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
-    .ConfigureServices(services => {
+    .ConfigureServices(services =>
+    {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
 

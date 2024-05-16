@@ -56,7 +56,7 @@ namespace AdelaideFuel.Maui.Controls
             {
                 var separator = new BoxView() { VerticalOptions = LayoutOptions.Fill, WidthRequest = 1 };
                 separator.Margin = new Thickness(_separatorSpacing, 0, _separatorSpacing, 0);
-                separator.SetDynamicResource(BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
+                separator.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PrimaryAccentColor);
 
                 Grid.SetRowSpan(separator, 2);
 

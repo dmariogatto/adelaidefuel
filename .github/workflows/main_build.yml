@@ -2,16 +2,10 @@ name: Build MAUI Project
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - '.github/workflows/main_build.yml'
 
 env:
   PACKAGE_NAME: "com.dgatto.adelaidefuel"
-  PROJECT_FOLDER: "src/AdelaideFuel.Maui"
+  PROJECT_FOLDER: "src/App/AdelaideFuel.Maui"
   PROJECT_FILE: "src/App/AdelaideFuel.Maui/AdelaideFuel.Maui.csproj"
   PROJECT_NAME: "AdelaideFuel"
   DOTNET_VERSION: 8.0.x  

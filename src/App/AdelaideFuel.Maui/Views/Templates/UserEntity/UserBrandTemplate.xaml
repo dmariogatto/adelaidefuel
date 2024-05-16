@@ -24,19 +24,10 @@
             <Grid ColumnDefinitions="36,48,*,48" ColumnSpacing="{StaticResource DefaultSpacing}">
                 <CheckBox IsChecked="{Binding IsActive}" />
 
-                <Frame
+                <controls:BrandIconView
                     Grid.Column="1"
-                    BackgroundColor="Transparent"
-                    CornerRadius="20"
-                    HeightRequest="40"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    WidthRequest="40">
-                    <ffimg:CachedImage
-                        LoadingDelay="200"
-                        LoadingPlaceholder="{StaticResource FuelImg}"
-                        Source="{Binding Id, Mode=OneTime, Converter={StaticResource BrandIdToIconConverter}}" />
-                </Frame>
+                    BrandId="{Binding Id}"
+                    Size="40" />
 
                 <Label
                     Grid.Column="2"
