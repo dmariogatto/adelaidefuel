@@ -6,12 +6,8 @@ namespace AdelaideFuel.Maui.Controls
 {
     public class BrandIconView : Frame
     {
-        public static readonly BindableProperty SizeProperty =
-          BindableProperty.Create(
-              propertyName: nameof(Size),
-              returnType: typeof(double),
-              declaringType: typeof(BrandIconView),
-              defaultValue: 44d);
+        private static readonly BrandIdToIconConverter IconConverter = new BrandIdToIconConverter();
+        private static readonly DivideByConverter RadiusConverter = new DivideByConverter();
 
         public static readonly BindableProperty BrandIdProperty =
           BindableProperty.Create(
@@ -19,9 +15,6 @@ namespace AdelaideFuel.Maui.Controls
               returnType: typeof(int),
               declaringType: typeof(BrandIconView),
               defaultValue: 0);
-
-        public static readonly BrandIdToIconConverter IconConverter = new BrandIdToIconConverter();
-        public static readonly DivideByConverter RadiusConverter = new DivideByConverter();
 
         public BrandIconView()
         {
@@ -32,44 +25,32 @@ namespace AdelaideFuel.Maui.Controls
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Center;
 
-            SetBinding(
-                CornerRadiusProperty,
-                new Binding(nameof(Size),
-                    converter: RadiusConverter,
-                    converterParameter: 2d,
-                    source: this));
-            SetBinding(
-                HeightRequestProperty,
-                new Binding(nameof(Size), source: this));
-            SetBinding(
-                WidthRequestProperty,
-                new Binding(nameof(Size), source: this));
-
             var ffImg = new CachedImage()
             {
                 LoadingDelay = 200,
                 LoadingPlaceholder = App.Current.FindResource<string>(Styles.Keys.FuelImg),
             };
 
-            ffImg.SetBinding(
-                HeightRequestProperty,
-                new Binding(nameof(Size), source: this));
-            ffImg.SetBinding(
-                WidthRequestProperty,
-                new Binding(nameof(Size), source: this));
-            ffImg.SetBinding(
-                CachedImage.SourceProperty,
-                new Binding(nameof(BrandId),
-                    converter: IconConverter,
-                    source: this));
-
             Content = ffImg;
+
+            _size = 44d;
         }
 
+        private double _size = -1d;
         public double Size
         {
-            get => (double)GetValue(SizeProperty);
-            set => SetValue(SizeProperty, value);
+            get => _size;
+            set
+            {
+                HeightRequest = value;
+                WidthRequest = value;
+                CornerRadius = (float)value / 2f;
+
+                Content.HeightRequest = value;
+                Content.WidthRequest = value;
+
+                _size = value;
+            }
         }
 
         public int BrandId
