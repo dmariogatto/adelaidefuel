@@ -1,5 +1,4 @@
 using AdelaideFuel.Functions.Services;
-using AdelaideFuel.Shared;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
