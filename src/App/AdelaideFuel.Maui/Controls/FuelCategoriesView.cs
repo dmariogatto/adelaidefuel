@@ -31,12 +31,6 @@ namespace AdelaideFuel.Maui.Controls
             _separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
                 ? Application.Current.FindResource<double>(Styles.Keys.MediumSpacing)
                 : Application.Current.FindResource<double>(Styles.Keys.XSmallSpacing);
-
-            PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(IsVisible) && IsVisible)
-                    InvalidateMeasure();
-            };
         }
 
         public ObservableRangeCollection<FuelCategory> FuelCategories
