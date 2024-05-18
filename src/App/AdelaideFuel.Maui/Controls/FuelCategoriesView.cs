@@ -58,10 +58,8 @@ namespace AdelaideFuel.Maui.Controls
                 separator.Margin = new Thickness(_separatorSpacing, 0, _separatorSpacing, 0);
                 separator.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PrimaryAccentColor);
 
-                Grid.SetRowSpan(separator, 2);
-
                 ColumnDefinitions.Add(new ColumnDefinition { Width = 1 + _separatorSpacing * 2 });
-                this.Add(separator, ColumnDefinitions.Count - 1, 0);
+                this.AddWithSpan(separator, ColumnDefinitions.Count - 1, 0, 2);
             }
 
             for (var i = 0; i < dataItemCount; i++)

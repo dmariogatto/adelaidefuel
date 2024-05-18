@@ -23,6 +23,7 @@
         <Grid RowDefinitions="Auto,*">
             <ListView
                 Grid.Row="1"
+                Margin="{StaticResource ListViewMargin}"
                 CachingStrategy="RecycleElement"
                 HasUnevenRows="True"
                 IsGroupingEnabled="True"

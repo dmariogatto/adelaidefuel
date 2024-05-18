@@ -187,8 +187,8 @@ public partial class App : Application
     {
         try
         {
-            var nativeService = IoC.Resolve<IUserNativeService>();
-            var fuels = nativeService.GetUserFuels();
+            var userFuels = IoC.Resolve<IStoreFactory>().GetUserStore<UserFuel>();
+            var fuels = userFuels.All();
 
             var actions = fuels
                 .Where(i => i.IsActive)
