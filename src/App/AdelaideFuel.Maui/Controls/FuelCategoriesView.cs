@@ -59,7 +59,7 @@ namespace AdelaideFuel.Maui.Controls
                 separator.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PrimaryAccentColor);
 
                 ColumnDefinitions.Add(new ColumnDefinition { Width = 1 + _separatorSpacing * 2 });
-                this.AddWithSpan(separator, ColumnDefinitions.Count - 1, 0, 2);
+                this.AddWithSpan(separator, 0, ColumnDefinitions.Count - 1, 2);
             }
 
             for (var i = 0; i < dataItemCount; i++)
