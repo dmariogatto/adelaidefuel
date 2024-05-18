@@ -1,6 +1,7 @@
 ﻿using Acr.UserDialogs;
 using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Effects;
+using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Models;
@@ -23,6 +24,7 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         AppActions.OnAppAction += OnAppAction;
+        VersionTracking.Default.Migrate();
         VersionTracking.Track();
 
         var builder = MauiApp.CreateBuilder();
