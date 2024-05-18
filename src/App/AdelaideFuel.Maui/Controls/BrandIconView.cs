@@ -7,7 +7,6 @@ namespace AdelaideFuel.Maui.Controls
     public class BrandIconView : Frame
     {
         private static readonly BrandIdToIconConverter IconConverter = new BrandIdToIconConverter();
-        private static readonly DivideByConverter RadiusConverter = new DivideByConverter();
 
         public static readonly BindableProperty BrandIdProperty =
           BindableProperty.Create(
@@ -31,9 +30,15 @@ namespace AdelaideFuel.Maui.Controls
                 LoadingPlaceholder = App.Current.FindResource<string>(Styles.Keys.FuelImg),
             };
 
+            ffImg.SetBinding(
+                CachedImage.SourceProperty,
+                new Binding(nameof(BrandId),
+                    converter: IconConverter,
+                    source: this));
+
             Content = ffImg;
 
-            _size = 44d;
+            Size = 44d;
         }
 
         private double _size = -1d;
