@@ -1,7 +1,6 @@
 ﻿using AdelaideFuel.Essentials;
 using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
-using AdelaideFuel.Services;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Networking;
 using MvvmHelpers;
