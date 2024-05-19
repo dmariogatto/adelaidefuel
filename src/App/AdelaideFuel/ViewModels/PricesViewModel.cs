@@ -1,6 +1,7 @@
 ﻿using AdelaideFuel.Essentials;
 using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Networking;
 using MvvmHelpers;
@@ -130,6 +131,8 @@ namespace AdelaideFuel.ViewModels
 
                 HasPrices = FuelPriceGroups.Any(g => g.HasPrices);
                 NoPricesFound = !HasPrices;
+
+                await SetupAppShortcutsAsync();
             }
             catch (Exception ex)
             {
@@ -280,6 +283,23 @@ namespace AdelaideFuel.ViewModels
 
             if (!hadInternet && HasInternet)
                 LoadFuelPriceGroupsCommand.ExecuteAsync(default);
+        }
+
+        private async Task SetupAppShortcutsAsync()
+        {
+            try
+            {
+                var actions = _userFuels
+                    .Take(3)
+                    .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
+                    .ToArray();
+
+                await AppActions.SetAsync(actions);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
     }
 }

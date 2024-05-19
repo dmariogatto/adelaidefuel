@@ -31,6 +31,9 @@ namespace AdelaideFuel.Maui.Services
             if (!string.IsNullOrWhiteSpace(eventName))
             {
                 System.Diagnostics.Debug.WriteLine($"Tracking Event: {eventName}");
+                return;
+
+#pragma warning disable CS0162 // Unreachable code detected
                 if (DeviceInfo.DeviceType == DeviceType.Virtual)
                 {
                     SentrySdk.CaptureMessage(eventName, scope =>
@@ -42,6 +45,7 @@ namespace AdelaideFuel.Maui.Services
                         }
                     });
                 }
+#pragma warning restore CS0162 // Unreachable code detected
             }
         }
 
