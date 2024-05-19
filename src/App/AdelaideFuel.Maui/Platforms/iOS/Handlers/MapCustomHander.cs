@@ -10,41 +10,52 @@ namespace AdelaideFuel.Maui.Handlers
     {
         public static void MapShowUserLocationButton(IMapHandler handler, IMap map)
         {
+            const float utSize = 48f;
+
             if (handler?.PlatformView is not MauiMapView mapView)
                 return;
             if (mapView.UserTrackingButton is null)
                 return;
 
             var showUserLocationButton = map?.ShowUserLocationButton ?? false;
+
             if (!showUserLocationButton && mapView.UserTrackingButton.Superview is not null)
             {
+                NSLayoutConstraint.DeactivateConstraints(getUserButtonConstraints(mapView));
                 mapView.UserTrackingButton.RemoveFromSuperview();
                 return;
             }
 
             if (showUserLocationButton && mapView.UserTrackingButton.Superview is null)
             {
-                const float utSize = 38f;
+                if (mapView.UserTrackingButton.Layer.Mask is null)
+                {
+                    mapView.UserTrackingButton.Layer.CornerRadius = utSize / 2;
+                    mapView.UserTrackingButton.Layer.BorderWidth = 0.25f;
 
-                var circleMask = new CoreAnimation.CAShapeLayer();
-                var circlePath = UIBezierPath.FromRoundedRect(new CGRect(0, 0, utSize, utSize), utSize / 2);
-                circleMask.Path = circlePath.CGPath;
-                mapView.UserTrackingButton.Layer.Mask = circleMask;
-
-                mapView.UserTrackingButton.TranslatesAutoresizingMaskIntoConstraints = false;
+                    var circleMask = new CoreAnimation.CAShapeLayer();
+                    var circlePath = UIBezierPath.FromRoundedRect(new CGRect(0, 0, utSize, utSize), utSize / 2);
+                    circleMask.Path = circlePath.CGPath;
+                    mapView.UserTrackingButton.Layer.Mask = circleMask;
+                }
 
                 mapView.AddSubview(mapView.UserTrackingButton);
+                mapView.UserTrackingButton.TranslatesAutoresizingMaskIntoConstraints = false;
 
-                var margins = mapView.LayoutMarginsGuide;
+                NSLayoutConstraint.ActivateConstraints(getUserButtonConstraints(mapView));
+            }
+
+            static NSLayoutConstraint[] getUserButtonConstraints(MauiMapView map)
+            {
+                var margins = map.LayoutMarginsGuide;
                 var insets = WindowStateManager.Default.GetCurrentUIWindow().SafeAreaInsets;
-
-                NSLayoutConstraint.ActivateConstraints(new[]
+                return new[]
                 {
-                    mapView.UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, insets.Top + 40),
-                    mapView.UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -8),
-                    mapView.UserTrackingButton.WidthAnchor.ConstraintEqualTo(utSize),
-                    mapView.UserTrackingButton.HeightAnchor.ConstraintEqualTo(mapView.UserTrackingButton.WidthAnchor),
-                });
+                    map.UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, insets.Top + 40),
+                    map.UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -8),
+                    map.UserTrackingButton.WidthAnchor.ConstraintEqualTo(utSize),
+                    map.UserTrackingButton.HeightAnchor.ConstraintEqualTo(map.UserTrackingButton.WidthAnchor),
+                };
             }
         }
     }

@@ -31,12 +31,6 @@ namespace AdelaideFuel.Maui.Controls
             _separatorSpacing = !IoC.Resolve<IDeviceDisplay>().IsSmall()
                 ? Application.Current.FindResource<double>(Styles.Keys.MediumSpacing)
                 : Application.Current.FindResource<double>(Styles.Keys.XSmallSpacing);
-
-            PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(IsVisible) && IsVisible)
-                    InvalidateMeasure();
-            };
         }
 
         public ObservableRangeCollection<FuelCategory> FuelCategories
@@ -58,10 +52,8 @@ namespace AdelaideFuel.Maui.Controls
                 separator.Margin = new Thickness(_separatorSpacing, 0, _separatorSpacing, 0);
                 separator.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PrimaryAccentColor);
 
-                Grid.SetRowSpan(separator, 2);
-
                 ColumnDefinitions.Add(new ColumnDefinition { Width = 1 + _separatorSpacing * 2 });
-                this.Add(separator, ColumnDefinitions.Count - 1, 0);
+                this.AddWithSpan(separator, 0, ColumnDefinitions.Count - 1, 2);
             }
 
             for (var i = 0; i < dataItemCount; i++)

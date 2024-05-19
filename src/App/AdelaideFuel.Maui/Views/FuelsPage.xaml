@@ -23,6 +23,7 @@
     <ContentPage.Content>
         <Grid>
             <sho:HorizontalListView
+                Margin="{StaticResource ListViewMargin}"
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
                 CollectionLayout="Vertical"
                 EnableDragAndDrop="True"

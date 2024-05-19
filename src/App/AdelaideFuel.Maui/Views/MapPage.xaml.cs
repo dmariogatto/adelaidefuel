@@ -303,6 +303,9 @@ namespace AdelaideFuel.Maui.Views
                 {
                     offset = heightAcc;
                     var offsetMargin = MainGrid.Height - offset;
+#if IOS || MACCATALYST
+                    offsetMargin--;
+#endif
                     drawer.Margin = new Thickness(0, offsetMargin, 0, -offsetMargin);
                 }
             }
