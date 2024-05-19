@@ -105,4 +105,8 @@
     <SentryUploadAndroidProguardMapping>true</SentryUploadAndroidProguardMapping>
   </PropertyGroup>
 
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true" />
+  </ItemGroup>
+
 </Project>

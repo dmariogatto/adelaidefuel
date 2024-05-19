@@ -73,19 +73,6 @@ public partial class App : Application
     protected override void OnSleep()
     {
         base.OnSleep();
-
-#if DEBUG
-        var sw = new System.Diagnostics.Stopwatch();
-        sw.Start();
-#endif
-
-        var appShortcutsTask = SetupAppShortcutsAsync();
-        appShortcutsTask.Wait();
-
-#if DEBUG
-        sw.Stop();
-        System.Diagnostics.Debug.WriteLine($"{nameof(OnSleep)}: completed in {sw.ElapsedMilliseconds}ms");
-#endif
     }
 
     protected override void OnResume()
@@ -180,28 +167,6 @@ public partial class App : Application
         catch (Exception ex)
         {
             IoC.Resolve<ILogger>().Error(ex);
-        }
-    }
-
-    private async Task SetupAppShortcutsAsync()
-    {
-        try
-        {
-            var userFuels = IoC.Resolve<IStoreFactory>().GetUserStore<UserFuel>();
-            var fuels = userFuels.All();
-
-            var actions = fuels
-                .Where(i => i.IsActive)
-                .OrderBy(i => i.SortOrder)
-                .Take(3)
-                .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
-                .ToArray();
-
-            await AppActions.SetAsync(actions).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 

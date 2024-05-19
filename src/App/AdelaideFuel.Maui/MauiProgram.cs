@@ -140,7 +140,7 @@ public static class MauiProgram
         migrate(VersionsKey, xamGroupName, mauiGroupName);
         migrate(BuildsKey, xamGroupName, mauiGroupName);
 
-        bool migrate(string key, string oldSharedGroup, string newSharedGroup)
+        static bool migrate(string key, string oldSharedGroup, string newSharedGroup)
         {
             if (Preferences.ContainsKey(key, oldSharedGroup))
             {
