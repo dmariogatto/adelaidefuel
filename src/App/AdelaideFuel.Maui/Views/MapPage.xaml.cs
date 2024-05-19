@@ -257,11 +257,6 @@ namespace AdelaideFuel.Maui.Views
             }
         }
 
-        private void MainGridSizeChanged(object sender, EventArgs e)
-        {
-            DispatchCalculateLockStates();
-        }
-
         private void BottomSheetSizeChanged(object sender, EventArgs e)
         {
             DispatchCalculateLockStates();
@@ -280,9 +275,12 @@ namespace AdelaideFuel.Maui.Views
             static bool isViewHeightValid(View v) => !double.IsNaN(v.Height) && v.Height >= 0;
             static double getViewHeight(View v) => v.Height + v.Margin.Top + v.Margin.Bottom;
 
+            if (drawer.Parent is not View parent)
+                return;
+
             if (!drawer.IsVisible)
             {
-                drawer.Margin = new Thickness(0, MainGrid.Height, 0, -MainGrid.Height);
+                drawer.Margin = new Thickness(0, parent.Height, 0, -parent.Height);
                 return;
             }
 
@@ -302,7 +300,7 @@ namespace AdelaideFuel.Maui.Views
                 if (c == BottomSheetDivider)
                 {
                     offset = heightAcc;
-                    var offsetMargin = MainGrid.Height - offset;
+                    var offsetMargin = parent.Height - offset;
 #if IOS || MACCATALYST
                     offsetMargin--;
 #endif
@@ -313,7 +311,7 @@ namespace AdelaideFuel.Maui.Views
             heightAcc += drawer.Padding.Bottom;
 
             if (ViewModel.SelectedSite is not null)
-                lockStates.Add((heightAcc - offset) / MainGrid.Height);
+                lockStates.Add((heightAcc - offset) / parent.Height);
 
             var expIdx = drawer.LockStates.Length == lockStates.Count
                 ? Array.IndexOf(drawer.LockStates, drawer.ExpandedPercentage)

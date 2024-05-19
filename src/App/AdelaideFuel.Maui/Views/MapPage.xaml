@@ -31,10 +31,7 @@
     </ContentPage.Resources>
 
     <views:BaseAdPage.MainContent>
-        <Grid
-            x:Name="MainGrid"
-            IgnoreSafeArea="True"
-            SizeChanged="MainGridSizeChanged">
+        <Grid IgnoreSafeArea="True">
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
@@ -162,8 +159,8 @@
                     <BoxView
                         x:Name="BottomSheetDivider"
                         Margin="{StaticResource MediumLeftTopThickness}"
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
-                        HeightRequest="1" />
+                        HeightRequest="1"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <controls:PricesBoardView Padding="{StaticResource MediumLeftTopThickness}" SiteFuelPrices="{Binding SelectedSite.Prices}" />
 
