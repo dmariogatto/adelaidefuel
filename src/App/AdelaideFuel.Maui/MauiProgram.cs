@@ -1,7 +1,6 @@
 ﻿using Acr.UserDialogs;
 using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Effects;
-using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Models;
@@ -23,8 +22,9 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        MigrateVersionTracking();
+
         AppActions.OnAppAction += OnAppAction;
-        VersionTracking.Default.Migrate();
         VersionTracking.Track();
 
         var builder = MauiApp.CreateBuilder();
@@ -123,6 +123,34 @@ public static class MauiProgram
             }
 
             IoC.Resolve<ILogger>().Event(Events.Action.AppAction);
+        }
+    }
+
+    private static void MigrateVersionTracking()
+    {
+        const string VersionsKey = "VersionTracking.Versions";
+        const string BuildsKey = "VersionTracking.Builds";
+
+        const string XamarinSharedGroupFmt = "{0}.xamarinessentials.versiontracking";
+        const string MauiSharedGroupFmt = "{0}.microsoft.maui.essentials.versiontracking";
+
+        var xamGroupName = string.Format(XamarinSharedGroupFmt, AppInfo.PackageName);
+        var mauiGroupName = string.Format(MauiSharedGroupFmt, AppInfo.PackageName);
+
+        migrate(VersionsKey, xamGroupName, mauiGroupName);
+        migrate(BuildsKey, xamGroupName, mauiGroupName);
+
+        bool migrate(string key, string oldSharedGroup, string newSharedGroup)
+        {
+            if (Preferences.ContainsKey(key, oldSharedGroup))
+            {
+                var data = Preferences.Get(key, null, oldSharedGroup);
+                Preferences.Set(key, data, newSharedGroup);
+                Preferences.Remove(key, oldSharedGroup);
+                return true;
+            }
+
+            return false;
         }
     }
 }
