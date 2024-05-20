@@ -129,6 +129,7 @@ namespace AdelaideFuel.Maui.Services
             return;
 #endif
 
+#pragma warning disable CS0162 // Unreachable code detected
             var logEntry = new List<string>
             {
                 $"[{DateTime.UtcNow:o}]"
@@ -146,6 +147,7 @@ namespace AdelaideFuel.Maui.Services
             {
                 File.AppendAllLines(_logFilePath, logEntry);
             }
+#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }
