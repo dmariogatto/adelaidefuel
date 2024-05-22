@@ -97,7 +97,7 @@ jobs:
         '${{ secrets.settings-json }}'
 
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
 

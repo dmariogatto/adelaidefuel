@@ -27,7 +27,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/appicon.appiconset</string>
+	<string>Resources/Assets.xcassets/appicon.appiconset</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Your location is used to show your position on the map and determine your closest stations.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
