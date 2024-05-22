@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#4CAF50" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#4CAF50" Condition="$(TargetFramework.Contains('-android'))" />
 
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#4CAF50" />
