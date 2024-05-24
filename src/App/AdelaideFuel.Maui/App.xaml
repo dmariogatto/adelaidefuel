@@ -125,6 +125,8 @@
                 <Setter Property="FontFamily" Value="{StaticResource SemiBoldFontFamily}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static styles:FontSizes.Title}}" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.ContrastColor}}" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
             <Style x:Key="LabelTitleStyle" TargetType="Label">

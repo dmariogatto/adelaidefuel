@@ -134,7 +134,7 @@
                     <Grid Margin="{StaticResource XSmallTopThickness}" ColumnDefinitions="*,*">
                         <Button
                             Margin="{StaticResource SmallLeftThickness}"
-                            Padding="0,6,0,6"
+                            Padding="0,8,0,8"
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
