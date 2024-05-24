@@ -12,12 +12,11 @@
     Title="{Binding Title}"
     x:DataType="viewModels:SubscriptionViewModel"
     x:TypeArguments="viewModels:SubscriptionViewModel"
-    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Shell.TabBarIsVisible="False">
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <Thickness x:Key="DefaultMargin">12,4,12,4</Thickness>
+            <Thickness x:Key="DefaultMargin">12,6,12,6</Thickness>
 
             <OnPlatform x:Key="ButtonHeight" x:TypeArguments="x:Double">
                 <OnPlatform.Platforms>

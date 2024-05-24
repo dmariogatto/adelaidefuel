@@ -120,6 +120,7 @@
                         <controls:BrandIconView Grid.RowSpan="3" BrandId="{Binding SelectedSite.BrandId}" />
                         <Label
                             Grid.Column="1"
+                            Margin="{StaticResource XSmallLeftThickness}"
                             FontFamily="{StaticResource BoldFontFamily}"
                             LineBreakMode="TailTruncation"
                             Style="{DynamicResource LabelStyle}"
@@ -135,6 +136,7 @@
                         <Label
                             Grid.Row="1"
                             Grid.Column="1"
+                            Margin="{StaticResource XSmallLeftThickness}"
                             FontFamily="{StaticResource BoldItalicFontFamily}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
                             HorizontalOptions="Start"
@@ -169,7 +171,7 @@
                         ColumnDefinitions="*,*"
                         IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}">
                         <Button
-                            Padding="0,6,0,6"
+                            Padding="0,8,0,8"
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
