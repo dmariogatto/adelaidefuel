@@ -16,7 +16,7 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <Thickness x:Key="DefaultMargin">12,6,12,6</Thickness>
+            <Thickness x:Key="DefaultMargin">12,0,12,0</Thickness>
 
             <OnPlatform x:Key="ButtonHeight" x:TypeArguments="x:Double">
                 <OnPlatform.Platforms>
@@ -48,7 +48,7 @@
         <ScrollView>
             <VerticalStackLayout
                 Margin="0,6,0,6"
-                Spacing="0"
+                Spacing="{StaticResource SmallSpacing}"
                 VerticalOptions="Start">
                 <Label
                     Margin="{StaticResource DefaultMargin}"
@@ -178,11 +178,11 @@
                         Grid.Row="3"
                         Margin="12,8,12,8"
                         ColumnDefinitions="*,Auto"
-                        ColumnSpacing="{StaticResource DefaultSpacing}"
+                        ColumnSpacing="{StaticResource SmallSpacing}"
                         IsEnabled="{Binding HasValidSubscription}"
                         Opacity="{StaticResource UnselectedOpacity}"
                         RowDefinitions="Auto,Auto"
-                        RowSpacing="{StaticResource DefaultSpacing}">
+                        RowSpacing="{StaticResource SmallSpacing}">
                         <View.Triggers>
                             <DataTrigger
                                 Binding="{Binding HasValidSubscription}"
