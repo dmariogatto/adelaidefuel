@@ -38,6 +38,8 @@ public static class MauiProgram
 #endif
                 options.EnableTracing = false;
                 options.TracesSampleRate = 0.25;
+
+                options.DisableUnobservedTaskExceptionCapture();
             })
             .ConfigureMauiHandlers(handlers =>
             {
