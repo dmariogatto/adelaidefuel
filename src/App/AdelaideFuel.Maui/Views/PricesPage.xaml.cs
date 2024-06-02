@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.Essentials;
+using AdelaideFuel.Maui.Dispatching;
 using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
@@ -8,6 +9,7 @@ namespace AdelaideFuel.Maui.Views
         private readonly IPermissions _permissions;
 
         private bool _isFirstLoad = true;
+        private IDispatcherTimer _timer;
         private CancellationTokenSource _timerCancellation;
 
         public PricesPage() : base()
@@ -62,7 +64,7 @@ namespace AdelaideFuel.Maui.Views
 
                 ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(default);
 
-                Dispatcher.StartTimer(TimeSpan.FromSeconds(60), () =>
+                _timer = Dispatcher.CreateAndStartTimer(TimeSpan.FromSeconds(60), () =>
                 {
                     if (cts.IsCancellationRequested)
                     {
@@ -84,7 +86,10 @@ namespace AdelaideFuel.Maui.Views
         private void TearDownAutoRefresh()
         {
             _timerCancellation?.Cancel();
+            _timer?.Stop();
+
             _timerCancellation = null;
+            _timer = null;
         }
 
         private void TryAgainClicked(object sender, EventArgs e)
