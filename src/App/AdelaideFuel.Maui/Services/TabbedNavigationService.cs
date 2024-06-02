@@ -1,5 +1,7 @@
+using AdelaideFuel.Maui.Views;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
+using MemoryToolkit.Maui;
 using System.Reflection;
 using NavigationPage_iOS = Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.NavigationPage;
 using TabbedPage_Droid = Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.TabbedPage;
@@ -72,6 +74,7 @@ namespace AdelaideFuel.Maui.Services
                 }
 
                 var mainNavPage = new NavigationPage(tabbedPage);
+                mainNavPage.Popped += OnMainNavigationPopped;
                 Application.Current.MainPage = mainNavPage;
             }
         }
@@ -103,6 +106,9 @@ namespace AdelaideFuel.Maui.Services
                 else
                 {
                     navigatedPage = CreatePage<T>();
+#if DEBUG
+                    LeakMonitorBehavior.SetCascade(navigatedPage, true);
+#endif
                     navFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
@@ -163,7 +169,14 @@ namespace AdelaideFuel.Maui.Services
 
             try
             {
+                var pages = MainPage.Navigation.NavigationStack.Skip(1).OfType<IBasePage>().ToList();
+
                 await MainPage.PopToRootAsync(animated);
+
+                foreach (var page in pages)
+                {
+                    page.OnDestory();
+                }
             }
             catch (Exception ex)
             {
@@ -172,6 +185,21 @@ namespace AdelaideFuel.Maui.Services
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private void OnMainNavigationPopped(object sender, NavigationEventArgs e)
+        {
+            try
+            {
+                if (e.Page is IBasePage page)
+                {
+                    page.OnDestory();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
         }
 

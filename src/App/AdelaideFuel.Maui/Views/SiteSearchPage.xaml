@@ -31,9 +31,6 @@
                 ItemsSource="{Binding FilteredSites}"
                 SelectionMode="None"
                 SeparatorVisibility="None">
-                <ListView.Footer>
-                    <ContentView Padding="{StaticResource XSmallThickness}" />
-                </ListView.Footer>
                 <ListView.GroupHeaderTemplate>
                     <DataTemplate x:DataType="{x:Null}">
                         <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">

@@ -10,9 +10,11 @@ using BetterMaps.Maui;
 using BetterMaps.Maui.Handlers;
 using Cats.Maui.AdMob;
 using FFImageLoading.Maui;
+using MemoryToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
+using System.Net;
 using ILogger = AdelaideFuel.Services.ILogger;
 using IMap = BetterMaps.Maui.IMap;
 
@@ -36,9 +38,18 @@ public static class MauiProgram
 #if DEBUG
                 options.Debug = false;
 #endif
-                options.EnableTracing = false;
-                options.TracesSampleRate = 0.25;
+                options.AutoSessionTracking = true;
+                options.IsGlobalModeEnabled = false;
+                options.TracesSampleRate = 0.1;
 
+                options.SetBeforeSend((sentryEvent, hint) =>
+                {
+                    if (sentryEvent.Exception is not null && !ShouldLogException(sentryEvent.Exception))
+                    {
+                        return null;
+                    }
+                    return sentryEvent;
+                });
                 options.DisableUnobservedTaskExceptionCapture();
             })
             .ConfigureMauiHandlers(handlers =>
@@ -68,6 +79,13 @@ public static class MauiProgram
             })
             .UseFFImageLoading()
             .UseSharpnadoCollectionView(false);
+
+#if DEBUG
+        // Configure logging
+        builder.Logging.AddDebug();
+        // Ensure UseLeakDetection is called after logging has been configured!
+        builder.UseLeakDetection();
+#endif
 
         builder.Services.AddSingleton<IMapCache, MapCache>();
 #if ANDROID
@@ -125,6 +143,31 @@ public static class MauiProgram
             }
 
             IoC.Resolve<ILogger>().Event(Events.Action.AppAction);
+        }
+    }
+
+    private static bool ShouldLogException(Exception ex)
+    {
+        switch (ex)
+        {
+            case TaskCanceledException _:
+            case TimeoutException _:
+            case OperationCanceledException _:
+            case HttpRequestException httpRequstEx
+                    when httpRequstEx.Message.Contains("No such host is known") ||
+                         httpRequstEx.Message.Contains("The network connection was lost.") ||
+                         httpRequstEx.Message.Contains("Network subsystem is down") ||
+                         httpRequstEx.Message.Contains("A server with the specified hostname could not be found.") ||
+                         httpRequstEx.Message.Contains("The Internet connection appears to be offline.") ||
+                         httpRequstEx.Message.Contains("Could not connect to the server."):
+            case WebException webEx
+                    when webEx.Message.Contains("Canceled") ||
+                         webEx.Message.Contains("Socket closed"):
+            case IOException ioEx
+                    when ioEx.Message.Contains("Network subsystem is down"):
+                return false;
+            default:
+                return true;
         }
     }
 

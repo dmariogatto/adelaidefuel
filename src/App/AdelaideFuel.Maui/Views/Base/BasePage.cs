@@ -1,8 +1,14 @@
 ﻿using AdelaideFuel.ViewModels;
+using MemoryToolkit.Maui;
 
 namespace AdelaideFuel.Maui.Views
 {
-    public class BasePage<T> : ContentPage where T : BaseViewModel
+    public interface IBasePage : IContentView
+    {
+        void OnDestory();
+    }
+
+    public class BasePage<T> : ContentPage, IBasePage where T : BaseViewModel
     {
         public T ViewModel => BindingContext as T;
 
@@ -14,9 +20,10 @@ namespace AdelaideFuel.Maui.Views
             ViewModel.OnCreate();
         }
 
-        ~BasePage()
+        public virtual void OnDestory()
         {
             ViewModel.OnDestory();
+            this.TearDown();
         }
 
         protected override void OnAppearing()

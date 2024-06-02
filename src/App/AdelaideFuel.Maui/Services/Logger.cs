@@ -113,32 +113,14 @@ namespace AdelaideFuel.Maui.Services
         {
             if (ex is not null && _deviceInfo.DeviceType != DeviceType.Virtual)
             {
-                switch (ex)
+                SentrySdk.CaptureException(ex, scope =>
                 {
-                    case TaskCanceledException _:
-                    case TimeoutException _:
-                    case OperationCanceledException _:
-                    case HttpRequestException httpRequstEx when httpRequstEx.Message.Contains("No such host is known") ||
-                                                                httpRequstEx.Message.Contains("The network connection was lost.") ||
-                                                                httpRequstEx.Message.Contains("Network subsystem is down") ||
-                                                                httpRequstEx.Message.Contains("A server with the specified hostname could not be found.") ||
-                                                                httpRequstEx.Message.Contains("The Internet connection appears to be offline.") ||
-                                                                httpRequstEx.Message.Contains("Could not connect to the server."):
-                    case WebException webEx when webEx.Message.Contains("Canceled") ||
-                                                 webEx.Message.Contains("Socket closed"):
-                    case IOException ioEx when ioEx.Message.Contains("Network subsystem is down"):
-                        break;
-                    default:
-                        SentrySdk.CaptureException(ex, scope =>
-                        {
-                            if (data is not null)
-                            {
-                                foreach (var d in data)
-                                    scope.SetExtra(d.Key, d.Value);
-                            }
-                        });
-                        break;
-                }
+                    if (data is not null)
+                    {
+                        foreach (var d in data)
+                            scope.SetExtra(d.Key, d.Value);
+                    }
+                });
             }
 
 #if !DEBUG
