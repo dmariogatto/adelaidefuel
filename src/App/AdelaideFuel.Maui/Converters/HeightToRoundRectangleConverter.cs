@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using Microsoft.Maui.Controls.Shapes;
+﻿using Microsoft.Maui.Controls.Shapes;
+using System.Globalization;
 
 namespace AdelaideFuel.Maui.Converters
 {
