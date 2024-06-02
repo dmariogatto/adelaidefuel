@@ -9,10 +9,7 @@
     xmlns:sho="http://sharpnado.com"
     x:DataType="models:UserBrand">
     <ContentView>
-        <Frame
-            Margin="{StaticResource ItemMargin}"
-            Padding="{StaticResource XSmallThickness}"
-            Style="{DynamicResource CardStyle}">
+        <controls:ItemCard Padding="{StaticResource XSmallThickness}">
             <View.Triggers>
                 <DataTrigger
                     Binding="{Binding IsActive}"
@@ -44,6 +41,6 @@
                     TintColor="{StaticResource PrimaryAccentColor}"
                     VerticalOptions="Center" />
             </Grid>
-        </Frame>
+        </controls:ItemCard>
     </ContentView>
 </sho:DraggableViewCell>

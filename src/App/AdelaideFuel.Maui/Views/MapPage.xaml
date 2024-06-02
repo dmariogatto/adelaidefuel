@@ -54,17 +54,16 @@
                 <controls:LoadingIndicator />
             </VerticalStackLayout>
 
-            <Frame
+            <controls:ItemCard
                 x:Name="SearchButtonLayout"
-                Margin="{StaticResource XSmallThickness}"
                 Padding="0"
-                CornerRadius="18"
-                HeightRequest="36"
+                HeightRequest="44"
                 HorizontalOptions="End"
                 IsVisible="{Binding InitialLoadComplete}"
-                Style="{DynamicResource CardStyle}"
+                StrokeShape="RoundRectangle 22,22,22,22"
+                Style="{DynamicResource CardBorderStyle}"
                 VerticalOptions="Center"
-                WidthRequest="36">
+                WidthRequest="44">
                 <View.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToSiteSearchCommand}" />
                 </View.GestureRecognizers>
@@ -73,7 +72,7 @@
                     SemanticProperties.Description="{local:Translate Search}"
                     Source="{StaticResource SearchImg}"
                     TintColor="{DynamicResource {x:Static styles:Keys.TintColor}}" />
-            </Frame>
+            </controls:ItemCard>
 
             <controls:BottomDrawer
                 x:Name="BottomDrawerControl"

@@ -1,5 +1,4 @@
 ﻿using AdelaideFuel.Services;
-using System.Net;
 
 namespace AdelaideFuel.Maui.Services
 {

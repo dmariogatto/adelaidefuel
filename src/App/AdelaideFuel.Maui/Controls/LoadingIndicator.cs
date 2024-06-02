@@ -3,7 +3,7 @@ using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Controls
 {
-    public class LoadingIndicator : Frame
+    public class LoadingIndicator : Border
     {
         public static readonly BindableProperty IsBusyProperty =
           BindableProperty.Create(
@@ -14,6 +14,8 @@ namespace AdelaideFuel.Maui.Controls
 
         public LoadingIndicator()
         {
+            SetDynamicResource(StyleProperty, Styles.Keys.CardBorderStyle);
+
             InputTransparent = true;
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.End;
@@ -22,8 +24,6 @@ namespace AdelaideFuel.Maui.Controls
                 App.Current.FindResource<double>(Styles.Keys.MediumSpacing),
                 App.Current.FindResource<double>(Styles.Keys.LargeSpacing));
             Padding = App.Current.FindResource<Thickness>(Styles.Keys.XSmallThickness);
-
-            SetDynamicResource(StyleProperty, Styles.Keys.CardStyle);
 
             var activityIndicator = new ActivityIndicator()
             {

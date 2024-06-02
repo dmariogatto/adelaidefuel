@@ -27,12 +27,12 @@
             <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:SiteFuelPriceItemGroup">
                 <VerticalStackLayout Margin="{StaticResource XSmallTopThickness}" IsVisible="{Binding HasPrices}">
                     <Label Style="{DynamicResource LabelTitleStyle}" Text="{Binding Key.Name}" />
-                    <Frame Style="{DynamicResource CardStyle}">
+                    <controls:ItemCard>
                         <VerticalStackLayout
                             BindableLayout.ItemTemplate="{StaticResource FuelPriceTemplate}"
                             BindableLayout.ItemsSource="{Binding .}"
                             Spacing="{StaticResource DefaultSpacing}" />
-                    </Frame>
+                    </controls:ItemCard>
                 </VerticalStackLayout>
             </DataTemplate>
 

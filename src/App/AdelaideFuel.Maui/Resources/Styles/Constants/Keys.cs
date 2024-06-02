@@ -83,8 +83,11 @@
         public const string LargeSpacing = nameof(LargeSpacing);
         public const string XLargeSpacing = nameof(XLargeSpacing);
 
+        public const string ItemMargin = nameof(ItemMargin);
+
         public const string LabelStyle = nameof(LabelStyle);
-        public const string CardStyle = nameof(CardStyle);
+
+        public const string CardBorderStyle = nameof(CardBorderStyle);
 
         public const string UnselectedOpacity = nameof(UnselectedOpacity);
     }
