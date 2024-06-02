@@ -8,7 +8,7 @@
     xmlns:sho="http://sharpnado.com"
     x:DataType="models:UserFuel">
     <ContentView>
-        <Frame Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+        <controls:ItemCard>
             <View.Triggers>
                 <DataTrigger
                     Binding="{Binding IsActive}"
@@ -36,6 +36,6 @@
                     TintColor="{StaticResource PrimaryAccentColor}"
                     VerticalOptions="Center" />
             </Grid>
-        </Frame>
+        </controls:ItemCard>
     </ContentView>
 </sho:DraggableViewCell>

@@ -6,7 +6,7 @@ using AdelaideFuel.Services;
 
 namespace AdelaideFuel.Maui.Controls
 {
-    public class FuelSelectionView : Frame
+    public class FuelSelectionView : Border
     {
         public static readonly BindableProperty SelectedFuelProperty =
           BindableProperty.Create(
@@ -25,21 +25,21 @@ namespace AdelaideFuel.Maui.Controls
              defaultValue: default,
              propertyChanged: (b, o, n) => OnFuelsSourceChanged((FuelSelectionView)b, (IList<UserFuel>)o, (IList<UserFuel>)n));
 
+        private static readonly HeightToRoundRectangleConverter ToRoundRectangleConverter = new HeightToRoundRectangleConverter();
+
         private readonly IUserDialogs _userDialogs;
         private readonly ILogger _logger;
 
         public FuelSelectionView()
         {
-            SetDynamicResource(StyleProperty, Styles.Keys.CardStyle);
+            SetDynamicResource(StyleProperty, Styles.Keys.CardBorderStyle);
 
-            Margin = new Thickness(0);
-            Padding = App.Current.FindResource<Thickness>(Styles.Keys.SmallThickness);
+            Margin = Thickness.Zero;
             HorizontalOptions = LayoutOptions.Center;
 
-            SetBinding(CornerRadiusProperty, new Binding(
+            SetBinding(StrokeShapeProperty, new Binding(
                 nameof(Height),
-                converter: new MultiplyByConverter(0, double.MaxValue),
-                converterParameter: 0.5d,
+                converter: ToRoundRectangleConverter,
                 source: this));
 
             var fuelImg = new TintImage()

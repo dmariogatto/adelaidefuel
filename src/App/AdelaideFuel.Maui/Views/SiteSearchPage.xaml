@@ -52,7 +52,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:SiteFuelPrice">
                         <ViewCell>
-                            <Frame Margin="{StaticResource ItemMargin}" Style="{DynamicResource CardStyle}">
+                            <controls:ItemCard>
                                 <Grid
                                     ColumnDefinitions="48,*,Auto"
                                     ColumnSpacing="{StaticResource XSmallSpacing}"
@@ -96,7 +96,7 @@
                                         </View.Triggers>
                                     </Label>
                                 </Grid>
-                            </Frame>
+                            </controls:ItemCard>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
