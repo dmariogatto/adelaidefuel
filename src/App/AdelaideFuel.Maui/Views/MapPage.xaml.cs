@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Converters;
+using AdelaideFuel.Maui.Dispatching;
 using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
@@ -16,6 +17,7 @@ namespace AdelaideFuel.Maui.Views
     {
         private const string BottomDrawerHandleShake = nameof(BottomDrawerHandleShake);
 
+        private IDispatcherTimer _timer;
         private CancellationTokenSource _timerCancellation;
 
         public MapPage() : base()
@@ -105,7 +107,7 @@ namespace AdelaideFuel.Maui.Views
                 if (ViewModel.InitialLoadComplete)
                     ViewModel.LoadSitesCommand.ExecuteAsync(ViewModel.Fuel);
 
-                Dispatcher.StartTimer(TimeSpan.FromSeconds(60), () =>
+                _timer = Dispatcher.CreateAndStartTimer(TimeSpan.FromSeconds(60), () =>
                 {
                     if (cts.IsCancellationRequested)
                     {
@@ -132,7 +134,10 @@ namespace AdelaideFuel.Maui.Views
         private void TearDownAutoRefresh()
         {
             _timerCancellation?.Cancel();
+            _timer?.Stop();
+
             _timerCancellation = null;
+            _timer = null;
         }
 
         private void UpdateFromQueryParams()
