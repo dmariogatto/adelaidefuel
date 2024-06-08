@@ -11,7 +11,7 @@ namespace AdelaideFuel
     {
         static Constants()
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            var assembly = typeof(Constants).Assembly;
             var resName = assembly.GetManifestResourceNames()
                 ?.FirstOrDefault(r => r.EndsWith("settings.json", StringComparison.OrdinalIgnoreCase));
 
