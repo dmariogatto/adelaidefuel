@@ -111,6 +111,9 @@ jobs:
         dotnet publish ${{ inputs.project-file }} \
            -c ${{ inputs.build-config }} \
            -f ${{ inputs.dotnet-version-target }}-android \
+           -p:RunAOTCompilation=true \
+           -p:AndroidEnableProfiledAot=false \
+           -p:RuntimeIdentifiers=android-arm64;android-arm \
            -p:AndroidPackageFormats=aab \
            -p:AndroidKeyStore=true \
            -p:AndroidSigningKeyAlias=${{ secrets.keystore-alias }} \

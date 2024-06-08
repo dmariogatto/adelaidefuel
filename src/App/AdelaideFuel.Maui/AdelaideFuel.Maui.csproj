@@ -24,10 +24,6 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-    <CreatePackage>false</CreatePackage>
-  </PropertyGroup>
-
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#4CAF50" Condition="$(TargetFramework.Contains('-android'))" />
@@ -50,22 +46,15 @@
     <BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-ios'))">
     <CreatePackage>false</CreatePackage>
     <CodesignProvision>Automatic</CodesignProvision>
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-ios'))">
     <CreatePackage>false</CreatePackage>
     <CodesignProvision>Automatic</CodesignProvision>
     <CodesignKey>iPhone Distribution</CodesignKey>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-    <RunAOTCompilation>true</RunAOTCompilation>
-    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-    <EnableLLVM>true</EnableLLVM>
-    <RuntimeIdentifiers>android-arm64;android-arm</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -75,8 +64,8 @@
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
 
     <PackageReference Include="Acr.UserDialogs" Version="9.0.0" />
-    <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.10" />
-    <PackageReference Include="BetterMaps.Maui" Version="1.0.0-pre4" />
+    <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.11" />
+    <PackageReference Include="BetterMaps.Maui" Version="1.0.0-pre5" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre6" />
     <PackageReference Include="FFImageLoadingCompat.Maui" Version="0.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
