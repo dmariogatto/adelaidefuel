@@ -2,7 +2,6 @@
 using Microsoft.Maui.Devices;
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 
 namespace AdelaideFuel
