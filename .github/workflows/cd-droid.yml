@@ -111,7 +111,6 @@ jobs:
         dotnet publish ${{ inputs.project-file }} \
            -c ${{ inputs.build-config }} \
            -f ${{ inputs.dotnet-version-target }}-android \
-           -r android-arm64 \
            -p:RunAOTCompilation=true \
            -p:AndroidEnableProfiledAot=false \
            -p:EnableLLVM=true \
