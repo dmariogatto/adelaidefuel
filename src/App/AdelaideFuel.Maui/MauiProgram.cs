@@ -14,7 +14,6 @@ using MemoryToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
-using System.Net;
 using ILogger = AdelaideFuel.Services.ILogger;
 using IMap = BetterMaps.Maui.IMap;
 
@@ -43,6 +42,17 @@ public static class MauiProgram
                 options.TracesSampleRate = 0.1;
 
                 options.DisableUnobservedTaskExceptionCapture();
+
+                options.SetBeforeSend((sentryEvent, hint) =>
+                {
+                    var logger = IoC.Resolve<ILogger>();
+                    if (sentryEvent.Exception is not null && !logger.ShouldLogException(sentryEvent.Exception))
+                    {
+                        return null;
+                    }
+
+                    return sentryEvent;
+                });
             })
             .ConfigureMauiHandlers(handlers =>
             {
