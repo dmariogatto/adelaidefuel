@@ -50,6 +50,36 @@ namespace AdelaideFuel.Maui.Services
             }
         }
 
+        public bool ShouldLogException(Exception ex)
+        {
+            if (ex is null)
+                return false;
+
+            switch (ex)
+            {
+                case TaskCanceledException _:
+                case TimeoutException _:
+                case OperationCanceledException _:
+                case HttpRequestException httpRequstEx
+                        when httpRequstEx.Message.Contains("No such host is known", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("The network connection was lost", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("A server with the specified hostname could not be found", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("The Internet connection appears to be offline", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal):
+                case WebException webEx
+                        when webEx.Message.Contains("Canceled", StringComparison.Ordinal) ||
+                             webEx.Message.Contains("Socket closed", StringComparison.Ordinal) ||
+                             webEx.Message.Contains("Socket is closed", StringComparison.Ordinal) ||
+                             webEx.Message.Contains("No address associated with hostname", StringComparison.Ordinal):
+                case IOException ioEx
+                        when ioEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal):
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
         public long LogInBytes()
         {
             var size = 0L;
@@ -146,35 +176,6 @@ namespace AdelaideFuel.Maui.Services
                 File.AppendAllLines(_logFilePath, logEntry);
             }
 #pragma warning restore CS0162 // Unreachable code detected
-        }
-
-        private static bool ShouldLogException(Exception ex)
-        {
-            if (ex is null)
-                return false;
-
-            switch (ex)
-            {
-                case TaskCanceledException _:
-                case TimeoutException _:
-                case OperationCanceledException _:
-                case HttpRequestException httpRequstEx
-                        when httpRequstEx.Message.Contains("No such host is known", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("The network connection was lost", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("A server with the specified hostname could not be found", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("The Internet connection appears to be offline", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal):
-                case WebException webEx
-                        when webEx.Message.Contains("Canceled", StringComparison.Ordinal) ||
-                             webEx.Message.Contains("Socket closed", StringComparison.Ordinal) ||
-                             webEx.Message.Contains("No address associated with hostname", StringComparison.Ordinal):
-                case IOException ioEx
-                        when ioEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal):
-                    return false;
-                default:
-                    return true;
-            }
         }
     }
 }

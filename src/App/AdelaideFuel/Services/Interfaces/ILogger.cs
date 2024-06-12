@@ -9,6 +9,8 @@ namespace AdelaideFuel.Services
         void Error(Exception ex, IReadOnlyDictionary<string, string> data = null);
         void Event(string eventName, IReadOnlyDictionary<string, string> properties = null);
 
+        bool ShouldLogException(Exception ex);
+
         long LogInBytes();
         Task<string> GetLog();
         void DeleteLog();
