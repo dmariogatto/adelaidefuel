@@ -154,7 +154,7 @@ namespace AdelaideFuel.Storage
                 {
                     items = _directory
                         .GetFiles()
-                        .Select(i => (Path.GetFileNameWithoutExtension(i.Name), !IsExpired(i.FullName) ? ItemCacheState.Active : ItemCacheState.Expired))
+                        .Select(i => (Path.GetFileNameWithoutExtension(i.Name), !IsFileExpired(i.FullName) ? ItemCacheState.Active : ItemCacheState.Expired))
                         .ToList();
                 }
                 catch (Exception ex)
@@ -202,7 +202,7 @@ namespace AdelaideFuel.Storage
                 {
                     exists = _directory
                         .EnumerateFiles()
-                        .Where(i => includeExpired || !IsExpired(i.FullName))
+                        .Where(i => includeExpired || !IsFileExpired(i.FullName))
                         .Any();
                 }
                 catch (Exception ex)
@@ -225,7 +225,7 @@ namespace AdelaideFuel.Storage
                 {
                     count = _directory
                         .EnumerateFiles()
-                        .Count(i => includeExpired || !IsExpired(i.FullName));
+                        .Count(i => includeExpired || !IsFileExpired(i.FullName));
                 }
                 catch (Exception ex)
                 {
@@ -403,7 +403,7 @@ namespace AdelaideFuel.Storage
                 {
                     Parallel.ForEach(_directory.GetFiles(), (fi) =>
                     {
-                        if (IsExpired(fi.FullName))
+                        if (IsFileExpired(fi.FullName))
                         {
                             fi.Delete();
                             Interlocked.Increment(ref count);
@@ -447,7 +447,7 @@ namespace AdelaideFuel.Storage
         private FileInfo GetFile(string key, bool includeExpired)
         {
             var filePath = GetFilePath(_directory, key);
-            if (File.Exists(filePath) && (includeExpired || !IsExpired(filePath)))
+            if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
             {
                 return new FileInfo(filePath);
             }
@@ -462,7 +462,7 @@ namespace AdelaideFuel.Storage
             foreach (var k in keys)
             {
                 var filePath = GetFilePath(_directory, k);
-                if (File.Exists(filePath) && (includeExpired || !IsExpired(filePath)))
+                if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
                 {
                     files.Add(new FileInfo(filePath));
                 }
@@ -505,7 +505,7 @@ namespace AdelaideFuel.Storage
             return modified == Y2k ? DateTime.MaxValue : modified;
         }
 
-        private static bool IsExpired(string filePath)
+        private static bool IsFileExpired(string filePath)
         {
             var modified = File.GetLastWriteTimeUtc(filePath);
             return modified != Y2k && modified < DateTime.UtcNow;
