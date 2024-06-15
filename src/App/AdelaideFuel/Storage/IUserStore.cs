@@ -9,7 +9,7 @@ namespace AdelaideFuel.Storage
 
     public interface IUserStore<T> : IUserStore where T : class
     {
-        IList<T> All();
+        IReadOnlyList<T> All();
         T Get(int id);
 
         bool Upsert(T item);

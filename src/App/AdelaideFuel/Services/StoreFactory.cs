@@ -47,8 +47,8 @@ namespace AdelaideFuel.Services
         public ICacheStore<T> GetCacheStore<T>() where T : class
             => _cacheStores.GetOrAdd(typeof(T), (k) => new CacheFileStore<T>(_cachePath, _logger)) as ICacheStore<T>;
 
-        public void CacheEmptyExpired() => _cacheStores.Values.ForEach(v => v.EmptyExpiredAsync(default).Wait());
-        public void CacheEmptyAll() => _cacheStores.Values.ForEach(v => v.EmptyAllAsync(default).Wait());
+        public void CacheEmptyExpired() => _cacheStores.Values.ForEach(v => v.EmptyExpired());
+        public void CacheEmptyAll() => _cacheStores.Values.ForEach(v => v.EmptyAll());
 
         public long CacheSizeInBytes() => SizeInBytes(_cachePath);
 

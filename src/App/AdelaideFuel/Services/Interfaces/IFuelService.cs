@@ -10,15 +10,15 @@ namespace AdelaideFuel.Services
 {
     public interface IFuelService
     {
-        Task<IList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken);
-        Task<IList<FuelDto>> GetFuelsAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<FuelDto>> GetFuelsAsync(CancellationToken cancellationToken);
 
-        Task<IList<SiteDto>> GetSitesAsync(CancellationToken cancellationToken);
-        Task<IList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken);
+        Task<IReadOnlyList<SiteDto>> GetSitesAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken);
 
-        Task<(IList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken);
+        Task<(IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken);
 
-        Task<(IList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
+        Task<(IReadOnlyList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 
         Task<bool> SyncBrandsAsync(CancellationToken cancellationToken);
         Task<bool> SyncFuelsAsync(CancellationToken cancellationToken);
@@ -26,14 +26,14 @@ namespace AdelaideFuel.Services
 
         Task<bool> SyncAllAsync(CancellationToken cancellationToken);
 
-        Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken);
-        Task<int> UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken);
+        Task<IReadOnlyList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken);
+        Task<int> UpsertUserBrandsAsync(IReadOnlyList<UserBrand> brands, CancellationToken cancellationToken);
 
-        Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken);
-        Task<int> UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken);
+        Task<IReadOnlyList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken);
+        Task<int> UpsertUserFuelsAsync(IReadOnlyList<UserFuel> fuels, CancellationToken cancellationToken);
 
-        Task<IList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken);
-        Task<int> UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
-        Task<int> RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken);
+        Task<IReadOnlyList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken);
+        Task<int> UpsertUserRadiiAsync(IReadOnlyList<UserRadius> radii, CancellationToken cancellationToken);
+        Task<int> RemoveUserRadiiAsync(IReadOnlyList<UserRadius> radii, CancellationToken cancellationToken);
     }
 }

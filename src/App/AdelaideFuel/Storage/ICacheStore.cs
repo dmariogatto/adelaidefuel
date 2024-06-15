@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdelaideFuel.Storage
 {
@@ -16,28 +14,28 @@ namespace AdelaideFuel.Storage
     {
         string Name { get; }
 
-        Task<bool> RemoveAsync(string key, CancellationToken cancellationToken);
-        Task<int> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken);
+        bool Remove(string key);
+        int RemoveRange(IEnumerable<string> keys);
 
-        Task<int> EmptyAllAsync(CancellationToken cancellationToken);
-        Task<int> EmptyExpiredAsync(CancellationToken cancellationToken);
+        int EmptyAll();
+        int EmptyExpired();
 
-        Task<bool> ExistsAsync(string key, bool includeExpired, CancellationToken cancellationToken);
-        Task<IList<(string, ItemCacheState)>> GetKeysAsync(CancellationToken cancellationToken);
+        bool Exists(string key, bool includeExpired);
+        IReadOnlyCollection<(string, ItemCacheState)> GetKeys();
 
-        Task<DateTime?> GetExpirationAsync(string key, CancellationToken cancellationToken);
+        DateTime? GetExpiration(string key);
 
-        Task<bool> AnyAsync(bool includeExpired, CancellationToken cancellationToken);
-        Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken);
+        bool Any(bool includeExpired);
+        int Count(bool includeExpired);
     }
 
     public interface ICacheStore<T> : ICacheStore where T : class
     {
-        Task<bool> UpsertAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken);
-        Task<int> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken);
-        Task<bool> UpdateAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken);
-        Task<IList<T>> AllAsync(bool includeExpired, CancellationToken cancellationToken);
-        Task<T> GetAsync(string key, bool includeExpired, CancellationToken cancellationToken);
-        Task<IList<T>> GetRangeAsync(IEnumerable<string> keys, bool includeExpired, CancellationToken cancellationToken);
+        bool Upsert(string key, T data, TimeSpan expireIn);
+        int UpsertRange(IEnumerable<(string key, T data)> items, TimeSpan expireIn);
+        bool Update(string key, T data, TimeSpan expireIn);
+        IReadOnlyList<T> All(bool includeExpired);
+        T Get(string key, bool includeExpired);
+        IReadOnlyList<T> GetRange(IEnumerable<string> keys, bool includeExpired);
     }
 }
