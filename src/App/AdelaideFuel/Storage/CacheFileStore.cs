@@ -518,10 +518,14 @@ namespace AdelaideFuel.Storage
 
             if (dataType.IsGenericType)
             {
-                if ((dataType.GetGenericTypeDefinition() == typeof(List<>) ||
-                     dataType.GetGenericTypeDefinition() == typeof(IList<>) ||
-                     dataType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
-                     dataType.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)) &&
+                var supportedGenericTypes = new [] {
+                    typeof(List<>),
+                    typeof(IList<>),
+                    typeof(IReadOnlyList<>),
+                    typeof(IReadOnlyCollection<>)
+                };
+
+                if (supportedGenericTypes.Contains(dataType.GetGenericTypeDefinition()) &&
                     !dataType.GenericTypeArguments[0].IsGenericType)
                 {
                     name = $"List_{dataType.GenericTypeArguments[0].Name}";
