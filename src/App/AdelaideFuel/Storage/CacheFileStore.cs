@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -513,30 +514,34 @@ namespace AdelaideFuel.Storage
 
         private static string GetCollectionNameByType()
         {
-            var dataType = typeof(T);
-            var name = string.Empty;
+            var sb = new StringBuilder();
 
-            if (dataType.IsGenericType)
+            void AppendTypeName(Type t)
             {
-                var supportedGenericTypes = new [] {
-                    typeof(List<>),
-                    typeof(IList<>),
-                    typeof(IReadOnlyList<>),
-                    typeof(IReadOnlyCollection<>)
-                };
-
-                if (supportedGenericTypes.Contains(dataType.GetGenericTypeDefinition()) &&
-                    !dataType.GenericTypeArguments[0].IsGenericType)
+                if (t.IsGenericType)
                 {
-                    name = $"List_{dataType.GenericTypeArguments[0].Name}";
+                    var genericTypeName = t.GetGenericTypeDefinition().Name;
+                    var unmangledName = genericTypeName[..genericTypeName.IndexOf('`')];
+                    sb.Append(unmangledName);
+                    sb.Append("__");
+                    var genericArguments = t.GetGenericArguments();
+                    for (var i = 0; i < genericArguments.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append('_');
+                        AppendTypeName(genericArguments[i]);
+                    }
+                    sb.Append("__");
+                }
+                else
+                {
+                    sb.Append(t.Name);
                 }
             }
-            else
-            {
-                name = dataType.Name;
-            }
 
-            return name;
+            AppendTypeName(typeof(T));
+
+            return sb.ToString();
         }
         #endregion
     }
