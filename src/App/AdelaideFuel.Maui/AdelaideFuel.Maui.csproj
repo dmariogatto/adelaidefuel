@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
-    <TrimmerRootAssembly Include="System.Runtime" RootMode="All"/>
+    <TrimmerRootAssembly Include="System.Runtime" RootMode="All" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-ios'))">
