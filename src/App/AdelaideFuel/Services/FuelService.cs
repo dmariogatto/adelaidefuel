@@ -85,33 +85,33 @@ namespace AdelaideFuel.Services
                     );
         }
 
-        public async Task<IList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken)
         {
-            IList<BrandDto> brands = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetBrandsAsync(Constants.ApiKeyBrands, ct), cancellationToken).ConfigureAwait(false);
-            return brands ?? Array.Empty<BrandDto>();
+            var brands = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetBrandsAsync(Constants.ApiKeyBrands, ct), cancellationToken).ConfigureAwait(false);
+            return brands ?? [];
         }
 
-        public async Task<IList<FuelDto>> GetFuelsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<FuelDto>> GetFuelsAsync(CancellationToken cancellationToken)
         {
-            IList<FuelDto> fuels = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetFuelsAsync(Constants.ApiKeyFuels, ct), cancellationToken).ConfigureAwait(false);
-            return fuels ?? Array.Empty<FuelDto>();
+            var fuels = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetFuelsAsync(Constants.ApiKeyFuels, ct), cancellationToken).ConfigureAwait(false);
+            return fuels ?? [];
         }
 
-        public async Task<IList<SiteDto>> GetSitesAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SiteDto>> GetSitesAsync(CancellationToken cancellationToken)
         {
-            IList<SiteDto> sites = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetSitesAsync(Constants.ApiKeySites, ct), cancellationToken).ConfigureAwait(false);
-            return sites ?? Array.Empty<SiteDto>();
+            var sites = await GetResponseAsync(CacheKey(), ct => _fuelApi.GetSitesAsync(Constants.ApiKeySites, ct), cancellationToken).ConfigureAwait(false);
+            return sites ?? [];
         }
 
-        public async Task<IList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SiteDto>> GetSitesAsync(int brandId, CancellationToken cancellationToken)
         {
             if (brandId < 0) throw new ArgumentOutOfRangeException(nameof(brandId));
 
-            IList<SiteDto> sites = await GetResponseAsync(CacheKey(brandId), ct => _fuelApi.GetSitesAsync(Constants.ApiKeySites, ct, brandId), cancellationToken).ConfigureAwait(false);
-            return sites ?? Array.Empty<SiteDto>();
+            var sites = await GetResponseAsync(CacheKey(brandId), ct => _fuelApi.GetSitesAsync(Constants.ApiKeySites, ct, brandId), cancellationToken).ConfigureAwait(false);
+            return sites ?? [];
         }
 
-        public async Task<(IList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken)
+        public async Task<(IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken)
         {
             var userBrandsTask = GetUserBrandsAsync(cancellationToken);
             var userFuelsTask = GetUserFuelsAsync(cancellationToken);
@@ -140,7 +140,7 @@ namespace AdelaideFuel.Services
             var cacheKey = CacheKey(queryString, nameof(GetSitePricesAsync));
             var lastCheckCacheKey = CacheKey("last_check", nameof(GetSitePricesAsync));
 
-            (IList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
+            (IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
                 (Array.Empty<SiteFuelPrice>(), DateTime.MinValue);
 
             async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime modifiedUtc, CancellationToken ct)
@@ -175,18 +175,18 @@ namespace AdelaideFuel.Services
             if (!MemoryCache.TryGetValue(cacheKey, out result) ||
                 await isOutOfDateAsync(lastCheckCacheKey, result.modifiedUtc, cancellationToken).ConfigureAwait(false))
             {
-                var diskCache = _storeFactory.GetCacheStore<IList<SiteFuelPrice>>();
+                var diskCache = _storeFactory.GetCacheStore<IReadOnlyList<SiteFuelPrice>>();
 
                 if (_connectivity.NetworkAccess != NetworkAccess.Internet)
                 {
-                    result.prices = await diskCache.GetAsync(cacheKey, true, cancellationToken).ConfigureAwait(false) ?? Array.Empty<SiteFuelPrice>();
+                    result.prices = diskCache.Get(cacheKey, true) ?? [];
                     if (result.prices.Any())
                         result.modifiedUtc = result.prices.Max(i => i.ModifiedUtc);
                 }
                 else
                 {
-                    var sites = default(IList<SiteDto>);
-                    var prices = default(IList<SitePriceDto>);
+                    var sites = default(IReadOnlyList<SiteDto>);
+                    var prices = default(IReadOnlyList<SitePriceDto>);
                     var newModifiedUtc = DateTime.MinValue;
 
                     try
@@ -223,7 +223,7 @@ namespace AdelaideFuel.Services
                             MemoryCache.SetAbsolute(cacheKey, result, CachePricesExpireTimeSpan);
                             MemoryCache.SetAbsolute(lastCheckCacheKey, _clock.UtcNow, CachePricesExpireTimeSpan);
 
-                            _ = diskCache.UpsertAsync(cacheKey, result.prices, TimeSpan.FromDays(3), default);
+                            diskCache.Upsert(cacheKey, result.prices, TimeSpan.FromDays(3));
                         }
                     }
                 }
@@ -234,7 +234,7 @@ namespace AdelaideFuel.Services
             return result;
         }
 
-        public async Task<(IList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
+        public async Task<(IReadOnlyList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
             async Task<Location> getLocationAsync(CancellationToken ct)
             {
@@ -476,9 +476,9 @@ namespace AdelaideFuel.Services
             return success;
         }
 
-        public async Task<IList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<UserBrand>> GetUserBrandsAsync(CancellationToken cancellationToken)
         {
-            var result = default(IList<UserBrand>);
+            var result = default(IReadOnlyList<UserBrand>);
 
             await _syncBrandsSemaphore.WaitAsync().ConfigureAwait(false);
 
@@ -498,15 +498,15 @@ namespace AdelaideFuel.Services
                 _syncBrandsSemaphore.Release();
             }
 
-            return result ?? Array.Empty<UserBrand>();
+            return result ?? [];
         }
 
-        public Task<int> UpsertUserBrandsAsync(IList<UserBrand> brands, CancellationToken cancellationToken)
+        public Task<int> UpsertUserBrandsAsync(IReadOnlyList<UserBrand> brands, CancellationToken cancellationToken)
             => Task.FromResult(UpsertUserEntities(brands));
 
-        public async Task<IList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<UserFuel>> GetUserFuelsAsync(CancellationToken cancellationToken)
         {
-            var result = default(IList<UserFuel>);
+            var result = default(IReadOnlyList<UserFuel>);
 
             await _syncFuelsSemaphore.WaitAsync().ConfigureAwait(false);
 
@@ -526,15 +526,15 @@ namespace AdelaideFuel.Services
                 _syncFuelsSemaphore.Release();
             }
 
-            return result ?? Array.Empty<UserFuel>();
+            return result ?? [];
         }
 
-        public Task<int> UpsertUserFuelsAsync(IList<UserFuel> fuels, CancellationToken cancellationToken)
+        public Task<int> UpsertUserFuelsAsync(IReadOnlyList<UserFuel> fuels, CancellationToken cancellationToken)
             => Task.FromResult(UpsertUserEntities(fuels));
 
-        public async Task<IList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<UserRadius>> GetUserRadiiAsync(CancellationToken cancellationToken)
         {
-            var result = default(IList<UserRadius>);
+            var result = default(IReadOnlyList<UserRadius>);
 
             await _syncRadiiSemaphore.WaitAsync().ConfigureAwait(false);
 
@@ -554,16 +554,16 @@ namespace AdelaideFuel.Services
                 _syncRadiiSemaphore.Release();
             }
 
-            return result ?? Array.Empty<UserRadius>();
+            return result ?? [];
         }
 
-        public Task<int> UpsertUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+        public Task<int> UpsertUserRadiiAsync(IReadOnlyList<UserRadius> radii, CancellationToken cancellationToken)
             => Task.FromResult(UpsertUserEntities(radii));
 
-        public Task<int> RemoveUserRadiiAsync(IList<UserRadius> radii, CancellationToken cancellationToken)
+        public Task<int> RemoveUserRadiiAsync(IReadOnlyList<UserRadius> radii, CancellationToken cancellationToken)
             => Task.FromResult(RemoveUserEntities(radii));
 
-        private IList<T> SyncSortableEntitiesWithApi<T, V>(IList<V> apiEntities, IList<T> userEntities)
+        private IReadOnlyList<T> SyncSortableEntitiesWithApi<T, V>(IReadOnlyList<V> apiEntities, IReadOnlyList<T> userEntities)
             where V : class, IFuelLookup
             where T : class, IUserSortableEntity, new()
         {
@@ -652,7 +652,7 @@ namespace AdelaideFuel.Services
             if (!MemoryCache.TryGetValue(cacheKey, out TResponse response))
             {
                 var diskCache = _storeFactory.GetCacheStore<TResponse>();
-                response = await diskCache.GetAsync(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet, cancellationToken).ConfigureAwait(false);
+                response = diskCache.Get(cacheKey, _connectivity.NetworkAccess != NetworkAccess.Internet);
 
                 if (response is null && _connectivity.NetworkAccess == NetworkAccess.Internet)
                 {
@@ -660,8 +660,7 @@ namespace AdelaideFuel.Services
                     {
                         response = await _retryPolicy.ExecuteAsync(apiRequest, cancellationToken).ConfigureAwait(false);
                         if (!cancellationToken.IsCancellationRequested && response is not null)
-                            // Cache regardless, no CT token
-                            await diskCache.UpsertAsync(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan, default).ConfigureAwait(false);
+                            diskCache.Upsert(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan);
                     }
                     catch (Exception ex)
                     {
@@ -684,7 +683,7 @@ namespace AdelaideFuel.Services
             return response;
         }
 
-        private async Task<(IList<SitePriceDto> prices, DateTime modifiedUtc)> RequestSitePriceAsync(HttpMethod httpMethod, string queryString, CancellationToken ct)
+        private async Task<(IReadOnlyList<SitePriceDto> prices, DateTime modifiedUtc)> RequestSitePriceAsync(HttpMethod httpMethod, string queryString, CancellationToken ct)
         {
             const string sitePrices = "SitePrices";
 
@@ -703,7 +702,7 @@ namespace AdelaideFuel.Services
                 ? response.Content.Headers.LastModified.Value.UtcDateTime
                 : _clock.UtcNow;
 
-            var result = default(IList<SitePriceDto>);
+            var result = default(IReadOnlyList<SitePriceDto>);
             if (httpMethod == HttpMethod.Get)
             {
                 using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

@@ -71,7 +71,8 @@ namespace AdelaideFuel.Maui.Services
                         when webEx.Message.Contains("Canceled", StringComparison.Ordinal) ||
                              webEx.Message.Contains("Socket closed", StringComparison.Ordinal) ||
                              webEx.Message.Contains("Socket is closed", StringComparison.Ordinal) ||
-                             webEx.Message.Contains("No address associated with hostname", StringComparison.Ordinal):
+                             webEx.Message.Contains("No address associated with hostname", StringComparison.Ordinal) ||
+                             webEx.Message.Contains("Software caused connection abort", StringComparison.Ordinal):
                 case IOException ioEx
                         when ioEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal):
                     return false;

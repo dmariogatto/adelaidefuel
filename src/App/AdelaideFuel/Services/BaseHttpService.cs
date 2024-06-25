@@ -13,13 +13,11 @@ namespace AdelaideFuel.Services
 
         protected readonly static HttpClient HttpClient = new HttpClient();
 
-        protected static async Task<T> DeserializeJsonFromStreamAsync<T>(Stream stream)
+        protected static ValueTask<T> DeserializeJsonFromStreamAsync<T>(Stream stream)
         {
             if (stream is null || stream.CanRead == false)
                 return default;
-
-            var result = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
-            return result;
+            return JsonSerializer.DeserializeAsync<T>(stream);
         }
     }
 }

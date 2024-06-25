@@ -35,7 +35,7 @@ namespace AdelaideFuel.Storage
 
         public string Name => typeof(T).Name;
 
-        public IList<T> All()
+        public IReadOnlyList<T> All()
         {
             lock (_lock)
             {

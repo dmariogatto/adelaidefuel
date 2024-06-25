@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace AdelaideFuel.Storage
         private readonly DirectoryInfo _directory;
         private readonly string _collectionName;
 
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly object _lock = new object();
 
         public CacheFileStore(string baseDirectory, ILogger logger, string collectionName = "")
         {
@@ -41,27 +42,24 @@ namespace AdelaideFuel.Storage
         public string Name => _collectionName;
 
         #region Exist and Expiration Methods
-        public async Task<bool> ExistsAsync(string key, bool includeExpired, CancellationToken cancellationToken)
+        public bool Exists(string key, bool includeExpired)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             var exists = false;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = GetFile(key, includeExpired);
-                exists = fi is not null;
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                try
+                {
+                    var fi = GetFile(key, includeExpired);
+                    exists = fi is not null;
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return exists;
@@ -69,198 +67,171 @@ namespace AdelaideFuel.Storage
         #endregion
 
         #region Get Methods
-        public async Task<IList<T>> AllAsync(bool includeExpired, CancellationToken cancellationToken)
+        public IReadOnlyList<T> All(bool includeExpired)
         {
-            var items = new List<T>();
+            var items = new ConcurrentBag<T>();
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var bag = new ConcurrentBag<T>();
-
-                await Parallel.ForEachAsync(_directory.GetFiles(), cancellationToken, async (fi, ct) =>
+                try
                 {
-                    using var fs = fi.OpenRead();
-                    bag.Add(await JsonSerializer.DeserializeAsync<T>(fs, cancellationToken: ct).ConfigureAwait(false));
-                    fs.Close();
-                }).ConfigureAwait(false);
-
-                items.AddRange(bag);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
+                    {
+                        using var fs = fi.OpenRead();
+                        items.Add(JsonSerializer.Deserialize<T>(fs));
+                        fs.Close();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
-            return items;
+            return [.. items];
         }
 
-        public async Task<T> GetAsync(string key, bool includeExpired, CancellationToken cancellationToken)
+        public T Get(string key, bool includeExpired)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             var result = default(T);
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = GetFile(key, includeExpired);
-                if (fi is not null)
+                try
                 {
-                    using var fs = fi.OpenRead();
-                    result = await JsonSerializer.DeserializeAsync<T>(fs, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    fs.Close();
+                    var fi = GetFile(key, includeExpired);
+                    if (fi is not null)
+                    {
+                        using var fs = fi.OpenRead();
+                        result = JsonSerializer.Deserialize<T>(fs);
+                        fs.Close();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return result;
         }
 
-        public async Task<IList<T>> GetRangeAsync(IEnumerable<string> keys, bool includeExpired, CancellationToken cancellationToken)
+        public IReadOnlyList<T> GetRange(IEnumerable<string> keys, bool includeExpired)
         {
-            var items = new List<T>();
+            var items = new ConcurrentBag<T>();
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var bag = new ConcurrentBag<T>();
-                var files = GetFiles(keys, includeExpired);
-
-                await Parallel.ForEachAsync(files, cancellationToken, async (fi, ct) =>
+                try
                 {
-                    using var fs = fi.OpenRead();
-                    bag.Add(await JsonSerializer.DeserializeAsync<T>(fs, cancellationToken: ct).ConfigureAwait(false));
-                    fs.Close();
-                }).ConfigureAwait(false);
+                    var files = GetFiles(keys, includeExpired);
 
-                items.AddRange(bag);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                    Parallel.ForEach(files, (fi) =>
+                    {
+                        using var fs = fi.OpenRead();
+                        items.Add(JsonSerializer.Deserialize<T>(fs));
+                        fs.Close();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
-            return items;
+            return [.. items];
         }
 
-        public async Task<IList<(string, ItemCacheState)>> GetKeysAsync(CancellationToken cancellationToken)
+        public IReadOnlyCollection<(string, ItemCacheState)> GetKeys()
         {
-            var items = default(IList<(string, ItemCacheState)>);
+            var items = default(List<(string, ItemCacheState)>);
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                items = _directory
-                    .GetFiles()
-                    .Select(i => (Path.GetFileNameWithoutExtension(i.Name), !IsExpired(i.FullName) ? ItemCacheState.Active : ItemCacheState.Expired))
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                try
+                {
+                    items = _directory
+                        .GetFiles()
+                        .Select(i => (Path.GetFileNameWithoutExtension(i.Name), !IsFileExpired(i.FullName) ? ItemCacheState.Active : ItemCacheState.Expired))
+                        .ToList();
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return items ?? [];
         }
 
-        public async Task<DateTime?> GetExpirationAsync(string key, CancellationToken cancellationToken)
+        public DateTime? GetExpiration(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             var expires = default(DateTime?);
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = GetFile(key, true);
-                if (fi is not null)
+                try
                 {
-                    expires = GetExpiration(fi.FullName);
+                    var fi = GetFile(key, true);
+                    if (fi is not null)
+                    {
+                        expires = GetFileExpiration(fi.FullName);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return expires;
         }
 
-        public async Task<bool> AnyAsync(bool includeExpired, CancellationToken cancellationToken)
+        public bool Any(bool includeExpired)
         {
             var exists = false;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
+            lock (_lock)
+            {
+                try
+                {
+                    exists = _directory
+                        .EnumerateFiles()
+                        .Where(i => includeExpired || !IsFileExpired(i.FullName))
+                        .Any();
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
 
-            try
-            {
-                exists = _directory
-                    .EnumerateFiles()
-                    .Where(i => includeExpired || !IsExpired(i.FullName))
-                    .Any();
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
             }
 
             return exists;
         }
 
-        public async Task<int> CountAsync(bool includeExpired, CancellationToken cancellationToken)
+        public int Count(bool includeExpired)
         {
             var count = -1;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                count = _directory
-                    .EnumerateFiles()
-                    .Count(i => includeExpired || !IsExpired(i.FullName));
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                try
+                {
+                    count = _directory
+                        .EnumerateFiles()
+                        .Count(i => includeExpired || !IsFileExpired(i.FullName));
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return count;
@@ -269,7 +240,7 @@ namespace AdelaideFuel.Storage
         #endregion
 
         #region Add Methods
-        public async Task<bool> UpsertAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken)
+        public bool Upsert(string key, T data, TimeSpan expireIn)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
@@ -279,66 +250,60 @@ namespace AdelaideFuel.Storage
 
             var success = false;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = new FileInfo(GetFilePath(_directory, key));
-                using var fs = fi.OpenWrite();
-                await JsonSerializer.SerializeAsync(fs, data, cancellationToken: cancellationToken).ConfigureAwait(false);
-                fs.Close();
+                try
+                {
+                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    using var fs = fi.OpenWrite();
+                    JsonSerializer.Serialize(fs, data);
+                    fs.Close();
 
-                File.SetLastWriteTimeUtc(fi.FullName, GetExpiration(expireIn));
+                    File.SetLastWriteTimeUtc(fi.FullName, GetExpectedExpiration(expireIn));
 
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, key);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, key);
+                }
             }
 
             return success;
         }
 
-        public async Task<int> UpsertRangeAsync(IEnumerable<(string key, T data)> items, TimeSpan expireIn, CancellationToken cancellationToken)
+        public int UpsertRange(IEnumerable<(string key, T data)> items, TimeSpan expireIn)
         {
             var count = 0;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var expiresIn = GetExpiration(expireIn);
-
-                await Parallel.ForEachAsync(items, cancellationToken, async (i, ct) =>
+                try
                 {
-                    var fi = new FileInfo(GetFilePath(_directory, i.key));
-                    using var fs = fi.OpenWrite();
-                    await JsonSerializer.SerializeAsync(fs, i.data, cancellationToken: ct).ConfigureAwait(false);
-                    fs.Close();
+                    var expiresIn = GetExpectedExpiration(expireIn);
 
-                    File.SetLastWriteTimeUtc(fi.FullName, expiresIn);
+                    Parallel.ForEach(items, (i) =>
+                    {
+                        var fi = new FileInfo(GetFilePath(_directory, i.key));
+                        using var fs = fi.OpenWrite();
+                        JsonSerializer.Serialize(fs, i.data);
+                        fs.Close();
 
-                    Interlocked.Increment(ref count);
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                        File.SetLastWriteTimeUtc(fi.FullName, expiresIn);
+
+                        Interlocked.Increment(ref count);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return count;
         }
 
-        public async Task<bool> UpdateAsync(string key, T data, TimeSpan expireIn, CancellationToken cancellationToken)
+        public bool Update(string key, T data, TimeSpan expireIn)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
@@ -348,91 +313,80 @@ namespace AdelaideFuel.Storage
 
             var success = false;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = new FileInfo(GetFilePath(_directory, key));
-                if (fi.Exists)
+                try
                 {
-                    using var fs = fi.OpenWrite();
-                    await JsonSerializer.SerializeAsync(fs, data, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    fs.Close();
+                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    if (fi.Exists)
+                    {
+                        using var fs = fi.OpenWrite();
+                        JsonSerializer.Serialize(fs, data);
+                        fs.Close();
 
-                    File.SetLastWriteTimeUtc(fi.FullName, GetExpiration(expireIn));
+                        File.SetLastWriteTimeUtc(fi.FullName, GetExpectedExpiration(expireIn));
 
-                    success = true;
+                        success = true;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, key);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                catch (Exception ex)
+                {
+                    LogError(ex, key);
+                }
             }
 
             return success;
         }
 
-        public async Task<bool> RemoveAsync(string key, CancellationToken cancellationToken)
+        public bool Remove(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException(KeyNotEmptyExMsg, nameof(key));
 
             var success = false;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                var fi = new FileInfo(GetFilePath(_directory, key));
-                if (fi.Exists)
+                try
                 {
-                    fi.Delete();
-                    success = true;
+                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    if (fi.Exists)
+                    {
+                        fi.Delete();
+                        success = true;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, key);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                catch (Exception ex)
+                {
+                    LogError(ex, key);
+                }
             }
 
             return success;
         }
 
-        public async Task<int> RemoveRangeAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
+        public int RemoveRange(IEnumerable<string> keys)
         {
             var count = 0;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                await Parallel.ForEachAsync(keys, cancellationToken, (k, ct) =>
+                try
                 {
-                    var fi = new FileInfo(GetFilePath(_directory, k));
-                    if (fi.Exists)
+                    Parallel.ForEach(keys, (k) =>
                     {
-                        fi.Delete();
-                        Interlocked.Increment(ref count);
-                    }
-
-                    return ValueTask.CompletedTask;
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                        var fi = new FileInfo(GetFilePath(_directory, k));
+                        if (fi.Exists)
+                        {
+                            fi.Delete();
+                            Interlocked.Increment(ref count);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return count;
@@ -440,60 +394,50 @@ namespace AdelaideFuel.Storage
         #endregion
 
         #region Empty Methods
-        public async Task<int> EmptyExpiredAsync(CancellationToken cancellationToken)
+        public int EmptyExpired()
         {
             var count = 0;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                await Parallel.ForEachAsync(_directory.GetFiles(), cancellationToken, (fi, ct) =>
+                try
                 {
-                    if (IsExpired(fi.FullName))
+                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
                     {
-                        fi.Delete();
-                        Interlocked.Increment(ref count);
-                    }
-
-                    return ValueTask.CompletedTask;
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                        if (IsFileExpired(fi.FullName))
+                        {
+                            fi.Delete();
+                            Interlocked.Increment(ref count);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return count;
         }
 
-        public async Task<int> EmptyAllAsync(CancellationToken cancellationToken)
+        public int EmptyAll()
         {
             var count = 0;
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
-
-            try
+            lock (_lock)
             {
-                await Parallel.ForEachAsync(_directory.GetFiles(), cancellationToken, (fi, ct) =>
+                try
                 {
-                    fi.Delete();
-                    Interlocked.Increment(ref count);
-
-                    return ValueTask.CompletedTask;
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, string.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
+                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
+                    {
+                        fi.Delete();
+                        Interlocked.Increment(ref count);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, string.Empty);
+                }
             }
 
             return count;
@@ -504,7 +448,7 @@ namespace AdelaideFuel.Storage
         private FileInfo GetFile(string key, bool includeExpired)
         {
             var filePath = GetFilePath(_directory, key);
-            if (File.Exists(filePath) && (includeExpired || !IsExpired(filePath)))
+            if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
             {
                 return new FileInfo(filePath);
             }
@@ -519,7 +463,7 @@ namespace AdelaideFuel.Storage
             foreach (var k in keys)
             {
                 var filePath = GetFilePath(_directory, k);
-                if (File.Exists(filePath) && (includeExpired || !IsExpired(filePath)))
+                if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
                 {
                     files.Add(new FileInfo(filePath));
                 }
@@ -545,7 +489,7 @@ namespace AdelaideFuel.Storage
         private static string GetFilePath(DirectoryInfo di, string key)
             => Path.Combine(di.FullName, $"{key}.json");
 
-        private static DateTime GetExpiration(TimeSpan timeSpan)
+        private static DateTime GetExpectedExpiration(TimeSpan timeSpan)
         {
             if (timeSpan == TimeSpan.MaxValue)
                 return Y2k;
@@ -553,7 +497,7 @@ namespace AdelaideFuel.Storage
             return DateTime.UtcNow.Add(timeSpan);
         }
 
-        private static DateTime GetExpiration(string filePath)
+        private static DateTime GetFileExpiration(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
                 return DateTime.MinValue;
@@ -562,7 +506,7 @@ namespace AdelaideFuel.Storage
             return modified == Y2k ? DateTime.MaxValue : modified;
         }
 
-        private static bool IsExpired(string filePath)
+        private static bool IsFileExpired(string filePath)
         {
             var modified = File.GetLastWriteTimeUtc(filePath);
             return modified != Y2k && modified < DateTime.UtcNow;
@@ -570,24 +514,34 @@ namespace AdelaideFuel.Storage
 
         private static string GetCollectionNameByType()
         {
-            var dataType = typeof(T);
-            var name = string.Empty;
+            var sb = new StringBuilder();
 
-            if (dataType.IsGenericType)
+            void AppendTypeName(Type t)
             {
-                if ((dataType.GetGenericTypeDefinition() == typeof(List<>) ||
-                     dataType.GetGenericTypeDefinition() == typeof(IList<>)) &&
-                    !dataType.GenericTypeArguments[0].IsGenericType)
+                if (t.IsGenericType)
                 {
-                    name = $"List_{dataType.GenericTypeArguments[0].Name}";
+                    var genericTypeName = t.GetGenericTypeDefinition().Name;
+                    var unmangledName = genericTypeName[..genericTypeName.IndexOf('`')];
+                    sb.Append(unmangledName);
+                    sb.Append("__");
+                    var genericArguments = t.GetGenericArguments();
+                    for (var i = 0; i < genericArguments.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append('_');
+                        AppendTypeName(genericArguments[i]);
+                    }
+                    sb.Append("__");
+                }
+                else
+                {
+                    sb.Append(t.Name);
                 }
             }
-            else
-            {
-                name = dataType.Name;
-            }
 
-            return name;
+            AppendTypeName(typeof(T));
+
+            return sb.ToString();
         }
         #endregion
     }

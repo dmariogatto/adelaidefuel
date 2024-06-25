@@ -159,9 +159,7 @@ namespace AdelaideFuel.Services
         public async Task<InAppBillingProduct> GetProductAsync()
         {
             var cacheKey = $"{nameof(InAppBillingProduct)}_{_productId}";
-            var product = default(InAppBillingProduct);
-
-            product = await _iapCache.GetAsync(cacheKey, false, default).ConfigureAwait(false);
+            var product = _iapCache.Get(cacheKey, false);
 
             if (product is null)
             {
@@ -178,7 +176,7 @@ namespace AdelaideFuel.Services
 
                         if (product is not null)
                         {
-                            await _iapCache.UpsertAsync(cacheKey, product, TimeSpan.FromDays(7), default).ConfigureAwait(false);
+                            _iapCache.Upsert(cacheKey, product, TimeSpan.FromDays(7));
                         }
                     }
                 }
