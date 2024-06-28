@@ -1,9 +1,7 @@
 name: Code format check
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+
 jobs:
   dotnet-format:
     runs-on: windows-latest
