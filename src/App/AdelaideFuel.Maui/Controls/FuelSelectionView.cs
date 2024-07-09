@@ -36,6 +36,7 @@ namespace AdelaideFuel.Maui.Controls
 
             Margin = Thickness.Zero;
             HorizontalOptions = LayoutOptions.Center;
+            VerticalOptions = LayoutOptions.Start;
 
             SetBinding(StrokeShapeProperty, new Binding(
                 nameof(Height),
