@@ -306,9 +306,8 @@ namespace AdelaideFuel.Maui.Views
                 {
                     offset = heightAcc;
                     var offsetMargin = parent.Height - offset;
-#if IOS || MACCATALYST
+                    // So we can see the dividing line ---
                     offsetMargin--;
-#endif
                     drawer.Margin = new Thickness(0, offsetMargin, 0, -offsetMargin);
                 }
             }
