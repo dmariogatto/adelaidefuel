@@ -1,7 +1,4 @@
-﻿using AdelaideFuel.Attributes;
-using AdelaideFuel.Localisation;
-
-namespace AdelaideFuel.Services
+﻿namespace AdelaideFuel.Services
 {
     public enum Theme
     {

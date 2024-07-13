@@ -8,7 +8,6 @@ using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Networking;
 using Polly;
 using Polly.Retry;
-using Refit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -131,9 +130,9 @@ namespace AdelaideFuel.Services
 
             if (fuelIds.Count > 0)
             {
-                if (keyBuilder.Length > 0) keyBuilder.Append("&");
+                if (keyBuilder.Length > 0) keyBuilder.Append('&');
                 keyBuilder.Append("fuelIds=");
-                keyBuilder.AppendJoin(",", fuelIds);
+                keyBuilder.AppendJoin(',', fuelIds);
             }
 
             var queryString = keyBuilder.ToString();
@@ -664,15 +663,7 @@ namespace AdelaideFuel.Services
                     }
                     catch (Exception ex)
                     {
-                        var url = ex switch
-                        {
-                            ApiException apiEx => apiEx.Uri.ToString(),
-                            _ => string.Empty
-                        };
-
-                        Logger.Error(ex, !string.IsNullOrEmpty(url)
-                            ? new Dictionary<string, string>() { { nameof(url), url } }
-                            : null);
+                        Logger.Error(ex);
                     }
                 }
 
