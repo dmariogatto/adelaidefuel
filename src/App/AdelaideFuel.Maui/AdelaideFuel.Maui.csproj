@@ -46,10 +46,6 @@
     <BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
-    <TrimmerRootAssembly Include="System.Runtime" RootMode="All" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-ios'))">
     <CreatePackage>false</CreatePackage>
     <CodesignProvision>Automatic</CodesignProvision>
