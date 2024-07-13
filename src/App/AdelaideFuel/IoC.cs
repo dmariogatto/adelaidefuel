@@ -15,7 +15,6 @@ using Microsoft.Maui.Storage;
 using Plugin.InAppBilling;
 using Plugin.StoreReview;
 using Plugin.StoreReview.Abstractions;
-using Refit;
 using System;
 using System.Net.Http;
 
@@ -42,8 +41,8 @@ namespace AdelaideFuel
                 {
                     BaseAddress = new Uri(Constants.ApiUrlBase),
                 };
-                var metroApi = RestService.For<IAdelaideFuelApi>(client);
-                return metroApi;
+                var fuelApi = new AdelaideFuelApi(client);
+                return fuelApi;
             });
             services.AddSingleton<IIapVerifyApi>(_ =>
             {
@@ -51,7 +50,7 @@ namespace AdelaideFuel
                 {
                     BaseAddress = new Uri(Constants.ApiUrlIapBase),
                 };
-                var iapApi = RestService.For<IIapVerifyApi>(client);
+                var iapApi = new IapVerifyApi(client);
                 return iapApi;
             });
 
