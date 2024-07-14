@@ -34,14 +34,14 @@ namespace AdelaideFuel.Api
         {
             var uriBuilder = new StringBuilder();
 
-            if (brandIds.Any())
+            if (brandIds?.Any() == true)
             {
                 uriBuilder.Append(nameof(brandIds));
                 uriBuilder.Append('=');
                 uriBuilder.AppendJoin(',', brandIds);
             }
 
-            if (fuelIds.Any())
+            if (fuelIds?.Any() == true)
             {
                 if (uriBuilder.Length > 0) uriBuilder.Append('&');
                 uriBuilder.Append(nameof(fuelIds));
