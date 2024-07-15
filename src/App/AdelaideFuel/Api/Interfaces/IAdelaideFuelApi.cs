@@ -1,4 +1,5 @@
 ﻿using AdelaideFuel.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace AdelaideFuel.Api
 
         Task<List<SiteDto>> GetSitesAsync(string code, CancellationToken cancellationToken, long? brandId = null);
 
-        Task<List<SitePriceDto>> GetSitePricesAsync(string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds, CancellationToken cancellationToken);
+        Task<(List<SitePriceDto> Prices, DateTime ModifiedUtc)> GetSitePricesAsync(string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds, CancellationToken cancellationToken);
+
+        Task<DateTime> GetSitePricesModifiedUtcAsync(string code, CancellationToken cancellationToken);
     }
 }
