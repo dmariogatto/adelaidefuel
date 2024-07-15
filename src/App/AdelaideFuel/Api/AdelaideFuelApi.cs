@@ -65,7 +65,7 @@ namespace AdelaideFuel.Api
             return modifiedUtc;
         }
 
-        private string GetSitePricesQueryString(IEnumerable<int> brandIds, IEnumerable<int> fuelIds)
+        private static string GetSitePricesQueryString(IEnumerable<int> brandIds, IEnumerable<int> fuelIds)
         {
             var queryBuilder = new StringBuilder();
 
