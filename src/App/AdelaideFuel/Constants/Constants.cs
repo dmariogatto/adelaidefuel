@@ -31,7 +31,7 @@ namespace AdelaideFuel
 
         public const string AuthHeader = "x-functions-key";
 
-        public static double OutOfStockPriceInCents = 999.9;
+        public const double OutOfStockPriceInCents = 999.9;
 
         public static readonly Coords AdelaideCenter = new Coords(-34.9241446714455, 138.599550649524);
         public static readonly Coords SaCenter = new Coords(-30.058333, 135.763333, 1025 * 1000);

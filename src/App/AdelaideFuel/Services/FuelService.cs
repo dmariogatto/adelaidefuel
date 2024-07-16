@@ -10,10 +10,7 @@ using Polly;
 using Polly.Retry;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -120,23 +117,7 @@ namespace AdelaideFuel.Services
             var brandIds = userBrandsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
             var fuelIds = userFuelsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
 
-            var keyBuilder = new StringBuilder();
-
-            if (brandIds.Count > 0)
-            {
-                keyBuilder.Append("brandIds=");
-                keyBuilder.AppendJoin(",", brandIds);
-            }
-
-            if (fuelIds.Count > 0)
-            {
-                if (keyBuilder.Length > 0) keyBuilder.Append('&');
-                keyBuilder.Append("fuelIds=");
-                keyBuilder.AppendJoin(',', fuelIds);
-            }
-
-            var queryString = keyBuilder.ToString();
-            var cacheKey = CacheKey(queryString, nameof(GetSitePricesAsync));
+            var cacheKey = CacheKey(string.Join(',', brandIds.Concat(new[] { -1 }).Concat(fuelIds)), nameof(GetSitePricesAsync));
             var lastCheckCacheKey = CacheKey("last_check", nameof(GetSitePricesAsync));
 
             (IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
@@ -152,11 +133,11 @@ namespace AdelaideFuel.Services
 
                 try
                 {
-                    (_, newModifiedUtc) = _connectivity.NetworkAccess == NetworkAccess.Internet
+                    newModifiedUtc = _connectivity.NetworkAccess == NetworkAccess.Internet
                         ? await _retryPolicy.ExecuteAsync(
-                              (ct) => RequestSitePriceAsync(HttpMethod.Head, string.Empty, ct),
+                              (ct) => _fuelApi.GetSitePricesModifiedUtcAsync(Constants.ApiKeySitePrices, ct),
                               ct).ConfigureAwait(false)
-                        : (null, DateTime.MinValue);
+                        : DateTime.MinValue;
                 }
                 catch (Exception ex)
                 {
@@ -192,7 +173,7 @@ namespace AdelaideFuel.Services
                     {
                         var sitesTask = GetSitesAsync(cancellationToken);
                         var pricesTask = _retryPolicy.ExecuteAsync(
-                            (ct) => RequestSitePriceAsync(HttpMethod.Get, queryString, ct),
+                            (ct) => _fuelApi.GetSitePricesAsync(Constants.ApiKeySitePrices, brandIds, fuelIds, ct),
                             cancellationToken);
 
                         await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
@@ -672,35 +653,6 @@ namespace AdelaideFuel.Services
             }
 
             return response;
-        }
-
-        private async Task<(IReadOnlyList<SitePriceDto> prices, DateTime modifiedUtc)> RequestSitePriceAsync(HttpMethod httpMethod, string queryString, CancellationToken ct)
-        {
-            const string sitePrices = "SitePrices";
-
-            if (httpMethod != HttpMethod.Head && httpMethod != HttpMethod.Get)
-                throw new ArgumentOutOfRangeException(nameof(httpMethod));
-
-            var uri = Path.Combine(Constants.ApiUrlBase, !string.IsNullOrEmpty(queryString) ? $"{sitePrices}?{queryString}" : sitePrices);
-            var request = new HttpRequestMessage(httpMethod, uri);
-            request.Headers.Add(Constants.AuthHeader, Constants.ApiKeySitePrices);
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(TimeSpan.FromSeconds(10));
-            using var response = await HttpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var modifiedUtc = response.Content.Headers.LastModified is not null
-                ? response.Content.Headers.LastModified.Value.UtcDateTime
-                : _clock.UtcNow;
-
-            var result = default(IReadOnlyList<SitePriceDto>);
-            if (httpMethod == HttpMethod.Get)
-            {
-                using var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                result = await DeserializeJsonFromStreamAsync<List<SitePriceDto>>(s).ConfigureAwait(false);
-            }
-
-            return (result, modifiedUtc);
         }
     }
 }

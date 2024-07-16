@@ -1,8 +1,10 @@
 ﻿using AdelaideFuel.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,28 +32,60 @@ namespace AdelaideFuel.Api
             return GetAsync<List<SiteDto>>(requestUri, cancellationToken, functionKey: code);
         }
 
-        public Task<List<SitePriceDto>> GetSitePricesAsync(string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds, CancellationToken cancellationToken)
+        public async Task<(List<SitePriceDto> Prices, DateTime ModifiedUtc)> GetSitePricesAsync(string code, IEnumerable<int> brandIds, IEnumerable<int> fuelIds, CancellationToken cancellationToken)
         {
-            var uriBuilder = new StringBuilder();
+            var queryString = GetSitePricesQueryString(brandIds, fuelIds);
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, "SitePrices" + queryString);
+            request.Headers.Add(Constants.AuthHeader, code);
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(10));
+
+            using var response = await HttpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var modifiedUtc = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
+
+            using var stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false);
+            var result = await JsonSerializer.DeserializeAsync<List<SitePriceDto>>(stream, cancellationToken: cts.Token).ConfigureAwait(false);
+
+            return (result, modifiedUtc);
+        }
+
+        public async Task<DateTime> GetSitePricesModifiedUtcAsync(string code, CancellationToken cancellationToken)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Head, "SitePrices");
+            request.Headers.Add(Constants.AuthHeader, code);
+
+            using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var modifiedUtc = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
+            return modifiedUtc;
+        }
+
+        private static string GetSitePricesQueryString(IEnumerable<int> brandIds, IEnumerable<int> fuelIds)
+        {
+            var queryBuilder = new StringBuilder();
 
             if (brandIds?.Any() == true)
             {
-                uriBuilder.Append(nameof(brandIds));
-                uriBuilder.Append('=');
-                uriBuilder.AppendJoin(',', brandIds);
+                queryBuilder.Append('?');
+                queryBuilder.Append(nameof(brandIds));
+                queryBuilder.Append('=');
+                queryBuilder.AppendJoin(',', brandIds);
             }
 
             if (fuelIds?.Any() == true)
             {
-                if (uriBuilder.Length > 0) uriBuilder.Append('&');
-                uriBuilder.Append(nameof(fuelIds));
-                uriBuilder.Append('=');
-                uriBuilder.AppendJoin(',', fuelIds);
+                queryBuilder.Append(queryBuilder.Length > 0 ? '&' : '?');
+                queryBuilder.Append(nameof(fuelIds));
+                queryBuilder.Append('=');
+                queryBuilder.AppendJoin(',', fuelIds);
             }
 
-            uriBuilder.Insert(0, uriBuilder.Length > 0 ? "SitePrices?" : "SitePrices");
-
-            return GetAsync<List<SitePriceDto>>(uriBuilder.ToString(), cancellationToken, functionKey: code);
+            return queryBuilder.ToString();
         }
     }
 }

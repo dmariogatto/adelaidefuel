@@ -23,7 +23,6 @@ The [maps package](https://www.nuget.org/packages/BetterMaps.Maui/) is based on 
 
 - [Mvvm Helpers](https://github.com/jamesmontemagno/mvvm-helpers)
 - [Polly](https://github.com/App-vNext/Polly)
-- [Refit](https://github.com/reactiveui/refit)
 - [StoreReviewPlugin](https://github.com/jamesmontemagno/StoreReviewPlugin)
 - [UserDialogs](https://github.com/aritchie/userdialogs)
 
