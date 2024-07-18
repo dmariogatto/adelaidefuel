@@ -120,7 +120,7 @@
                 <View.Triggers>
                     <MultiTrigger TargetType="View">
                         <MultiTrigger.Conditions>
-                            <BindingCondition Binding="{Binding FilteredSites.Count}" Value="0" />
+                            <BindingCondition Binding="{Binding FilteredSites, Converter={StaticResource CollectionToCountConverter}}" Value="0" />
                             <BindingCondition Binding="{Binding InitialLoadComplete}" Value="True" />
                             <BindingCondition Binding="{Binding IsBusy}" Value="False" />
                         </MultiTrigger.Conditions>

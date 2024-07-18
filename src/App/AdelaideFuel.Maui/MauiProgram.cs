@@ -34,12 +34,14 @@ public static class MauiProgram
             .UseSentry(options =>
             {
                 options.Dsn = Constants.SentryDsn;
+
 #if DEBUG
                 options.Debug = false;
+                options.TracesSampleRate = 0.5;
+#else
+                options.Debug = false;
+                options.TracesSampleRate = 0.0;
 #endif
-                options.AutoSessionTracking = true;
-                options.IsGlobalModeEnabled = false;
-                options.TracesSampleRate = 0.1;
 
                 options.DisableUnobservedTaskExceptionCapture();
 

@@ -14,8 +14,9 @@ namespace AdelaideFuel.ViewModels
 {
     public class SiteSearchViewModel : BaseViewModel
     {
-        private readonly List<SiteDto> _sites = new List<SiteDto>();
-        private readonly Dictionary<UserFuel, List<SiteFuelPrice>> _sitePrices = new Dictionary<UserFuel, List<SiteFuelPrice>>();
+        private readonly Dictionary<UserFuel, IReadOnlyList<SiteFuelPrice>> _sitePrices = new Dictionary<UserFuel, IReadOnlyList<SiteFuelPrice>>();
+
+        private IReadOnlyList<SiteDto> _sites = [];
 
         private CancellationTokenSource _searchCancellation;
 
@@ -23,8 +24,6 @@ namespace AdelaideFuel.ViewModels
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             Title = Resources.Stations;
-
-            FilteredSites = new ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>>();
 
             LoadCommand = new AsyncCommand(LoadAsync);
             SearchCommand = new AsyncCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
@@ -66,7 +65,12 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        public ObservableRangeCollection<Grouping<UserFuel, SiteFuelPrice>> FilteredSites { get; private set; }
+        private IReadOnlyList<Grouping<UserFuel, SiteFuelPrice>> _filteredSites;
+        public IReadOnlyList<Grouping<UserFuel, SiteFuelPrice>> FilteredSites
+        {
+            get => _filteredSites;
+            private set => SetProperty(ref _filteredSites, value);
+        }
 
         public AsyncCommand LoadCommand { get; private set; }
         public AsyncCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
@@ -88,7 +92,7 @@ namespace AdelaideFuel.ViewModels
 
                 await Task.WhenAll(sitesTask, sitePricesTask);
 
-                _sites.AddRange(sitesTask.Result);
+                _sites = sitesTask.Result;
 
                 var sitesByFuelId =
                     (from s in sitePricesTask.Result.prices
@@ -107,8 +111,7 @@ namespace AdelaideFuel.ViewModels
 
                 await delayTask;
 
-                FilteredSites.ReplaceRange(
-                    _sitePrices.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)));
+                FilteredSites = _sitePrices.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)).ToList();
             }
             catch (Exception ex)
             {
@@ -138,28 +141,26 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                var sites = (IEnumerable<SiteDto>)_sites;
-                var filtered = sites;
+                var filtered = _sites.AsEnumerable();
 
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
                     var compareInfo = CultureInfo.InvariantCulture.CompareInfo;
                     var parts = searchText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    filtered = sites
+                    filtered = filtered
                         .Where(i => parts.Any(p => compareInfo.IndexOf(i.Name, p, CompareOptions.OrdinalIgnoreCase) >= 0 || p == i.Postcode) ||
                                     parts.All(p => compareInfo.IndexOf(i.Address, p, CompareOptions.OrdinalIgnoreCase) >= 0));
                 }
 
                 var filteredSiteIds = new HashSet<int>(filtered.Select(i => i.SiteId));
-
-                FilteredSites.Clear();
+                var filteredSites = new List<Grouping<UserFuel, SiteFuelPrice>>();
 
                 foreach (var kv in _sitePrices)
                 {
                     var prices = kv.Value.Where(i => filteredSiteIds.Contains(i.SiteId));
                     if (prices.Any())
                     {
-                        FilteredSites.Add(new Grouping<UserFuel, SiteFuelPrice>(
+                        filteredSites.Add(new Grouping<UserFuel, SiteFuelPrice>(
                             new UserFuel()
                             {
                                 Id = prices.First().FuelId,
@@ -170,6 +171,8 @@ namespace AdelaideFuel.ViewModels
                             prices));
                     }
                 }
+
+                FilteredSites = filteredSites;
             }
             catch (Exception ex)
             {
