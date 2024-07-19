@@ -24,6 +24,7 @@
             <ListView
                 Grid.Row="1"
                 Margin="{StaticResource ListViewMargin}"
+                BackgroundColor="Transparent"
                 CachingStrategy="RecycleElement"
                 HasUnevenRows="True"
                 IsGroupingEnabled="True"
