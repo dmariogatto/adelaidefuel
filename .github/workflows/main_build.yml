@@ -10,7 +10,7 @@ env:
   PROJECT_NAME: "AdelaideFuel"
   DOTNET_VERSION: 8.0.x  
   DOTNET_VERSION_TARGET: net8.0
-  XCODE_VERSION: 15.2
+  XCODE_VERSION: 15.3
 
 jobs:
 
