@@ -1,8 +1,8 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
-using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,14 +10,11 @@ namespace AdelaideFuel.ViewModels
 {
     public abstract class BaseUserEntityViewModel<T> : BaseViewModel where T : IUserSortableEntity
     {
-        private readonly ObservableRangeCollection<IUserEntity> _originalEntities;
+        private IReadOnlyList<IUserEntity> _originalEntities = [];
 
         public BaseUserEntityViewModel(
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
-            _originalEntities = new ObservableRangeCollection<IUserEntity>();
-            Entities = new ObservableRangeCollection<IUserSortableEntity>();
-
             LoadEntitiesCommand = new AsyncCommand(LoadEntitiesAsync);
             SaveEntitiesCommand = new AsyncCommand(SaveEntitiesAsync);
             EntityTappedCommand = new AsyncCommand<IUserSortableEntity>(EntityTappedAsync);
@@ -47,7 +44,12 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _entityName, value);
         }
 
-        public ObservableRangeCollection<IUserSortableEntity> Entities { get; private set; }
+        private IReadOnlyList<IUserSortableEntity> _entities;
+        public IReadOnlyList<IUserSortableEntity> Entities
+        {
+            get => _entities;
+            protected set => SetProperty(ref _entities, value);
+        }
 
         public AsyncCommand LoadEntitiesCommand { get; private set; }
         public AsyncCommand SaveEntitiesCommand { get; private set; }
@@ -65,19 +67,16 @@ namespace AdelaideFuel.ViewModels
             {
                 async Task loadEntitiesAsync()
                 {
-                    // iOS binding issue when reseting radii
-                    Entities.Clear();
-
                     switch (typeof(T))
                     {
                         case Type t when t == typeof(UserBrand):
-                            Entities.ReplaceRange(await FuelService.GetUserBrandsAsync(default));
+                            Entities = await FuelService.GetUserBrandsAsync(default);
                             break;
                         case Type t when t == typeof(UserFuel):
-                            Entities.ReplaceRange(await FuelService.GetUserFuelsAsync(default));
+                            Entities = await FuelService.GetUserFuelsAsync(default);
                             break;
                         case Type t when t == typeof(UserRadius):
-                            Entities.ReplaceRange(await FuelService.GetUserRadiiAsync(default));
+                            Entities = await FuelService.GetUserRadiiAsync(default);
                             break;
                         default:
                             throw new InvalidOperationException($"Unsupported type {typeof(T).Name}");
@@ -92,7 +91,7 @@ namespace AdelaideFuel.ViewModels
                     await loadEntitiesAsync();
                 }
 
-                _originalEntities.ReplaceRange(Entities.Select(i => i.Clone()));
+                _originalEntities = Entities.Select(i => i.Clone()).ToList();
                 HasError = !Entities.Any();
             }
             catch (Exception ex)
@@ -198,7 +197,7 @@ namespace AdelaideFuel.ViewModels
                 }
                 else
                 {
-                    Entities.Remove(entity);
+                    Entities = Entities.Except([entity]).ToList();
                 }
             }
             catch (Exception ex)

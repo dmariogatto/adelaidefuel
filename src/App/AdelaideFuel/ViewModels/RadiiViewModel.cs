@@ -80,7 +80,10 @@ namespace AdelaideFuel.ViewModels
                     };
 
                     var insertIdx = Entities.FirstIndexOf(i => km < i.Id);
-                    Entities.Insert(Math.Max(0, insertIdx), newRadius);
+                    var entities = Entities.ToList();
+                    entities.Insert(Math.Max(0, insertIdx), newRadius);
+
+                    Entities = entities;
                 }
             }
             catch (Exception ex)

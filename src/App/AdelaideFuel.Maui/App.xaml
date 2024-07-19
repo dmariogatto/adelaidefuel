@@ -101,6 +101,7 @@
             <converters:EqualityConverter x:Key="EqualityConverter" />
             <converters:MultiplyByConverter x:Key="MultiplyByConverter" />
             <converters:DivideByConverter x:Key="DivideByConverter" />
+            <converters:CollectionToCountConverter x:Key="CollectionToCountConverter" />
 
             <Style x:Key="BaseTabbedPageStyle" TargetType="TabbedPage">
                 <Setter Property="BarBackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />

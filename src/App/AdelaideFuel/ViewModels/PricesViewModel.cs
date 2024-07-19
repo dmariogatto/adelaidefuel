@@ -3,7 +3,6 @@ using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Networking;
-using MvvmHelpers;
 using MvvmHelpers.Commands;
 using System;
 using System.Collections.Generic;
@@ -19,8 +18,8 @@ namespace AdelaideFuel.ViewModels
         private readonly IPermissions _permissions;
         private readonly IVersionTracking _versionTracking;
 
-        private readonly ObservableRangeCollection<UserFuel> _userFuels;
-        private readonly ObservableRangeCollection<UserRadius> _userRadii;
+        private IReadOnlyList<UserFuel> _userFuels = [];
+        private IReadOnlyList<UserRadius> _userRadii = [];
 
         public PricesViewModel(
             IConnectivity connectivity,
@@ -28,16 +27,11 @@ namespace AdelaideFuel.ViewModels
             IVersionTracking versionTracking,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
-            _userFuels = new ObservableRangeCollection<UserFuel>();
-            _userRadii = new ObservableRangeCollection<UserRadius>();
-
             _connectivity = connectivity;
             _permissions = permissions;
             _versionTracking = versionTracking;
 
             Title = Resources.Prices;
-
-            FuelPriceGroups = new ObservableRangeCollection<SiteFuelPriceItemGroup>();
 
             LoadFuelPriceGroupsCommand = new AsyncCommand<CancellationToken>(LoadFuelPriceGroupsAsync);
             FuelPriceTappedCommand = new AsyncCommand<SiteFuelPriceItem>((fp) => fp?.SiteId is not null
@@ -105,7 +99,12 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _noLocation, value);
         }
 
-        public ObservableRangeCollection<SiteFuelPriceItemGroup> FuelPriceGroups { get; private set; }
+        private IReadOnlyList<SiteFuelPriceItemGroup> _fuelPriceGroups = [];
+        public IReadOnlyList<SiteFuelPriceItemGroup> FuelPriceGroups
+        {
+            get => _fuelPriceGroups;
+            private set => SetProperty(ref _fuelPriceGroups, value);
+        }
 
         public AsyncCommand<CancellationToken> LoadFuelPriceGroupsCommand { get; private set; }
         public AsyncCommand<SiteFuelPriceItem> FuelPriceTappedCommand { get; private set; }
@@ -209,11 +208,10 @@ namespace AdelaideFuel.ViewModels
                     }
 
                     HasPrices = false;
-                    FuelPriceGroups.Clear();
-                    FuelPriceGroups.AddRange(fuelPriceGroups);
+                    FuelPriceGroups = fuelPriceGroups;
 
-                    _userFuels.ReplaceRange(fuels);
-                    _userRadii.ReplaceRange(radii);
+                    _userFuels = fuels;
+                    _userRadii = radii;
 
                     return true;
                 }

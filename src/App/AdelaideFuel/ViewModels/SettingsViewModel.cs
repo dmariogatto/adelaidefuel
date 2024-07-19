@@ -4,7 +4,6 @@ using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Devices;
-using MvvmHelpers;
 using MvvmHelpers.Commands;
 using Plugin.StoreReview.Abstractions;
 using System;
@@ -47,7 +46,7 @@ namespace AdelaideFuel.ViewModels
             _storeFactory = storeFactory;
             _themeService = themeService;
 
-            Themes = new ObservableRangeCollection<string>(Enum.GetNames(typeof(Theme)));
+            Themes = Enum.GetNames(typeof(Theme));
 
             LoadSettingsCommand = new Command(() =>
             {
@@ -119,7 +118,7 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        public ObservableRangeCollection<string> Themes { get; private set; }
+        public IReadOnlyList<string> Themes { get; private set; } = [];
 
         public Command LoadSettingsCommand { get; private set; }
         public AsyncCommand SendFeedbackCommand { get; private set; }
