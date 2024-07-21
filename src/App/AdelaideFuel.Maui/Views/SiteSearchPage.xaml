@@ -53,51 +53,53 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:SiteFuelPrice">
                         <ViewCell>
-                            <controls:ItemCard>
-                                <Grid
-                                    ColumnDefinitions="48,*,Auto"
-                                    ColumnSpacing="{StaticResource XSmallSpacing}"
-                                    RowDefinitions="Auto,Auto"
-                                    RowSpacing="{StaticResource XSmallSpacing}">
-                                    <controls:BrandIconView
-                                        Grid.RowSpan="3"
-                                        BrandId="{Binding BrandId}"
-                                        Size="40" />
-                                    <Label
-                                        Grid.Column="1"
-                                        Style="{DynamicResource LabelTitleStyle}"
-                                        Text="{Binding SiteName}" />
-                                    <Label
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
-                                        Style="{DynamicResource LabelStyle}">
-                                        <Label.Text>
-                                            <MultiBinding StringFormat="{}{0}, {1}">
-                                                <Binding Path="SiteAddress" />
-                                                <Binding Path="SitePostcode" />
-                                            </MultiBinding>
-                                        </Label.Text>
-                                    </Label>
-                                    <Label
-                                        Grid.RowSpan="2"
-                                        Grid.Column="2"
-                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
-                                        HorizontalTextAlignment="End"
-                                        Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
-                                        VerticalTextAlignment="Center">
-                                        <View.Triggers>
-                                            <DataTrigger
-                                                Binding="{Binding PriceInCents}"
-                                                TargetType="View"
-                                                Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
-                                                <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
-                                            </DataTrigger>
-                                        </View.Triggers>
-                                    </Label>
-                                </Grid>
-                            </controls:ItemCard>
+                            <ContentView>
+                                <controls:ItemCard>
+                                    <Grid
+                                        ColumnDefinitions="48,*,Auto"
+                                        ColumnSpacing="{StaticResource XSmallSpacing}"
+                                        RowDefinitions="Auto,Auto"
+                                        RowSpacing="{StaticResource XSmallSpacing}">
+                                        <controls:BrandIconView
+                                            Grid.RowSpan="3"
+                                            BrandId="{Binding BrandId}"
+                                            Size="40" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Style="{DynamicResource LabelTitleStyle}"
+                                            Text="{Binding SiteName}" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                                            Style="{DynamicResource LabelStyle}">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="{}{0}, {1}">
+                                                    <Binding Path="SiteAddress" />
+                                                    <Binding Path="SitePostcode" />
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                        <Label
+                                            Grid.RowSpan="2"
+                                            Grid.Column="2"
+                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
+                                            HorizontalTextAlignment="End"
+                                            Style="{DynamicResource LabelStyle}"
+                                            Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                            VerticalTextAlignment="Center">
+                                            <View.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding PriceInCents}"
+                                                    TargetType="View"
+                                                    Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
+                                                    <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                                                </DataTrigger>
+                                            </View.Triggers>
+                                        </Label>
+                                    </Grid>
+                                </controls:ItemCard>
+                            </ContentView>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
