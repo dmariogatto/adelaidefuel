@@ -85,6 +85,7 @@ namespace AdelaideFuel.Storage
                 catch (Exception ex)
                 {
                     LogError(ex, string.Empty);
+                    items.Clear();
                 }
             }
 
@@ -139,6 +140,7 @@ namespace AdelaideFuel.Storage
                 catch (Exception ex)
                 {
                     LogError(ex, string.Empty);
+                    items.Clear();
                 }
             }
 
