@@ -66,7 +66,10 @@ namespace AdelaideFuel.Maui.Services
                              httpRequstEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal) ||
                              httpRequstEx.Message.Contains("A server with the specified hostname could not be found", StringComparison.Ordinal) ||
                              httpRequstEx.Message.Contains("The Internet connection appears to be offline", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal):
+                             httpRequstEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("Connection failure", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("An SSL error has occurred and a secure connection to the server cannot be made", StringComparison.Ordinal) ||
+                             httpRequstEx.Message.Contains("net_http_content_stream_copy_error", StringComparison.Ordinal):
                 case WebException webEx
                         when webEx.Message.Contains("Canceled", StringComparison.Ordinal) ||
                              webEx.Message.Contains("Socket closed", StringComparison.Ordinal) ||
