@@ -257,7 +257,7 @@ namespace AdelaideFuel.Storage
                 try
                 {
                     var fi = new FileInfo(GetFilePath(_directory, key));
-                    using var fs = fi.OpenWrite();
+                    using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                     JsonSerializer.Serialize(fs, data);
                     fs.Close();
 
@@ -287,7 +287,7 @@ namespace AdelaideFuel.Storage
                     Parallel.ForEach(items, (i) =>
                     {
                         var fi = new FileInfo(GetFilePath(_directory, i.key));
-                        using var fs = fi.OpenWrite();
+                        using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                         JsonSerializer.Serialize(fs, i.data);
                         fs.Close();
 
@@ -322,7 +322,7 @@ namespace AdelaideFuel.Storage
                     var fi = new FileInfo(GetFilePath(_directory, key));
                     if (fi.Exists)
                     {
-                        using var fs = fi.OpenWrite();
+                        using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                         JsonSerializer.Serialize(fs, data);
                         fs.Close();
 
