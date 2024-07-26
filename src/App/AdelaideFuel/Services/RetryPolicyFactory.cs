@@ -15,8 +15,11 @@ namespace AdelaideFuel.Services
 
         public PolicyBuilder GetNetRetryPolicy() =>
             _retryPolicyService.GetNativeNetRetryPolicy()
-                .Or<HttpRequestException>(e => e.StatusCode != HttpStatusCode.BadRequest &&
-                                               e.StatusCode != HttpStatusCode.NotFound &&
-                                               e.StatusCode != HttpStatusCode.InternalServerError);
+                .Or<HttpRequestException>(e => !e.StatusCode.HasValue || CanRetryStatusCode(e.StatusCode.Value));
+
+        private static bool CanRetryStatusCode(HttpStatusCode statusCode) =>
+            statusCode != HttpStatusCode.TooManyRequests &&
+            statusCode != HttpStatusCode.BadRequest &&
+            statusCode != HttpStatusCode.NotFound;
     }
 }
