@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
-    <PackageReference Include="Acr.UserDialogs" Version="9.0.0" />
+    <PackageReference Include="Acr.UserDialogs" Version="9.1.0" />
     <PackageReference Include="Cats.Build.Blacklist" Version="1.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
