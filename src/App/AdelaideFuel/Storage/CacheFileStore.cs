@@ -1,4 +1,5 @@
-﻿using AdelaideFuel.Services;
+﻿using AdelaideFuel.Storage;
+using AdelaideFuel.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -256,6 +257,8 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
+                    _directory.Create();
+
                     var fi = new FileInfo(GetFilePath(_directory, key));
                     using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                     JsonSerializer.Serialize(fs, data);
@@ -282,6 +285,8 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
+                    _directory.Create();
+
                     var expiresIn = GetExpectedExpiration(expireIn);
 
                     Parallel.ForEach(items, (i) =>
@@ -319,6 +324,8 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
+                    _directory.Create();
+
                     var fi = new FileInfo(GetFilePath(_directory, key));
                     if (fi.Exists)
                     {
