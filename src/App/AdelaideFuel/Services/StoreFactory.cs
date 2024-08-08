@@ -59,9 +59,12 @@ namespace AdelaideFuel.Services
             try
             {
                 var di = new DirectoryInfo(path);
-                foreach (var fi in di.GetFiles("*.*", SearchOption.AllDirectories))
+                if (di.Exists)
                 {
-                    size += fi.Length;
+                    foreach (var fi in di.GetFiles("*.*", SearchOption.AllDirectories))
+                    {
+                        size += fi.Length;
+                    }
                 }
             }
             catch (Exception ex)

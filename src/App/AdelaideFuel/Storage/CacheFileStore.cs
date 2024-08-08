@@ -18,7 +18,7 @@ namespace AdelaideFuel.Storage
 
         private readonly ILogger _logger;
 
-        private readonly DirectoryInfo _directory;
+        private readonly string _directoryPath;
         private readonly string _collectionName;
 
         private readonly object _lock = new object();
@@ -36,7 +36,7 @@ namespace AdelaideFuel.Storage
             if (string.IsNullOrEmpty(_collectionName))
                 throw new ArgumentException($"Collection name cannot be empty (type: '{typeof(T).FullName}')");
 
-            _directory = Directory.CreateDirectory(Path.Combine(baseDirectory, _collectionName));
+            _directoryPath = Path.Combine(baseDirectory, _collectionName);
         }
 
         public string Name => _collectionName;
@@ -75,7 +75,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
+                    Parallel.ForEach(CreateDirectory().GetFiles(), (fi) =>
                     {
                         using var fs = fi.OpenRead();
                         items.Add(JsonSerializer.Deserialize<T>(fs));
@@ -155,7 +155,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    items = _directory
+                    items = CreateDirectory()
                         .GetFiles()
                         .Select(i => (Path.GetFileNameWithoutExtension(i.Name), !IsFileExpired(i.FullName) ? ItemCacheState.Active : ItemCacheState.Expired))
                         .ToList();
@@ -203,7 +203,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    exists = _directory
+                    exists = CreateDirectory()
                         .EnumerateFiles()
                         .Where(i => includeExpired || !IsFileExpired(i.FullName))
                         .Any();
@@ -226,7 +226,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    count = _directory
+                    count = CreateDirectory()
                         .EnumerateFiles()
                         .Count(i => includeExpired || !IsFileExpired(i.FullName));
                 }
@@ -256,7 +256,9 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    CreateDirectory();
+
+                    var fi = new FileInfo(GetFilePath(_directoryPath, key));
                     using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                     JsonSerializer.Serialize(fs, data);
                     fs.Close();
@@ -282,11 +284,13 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
+                    CreateDirectory();
+
                     var expiresIn = GetExpectedExpiration(expireIn);
 
                     Parallel.ForEach(items, (i) =>
                     {
-                        var fi = new FileInfo(GetFilePath(_directory, i.key));
+                        var fi = new FileInfo(GetFilePath(_directoryPath, i.key));
                         using var fs = fi.Open(FileMode.Create, FileAccess.Write);
                         JsonSerializer.Serialize(fs, i.data);
                         fs.Close();
@@ -319,7 +323,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    var fi = new FileInfo(GetFilePath(_directoryPath, key));
                     if (fi.Exists)
                     {
                         using var fs = fi.Open(FileMode.Create, FileAccess.Write);
@@ -351,7 +355,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = new FileInfo(GetFilePath(_directory, key));
+                    var fi = new FileInfo(GetFilePath(_directoryPath, key));
                     if (fi.Exists)
                     {
                         fi.Delete();
@@ -377,7 +381,7 @@ namespace AdelaideFuel.Storage
                 {
                     Parallel.ForEach(keys, (k) =>
                     {
-                        var fi = new FileInfo(GetFilePath(_directory, k));
+                        var fi = new FileInfo(GetFilePath(_directoryPath, k));
                         if (fi.Exists)
                         {
                             fi.Delete();
@@ -404,7 +408,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
+                    Parallel.ForEach(CreateDirectory().GetFiles(), (fi) =>
                     {
                         if (IsFileExpired(fi.FullName))
                         {
@@ -430,7 +434,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    Parallel.ForEach(_directory.GetFiles(), (fi) =>
+                    Parallel.ForEach(CreateDirectory().GetFiles(), (fi) =>
                     {
                         fi.Delete();
                         Interlocked.Increment(ref count);
@@ -449,7 +453,8 @@ namespace AdelaideFuel.Storage
         #region Private Methods
         private FileInfo GetFile(string key, bool includeExpired)
         {
-            var filePath = GetFilePath(_directory, key);
+            var filePath = GetFilePath(_directoryPath, key);
+
             if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
             {
                 return new FileInfo(filePath);
@@ -464,7 +469,7 @@ namespace AdelaideFuel.Storage
 
             foreach (var k in keys)
             {
-                var filePath = GetFilePath(_directory, k);
+                var filePath = GetFilePath(_directoryPath, k);
                 if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
                 {
                     files.Add(new FileInfo(filePath));
@@ -479,7 +484,7 @@ namespace AdelaideFuel.Storage
             var data = new Dictionary<string, string>
             {
                 { "name", Name },
-                { "path", _directory.FullName }
+                { "path", _directoryPath }
             };
 
             if (!string.IsNullOrEmpty(key))
@@ -488,8 +493,8 @@ namespace AdelaideFuel.Storage
             _logger.Error(ex, data);
         }
 
-        private static string GetFilePath(DirectoryInfo di, string key)
-            => Path.Combine(di.FullName, $"{key}.json");
+        private static string GetFilePath(string directory, string key)
+            => Path.Combine(directory, $"{key}.json");
 
         private static DateTime GetExpectedExpiration(TimeSpan timeSpan)
         {
@@ -513,6 +518,9 @@ namespace AdelaideFuel.Storage
             var modified = File.GetLastWriteTimeUtc(filePath);
             return modified != Y2k && modified < DateTime.UtcNow;
         }
+
+        private DirectoryInfo CreateDirectory()
+            => Directory.CreateDirectory(_directoryPath);
 
         private static string GetCollectionNameByType()
         {
