@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <UseMauiEssentials>true</UseMauiEssentials>
-    <MauiVersion>8.0.71</MauiVersion>
+    <MauiVersion>8.0.80</MauiVersion>
     <LangVersion>latest</LangVersion>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
