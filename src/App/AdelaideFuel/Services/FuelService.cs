@@ -16,12 +16,12 @@ using System.Threading.Tasks;
 
 namespace AdelaideFuel.Services
 {
-    public class FuelService : BaseHttpService, IFuelService
+    public class FuelService : BaseService, IFuelService
     {
         private readonly static TimeSpan CacheExpireTimeSpan = TimeSpan.FromHours(12);
         private readonly static TimeSpan CachePricesExpireTimeSpan = TimeSpan.FromMinutes(60);
 
-        private readonly int[] _defaultRadii = new[] { 1, 3, 5, 10, 25, 50, int.MaxValue };
+        private readonly IReadOnlyList<int> _defaultRadii = [1, 3, 5, 10, 25, 50, int.MaxValue];
 
         private readonly IAppClock _clock;
 
@@ -209,7 +209,7 @@ namespace AdelaideFuel.Services
                 }
             }
 
-            result.prices ??= Array.Empty<SiteFuelPrice>();
+            result.prices ??= [];
 
             return result;
         }

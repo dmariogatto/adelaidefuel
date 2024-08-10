@@ -53,7 +53,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = GetFile(key, includeExpired);
+                    var fi = GetFileIfExists(key, includeExpired);
                     exists = fi is not null;
                 }
                 catch (Exception ex)
@@ -103,7 +103,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = GetFile(key, includeExpired);
+                    var fi = GetFileIfExists(key, includeExpired);
                     if (fi is not null)
                     {
                         using var fs = fi.OpenRead();
@@ -128,9 +128,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var files = GetFiles(keys, includeExpired);
-
-                    Parallel.ForEach(files, (fi) =>
+                    Parallel.ForEach(GetFilesIfExists(keys, includeExpired), (fi) =>
                     {
                         using var fs = fi.OpenRead();
                         items.Add(JsonSerializer.Deserialize<T>(fs));
@@ -180,7 +178,7 @@ namespace AdelaideFuel.Storage
             {
                 try
                 {
-                    var fi = GetFile(key, true);
+                    var fi = GetFileIfExists(key, true);
                     if (fi is not null)
                     {
                         expires = GetFileExpiration(fi.FullName);
@@ -451,7 +449,7 @@ namespace AdelaideFuel.Storage
         #endregion
 
         #region Private Methods
-        private FileInfo GetFile(string key, bool includeExpired)
+        private FileInfo GetFileIfExists(string key, bool includeExpired)
         {
             var filePath = GetFilePath(_directoryPath, key);
 
@@ -463,17 +461,14 @@ namespace AdelaideFuel.Storage
             return default;
         }
 
-        private List<FileInfo> GetFiles(IEnumerable<string> keys, bool includeExpired)
+        private IReadOnlyList<FileInfo> GetFilesIfExists(IEnumerable<string> keys, bool includeExpired)
         {
             var files = new List<FileInfo>();
 
             foreach (var k in keys)
             {
-                var filePath = GetFilePath(_directoryPath, k);
-                if (File.Exists(filePath) && (includeExpired || !IsFileExpired(filePath)))
-                {
-                    files.Add(new FileInfo(filePath));
-                }
+                if (GetFileIfExists(k, includeExpired) is FileInfo fi)
+                    files.Add(fi);
             }
 
             return files;
