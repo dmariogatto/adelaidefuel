@@ -65,6 +65,11 @@ public static class MauiProgram
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
                 handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
+
+                if (DeviceInfo.Version.Major <= 12)
+                {
+                    handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
+                }
 #elif ANDROID
 #elif ANDROID
                 MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.MapView.ViewAttachedToWindow), MapCustomHandler.MapViewAttachedToWindow);
