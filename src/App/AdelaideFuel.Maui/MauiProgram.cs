@@ -25,6 +25,10 @@ public static class MauiProgram
     {
         MigrateVersionTracking();
 
+#if ANDROID
+        AndroidSecureStorageWorkaroundAsync().Wait();
+#endif
+
         AppActions.OnAppAction += OnAppAction;
         VersionTracking.Track();
 
@@ -65,6 +69,11 @@ public static class MauiProgram
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
                 handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
+
+                if (DeviceInfo.Version.Major <= 12)
+                {
+                    handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
+                }
 #elif ANDROID
 #elif ANDROID
                 MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.MapView.ViewAttachedToWindow), MapCustomHandler.MapViewAttachedToWindow);
@@ -179,4 +188,20 @@ public static class MauiProgram
             return false;
         }
     }
+
+#if ANDROID
+    private static async Task AndroidSecureStorageWorkaroundAsync()
+    {
+        try
+        {
+            await SecureStorage.GetAsync("key").ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            var alias = $"{AppInfo.Current.PackageName}.microsoft.maui.essentials.preferences";
+            var preferences = Platform.AppContext.GetSharedPreferences(alias, Android.Content.FileCreationMode.Private);
+            preferences?.Edit()?.Clear()?.Commit();
+        }
+    }
+#endif
 }
