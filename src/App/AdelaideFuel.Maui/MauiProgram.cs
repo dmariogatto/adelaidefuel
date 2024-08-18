@@ -25,6 +25,10 @@ public static class MauiProgram
     {
         MigrateVersionTracking();
 
+#if ANDROID
+        AndroidSecureStorageWorkaroundAsync().Wait();
+#endif
+
         AppActions.OnAppAction += OnAppAction;
         VersionTracking.Track();
 
@@ -184,4 +188,20 @@ public static class MauiProgram
             return false;
         }
     }
+
+#if ANDROID
+    private static async Task AndroidSecureStorageWorkaroundAsync()
+    {
+        try
+        {
+            await SecureStorage.GetAsync("key").ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            var alias = $"{AppInfo.Current.PackageName}.microsoft.maui.essentials.preferences";
+            var preferences = Platform.AppContext.GetSharedPreferences(alias, Android.Content.FileCreationMode.Private);
+            preferences?.Edit()?.Clear()?.Commit();
+        }
+    }
+#endif
 }
