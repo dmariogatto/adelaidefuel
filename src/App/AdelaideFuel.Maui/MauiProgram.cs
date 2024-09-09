@@ -75,7 +75,6 @@ public static class MauiProgram
                     handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
                 }
 #elif ANDROID
-#elif ANDROID
                 MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.MapView.ViewAttachedToWindow), MapCustomHandler.MapViewAttachedToWindow);
 #endif
             })
