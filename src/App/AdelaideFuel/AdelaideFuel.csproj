@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <UseMauiEssentials>true</UseMauiEssentials>
-    <MauiVersion>8.0.80</MauiVersion>
+    <MauiVersion>8.0.82</MauiVersion>
     <LangVersion>latest</LangVersion>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -25,7 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
-    <PackageReference Include="NodaTime" Version="3.1.11" />
+    <PackageReference Include="NodaTime" Version="3.1.12" />
     <PackageReference Include="Plugin.StoreReview" Version="6.2.0" />
     <PackageReference Include="Polly" Version="8.4.1" />
     <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
