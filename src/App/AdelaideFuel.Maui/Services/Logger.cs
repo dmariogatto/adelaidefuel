@@ -60,25 +60,26 @@ namespace AdelaideFuel.Maui.Services
                 case TaskCanceledException _:
                 case TimeoutException _:
                 case OperationCanceledException _:
-                case HttpRequestException httpRequstEx
-                        when httpRequstEx.Message.Contains("No such host is known", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("The network connection was lost", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("A server with the specified hostname could not be found", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("The Internet connection appears to be offline", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("Connection failure", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("An SSL error has occurred and a secure connection to the server cannot be made", StringComparison.Ordinal) ||
-                             httpRequstEx.Message.Contains("net_http_content_stream_copy_error", StringComparison.Ordinal):
+                case HttpRequestException httpRequestEx
+                        when httpRequestEx.Message.Contains("The request timed out", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("No such host is known", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("The network connection was lost", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("A server with the specified hostname could not be found", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("The Internet connection appears to be offline", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("Could not connect to the server", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("Connection failure", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("An SSL error has occurred and a secure connection to the server cannot be made", StringComparison.Ordinal) ||
+                             httpRequestEx.Message.Contains("net_http_content_stream_copy_error", StringComparison.Ordinal):
                 case WebException webEx
                         when webEx.Message.Contains("Canceled", StringComparison.Ordinal) ||
                              webEx.Message.Contains("Socket closed", StringComparison.Ordinal) ||
                              webEx.Message.Contains("Socket is closed", StringComparison.Ordinal) ||
                              webEx.Message.Contains("No address associated with hostname", StringComparison.Ordinal) ||
-                             webEx.Message.Contains("Software caused connection abort", StringComparison.Ordinal):
+                             webEx.Message.Contains("Software caused connection abort", StringComparison.Ordinal) ||
+                             webEx.Message.Contains("unexpected end of stream", StringComparison.Ordinal):
                 case IOException ioEx
                         when ioEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal):
-                    return false;
                 default:
                     return true;
             }

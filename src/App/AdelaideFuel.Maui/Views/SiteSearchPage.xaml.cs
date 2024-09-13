@@ -32,5 +32,10 @@ namespace AdelaideFuel.Maui.Views
                 ViewModel.TappedCommand.ExecuteAsync(model);
             }
         }
+
+        private void OnSearchButtonPressed(object sender, EventArgs e)
+        {
+            Search.HideSoftInputAsync(CancellationToken.None);
+        }
     }
 }

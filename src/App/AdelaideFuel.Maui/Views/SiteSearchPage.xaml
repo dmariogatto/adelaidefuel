@@ -110,6 +110,7 @@
                 ios:SearchBar.SearchBarStyle="Minimal"
                 CancelButtonColor="{DynamicResource {x:Static styles:Keys.LinkColor}}"
                 PlaceholderColor="{DynamicResource PrimaryTextColor}"
+                SearchButtonPressed="OnSearchButtonPressed"
                 TextColor="{DynamicResource PrimaryTextColor}"
                 WidthRequest="{Binding Width, Source={x:RelativeSource AncestorType={x:Type Grid}}}" />
 
