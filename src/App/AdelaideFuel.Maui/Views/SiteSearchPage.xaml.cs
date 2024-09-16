@@ -35,7 +35,10 @@ namespace AdelaideFuel.Maui.Views
 
         private void OnSearchButtonPressed(object sender, EventArgs e)
         {
-            Search.HideSoftInputAsync(CancellationToken.None);
+            if (Search.IsSoftInputShowing())
+            {
+                Search.HideSoftInputAsync(CancellationToken.None);
+            }
         }
     }
 }
