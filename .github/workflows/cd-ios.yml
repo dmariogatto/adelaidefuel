@@ -21,6 +21,9 @@ on:
       dotnet-version-target:
         required: true
         type: string
+      dotnet-workload-version:
+        required: true
+        type: string
       xcode-version:
         required: true
         type: string      
@@ -115,7 +118,7 @@ jobs:
 
     - name: Install MAUI Workload
       shell: bash
-      run: dotnet workload install maui-ios --ignore-failed-sources
+      run: dotnet workload install maui-ios --version ${{ inputs.dotnet-workload-version }} --ignore-failed-sources
 
     - name: Publish iOS
       shell: bash
