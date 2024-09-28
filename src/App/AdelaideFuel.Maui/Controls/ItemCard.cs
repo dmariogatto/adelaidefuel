@@ -17,8 +17,8 @@ namespace AdelaideFuel.Maui.Controls
                 {
                     Brush = Colors.Black,
                     Opacity = 0.35f,
-                    Radius = 4.5f,
-                    Offset = new Point(4, 4),
+                    Radius = 1.75f,
+                    Offset = new Point(2, 2),
                 };
             }
         }
