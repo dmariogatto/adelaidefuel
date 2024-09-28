@@ -10,7 +10,8 @@ env:
   PROJECT_NAME: "AdelaideFuel"
   DOTNET_VERSION: 8.0.x  
   DOTNET_VERSION_TARGET: net8.0
-  XCODE_VERSION: 15.3
+  DOTNET_WORKLOAD_VERSION: 8.0.402
+  XCODE_VERSION: 15.4
 
 jobs:
 
@@ -23,6 +24,7 @@ jobs:
       projectName: ${{ env.PROJECT_NAME }}
       dotnetVersion: ${{ env.DOTNET_VERSION }}
       dotnetVersionTarget: ${{ env.DOTNET_VERSION_TARGET }}
+      dotnetWorkloadVersion: ${{ env.DOTNET_WORKLOAD_VERSION }}
       xcodeVersion: ${{ env.XCODE_VERSION }} 
     steps:
       - run: echo "Exposing env vars, because they can't be passed to nested workflows."
@@ -38,6 +40,7 @@ jobs:
       project-name: ${{ needs.vars.outputs.projectName }}
       dotnet-version: ${{ needs.vars.outputs.dotnetVersion }}
       dotnet-version-target: ${{ needs.vars.outputs.dotnetVersionTarget }}
+      dotnet-workload-version: ${{ needs.vars.outputs.dotnetWorkloadVersion }}
       xcode-version: ${{ needs.vars.outputs.xcodeVersion }}
       build-config: 'Release'
       build-number: ${{ github.run_number }}
@@ -64,6 +67,7 @@ jobs:
       project-name: ${{ needs.vars.outputs.projectName }}
       dotnet-version: ${{ needs.vars.outputs.dotnetVersion }}
       dotnet-version-target: ${{ needs.vars.outputs.dotnetVersionTarget }}
+      dotnet-workload-version: ${{ needs.vars.outputs.dotnetWorkloadVersion }}
       build-config: 'Release'
       build-number: ${{ github.run_number }}
       build-offset: ${{ vars.DROID_BUILD_OFFSET }}
