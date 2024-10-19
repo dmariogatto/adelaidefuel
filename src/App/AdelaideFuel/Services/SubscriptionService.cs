@@ -171,7 +171,7 @@ namespace AdelaideFuel.Services
                 {
                     if (connected)
                     {
-                        var items = await _inAppBilling.GetProductInfoAsync(ItemType.Subscription, _productId).ConfigureAwait(false);
+                        var items = await _inAppBilling.GetProductInfoAsync(ItemType.Subscription, new[] { _productId }).ConfigureAwait(false);
                         product = items?.FirstOrDefault();
 
                         if (product is not null)
@@ -354,8 +354,8 @@ namespace AdelaideFuel.Services
 
             try
             {
-                await _inAppBilling.FinalizePurchaseAsync(purchase.TransactionIdentifier).ConfigureAwait(false);
-                success = true;
+                var results = await _inAppBilling.FinalizePurchaseAsync(new[] { purchase.TransactionIdentifier }).ConfigureAwait(false);
+                success = results?.FirstOrDefault().Success ?? false;
             }
             catch (Exception ex)
             {
