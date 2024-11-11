@@ -1,6 +1,5 @@
 ﻿using AdelaideFuel.Maui.Styles;
 using AdelaideFuel.Services;
-using WeakEventManager = MvvmHelpers.WeakEventManager;
 
 namespace AdelaideFuel.Maui
 {

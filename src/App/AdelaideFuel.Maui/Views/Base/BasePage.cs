@@ -22,7 +22,7 @@ namespace AdelaideFuel.Maui.Views
 
         public virtual void OnDestory()
         {
-            ViewModel.OnDestory();
+            ViewModel.OnDestroy();
             this.TearDown();
         }
 

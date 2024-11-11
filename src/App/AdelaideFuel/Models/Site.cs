@@ -1,6 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Shared;
-using MvvmHelpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

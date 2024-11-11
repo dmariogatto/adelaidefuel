@@ -1,6 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
-using MvvmHelpers.Commands;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +15,10 @@ namespace AdelaideFuel.ViewModels
         public BaseUserEntityViewModel(
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
-            LoadEntitiesCommand = new AsyncCommand(LoadEntitiesAsync);
-            SaveEntitiesCommand = new AsyncCommand(SaveEntitiesAsync);
-            EntityTappedCommand = new AsyncCommand<IUserSortableEntity>(EntityTappedAsync);
-            EntityRemoveCommand = new AsyncCommand<IUserSortableEntity>(EntityRemoveAsync);
+            LoadEntitiesCommand = new AsyncRelayCommand(LoadEntitiesAsync);
+            SaveEntitiesCommand = new AsyncRelayCommand(SaveEntitiesAsync);
+            EntityTappedCommand = new AsyncRelayCommand<IUserSortableEntity>(EntityTappedAsync);
+            EntityRemoveCommand = new AsyncRelayCommand<IUserSortableEntity>(EntityRemoveAsync);
         }
 
         #region Overrides
@@ -26,14 +26,14 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
-            LoadEntitiesCommand.ExecuteAsync();
+            LoadEntitiesCommand.Execute(null);
         }
 
         public override void OnDisappearing()
         {
             base.OnDisappearing();
 
-            SaveEntitiesCommand.ExecuteAsync();
+            SaveEntitiesCommand.Execute(null);
         }
         #endregion
 
@@ -51,10 +51,10 @@ namespace AdelaideFuel.ViewModels
             protected set => SetProperty(ref _entities, value);
         }
 
-        public AsyncCommand LoadEntitiesCommand { get; private set; }
-        public AsyncCommand SaveEntitiesCommand { get; private set; }
-        public AsyncCommand<IUserSortableEntity> EntityTappedCommand { get; private set; }
-        public AsyncCommand<IUserSortableEntity> EntityRemoveCommand { get; private set; }
+        public AsyncRelayCommand LoadEntitiesCommand { get; private set; }
+        public AsyncRelayCommand SaveEntitiesCommand { get; private set; }
+        public AsyncRelayCommand<IUserSortableEntity> EntityTappedCommand { get; private set; }
+        public AsyncRelayCommand<IUserSortableEntity> EntityRemoveCommand { get; private set; }
 
         private async Task LoadEntitiesAsync()
         {

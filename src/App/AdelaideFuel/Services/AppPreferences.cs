@@ -1,5 +1,5 @@
-﻿using Microsoft.Maui.Storage;
-using MvvmHelpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Storage;
 using System;
 
 namespace AdelaideFuel.Services

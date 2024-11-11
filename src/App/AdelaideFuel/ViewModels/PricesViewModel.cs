@@ -1,9 +1,9 @@
 ﻿using AdelaideFuel.Essentials;
 using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Networking;
-using MvvmHelpers.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,16 +33,16 @@ namespace AdelaideFuel.ViewModels
 
             Title = Resources.Prices;
 
-            LoadFuelPriceGroupsCommand = new AsyncCommand<CancellationToken>(LoadFuelPriceGroupsAsync);
-            FuelPriceTappedCommand = new AsyncCommand<SiteFuelPriceItem>((fp) => fp?.SiteId is not null
+            LoadFuelPriceGroupsCommand = new AsyncRelayCommand<CancellationToken>(LoadFuelPriceGroupsAsync);
+            FuelPriceTappedCommand = new AsyncRelayCommand<SiteFuelPriceItem>((fp) => fp?.SiteId is not null
                 ? NavigationService.NavigateToAsync<MapViewModel>(new Dictionary<string, string>()
                 {
                     { NavigationKeys.SiteIdQueryProperty, fp.SiteId.ToString() },
                     { NavigationKeys.FuelIdQueryProperty, fp.FuelId.ToString() }
                 })
                 : Task.CompletedTask);
-            GoToMapCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<MapViewModel>());
-            GoToSettingsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SettingsViewModel>());
+            GoToMapCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<MapViewModel>());
+            GoToSettingsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<SettingsViewModel>());
         }
 
         #region Overrides
@@ -106,10 +106,10 @@ namespace AdelaideFuel.ViewModels
             private set => SetProperty(ref _fuelPriceGroups, value);
         }
 
-        public AsyncCommand<CancellationToken> LoadFuelPriceGroupsCommand { get; private set; }
-        public AsyncCommand<SiteFuelPriceItem> FuelPriceTappedCommand { get; private set; }
-        public AsyncCommand GoToMapCommand { get; private set; }
-        public AsyncCommand GoToSettingsCommand { get; private set; }
+        public AsyncRelayCommand<CancellationToken> LoadFuelPriceGroupsCommand { get; private set; }
+        public AsyncRelayCommand<SiteFuelPriceItem> FuelPriceTappedCommand { get; private set; }
+        public AsyncRelayCommand GoToMapCommand { get; private set; }
+        public AsyncRelayCommand GoToSettingsCommand { get; private set; }
 
         private async Task LoadFuelPriceGroupsAsync(CancellationToken ct)
         {
