@@ -4,6 +4,15 @@ using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Services
 {
+    public static class BaseNavigationServiceExtensions
+    {
+        public static Page GetMainPage(this INavigationService navigationService)
+            => navigationService is BaseNavigationService service
+               ? service.CreateMainPage()
+               : null;
+    }
+
+
     public abstract class BaseNavigationService
     {
         protected readonly ILogger Logger;
@@ -14,6 +23,8 @@ namespace AdelaideFuel.Maui.Services
         {
             Logger = logger;
         }
+
+        public abstract Page CreateMainPage();
 
         public bool IsBusy { get; protected set; }
 

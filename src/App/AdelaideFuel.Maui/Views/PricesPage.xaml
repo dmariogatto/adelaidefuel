@@ -44,7 +44,7 @@
                     RowDefinitions="Auto,Auto,Auto,1"
                     RowSpacing="{StaticResource XSmallSpacing}">
                     <View.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding FuelPriceTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:PricesViewModel}}}" CommandParameter="{Binding}" />
+                        <TapGestureRecognizer Command="{Binding FuelPriceTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:PricesViewModel}}, x:DataType=viewModels:PricesViewModel}" CommandParameter="{Binding}" />
                     </View.GestureRecognizers>
                     <controls:BrandIconView Grid.RowSpan="3" BrandId="{Binding BrandId}" />
                     <Label

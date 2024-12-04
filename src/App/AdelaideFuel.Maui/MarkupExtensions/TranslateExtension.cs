@@ -6,6 +6,7 @@ using System.Resources;
 
 namespace AdelaideFuel.Maui
 {
+    [AcceptEmptyServiceProvider]
     [ContentProperty(nameof(Text))]
     public class TranslateExtension : IMarkupExtension
     {

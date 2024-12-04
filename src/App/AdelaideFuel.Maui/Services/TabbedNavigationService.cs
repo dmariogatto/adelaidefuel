@@ -1,7 +1,6 @@
 using AdelaideFuel.Maui.Views;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
-using MemoryToolkit.Maui;
 using System.Reflection;
 using NavigationPage_iOS = Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.NavigationPage;
 using TabbedPage_Droid = Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.TabbedPage;
@@ -18,7 +17,19 @@ namespace AdelaideFuel.Maui.Services
             typeof(SettingsViewModel)
         };
 
-        private NavigationPage MainPage => (NavigationPage)Application.Current.MainPage;
+        private NavigationPage MainPage
+        {
+            get
+            {
+                if (Application.Current.Windows.Count == 0)
+                    throw new InvalidOperationException("Application does not have any Windows initialised");
+                if (Application.Current.Windows[0].Page is not NavigationPage)
+                    throw new InvalidOperationException("Window[0].Page is not a NavigationPage");
+
+                return (NavigationPage)Application.Current.Windows[0].Page;
+            }
+        }
+
         private TabbedPage TabbedPage => MainPage?.RootPage as TabbedPage;
 
         public TabbedNavigationService(ILogger logger) : base(logger)
@@ -29,9 +40,9 @@ namespace AdelaideFuel.Maui.Services
             ? (tp.CurrentPage as NavigationPage)?.RootPage?.BindingContext as IViewModel
             : MainPage.CurrentPage.BindingContext as IViewModel;
 
-        public void Init()
+        public override Page CreateMainPage()
         {
-            if (Application.Current.MainPage is null)
+            if (Application.Current.Windows.Count == 0)
             {
                 var tabbedPage = new TabbedPage();
                 tabbedPage.SetDynamicResource(TabbedPage.StyleProperty, Styles.Keys.BaseTabbedPageStyle);
@@ -75,8 +86,10 @@ namespace AdelaideFuel.Maui.Services
 
                 var mainNavPage = new NavigationPage(tabbedPage);
                 mainNavPage.Popped += OnMainNavigationPopped;
-                Application.Current.MainPage = mainNavPage;
+                return mainNavPage;
             }
+
+            return MainPage;
         }
 
         public async Task NavigateToAsync<T>(IDictionary<string, string> parameters = null, bool animated = true) where T : IViewModel
@@ -106,9 +119,6 @@ namespace AdelaideFuel.Maui.Services
                 else
                 {
                     navigatedPage = CreatePage<T>();
-#if DEBUG
-                    LeakMonitorBehavior.SetCascade(navigatedPage, true);
-#endif
                     navFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
@@ -175,7 +185,7 @@ namespace AdelaideFuel.Maui.Services
 
                 foreach (var page in pages)
                 {
-                    page.OnDestory();
+                    page.OnDestroy();
                 }
             }
             catch (Exception ex)
@@ -194,7 +204,7 @@ namespace AdelaideFuel.Maui.Services
             {
                 if (e.Page is IBasePage page)
                 {
-                    page.OnDestory();
+                    page.OnDestroy();
                 }
             }
             catch (Exception ex)

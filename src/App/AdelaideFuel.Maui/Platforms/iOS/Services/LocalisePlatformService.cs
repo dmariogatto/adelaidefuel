@@ -6,7 +6,7 @@ namespace AdelaideFuel.Services
 {
     public class LocalisePlatformService : ILocalise
     {
-        private readonly IDictionary<string, CultureInfo> _cultures = new Dictionary<string, CultureInfo>();
+        private readonly Dictionary<string, CultureInfo> _cultures = new Dictionary<string, CultureInfo>(StringComparer.Ordinal);
 
         public void SetLocale(CultureInfo ci)
         {
@@ -16,41 +16,38 @@ namespace AdelaideFuel.Services
 
         public CultureInfo GetCurrentCultureInfo()
         {
-            var netLanguage = iOSToDotnetLanguage(NSLocale.PreferredLanguages.FirstOrDefault() ?? "en");
+            var iosLanguage = NSLocale.PreferredLanguages.FirstOrDefault() ?? "en";
 
-            if (!_cultures.ContainsKey(netLanguage))
+            if (!_cultures.TryGetValue(iosLanguage, out var ci))
             {
-                // this gets called a lot - try/catch can be expensive so consider caching or something
-                CultureInfo ci = null;
+                var netLanguage = iOSToDotnetLanguage(iosLanguage);
+
                 try
                 {
                     ci = new CultureInfo(netLanguage);
                 }
-                catch (CultureNotFoundException e1)
+                catch (CultureNotFoundException ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(e1);
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
 
-                    // locale not valid .NET culture (eg. "en-ES" : English in Spain)
-                    // fallback to first characters, in this case "en"
+                if (ci is null)
+                {
                     try
                     {
                         var fallback = ToDotnetFallbackLanguage(new PlatformCulture(netLanguage));
                         ci = new CultureInfo(fallback);
                     }
-                    catch (CultureNotFoundException e2)
+                    catch (CultureNotFoundException ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(e2);
-
-                        // language not valid .NET culture, falling back to English
-                        ci = new CultureInfo("en");
+                        System.Diagnostics.Debug.WriteLine(ex);
                     }
                 }
 
-                if (ci is not null)
-                    _cultures.Add(netLanguage, ci);
+                _cultures.Add(iosLanguage, ci ??= new CultureInfo("en"));
             }
 
-            return _cultures[netLanguage];
+            return ci;
         }
 
         public bool Is24Hour
@@ -58,9 +55,10 @@ namespace AdelaideFuel.Services
 
         private string iOSToDotnetLanguage(string iOSLanguage)
         {
-            var netLanguage = iOSLanguage;
+            var netLanguage = iOSLanguage.Replace("_", "-");
+
             //certain languages need to be converted to CultureInfo equivalent
-            switch (iOSLanguage)
+            switch (netLanguage)
             {
                 case "ms-MY":   // "Malaysian (Malaysia)" not supported .NET culture
                 case "ms-SG":   // "Malaysian (Singapore)" not supported .NET culture
@@ -72,12 +70,14 @@ namespace AdelaideFuel.Services
                     // add more application-specific cases here (if required)
                     // ONLY use cultures that have been tested and known to work
             }
+
             return netLanguage;
         }
 
         private string ToDotnetFallbackLanguage(PlatformCulture platCulture)
         {
             var netLanguage = platCulture.LanguageCode; // use the first part of the identifier (two chars, usually);
+
             switch (platCulture.LanguageCode)
             {
                 case "pt":
@@ -89,6 +89,7 @@ namespace AdelaideFuel.Services
                     // add more application-specific cases here (if required)
                     // ONLY use cultures that have been tested and known to work
             }
+
             return netLanguage;
         }
     }

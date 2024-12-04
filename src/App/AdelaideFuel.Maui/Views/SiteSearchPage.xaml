@@ -112,7 +112,7 @@
                 PlaceholderColor="{DynamicResource PrimaryTextColor}"
                 SearchButtonPressed="OnSearchButtonPressed"
                 TextColor="{DynamicResource PrimaryTextColor}"
-                WidthRequest="{Binding Width, Source={x:RelativeSource AncestorType={x:Type Grid}}}" />
+                WidthRequest="{Binding Width, Source={x:RelativeSource AncestorType={x:Type Grid}}, x:DataType=Grid}" />
 
             <Label
                 Grid.Row="1"
