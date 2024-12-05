@@ -20,7 +20,7 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 
     <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
@@ -73,7 +73,7 @@
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
 
     <PackageReference Include="Acr.UserDialogs" Version="9.1.0" />
-    <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.15" />
+    <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.16" />
     <PackageReference Include="BetterMaps.Maui" Version="1.0.0" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre2" />
     <PackageReference Include="FFImageLoadingCompat.Maui" Version="0.1.1" />
