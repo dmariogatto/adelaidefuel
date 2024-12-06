@@ -110,4 +110,10 @@
     <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true" />
   </ItemGroup>
 
+  <Target Name="SelectStaticRegistrar" AfterTargets="SelectRegistrar">
+    <PropertyGroup Condition="'$(Registrar)' == 'managed-static'">
+      <Registrar>static</Registrar>
+    </PropertyGroup>
+  </Target>
+
 </Project>
