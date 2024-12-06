@@ -134,7 +134,7 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
 
     - name: Upload to TestFlight
-      uses: apple-actions/upload-testflight-build@v1
+      uses: henrik1/upload-testflight@v2
       with:
         app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-name }}.Maui.ipa
         issuer-id: ${{ secrets.appstore-issuer }}
