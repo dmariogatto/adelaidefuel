@@ -8,10 +8,10 @@ env:
   PROJECT_FOLDER: "src/App/AdelaideFuel.Maui"
   PROJECT_FILE: "src/App/AdelaideFuel.Maui/AdelaideFuel.Maui.csproj"
   PROJECT_NAME: "AdelaideFuel"
-  DOTNET_VERSION: 8.0.x  
-  DOTNET_VERSION_TARGET: net8.0
-  DOTNET_WORKLOAD_VERSION: 8.0.402
-  XCODE_VERSION: 15.4
+  DOTNET_VERSION: 9.0.x  
+  DOTNET_VERSION_TARGET: net9.0
+  DOTNET_WORKLOAD_VERSION: 9.0.100
+  XCODE_VERSION: latest
 
 jobs:
 
