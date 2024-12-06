@@ -60,7 +60,7 @@ on:
 
 jobs:
   maui-ios:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
 
     - name: Set XCode version
