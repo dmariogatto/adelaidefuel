@@ -6,7 +6,7 @@ namespace AdelaideFuel.Services
 {
     public class LocalisePlatformService : ILocalise
     {
-        private readonly IDictionary<string, CultureInfo> _cultures = new Dictionary<string, CultureInfo>();
+        private readonly Dictionary<string, CultureInfo> _cultures = new Dictionary<string, CultureInfo>(StringComparer.Ordinal);
 
         public void SetLocale(CultureInfo ci)
         {
@@ -16,20 +16,23 @@ namespace AdelaideFuel.Services
 
         public CultureInfo GetCurrentCultureInfo()
         {
-            var netLanguage = AndroidToDotnetLanguage(Java.Util.Locale.Default.ToString().Replace("_", "-"));
+            var androidLanguage = Java.Util.Locale.Default.ToLanguageTag();
 
-            if (!_cultures.ContainsKey(netLanguage))
+            if (!_cultures.TryGetValue(androidLanguage, out var ci))
             {
-                // this gets called a lot - try/catch can be expensive so consider caching or something
-                CultureInfo ci = null;
+                var netLanguage = AndroidToDotnetLanguage(androidLanguage);
+
                 try
                 {
                     ci = new CultureInfo(netLanguage);
                 }
-                catch (CultureNotFoundException e1)
+                catch (CultureNotFoundException ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(e1);
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
 
+                if (ci is null)
+                {
                     // locale not valid .NET culture (eg. "en-ES" : English in Spain)
                     // fallback to first characters, in this case "en"
                     try
@@ -37,20 +40,16 @@ namespace AdelaideFuel.Services
                         var fallback = ToDotnetFallbackLanguage(new PlatformCulture(netLanguage));
                         ci = new CultureInfo(fallback);
                     }
-                    catch (CultureNotFoundException e2)
+                    catch (CultureNotFoundException ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(e2);
-
-                        // language not valid .NET culture, falling back to English
-                        ci = new CultureInfo("en");
+                        System.Diagnostics.Debug.WriteLine(ex);
                     }
                 }
 
-                if (ci is not null)
-                    _cultures.Add(netLanguage, ci);
+                _cultures.Add(androidLanguage, ci ??= new CultureInfo("en"));
             }
 
-            return _cultures[netLanguage];
+            return ci;
         }
 
         public bool Is24Hour
@@ -58,9 +57,10 @@ namespace AdelaideFuel.Services
 
         private string AndroidToDotnetLanguage(string androidLanguage)
         {
-            var netLanguage = androidLanguage;
+            var netLanguage = androidLanguage.Replace("_", "-");
+
             //certain languages need to be converted to CultureInfo equivalent
-            switch (androidLanguage)
+            switch (netLanguage)
             {
                 case "ms-BN":   // "Malaysian (Brunei)" not supported .NET culture
                 case "ms-MY":   // "Malaysian (Malaysia)" not supported .NET culture
@@ -76,12 +76,14 @@ namespace AdelaideFuel.Services
                     // add more application-specific cases here (if required)
                     // ONLY use cultures that have been tested and known to work
             }
+
             return netLanguage;
         }
 
         private string ToDotnetFallbackLanguage(PlatformCulture platCulture)
         {
             var netLanguage = platCulture.LanguageCode; // use the first part of the identifier (two chars, usually);
+
             switch (platCulture.LanguageCode)
             {
                 case "gsw":
@@ -90,6 +92,7 @@ namespace AdelaideFuel.Services
                     // add more application-specific cases here (if required)
                     // ONLY use cultures that have been tested and known to work
             }
+
             return netLanguage;
         }
     }

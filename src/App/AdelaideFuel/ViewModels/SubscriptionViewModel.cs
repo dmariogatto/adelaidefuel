@@ -1,8 +1,8 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Services;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices;
-using MvvmHelpers.Commands;
 using Plugin.InAppBilling;
 using System;
 using System.Threading.Tasks;
@@ -37,13 +37,13 @@ namespace AdelaideFuel.ViewModels
 
             _subscriptionService = subscriptionService;
 
-            LoadProductCommand = new AsyncCommand(LoadProductAsync);
-            LoadProductCommand.ExecuteAsync();
+            LoadProductCommand = new AsyncRelayCommand(LoadProductAsync);
+            LoadProductCommand.Execute(null);
 
-            PurchaseCommand = new AsyncCommand(PurchaseAsync);
-            RestorePurchasesCommand = new AsyncCommand(RestorePurchasesAsync);
+            PurchaseCommand = new AsyncRelayCommand(PurchaseAsync);
+            RestorePurchasesCommand = new AsyncRelayCommand(RestorePurchasesAsync);
 
-            ManageSubscriptionsCommand = new AsyncCommand(ManageSubscriptionsAsync);
+            ManageSubscriptionsCommand = new AsyncRelayCommand(ManageSubscriptionsAsync);
         }
 
         #region Overrides
@@ -79,10 +79,10 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        public AsyncCommand LoadProductCommand { get; private set; }
-        public AsyncCommand PurchaseCommand { get; private set; }
-        public AsyncCommand RestorePurchasesCommand { get; private set; }
-        public AsyncCommand ManageSubscriptionsCommand { get; private set; }
+        public AsyncRelayCommand LoadProductCommand { get; private set; }
+        public AsyncRelayCommand PurchaseCommand { get; private set; }
+        public AsyncRelayCommand RestorePurchasesCommand { get; private set; }
+        public AsyncRelayCommand ManageSubscriptionsCommand { get; private set; }
 
         private async Task LoadProductAsync()
         {

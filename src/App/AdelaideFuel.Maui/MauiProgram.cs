@@ -10,7 +10,6 @@ using BetterMaps.Maui;
 using BetterMaps.Maui.Handlers;
 using Cats.Maui.AdMob;
 using FFImageLoading.Maui;
-using MemoryToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
@@ -97,8 +96,6 @@ public static class MauiProgram
 #if DEBUG
         // Configure logging
         builder.Logging.AddDebug();
-        // Ensure UseLeakDetection is called after logging has been configured!
-        builder.UseLeakDetection();
 #endif
 
         builder.Services.AddSingleton<IMapCache, MapCache>();

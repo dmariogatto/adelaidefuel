@@ -1,6 +1,5 @@
 ﻿using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Models;
-using MvvmHelpers;
 using System.Collections.Specialized;
 
 namespace AdelaideFuel.Maui.Controls

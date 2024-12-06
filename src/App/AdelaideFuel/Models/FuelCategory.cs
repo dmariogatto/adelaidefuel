@@ -1,4 +1,4 @@
-﻿using MvvmHelpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Diagnostics;
 
 namespace AdelaideFuel.Models

@@ -1,10 +1,10 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Services;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Devices;
-using MvvmHelpers.Commands;
 using Plugin.StoreReview.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -48,27 +48,27 @@ namespace AdelaideFuel.ViewModels
 
             Themes = Enum.GetNames(typeof(Theme));
 
-            LoadSettingsCommand = new Command(() =>
+            LoadSettingsCommand = new RelayCommand(() =>
             {
                 OnPropertyChanged(nameof(LogDataSize));
                 OnPropertyChanged(nameof(CacheDataSize));
             });
 
-            SendFeedbackCommand = new AsyncCommand(SendFeedbackAsync);
-            RateAppCommand = new Command(RateApp);
-            OpenAppSettingsCommand = new Command(_appInfo.ShowSettingsUI);
-            GoToSubscriptionCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SubscriptionViewModel>());
-            GoToBrandsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
-            GoToFuelsCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<FuelsViewModel>());
-            GoToRadiiCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
-            GenerateTestCrashCommand = new Command(() =>
+            SendFeedbackCommand = new AsyncRelayCommand(SendFeedbackAsync);
+            RateAppCommand = new RelayCommand(RateApp);
+            OpenAppSettingsCommand = new RelayCommand(_appInfo.ShowSettingsUI);
+            GoToSubscriptionCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<SubscriptionViewModel>());
+            GoToBrandsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
+            GoToFuelsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<FuelsViewModel>());
+            GoToRadiiCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
+            GenerateTestCrashCommand = new RelayCommand(() =>
             {
                 try { throw new Exception("Test Crash"); }
                 catch (Exception ex) { Logger.Error(ex); }
             });
-            ViewLogCommand = new AsyncCommand(ViewLogAsync);
-            DeleteLogCommand = new Command(DeleteLog);
-            ClearCacheCommand = new Command(ClearCache);
+            ViewLogCommand = new AsyncRelayCommand(ViewLogAsync);
+            DeleteLogCommand = new RelayCommand(DeleteLog);
+            ClearCacheCommand = new RelayCommand(ClearCache);
         }
 
         #region Overrides
@@ -120,18 +120,18 @@ namespace AdelaideFuel.ViewModels
 
         public IReadOnlyList<string> Themes { get; private set; } = [];
 
-        public Command LoadSettingsCommand { get; private set; }
-        public AsyncCommand SendFeedbackCommand { get; private set; }
-        public Command RateAppCommand { get; private set; }
-        public Command OpenAppSettingsCommand { get; private set; }
-        public AsyncCommand GoToSubscriptionCommand { get; private set; }
-        public AsyncCommand GoToBrandsCommand { get; private set; }
-        public AsyncCommand GoToFuelsCommand { get; private set; }
-        public AsyncCommand GoToRadiiCommand { get; private set; }
-        public Command GenerateTestCrashCommand { get; private set; }
-        public AsyncCommand ViewLogCommand { get; private set; }
-        public Command DeleteLogCommand { get; private set; }
-        public Command ClearCacheCommand { get; private set; }
+        public RelayCommand LoadSettingsCommand { get; private set; }
+        public AsyncRelayCommand SendFeedbackCommand { get; private set; }
+        public RelayCommand RateAppCommand { get; private set; }
+        public RelayCommand OpenAppSettingsCommand { get; private set; }
+        public AsyncRelayCommand GoToSubscriptionCommand { get; private set; }
+        public AsyncRelayCommand GoToBrandsCommand { get; private set; }
+        public AsyncRelayCommand GoToFuelsCommand { get; private set; }
+        public AsyncRelayCommand GoToRadiiCommand { get; private set; }
+        public RelayCommand GenerateTestCrashCommand { get; private set; }
+        public AsyncRelayCommand ViewLogCommand { get; private set; }
+        public RelayCommand DeleteLogCommand { get; private set; }
+        public RelayCommand ClearCacheCommand { get; private set; }
 
         private async Task SendFeedbackAsync()
         {

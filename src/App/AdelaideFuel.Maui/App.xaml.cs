@@ -1,4 +1,4 @@
-﻿using AdelaideFuel.Models;
+﻿using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
 using Cats.Maui.AdMob;
@@ -21,9 +21,15 @@ public partial class App : Application
 
         ThemeManager.LoadTheme();
         RequestedThemeChanged += (_, _) => ThemeManager.OsThemeChanged();
+    }
 
-        IoC.Resolve<INavigationService>().Init();
+    protected override Window CreateWindow(IActivationState activationState)
+    {
+        var mainPage = IoC.Resolve<INavigationService>().GetMainPage();
+
         _ = AppReviewRequestAsync();
+
+        return new Window(mainPage);
     }
 
     protected override void OnStart()

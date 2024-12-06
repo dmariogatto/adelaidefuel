@@ -3,11 +3,10 @@ using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
 using AdelaideFuel.Shared;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Devices.Sensors;
-using MvvmHelpers;
-using MvvmHelpers.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -64,15 +63,15 @@ namespace AdelaideFuel.ViewModels
             Fuels = new ObservableRangeCollection<UserFuel>();
             FuelCategories = new ObservableRangeCollection<FuelCategory>();
 
-            LoadSitesCommand = new AsyncCommand<UserFuel>(LoadSitesAsync);
-            LoadFuelsCommand = new AsyncCommand<int>(LoadFuelsAsync);
-            LaunchMapCommand = new AsyncCommand<Site>(LaunchMapAsync);
-            GoToSiteSearchCommand = new AsyncCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>(new Dictionary<string, string>()
+            LoadSitesCommand = new AsyncRelayCommand<UserFuel>(LoadSitesAsync);
+            LoadFuelsCommand = new AsyncRelayCommand<int>(LoadFuelsAsync);
+            LaunchMapCommand = new AsyncRelayCommand<Site>(LaunchMapAsync);
+            GoToSiteSearchCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<SiteSearchViewModel>(new Dictionary<string, string>()
             {
                 { NavigationKeys.FuelIdQueryProperty, (Fuel?.Id ?? -1).ToString()  }
             }));
 
-            CheckAndRequestLocationCommand = new AsyncCommand(CheckAndRequestLocationAsync);
+            CheckAndRequestLocationCommand = new AsyncRelayCommand(CheckAndRequestLocationAsync);
         }
 
         #region Overrides
@@ -80,7 +79,7 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
-            CheckAndRequestLocationCommand.ExecuteAsync();
+            CheckAndRequestLocationCommand.Execute(null);
 
             TrackEvent(Events.PageView.MapView);
         }
@@ -176,12 +175,12 @@ namespace AdelaideFuel.ViewModels
         public ObservableRangeCollection<UserFuel> Fuels { get; private set; }
         public ObservableRangeCollection<FuelCategory> FuelCategories { get; private set; }
 
-        public AsyncCommand<int> LoadFuelsCommand { get; private set; }
-        public AsyncCommand<UserFuel> LoadSitesCommand { get; private set; }
-        public AsyncCommand<Site> LaunchMapCommand { get; private set; }
-        public AsyncCommand GoToSiteSearchCommand { get; private set; }
+        public AsyncRelayCommand<int> LoadFuelsCommand { get; private set; }
+        public AsyncRelayCommand<UserFuel> LoadSitesCommand { get; private set; }
+        public AsyncRelayCommand<Site> LaunchMapCommand { get; private set; }
+        public AsyncRelayCommand GoToSiteSearchCommand { get; private set; }
 
-        public AsyncCommand CheckAndRequestLocationCommand { get; private set; }
+        public AsyncRelayCommand CheckAndRequestLocationCommand { get; private set; }
 
         private async Task LoadFuelsAsync(int defaultFuelId)
         {

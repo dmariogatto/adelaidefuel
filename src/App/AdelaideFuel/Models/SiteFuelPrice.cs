@@ -1,5 +1,5 @@
 ﻿using AdelaideFuel.Shared;
-using MvvmHelpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
 

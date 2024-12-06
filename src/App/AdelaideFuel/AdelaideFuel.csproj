@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <UseMauiEssentials>true</UseMauiEssentials>
-    <MauiVersion>8.0.92</MauiVersion>
+    <MauiVersion>9.0.12</MauiVersion>
     <LangVersion>latest</LangVersion>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -18,18 +18,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
     <PackageReference Include="Acr.UserDialogs" Version="9.1.0" />
     <PackageReference Include="Cats.Build.Blacklist" Version="1.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
     <PackageReference Include="NodaTime" Version="3.2.0" />
     <PackageReference Include="Plugin.StoreReview" Version="6.2.0" />
-    <PackageReference Include="Polly" Version="8.4.2" />
-    <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
-    <PackageReference Include="Plugin.InAppBilling" Version="9.0.2-beta" />
+    <PackageReference Include="Polly" Version="8.5.0" />
+    <PackageReference Include="Plugin.InAppBilling" Version="9.0.5-beta" />
   </ItemGroup>
 
   <ItemGroup>

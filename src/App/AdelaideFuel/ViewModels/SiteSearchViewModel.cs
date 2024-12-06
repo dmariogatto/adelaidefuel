@@ -1,8 +1,7 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
 using AdelaideFuel.Shared;
-using MvvmHelpers;
-using MvvmHelpers.Commands;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,9 +24,9 @@ namespace AdelaideFuel.ViewModels
         {
             Title = Resources.Stations;
 
-            LoadCommand = new AsyncCommand(LoadAsync);
-            SearchCommand = new AsyncCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
-            TappedCommand = new AsyncCommand<SiteFuelPrice>(TappedAsync);
+            LoadCommand = new AsyncRelayCommand(LoadAsync);
+            SearchCommand = new AsyncRelayCommand<(string, CancellationToken)>(t => SearchAsync(t.Item1, t.Item2));
+            TappedCommand = new AsyncRelayCommand<SiteFuelPrice>(TappedAsync);
         }
 
         #region Overrides
@@ -35,7 +34,7 @@ namespace AdelaideFuel.ViewModels
         {
             base.OnAppearing();
 
-            LoadCommand.ExecuteAsync();
+            LoadCommand.Execute(null);
 
             TrackEvent(Events.PageView.SiteSearchView);
         }
@@ -72,9 +71,9 @@ namespace AdelaideFuel.ViewModels
             private set => SetProperty(ref _filteredSites, value);
         }
 
-        public AsyncCommand LoadCommand { get; private set; }
-        public AsyncCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
-        public AsyncCommand<SiteFuelPrice> TappedCommand { get; private set; }
+        public AsyncRelayCommand LoadCommand { get; private set; }
+        public AsyncRelayCommand<(string searchText, CancellationToken ct)> SearchCommand { get; private set; }
+        public AsyncRelayCommand<SiteFuelPrice> TappedCommand { get; private set; }
 
         private async Task LoadAsync()
         {

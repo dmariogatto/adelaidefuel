@@ -1,10 +1,11 @@
 ﻿using AdelaideFuel.Maui.Converters;
 using AdelaideFuel.Maui.Extensions;
 using FFImageLoading.Maui;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace AdelaideFuel.Maui.Controls
 {
-    public class BrandIconView : Frame
+    public class BrandIconView : Border
     {
         private static readonly BrandIdToIconConverter IconConverter = new BrandIdToIconConverter();
 
@@ -17,8 +18,6 @@ namespace AdelaideFuel.Maui.Controls
 
         public BrandIconView()
         {
-            HasShadow = false;
-
             BackgroundColor = Colors.Transparent;
 
             HorizontalOptions = LayoutOptions.Center;
@@ -49,7 +48,7 @@ namespace AdelaideFuel.Maui.Controls
             {
                 HeightRequest = value;
                 WidthRequest = value;
-                CornerRadius = (float)value / 2f;
+                StrokeShape = new RoundRectangle { CornerRadius = (float)value / 2f };
 
                 Content.HeightRequest = value;
                 Content.WidthRequest = value;

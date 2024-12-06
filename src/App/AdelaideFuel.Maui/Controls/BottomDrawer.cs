@@ -1,8 +1,10 @@
-﻿namespace AdelaideFuel.Maui.Controls
+﻿using Microsoft.Maui.Controls.Shapes;
+
+namespace AdelaideFuel.Maui.Controls
 {
     // https://github.com/galadril/Xam.Plugin.SimpleBottomDrawer
 
-    public class BottomDrawer : Frame
+    public class BottomDrawer : Border
     {
         #region Variables
 
@@ -44,7 +46,6 @@
 
         #endregion Variables
 
-
         #region Constructor & Destructor
 
         /// <summary>
@@ -54,8 +55,14 @@
         {
             // Set the default values for this control
             SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
-            CornerRadius = 18;
-            HasShadow = true;
+            StrokeShape = new RoundRectangle { CornerRadius = 18 };
+            Shadow = new Shadow()
+            {
+                Brush = Colors.Black,
+                Opacity = 0.45f,
+                Radius = 4.75f,
+                Offset = new Point(0, 0),
+            };
 
             // Set the pan gesture listeners
             var panGestures = new PanGestureRecognizer();
@@ -69,7 +76,6 @@
         }
 
         #endregion
-
 
         #region Properties
 
@@ -103,7 +109,6 @@
 
         #endregion
 
-
         #region Protected
 
         /// <summary>
@@ -121,7 +126,6 @@
         }
 
         #endregion Protected
-
 
         #region Private
 
@@ -266,7 +270,6 @@
         }
 
         #endregion
-
 
         #region Public
 

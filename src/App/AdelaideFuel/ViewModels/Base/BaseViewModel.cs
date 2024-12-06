@@ -1,14 +1,15 @@
 ﻿using Acr.UserDialogs;
 using AdelaideFuel.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
-using MvvmHelpers.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AdelaideFuel.ViewModels
 {
-    public abstract class BaseViewModel : MvvmHelpers.BaseViewModel, IViewModel
+    public abstract class BaseViewModel : ObservableObject, IViewModel
     {
         protected readonly IFuelService FuelService;
         protected readonly INavigationService NavigationService;
@@ -31,8 +32,8 @@ namespace AdelaideFuel.ViewModels
             _browser = bvmConstructor.Browser;
             _themeService = bvmConstructor.ThemeService;
 
-            OpenUrlCommand = new AsyncCommand<string>(OpenUrlAsync);
-            OpenUriCommand = new AsyncCommand<Uri>(OpenUriAsync);
+            OpenUrlCommand = new AsyncRelayCommand<string>(OpenUrlAsync);
+            OpenUriCommand = new AsyncRelayCommand<Uri>(OpenUriAsync);
         }
 
         public void TrackEvent(string eventName, IReadOnlyDictionary<string, string> properties = null) =>
@@ -43,8 +44,8 @@ namespace AdelaideFuel.ViewModels
             Logger.Event(eventName, new Dictionary<string, string>()
                 { { Events.Property.Old, oldVal.ToString() }, { Events.Property.New, newVal.ToString() } });
 
-        public AsyncCommand<string> OpenUrlCommand { get; private set; }
-        public AsyncCommand<Uri> OpenUriCommand { get; private set; }
+        public AsyncRelayCommand<string> OpenUrlCommand { get; private set; }
+        public AsyncRelayCommand<Uri> OpenUriCommand { get; private set; }
 
         public virtual void OnCreate()
         {
@@ -58,8 +59,22 @@ namespace AdelaideFuel.ViewModels
         {
         }
 
-        public virtual void OnDestory()
+        public virtual void OnDestroy()
         {
+        }
+
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
+
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set => SetProperty(ref _isBusy, value);
         }
 
 #if DEBUG

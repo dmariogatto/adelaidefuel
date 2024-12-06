@@ -1,6 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
-using MvvmHelpers.Commands;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,8 +15,8 @@ namespace AdelaideFuel.ViewModels
             Title = Resources.Radii;
             EntityName = Resources.Radius;
 
-            ResetRadiiCommand = new AsyncCommand(ResetRadiiAsync);
-            AddRadiusCommand = new AsyncCommand(AddRadiusAsync);
+            ResetRadiiCommand = new AsyncRelayCommand(ResetRadiiAsync);
+            AddRadiusCommand = new AsyncRelayCommand(AddRadiusAsync);
         }
 
         #region Overrides
@@ -28,8 +28,8 @@ namespace AdelaideFuel.ViewModels
         }
         #endregion
 
-        public AsyncCommand ResetRadiiCommand { get; private set; }
-        public AsyncCommand AddRadiusCommand { get; private set; }
+        public AsyncRelayCommand ResetRadiiCommand { get; private set; }
+        public AsyncRelayCommand AddRadiusCommand { get; private set; }
 
         private async Task ResetRadiiAsync()
         {
@@ -47,7 +47,7 @@ namespace AdelaideFuel.ViewModels
                     await FuelService.RemoveUserRadiiAsync(radii, default);
                     await FuelService.SyncRadiiAsync(default);
 
-                    await LoadEntitiesCommand.ExecuteAsync();
+                    await LoadEntitiesCommand.ExecuteAsync(null);
                 }
             }
             catch (Exception ex)

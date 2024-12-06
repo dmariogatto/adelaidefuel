@@ -7,6 +7,6 @@ namespace AdelaideFuel.ViewModels
         void OnCreate();
         void OnAppearing();
         void OnDisappearing();
-        void OnDestory();
+        void OnDestroy();
     }
 }

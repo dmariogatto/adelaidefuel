@@ -39,7 +39,7 @@
                         </DataTrigger>
                     </View.Triggers>
                     <View.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding EntityRemoveCommand, Mode=OneTime, Source={x:RelativeSource AncestorType={x:Type viewModels:RadiiViewModel}}}" CommandParameter="{Binding ., Mode=OneTime}" />
+                        <TapGestureRecognizer Command="{Binding EntityRemoveCommand, Mode=OneTime, Source={x:RelativeSource AncestorType={x:Type viewModels:RadiiViewModel}}, x:DataType=viewModels:RadiiViewModel}" CommandParameter="{Binding ., Mode=OneTime}" />
                     </View.GestureRecognizers>
                     <controls:TintImage
                         HeightRequest="28"
