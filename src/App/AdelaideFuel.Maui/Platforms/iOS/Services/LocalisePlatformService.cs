@@ -51,7 +51,7 @@ namespace AdelaideFuel.Services
         }
 
         public bool Is24Hour
-            => !NSDateFormatter.GetDateFormatFromTemplate("j", 0, NSLocale.CurrentLocale).Contains("a");
+            => !NSDateFormatter.GetDateFormatFromTemplate("j", 0, NSLocale.CurrentLocale).Contains('a');
 
         private string iOSToDotnetLanguage(string iOSLanguage)
         {
