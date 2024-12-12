@@ -19,6 +19,7 @@ namespace AdelaideFuel.Maui.Controls
         public BrandIconView()
         {
             BackgroundColor = Colors.Transparent;
+            StrokeThickness = 0;
 
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Center;
