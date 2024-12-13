@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <UseMauiEssentials>true</UseMauiEssentials>
-    <MauiVersion>9.0.14</MauiVersion>
+    <MauiVersion>9.0.21</MauiVersion>
     <LangVersion>latest</LangVersion>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
     <PackageReference Include="Acr.UserDialogs" Version="9.1.0" />
     <PackageReference Include="Cats.Build.Blacklist" Version="1.1.0">
