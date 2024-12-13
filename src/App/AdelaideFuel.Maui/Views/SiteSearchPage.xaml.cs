@@ -21,8 +21,8 @@ namespace AdelaideFuel.Maui.Views
                 Search.SetDynamicResource(SearchBar.BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
             }
 
-            Search.SetBinding(SearchBar.TextProperty, new Binding(nameof(Query), source: this));
-            Search.SetBinding(SearchBar.PlaceholderProperty, new Binding(nameof(Placeholder), source: this));
+            Search.SetBinding(SearchBar.TextProperty, static (ISearchPage i) => i.Query, source: this);
+            Search.SetBinding(SearchBar.PlaceholderProperty, static (ISearchPage i) => i.Placeholder, mode: BindingMode.OneWay, source: this);
         }
 
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)

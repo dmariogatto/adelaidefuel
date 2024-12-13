@@ -117,18 +117,29 @@ namespace AdelaideFuel.Maui.Views
                 boxView.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PageBackgroundColor);
                 boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
 
-                boxView.SetBinding(HeightRequestProperty,
-                    new Binding(nameof(HeightRequest), source: _adBannerView));
-                boxView.SetBinding(IsVisibleProperty,
-                    new Binding(nameof(IsVisible), source: _adBannerView));
+                boxView.SetBinding(
+                    HeightRequestProperty,
+                    static (AdSmartBanner i) => i.HeightRequest,
+                    mode: BindingMode.OneWay,
+                    source: _adBannerView);
+                boxView.SetBinding(
+                    IsVisibleProperty,
+                    static (AdSmartBanner i) => i.IsVisible,
+                    mode: BindingMode.OneWay,
+                    source: _adBannerView);
 
-                adSkeleton.SetBinding(HeightRequestProperty,
-                    new Binding(nameof(HeightRequest), source: _adBannerView));
-                adSkeleton.SetBinding(IsVisibleProperty,
-                    new Binding(nameof(AdSmartBanner.AdStatus),
-                                converter: new InverseEqualityConverter(),
-                                converterParameter: AdLoadStatus.Loaded,
-                                source: _adBannerView));
+                adSkeleton.SetBinding(
+                    HeightRequestProperty,
+                    static (AdSmartBanner i) => i.HeightRequest,
+                    mode: BindingMode.OneWay,
+                    source: _adBannerView);
+                adSkeleton.SetBinding(
+                    IsVisibleProperty,
+                    static (AdSmartBanner i) => i.AdStatus,
+                    converter: new InverseEqualityConverter(),
+                    converterParameter: AdLoadStatus.Loaded,
+                    mode: BindingMode.OneWay,
+                    source: _adBannerView);
             }
 
             public string AdUnitId
