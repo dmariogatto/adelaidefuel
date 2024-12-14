@@ -87,12 +87,16 @@ namespace AdelaideFuel.Maui.Controls
                     HorizontalOptions = LayoutOptions.Center,
                     Source = Application.Current.FindResource<string>(Styles.Keys.TwoToneCircleImg),
                 };
-                tintImg.SetBinding(TintImage.TintColorProperty, new Binding(
-                    nameof(FuelCategory.PriceCategory),
-                    converter: _priceCategoryToColorConverter));
-                tintImg.SetBinding(SemanticProperties.DescriptionProperty, new Binding(
-                    nameof(FuelCategory.PriceCategory),
-                    converter: _enumToDescriptionConverter));
+                tintImg.SetBinding(
+                    TintImage.TintColorProperty,
+                    static (FuelCategory i) => i.PriceCategory,
+                    converter: _priceCategoryToColorConverter,
+                    mode: BindingMode.OneWay);
+                tintImg.SetBinding(
+                    SemanticProperties.DescriptionProperty,
+                    static (FuelCategory i) => i.PriceCategory,
+                    converter: _enumToDescriptionConverter,
+                    mode: BindingMode.OneWay);
 
                 lbl = new Label()
                 {
@@ -101,7 +105,7 @@ namespace AdelaideFuel.Maui.Controls
                     FontSize = Application.Current.FindResource<double>(Styles.FontSizes.Micro),
                 };
                 lbl.SetDynamicResource(StyleProperty, Styles.Keys.LabelStyle);
-                lbl.SetBinding(Label.TextProperty, new Binding(nameof(FuelCategory.Description)));
+                lbl.SetBinding(Label.TextProperty, static (FuelCategory i) => i.Description, mode: BindingMode.OneWay);
 
                 ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 this.Add(tintImg, ColumnDefinitions.Count - 1, 0);

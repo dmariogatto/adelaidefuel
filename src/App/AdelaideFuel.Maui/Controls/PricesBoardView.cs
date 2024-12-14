@@ -86,7 +86,7 @@ namespace AdelaideFuel.Maui.Controls
                     VerticalTextAlignment = TextAlignment.Center
                 };
                 fuelLbl.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                fuelLbl.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.FuelName)));
+                fuelLbl.SetBinding(Label.TextProperty, static (SiteFuelPrice i) => i.FuelName, mode: BindingMode.OneWay);
 
                 priceLbl = new Label()
                 {
@@ -97,12 +97,12 @@ namespace AdelaideFuel.Maui.Controls
                 };
 
                 priceLbl.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
-                priceLbl.SetBinding(Label.TextProperty, new Binding(nameof(SiteFuelPrice.PriceInCents), stringFormat: "{0:#.0}"));
+                priceLbl.SetBinding(Label.TextProperty, static (SiteFuelPrice i) => i.PriceInCents, stringFormat: "{0:#.0}", mode: BindingMode.OneWay);
 
                 var oosTrigger = new DataTrigger(typeof(View))
                 {
                     BindingContext = item,
-                    Binding = new Binding(nameof(SiteFuelPrice.PriceInCents)),
+                    Binding = Binding.Create(static (SiteFuelPrice i) => i.PriceInCents, mode: BindingMode.OneWay),
                     Value = Constants.OutOfStockPriceInCents
                 };
                 oosTrigger.Setters.Add(new Setter() { Property = View.OpacityProperty, Value = App.Current.FindResource<double>(Styles.Keys.UnselectedOpacity) });

@@ -32,11 +32,12 @@ namespace AdelaideFuel.Maui.Views
             if (DeviceInfo.Current.Idiom == DeviceIdiom.Tablet)
             {
                 BottomDrawerControl.HorizontalOptions = LayoutOptions.Center;
-                BottomDrawerControl.SetBinding(Page.WidthRequestProperty, new Binding(
-                    nameof(Width),
+                BottomDrawerControl.SetBinding(Page.WidthRequestProperty,
+                    static (MapPage i) => i.Width,
                     converter: App.Current.FindResource<IValueConverter>(nameof(MultiplyByConverter)),
                     converterParameter: 0.7d,
-                    source: this));
+                    mode: BindingMode.OneWay,
+                    source: this);
             }
 
             SiteMap.MoveToRegion(MapSpan.FromCenterAndRadius(

@@ -56,6 +56,7 @@ namespace AdelaideFuel.Maui.Controls
             // Set the default values for this control
             SetDynamicResource(BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
             StrokeShape = new RoundRectangle { CornerRadius = 18 };
+            StrokeThickness = 0;
             Shadow = new Shadow()
             {
                 Brush = Colors.Black,

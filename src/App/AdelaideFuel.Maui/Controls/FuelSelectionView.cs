@@ -38,10 +38,12 @@ namespace AdelaideFuel.Maui.Controls
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Start;
 
-            SetBinding(StrokeShapeProperty, new Binding(
-                nameof(Height),
+            this.SetBinding(
+                StrokeShapeProperty,
+                static (FuelSelectionView i) => i.Height,
                 converter: ToRoundRectangleConverter,
-                source: this));
+                mode: BindingMode.OneWay,
+                source: RelativeBindingSource.Self);
 
             var fuelImg = new TintImage()
             {
@@ -59,7 +61,7 @@ namespace AdelaideFuel.Maui.Controls
                 VerticalTextAlignment = TextAlignment.Center,
             };
             fuelLbl.SetDynamicResource(Label.StyleProperty, Styles.Keys.LabelStyle);
-            fuelLbl.SetBinding(Label.TextProperty, new Binding($"{nameof(SelectedFuel)}.{nameof(SelectedFuel.Name)}", source: this));
+            fuelLbl.SetBinding(Label.TextProperty, static (FuelSelectionView i) => i.SelectedFuel.Name, mode: BindingMode.OneWay, source: this);
 
             var stackLayout = new HorizontalStackLayout()
             {

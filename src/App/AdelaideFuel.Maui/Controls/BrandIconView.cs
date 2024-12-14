@@ -19,6 +19,7 @@ namespace AdelaideFuel.Maui.Controls
         public BrandIconView()
         {
             BackgroundColor = Colors.Transparent;
+            StrokeThickness = 0;
 
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Center;
@@ -31,9 +32,10 @@ namespace AdelaideFuel.Maui.Controls
 
             ffImg.SetBinding(
                 CachedImage.SourceProperty,
-                new Binding(nameof(BrandId),
-                    converter: IconConverter,
-                    source: this));
+                static (BrandIconView i) => i.BrandId,
+                converter: IconConverter,
+                mode: BindingMode.OneWay,
+                source: this);
 
             Content = ffImg;
 

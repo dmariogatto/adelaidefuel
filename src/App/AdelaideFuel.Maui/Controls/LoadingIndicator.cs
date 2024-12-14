@@ -30,12 +30,24 @@ namespace AdelaideFuel.Maui.Controls
                 WidthRequest = 24,
                 HeightRequest = 24
             };
-            activityIndicator.SetDynamicResource(ActivityIndicator.ColorProperty, Styles.Keys.PrimaryAccentColor);
-            activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty,
-                new Binding(nameof(IsBusy), source: this));
 
-            SetBinding(IsVisibleProperty, new Binding(nameof(IsBusy), source: this));
-            SetBinding(IsBusyProperty, new Binding(nameof(BaseViewModel.IsBusy)));
+            activityIndicator.SetDynamicResource(ActivityIndicator.ColorProperty, Styles.Keys.PrimaryAccentColor);
+
+            activityIndicator.SetBinding(
+                ActivityIndicator.IsRunningProperty,
+                static (LoadingIndicator i) => i.IsBusy,
+                mode: BindingMode.OneWay,
+                source: this);
+
+            this.SetBinding(
+                IsVisibleProperty,
+                static (LoadingIndicator i) => i.IsBusy,
+                mode: BindingMode.OneWay,
+                source: RelativeBindingSource.Self);
+            this.SetBinding(
+                IsBusyProperty,
+                static (BaseViewModel i) => i.IsBusy,
+                mode: BindingMode.OneWay);
 
             Content = activityIndicator;
         }
