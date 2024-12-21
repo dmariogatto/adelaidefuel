@@ -62,7 +62,6 @@
                 HorizontalOptions="End"
                 IsVisible="{Binding InitialLoadComplete}"
                 StrokeShape="RoundRectangle 22,22,22,22"
-                Style="{DynamicResource CardBorderStyle}"
                 VerticalOptions="Center"
                 WidthRequest="44">
                 <View.GestureRecognizers>
