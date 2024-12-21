@@ -35,6 +35,7 @@ namespace AdelaideFuel.Maui.Controls
             SetDynamicResource(StyleProperty, Styles.Keys.CardBorderStyle);
 
             Margin = Thickness.Zero;
+            Padding = App.Current.FindResource<Thickness>(Styles.Keys.SmallThickness);
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Start;
 
