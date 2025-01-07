@@ -75,7 +75,7 @@
                         FontAttributes="Italic"
                         FontSize="{DynamicResource {x:Static styles:FontSizes.Caption}}"
                         LineBreakMode="WordWrap"
-                        Text="{local:Translate BasedOnDataProvidedSa}"
+                        Text="{Binding CurrentYear, StringFormat={local:Translate OnDataProvidedBySaGovCurrentYearItem}}"
                         TextColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 </sv:CustomCell>
             </sv:Section>

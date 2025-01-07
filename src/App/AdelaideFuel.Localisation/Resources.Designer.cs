@@ -162,15 +162,6 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Based on or contains data provided by the State of South Australia (Office of Consumer and Business Services 2021-2024). Copyright of the State of South Australia.
-        /// </summary>
-        public static string BasedOnDataProvidedSa {
-            get {
-                return ResourceManager.GetString("BasedOnDataProvidedSa", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Brand.
         /// </summary>
         public static string Brand {
@@ -697,6 +688,15 @@ namespace AdelaideFuel.Localisation {
         public static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Based on or contains data provided by the State of South Australia (Office of Consumer and Business Services 2021-{0}). Copyright of the State of South Australia.
+        /// </summary>
+        public static string OnDataProvidedBySaGovCurrentYearItem {
+            get {
+                return ResourceManager.GetString("OnDataProvidedBySaGovCurrentYearItem", resourceCulture);
             }
         }
         
