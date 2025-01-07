@@ -82,6 +82,8 @@ namespace AdelaideFuel.ViewModels
         }
         #endregion
 
+        public int CurrentYear => DateTime.Today.Year;
+
         public string Version => _appInfo.VersionString;
         public string Build => _appInfo.BuildString;
 
