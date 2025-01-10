@@ -18,11 +18,11 @@ namespace AdelaideFuel.Maui.Views
 
             var pin = new Pin();
 
-            pin.SetBinding(Pin.AddressProperty, static (IMapPin i) => i.Description, mode: BindingMode.OneWay);
-            pin.SetBinding(Pin.LabelProperty, static (IMapPin i) => i.Label, mode: BindingMode.OneWay);
-            pin.SetBinding(Pin.ZIndexProperty, static (IMapPin i) => i.ZIndex, mode: BindingMode.OneWay);
-            pin.SetBinding(Pin.PositionProperty, static (IMapPin i) => i.Position, converter: PositionConverter, mode: BindingMode.OneWay);
-            pin.SetBinding(Pin.TintColorProperty, static (Site i) => i.PriceCategory, converter: PriceCategoryConverter, mode: BindingMode.OneWay);
+            pin.SetBinding(Pin.AddressProperty, new Binding(nameof(IMapPin.Description)));
+            pin.SetBinding(Pin.LabelProperty, new Binding(nameof(IMapPin.Label)));
+            pin.SetBinding(Pin.ZIndexProperty, new Binding(nameof(IMapPin.ZIndex)));
+            pin.SetBinding(Pin.PositionProperty, new Binding(nameof(IMapPin.Position), converter: PositionConverter));
+            pin.SetBinding(Pin.TintColorProperty, new Binding(nameof(Site.PriceCategory), converter: PriceCategoryConverter));
 
             pin.Anchor = new Point(0.5, 0.5);
             pin.ImageSource = Application.Current.FindResource<string>(Styles.Keys.TwoToneCircleImg);
