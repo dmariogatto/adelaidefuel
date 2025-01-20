@@ -15,5 +15,10 @@ namespace AdelaideFuel.Maui.Views
                 AccessibilitySection.Remove(ThemePicker);
             }
         }
+
+        private void BuildOnTapped(object sender, EventArgs e)
+        {
+            ViewModel.BuildTappedCommand.Execute(null);
+        }
     }
 }
