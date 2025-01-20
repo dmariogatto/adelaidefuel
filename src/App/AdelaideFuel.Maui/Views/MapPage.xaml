@@ -31,7 +31,7 @@
     </ContentPage.Resources>
 
     <views:BaseAdPage.MainContent>
-        <Grid IgnoreSafeArea="True">
+        <Grid IgnoreSafeArea="True" SizeChanged="BottomSheetSizeChanged">
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
