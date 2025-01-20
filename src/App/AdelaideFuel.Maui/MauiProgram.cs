@@ -69,8 +69,11 @@ public static class MauiProgram
                 ImageHandler.Mapper.AppendToMapping(nameof(TintImage.TintColor), TintImageHandler.MapTintColor);
 #if IOS || MACCATALYST
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
+
                 handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
+
+                SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
 
                 if (DeviceInfo.Version.Major <= 12)
                 {
