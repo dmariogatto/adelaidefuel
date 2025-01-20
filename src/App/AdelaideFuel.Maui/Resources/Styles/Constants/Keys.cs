@@ -50,30 +50,35 @@
         public const string LargeLeftThickness = nameof(LargeLeftThickness);
         public const string LargeLeftTopThickness = nameof(LargeLeftTopThickness);
         public const string LargeRightThickness = nameof(LargeRightThickness);
+        public const string LargeRightBottomThickness = nameof(LargeRightBottomThickness);
         public const string LargeThickness = nameof(LargeThickness);
         public const string LargeTopThickness = nameof(LargeTopThickness);
         public const string MediumBottomThickness = nameof(MediumBottomThickness);
         public const string MediumLeftThickness = nameof(MediumLeftThickness);
         public const string MediumLeftTopThickness = nameof(MediumLeftTopThickness);
         public const string MediumRightThickness = nameof(MediumRightThickness);
+        public const string MediumRightBottomThickness = nameof(MediumRightBottomThickness);
         public const string MediumThickness = nameof(MediumThickness);
         public const string MediumTopThickness = nameof(MediumTopThickness);
         public const string SmallBottomThickness = nameof(SmallBottomThickness);
         public const string SmallLeftThickness = nameof(SmallLeftThickness);
         public const string SmallLeftTopThickness = nameof(SmallLeftTopThickness);
         public const string SmallRightThickness = nameof(SmallRightThickness);
+        public const string SmallRightBottomThickness = nameof(SmallRightBottomThickness);
         public const string SmallThickness = nameof(SmallThickness);
         public const string SmallTopThickness = nameof(SmallTopThickness);
         public const string XLargeBottomThickness = nameof(XLargeBottomThickness);
         public const string XLargeLeftThickness = nameof(XLargeLeftThickness);
         public const string XLargeLeftTopThickness = nameof(XLargeLeftTopThickness);
         public const string XLargeRightThickness = nameof(XLargeRightThickness);
+        public const string XLargeRightBottomThickness = nameof(XLargeRightBottomThickness);
         public const string XLargeThickness = nameof(XLargeThickness);
         public const string XLargeTopThickness = nameof(XLargeTopThickness);
         public const string XSmallBottomThickness = nameof(XSmallBottomThickness);
         public const string XSmallLeftThickness = nameof(XSmallLeftThickness);
         public const string XSmallLeftTopThickness = nameof(XSmallLeftTopThickness);
         public const string XSmallRightThickness = nameof(XSmallRightThickness);
+        public const string XSmallRightBottomThickness = nameof(XSmallRightBottomThickness);
         public const string XSmallThickness = nameof(XSmallThickness);
         public const string XSmallTopThickness = nameof(XSmallTopThickness);
 
@@ -90,5 +95,7 @@
         public const string CardBorderStyle = nameof(CardBorderStyle);
 
         public const string UnselectedOpacity = nameof(UnselectedOpacity);
+
+        public const string CellDescriptionFontSize = nameof(CellDescriptionFontSize);
     }
 }

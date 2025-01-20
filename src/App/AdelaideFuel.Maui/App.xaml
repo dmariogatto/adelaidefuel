@@ -71,6 +71,12 @@
             <Thickness x:Key="LargeTopThickness">0,16,0,0</Thickness>
             <Thickness x:Key="XLargeTopThickness">0,20,0,0</Thickness>
 
+            <Thickness x:Key="XSmallRightBottomThickness">0,0,4,4</Thickness>
+            <Thickness x:Key="SmallRightBottomThickness">0,0,8,8</Thickness>
+            <Thickness x:Key="MediumRightBottomThickness">0,0,12,12</Thickness>
+            <Thickness x:Key="LargeRightBottomThickness">0,0,16,16</Thickness>
+            <Thickness x:Key="XLargeRightBottomThickness">0,0,20,20</Thickness>
+
             <Thickness x:Key="XSmallRightThickness">0,0,4,0</Thickness>
             <Thickness x:Key="SmallRightThickness">0,0,8,0</Thickness>
             <Thickness x:Key="MediumRightThickness">0,0,12,0</Thickness>
@@ -170,8 +176,9 @@
                 <Setter Property="CellBackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="CellTitleColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
                 <Setter Property="CellValueTextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
+                <Setter Property="CellHintTextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
                 <Setter Property="CellDescriptionColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
-                <Setter Property="CellDescriptionFontSize" Value="{DynamicResource {x:Static styles:FontSizes.Caption}}" />
+                <Setter Property="CellDescriptionFontSize" Value="{DynamicResource {x:Static styles:Keys.CellDescriptionFontSize}}" />
                 <Setter Property="CellAccentColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 <Setter Property="SelectedColor" Value="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}" />
                 <Setter Property="HeaderTextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
@@ -180,6 +187,7 @@
                 <Setter Property="HeaderFontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="CellTitleFontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="CellValueTextFontFamily" Value="{StaticResource RegFontFamily}" />
+                <Setter Property="CellHintFontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="CellDescriptionFontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="CellHintFontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="FooterFontFamily" Value="{StaticResource RegFontFamily}" />

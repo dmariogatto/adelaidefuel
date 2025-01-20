@@ -8,7 +8,7 @@ using Microsoft.Maui.Devices;
 using Plugin.StoreReview.Abstractions;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace AdelaideFuel.ViewModels
@@ -61,6 +61,7 @@ namespace AdelaideFuel.ViewModels
             GoToBrandsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
             GoToFuelsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<FuelsViewModel>());
             GoToRadiiCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<RadiiViewModel>());
+            BuildTappedCommand = new AsyncRelayCommand(BuildTappedAsync);
             GenerateTestCrashCommand = new RelayCommand(() =>
             {
                 try { throw new Exception("Test Crash"); }
@@ -80,12 +81,26 @@ namespace AdelaideFuel.ViewModels
 
             TrackEvent(Events.PageView.SettingsView);
         }
+
+        public override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            BuildTappedCount = 0;
+        }
         #endregion
 
         public int CurrentYear => DateTime.Today.Year;
 
         public string Version => _appInfo.VersionString;
         public string Build => _appInfo.BuildString;
+
+        private int _buildTappedCount;
+        public int BuildTappedCount
+        {
+            get => _buildTappedCount;
+            set => SetProperty(ref _buildTappedCount, value);
+        }
 
         public long LogDataSize => Logger.LogInBytes();
         public long CacheDataSize => _storeFactory.CacheSizeInBytes();
@@ -130,6 +145,7 @@ namespace AdelaideFuel.ViewModels
         public AsyncRelayCommand GoToBrandsCommand { get; private set; }
         public AsyncRelayCommand GoToFuelsCommand { get; private set; }
         public AsyncRelayCommand GoToRadiiCommand { get; private set; }
+        public AsyncRelayCommand BuildTappedCommand { get; private set; }
         public RelayCommand GenerateTestCrashCommand { get; private set; }
         public AsyncRelayCommand ViewLogCommand { get; private set; }
         public RelayCommand DeleteLogCommand { get; private set; }
@@ -139,22 +155,7 @@ namespace AdelaideFuel.ViewModels
         {
             try
             {
-                var builder = new StringBuilder();
-                builder.AppendLine($"App: {_appInfo.VersionString} | {_appInfo.BuildString}");
-                builder.AppendLine($"OS: {_deviceInfo.Platform} | {_deviceInfo.VersionString}");
-                builder.AppendLine($"Device: {_deviceInfo.Manufacturer} | {_deviceInfo.Model}");
-                builder.AppendLine();
-                builder.AppendLine(string.Format(Resources.ItemComma, Resources.AddYourMessageBelow));
-                builder.AppendLine("----");
-                builder.AppendLine();
-
-                var message = new EmailMessage
-                {
-                    Subject = string.Format(Resources.FeedbackSubjectItem, _deviceInfo.Platform),
-                    Body = builder.ToString(),
-                    To = new List<string>(1) { Constants.Email },
-                };
-
+                var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
                 await _email.ComposeAsync(message);
             }
             catch (Exception ex)
@@ -173,9 +174,38 @@ namespace AdelaideFuel.ViewModels
                 _storeReview.OpenStoreReviewPage(id);
         }
 
+        private async Task BuildTappedAsync()
+        {
+            try
+            {
+                BuildTappedCount++;
+
+                if (BuildTappedCount == 5)
+                {
+                    var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
+
+                    if (Logger.LogFilePath() is string logFilePath && File.Exists(logFilePath))
+                    {
+                        message.Attachments = new List<EmailAttachment>()
+                        {
+                            new EmailAttachment(logFilePath, "text/plain")
+                        };
+                    }
+
+                    await _email.ComposeAsync(message);
+
+                    BuildTappedCount = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+        }
+
         private async Task ViewLogAsync()
         {
-            var log = await Logger.GetLog();
+            var log = await Logger.GetLogAsync();
             if (!string.IsNullOrEmpty(log))
             {
                 await _clipboard.SetTextAsync(log);

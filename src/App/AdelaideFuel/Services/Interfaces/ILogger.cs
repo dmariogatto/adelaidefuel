@@ -11,8 +11,9 @@ namespace AdelaideFuel.Services
 
         bool ShouldLogException(Exception ex);
 
+        string LogFilePath();
         long LogInBytes();
-        Task<string> GetLog();
+        Task<string> GetLogAsync();
         void DeleteLog();
     }
 }

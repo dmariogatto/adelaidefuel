@@ -1,8 +1,12 @@
 ﻿using AdelaideFuel.Essentials;
+using AdelaideFuel.Localisation;
 using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Devices.Sensors;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static Microsoft.Maui.ApplicationModel.Permissions;
@@ -54,6 +58,27 @@ namespace AdelaideFuel
             }
 
             return location;
+        }
+
+        public static EmailMessage GetFeedbackEmailMessage(this IEmail email, IAppInfo appInfo, IDeviceInfo deviceInfo)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine($"App: {appInfo.VersionString} | {appInfo.BuildString}");
+            builder.AppendLine($"OS: {deviceInfo.Platform} | {deviceInfo.VersionString}");
+            builder.AppendLine($"Device: {deviceInfo.Manufacturer} | {deviceInfo.Model}");
+            builder.AppendLine();
+            builder.AppendLine(string.Format(Resources.ItemComma, Resources.AddYourMessageBelow));
+            builder.AppendLine("----");
+            builder.AppendLine();
+
+            var message = new EmailMessage
+            {
+                Subject = string.Format(Resources.FeedbackSubjectItem, deviceInfo.Platform),
+                Body = builder.ToString(),
+                To = new List<string>(1) { Constants.Email },
+            };
+
+            return message;
         }
     }
 }
