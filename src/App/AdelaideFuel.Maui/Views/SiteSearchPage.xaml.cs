@@ -27,6 +27,13 @@ namespace AdelaideFuel.Maui.Views
 
         private void ListViewItemTapped(object sender, ItemTappedEventArgs e)
         {
+            if (Search.IsSoftInputShowing())
+            {
+                Search.HideSoftInputAsync(CancellationToken.None);
+            }
+
+            Search.Unfocus();
+
             if (e.Item is SiteFuelPrice model)
             {
                 ViewModel.TappedCommand.ExecuteAsync(model);
@@ -39,6 +46,8 @@ namespace AdelaideFuel.Maui.Views
             {
                 Search.HideSoftInputAsync(CancellationToken.None);
             }
+
+            Search.Unfocus();
         }
     }
 }

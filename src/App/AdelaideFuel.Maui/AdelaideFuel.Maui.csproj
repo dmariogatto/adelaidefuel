@@ -79,7 +79,6 @@
     <PackageReference Include="FFImageLoadingCompat.Maui" Version="0.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
-    <PackageReference Include="Sentry.Maui" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
@@ -98,7 +97,15 @@
     <ProjectReference Include="..\AdelaideFuel\AdelaideFuel.csproj" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
+    <DefineConstants>$(DefineConstants);SENTRY</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
+    <PackageReference Include="Sentry.Maui" Version="5.0.1" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
     <!--<SentryOrg>sentry-org</SentryOrg>-->
     <!--<SentryProject>sentry-project</SentryProject>-->
     <SentryUploadSymbols>true</SentryUploadSymbols>

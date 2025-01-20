@@ -81,7 +81,10 @@
             </sv:Section>
             <sv:Section Title="{local:Translate ShouldIFuel}">
                 <sv:LabelCell Title="{local:Translate Version}" ValueText="{Binding Version}" />
-                <sv:LabelCell Title="{local:Translate Build}" ValueText="{Binding Build}" />
+                <sv:CommandCell
+                    Title="{local:Translate Build}"
+                    Command="{Binding BuildTappedCommand}"
+                    ValueText="{Binding Build}" />
             </sv:Section>
             <sv:Section Title="{local:Translate Development}" IsVisible="{Binding IsDevelopment}">
                 <sv:SwitchCell Title="{local:Translate ShowRadiiOnMap}" On="{Binding ShowRadiiOnMap}" />

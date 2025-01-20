@@ -2,6 +2,7 @@
 using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Effects;
 using AdelaideFuel.Maui.Handlers;
+using AdelaideFuel.Maui.Helpers;
 using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
@@ -34,6 +35,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+#if SENTRY
             .UseSentry(options =>
             {
                 options.Dsn = Constants.SentryDsn;
@@ -59,6 +61,7 @@ public static class MauiProgram
                     return sentryEvent;
                 });
             })
+#endif
             .ConfigureMauiHandlers(handlers =>
             {
                 handlers.AddSettingsViewHandler();
@@ -66,8 +69,11 @@ public static class MauiProgram
                 ImageHandler.Mapper.AppendToMapping(nameof(TintImage.TintColor), TintImageHandler.MapTintColor);
 #if IOS || MACCATALYST
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
+
                 handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
+
+                SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
 
                 if (DeviceInfo.Version.Major <= 12)
                 {
@@ -98,7 +104,15 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        builder.Services.AddSingleton<IMapCache, MapCache>();
+#if DEBUG || !SENTRY
+        GlobalExceptionHandler.UnhandledException += (sender, args) =>
+        {
+            if (args.ExceptionObject is Exception ex)
+                IoC.Resolve<ILogger>().Error(ex);
+        };
+#endif
+
+    builder.Services.AddSingleton<IMapCache, MapCache>();
 #if ANDROID
         builder.UseMauiMaps(
             lightThemeAsset: "map.style.light.json",

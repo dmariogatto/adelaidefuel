@@ -1,10 +1,12 @@
 ﻿using AdelaideFuel.Services;
 using System.Net;
+using System.Text;
 
 namespace AdelaideFuel.Maui.Services
 {
     public class Logger : ILogger
     {
+        private const int LogAgeDays = 2;
         private const string LogFileName = "fuel_log.txt";
 
         private static readonly object LogLock = new object();
@@ -19,6 +21,15 @@ namespace AdelaideFuel.Maui.Services
             _deviceInfo = deviceInfo;
 
             _logFilePath = Path.Combine(fileSystem.CacheDirectory, LogFileName);
+
+            if (File.Exists(_logFilePath))
+            {
+                var createdDate = File.GetCreationTime(_logFilePath).Date;
+                if (createdDate.AddDays(LogAgeDays) < DateTime.Today)
+                {
+                    File.Delete(_logFilePath);
+                }
+            }
         }
 
         public void Error(Exception ex, IReadOnlyDictionary<string, string> data = null)
@@ -29,25 +40,27 @@ namespace AdelaideFuel.Maui.Services
 
         public void Event(string eventName, IReadOnlyDictionary<string, string> properties = null)
         {
-            if (!string.IsNullOrWhiteSpace(eventName))
-            {
-                System.Diagnostics.Debug.WriteLine($"Tracking Event: {eventName}");
+            if (string.IsNullOrEmpty(eventName))
                 return;
 
+            System.Diagnostics.Debug.WriteLine($"Tracking Event: {eventName}");
+            return;
+
+#if !DEBUG && SENTRY
 #pragma warning disable CS0162 // Unreachable code detected
-                if (DeviceInfo.DeviceType == DeviceType.Virtual)
+            if (DeviceInfo.DeviceType == DeviceType.Virtual)
+            {
+                SentrySdk.CaptureMessage(eventName, scope =>
                 {
-                    SentrySdk.CaptureMessage(eventName, scope =>
+                    if (properties is not null)
                     {
-                        if (properties is not null)
-                        {
-                            foreach (var d in properties)
-                                scope.SetExtra(d.Key, d.Value);
-                        }
-                    });
-                }
-#pragma warning restore CS0162 // Unreachable code detected
+                        foreach (var d in properties)
+                            scope.SetExtra(d.Key, d.Value);
+                    }
+                });
             }
+#pragma warning restore CS0162 // Unreachable code detected
+#endif
         }
 
         public bool ShouldLogException(Exception ex)
@@ -85,6 +98,8 @@ namespace AdelaideFuel.Maui.Services
             }
         }
 
+        public string LogFilePath() => _logFilePath;
+
         public long LogInBytes()
         {
             var size = 0L;
@@ -105,7 +120,7 @@ namespace AdelaideFuel.Maui.Services
             return size;
         }
 
-        public async Task<string> GetLog()
+        public async Task<string> GetLogAsync()
         {
             var result = string.Empty;
 
@@ -146,7 +161,11 @@ namespace AdelaideFuel.Maui.Services
 
         private void WriteToLog(Exception ex, string msg, IReadOnlyDictionary<string, string> data)
         {
-            if (ShouldLogException(ex) && _deviceInfo.DeviceType != DeviceType.Virtual)
+            if (!ShouldLogException(ex))
+                return;
+
+#if SENTRY
+            if (_deviceInfo.DeviceType != DeviceType.Virtual)
             {
                 SentrySdk.CaptureException(ex, scope =>
                 {
@@ -157,30 +176,34 @@ namespace AdelaideFuel.Maui.Services
                     }
                 });
             }
-
-#if !DEBUG
-            return;
 #endif
 
-#pragma warning disable CS0162 // Unreachable code detected
-            var logEntry = new List<string>
-            {
-                $"[{DateTime.UtcNow:o}]"
-            };
+            var sb = new StringBuilder();
+            sb.Append($"[{DateTime.UtcNow:o}]");
 
-            if (!string.IsNullOrEmpty(msg))
-                logEntry.Add(msg);
+            if (!string.IsNullOrWhiteSpace(msg))
+                sb.Append($" {msg}");
+
+            sb.AppendLine();
+
             if (ex is not null)
-                logEntry.Add(ex.ToString());
-            if (data?.Any() == true)
-                foreach (var d in data)
-                    logEntry.Add($"{d.Key} : {d.Value}");
+                sb.AppendLine(ex.ToString());
+
+            var innerEx = ex.InnerException;
+            while (innerEx is not null)
+            {
+                sb.AppendLine(ex.ToString());
+                innerEx = innerEx.InnerException;
+            }
+
+            data?.ForEach(d => sb.AppendLine($"    {d.Key} : {d.Value}"));
+
+            sb.AppendLine();
 
             lock (LogLock)
             {
-                File.AppendAllLines(_logFilePath, logEntry);
+                File.AppendAllText(_logFilePath, sb.ToString());
             }
-#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }
