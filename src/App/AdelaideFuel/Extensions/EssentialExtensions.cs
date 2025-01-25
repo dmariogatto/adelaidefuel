@@ -80,5 +80,36 @@ namespace AdelaideFuel
 
             return message;
         }
+
+        public static EmailMessage GetCrashingEmailMessage(this IEmail email, IAppInfo appInfo, IDeviceInfo deviceInfo, Exception ex)
+        {
+            ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
+            var builder = new StringBuilder();
+            builder.AppendLine($"App: {appInfo.VersionString} | {appInfo.BuildString}");
+            builder.AppendLine($"OS: {deviceInfo.Platform} | {deviceInfo.VersionString}");
+            builder.AppendLine($"Device: {deviceInfo.Manufacturer} | {deviceInfo.Model}");
+            builder.AppendLine("Exception:");
+            builder.AppendLine(ex.ToString());
+            var innerEx = ex.InnerException;
+            while (innerEx is not null)
+            {
+                builder.AppendLine(innerEx.ToString());
+                innerEx = innerEx.InnerException;
+            }
+            builder.AppendLine();
+            builder.AppendLine(string.Format(Resources.ItemComma, Resources.AddYourMessageBelow));
+            builder.AppendLine("----");
+            builder.AppendLine();
+
+            var message = new EmailMessage
+            {
+                Subject = string.Format(Resources.CrashingSubjectItem, deviceInfo.Platform),
+                Body = builder.ToString(),
+                To = new List<string>(1) { Constants.Email },
+            };
+
+            return message;
+        }
     }
 }

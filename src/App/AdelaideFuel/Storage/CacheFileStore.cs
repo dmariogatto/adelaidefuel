@@ -21,7 +21,7 @@ namespace AdelaideFuel.Storage
         private readonly string _directoryPath;
         private readonly string _collectionName;
 
-        private readonly object _lock = new object();
+        private readonly Lock _lock = new();
 
         public CacheFileStore(string baseDirectory, ILogger logger, string collectionName = "")
         {
