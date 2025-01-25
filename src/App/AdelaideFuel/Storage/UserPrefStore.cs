@@ -147,7 +147,8 @@ namespace AdelaideFuel.Storage
                         }
                     }
 
-                    count++;
+                    if (success)
+                        count++;
                 }
 
                 _preferences.Set(_key, JsonSerializer.Serialize(result), _sharedName);
