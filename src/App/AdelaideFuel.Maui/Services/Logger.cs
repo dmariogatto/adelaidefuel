@@ -6,10 +6,10 @@ namespace AdelaideFuel.Maui.Services
 {
     public class Logger : ILogger
     {
-        private const int LogAgeDays = 2;
+        private const int LogAgeDays = 3;
         private const string LogFileName = "fuel_log.txt";
 
-        private static readonly object LogLock = new object();
+        private static readonly Lock LogLock = new();
 
         private readonly IDeviceInfo _deviceInfo;
         private readonly string _logFilePath;

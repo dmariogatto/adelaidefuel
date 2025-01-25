@@ -21,8 +21,14 @@ namespace AdelaideFuel.Maui;
 
 public static class MauiProgram
 {
+    private static readonly DateTime AppStartTime = DateTime.Now;
+
     public static MauiApp CreateMauiApp()
     {
+#if DEBUG || !SENTRY
+        GlobalExceptionHandler.UnhandledException += GlobalExceptionHandlerOnUnhandledException;
+#endif
+
         MigrateVersionTracking();
 
 #if ANDROID
@@ -104,15 +110,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-#if DEBUG || !SENTRY
-        GlobalExceptionHandler.UnhandledException += (sender, args) =>
-        {
-            if (args.ExceptionObject is Exception ex)
-                IoC.Resolve<ILogger>().Error(ex);
-        };
-#endif
-
-    builder.Services.AddSingleton<IMapCache, MapCache>();
+        builder.Services.AddSingleton<IMapCache, MapCache>();
 #if ANDROID
         builder.UseMauiMaps(
             lightThemeAsset: "map.style.light.json",
@@ -151,6 +149,35 @@ public static class MauiProgram
         _ = Task.Run(async () => await IoC.Resolve<IFuelService>().SyncAllAsync(default).ConfigureAwait(false));
 
         return mauiApp;
+    }
+
+    private static void GlobalExceptionHandlerOnUnhandledException(object sender, UnhandledExceptionEventArgs args)
+    {
+        if (args.ExceptionObject is not Exception ex)
+            return;
+
+        try
+        {
+            IoC.Resolve<ILogger>().Error(ex, new Dictionary<string, string>
+            {
+                { nameof(args.IsTerminating), args.IsTerminating.ToString() }
+            });
+        }
+        catch (Exception loggingEx)
+        {
+            System.Diagnostics.Debug.WriteLine(loggingEx);
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+
+        if (args.IsTerminating && Email.Default.IsComposeSupported)
+        {
+            var appRunTime = DateTime.Now - AppStartTime;
+            if (appRunTime < TimeSpan.FromSeconds(20))
+            {
+                var message = Email.Default.GetCrashingEmailMessage(AppInfo.Current, DeviceInfo.Current, ex);
+                _ = Email.Default.ComposeAsync(message);
+            }
+        }
     }
 
     private static void OnAppAction(object sender, AppActionEventArgs args)

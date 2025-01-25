@@ -288,6 +288,15 @@ namespace AdelaideFuel.Localisation {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Should I Fuel? - Crashing ({0}).
+        /// </summary>
+        public static string CrashingSubjectItem {
+            get {
+                return ResourceManager.GetString("CrashingSubjectItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dark Mode.
         /// </summary>
         public static string DarkMode {
