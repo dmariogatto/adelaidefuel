@@ -114,8 +114,7 @@ public static class MauiProgram
 #if ANDROID
         builder.UseMauiMaps(
             lightThemeAsset: "map.style.light.json",
-            darkThemeAsset: "map.style.dark.json",
-            renderer: BetterMaps.Maui.Android.GoogleMapsRenderer.Legacy);
+            darkThemeAsset: "map.style.dark.json");
 #else
         builder.UseMauiMaps();
 #endif
