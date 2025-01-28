@@ -5,14 +5,11 @@ namespace AdelaideFuel.Services
 {
     public class EnvironmentPlatformService : IEnvironmentService
     {
-        private readonly IStoreFactory _storeFactory;
         private readonly ILogger _logger;
 
         public EnvironmentPlatformService(
-            IStoreFactory storeFactory,
             ILogger logger)
         {
-            _storeFactory = storeFactory;
             _logger = logger;
         }
 
@@ -22,15 +19,12 @@ namespace AdelaideFuel.Services
         public Theme GetOperatingSystemTheme()
         {
             var uiModeFlags = Platform.AppContext.Resources.Configuration.UiMode & UiMode.NightMask;
-            switch (uiModeFlags)
+            return uiModeFlags switch
             {
-                case UiMode.NightYes:
-                    return Theme.Dark;
-                case UiMode.NightNo:
-                    return Theme.Light;
-                default:
-                    throw new NotSupportedException($"UiMode {uiModeFlags} not supported");
-            }
+                UiMode.NightYes => Theme.Dark,
+                UiMode.NightNo => Theme.Light,
+                _ => throw new NotSupportedException($"UiMode {uiModeFlags} not supported"),
+            };
         }
     }
 }
