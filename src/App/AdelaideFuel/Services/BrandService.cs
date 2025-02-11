@@ -85,7 +85,6 @@ namespace AdelaideFuel.Services
                     catch (Exception ex)
                     {
                         Logger.Error(ex);
-                        File.Delete(kv.Value);
                     }
                 }).ConfigureAwait(false);
             }
