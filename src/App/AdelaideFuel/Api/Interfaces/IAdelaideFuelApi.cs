@@ -1,6 +1,7 @@
 ﻿using AdelaideFuel.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +10,8 @@ namespace AdelaideFuel.Api
     public interface IAdelaideFuelApi
     {
         Task<List<BrandDto>> GetBrandsAsync(string code, CancellationToken cancellationToken);
+
+        Task<byte[]> GetBrandImageAsync(string code, int brandId, bool highDensity, CancellationToken cancellationToken);
 
         Task<List<FuelDto>> GetFuelsAsync(string code, CancellationToken cancellationToken);
 

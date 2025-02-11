@@ -34,6 +34,8 @@ namespace AdelaideFuel.Services
         private readonly IAdelaideFuelApi _fuelApi;
         private readonly IStoreFactory _storeFactory;
 
+        private readonly IBrandService _brandService;
+
         private readonly IUserStore<UserBrand> _brandUserStore;
         private readonly IUserStore<UserFuel> _fuelUserStore;
         private readonly IUserStore<UserRadius> _radiusUserStore;
@@ -52,6 +54,7 @@ namespace AdelaideFuel.Services
             IPermissions permissions,
             IAppPreferences appPrefs,
             IAdelaideFuelApi adelaideFuelApi,
+            IBrandService brandService,
             IStoreFactory storeFactory,
             ICacheService cacheService,
             IRetryPolicyFactory retryPolicyFactory,
@@ -67,6 +70,8 @@ namespace AdelaideFuel.Services
 
             _fuelApi = adelaideFuelApi;
             _storeFactory = storeFactory;
+
+            _brandService = brandService;
 
             _brandUserStore = _storeFactory.GetUserStore<UserBrand>();
             _fuelUserStore = _storeFactory.GetUserStore<UserFuel>();
@@ -333,6 +338,8 @@ namespace AdelaideFuel.Services
                 {
                     SyncSortableEntitiesWithApi(apiBrands, userBrands);
                     success = true;
+
+                    _ = _brandService.GetBrandImagePathsAsync(apiBrands.Select(i => i.Id).ToList(), CancellationToken.None);
                 }
             }
             catch (Exception ex)

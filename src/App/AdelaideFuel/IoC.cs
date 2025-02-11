@@ -61,6 +61,7 @@ namespace AdelaideFuel
             services.AddSingleton<ICacheService, CacheService>();
             services.AddSingleton<IStoreFactory, StoreFactory>();
             services.AddSingleton<IFuelService, FuelService>();
+            services.AddSingleton<IBrandService, BrandService>();
             services.AddSingleton<IIapVerifyService, IapVerifyService>();
             services.AddSingleton<ISubscriptionService, SubscriptionService>();
             services.AddSingleton<IAppPreferences, AppPreferences>();

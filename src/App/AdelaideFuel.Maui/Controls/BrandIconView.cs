@@ -1,6 +1,4 @@
 ﻿using AdelaideFuel.Maui.Converters;
-using AdelaideFuel.Maui.Extensions;
-using FFImageLoading.Maui;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace AdelaideFuel.Maui.Controls
@@ -24,20 +22,16 @@ namespace AdelaideFuel.Maui.Controls
             HorizontalOptions = LayoutOptions.Center;
             VerticalOptions = LayoutOptions.Center;
 
-            var ffImg = new CachedImage()
-            {
-                LoadingDelay = 200,
-                LoadingPlaceholder = App.Current.FindResource<string>(Styles.Keys.FuelImg),
-            };
+            var img = new Image();
 
-            ffImg.SetBinding(
-                CachedImage.SourceProperty,
+            img.SetBinding(
+                Image.SourceProperty,
                 static (BrandIconView i) => i.BrandId,
                 converter: IconConverter,
                 mode: BindingMode.OneWay,
                 source: this);
 
-            Content = ffImg;
+            Content = img;
 
             Size = 44d;
         }
@@ -64,5 +58,7 @@ namespace AdelaideFuel.Maui.Controls
             get => (int)GetValue(BrandIdProperty);
             set => SetValue(BrandIdProperty, value);
         }
+
+        protected override void OnSizeAllocated(double width, double height) => base.OnSizeAllocated(width, height);
     }
 }
