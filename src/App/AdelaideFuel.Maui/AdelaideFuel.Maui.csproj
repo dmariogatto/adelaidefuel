@@ -80,6 +80,10 @@
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.0.0" />
+  </ItemGroup>
+
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
     <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.10.0" />
     <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.0" />
@@ -120,6 +124,22 @@
     <PropertyGroup Condition="'$(Registrar)' == 'managed-static'">
       <Registrar>static</Registrar>
     </PropertyGroup>
+  </Target>
+
+  <!-- https://github.com/xamarin/xamarin-macios/pull/20463 -->
+  <Target Name="LinkWithSwift" DependsOnTargets="_ParseBundlerArguments;_DetectSdkLocations" BeforeTargets="_LinkNativeExecutable">
+    <PropertyGroup>
+      <_SwiftPlatform Condition="$(RuntimeIdentifier.StartsWith('iossimulator-'))">iphonesimulator</_SwiftPlatform>
+      <_SwiftPlatform Condition="$(RuntimeIdentifier.StartsWith('ios-'))">iphoneos</_SwiftPlatform>
+    </PropertyGroup>
+    <ItemGroup>
+      <_CustomLinkFlags Include="-L" />
+      <_CustomLinkFlags Include="/usr/lib/swift" />
+      <_CustomLinkFlags Include="-L" />
+      <_CustomLinkFlags Include="$(_SdkDevPath)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(_SwiftPlatform)" />
+      <_CustomLinkFlags Include="-Wl,-rpath" />
+      <_CustomLinkFlags Include="-Wl,/usr/lib/swift" />
+    </ItemGroup>
   </Target>
 
 </Project>
