@@ -10,14 +10,18 @@ namespace AdelaideFuel.Maui.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var path = value is int id && id > 0
-                ? _brandService.Value.GetBrandImagePath(id)
-                : string.Empty;
-
-            return new FileImageSource()
+            if (value is int id && id > 0)
             {
-                File = !string.IsNullOrEmpty(path) ? path : App.Current.FindResource<string>(Styles.Keys.FuelImg)
-            };
+                return ImageSource.FromStream(async (ct) =>
+                {
+                    var path = await _brandService.Value.GetBrandImagePathAsync(id, ct);
+                    return File.Exists(path)
+                        ? File.OpenRead(path)
+                        : Stream.Null;
+                });
+            }
+
+            return ImageSource.FromFile(App.Current.FindResource<string>(Styles.Keys.FuelImg));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
