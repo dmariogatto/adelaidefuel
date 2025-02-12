@@ -21,6 +21,22 @@ namespace AdelaideFuel.Api
             return GetAsync<List<BrandDto>>("Brands", cancellationToken, functionKey: code);
         }
 
+        public async Task<byte[]> GetBrandImageAsync(string code, int brandId, bool highDensity, CancellationToken cancellationToken)
+        {
+            var requestUri = $"Brand/Img/{brandId}%40{(highDensity ? "3x" : "2x")}.png";
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Add(Constants.AuthHeader, code);
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(20));
+
+            using var response = await HttpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsByteArrayAsync(cts.Token).ConfigureAwait(false);
+        }
+
         public Task<List<FuelDto>> GetFuelsAsync(string code, CancellationToken cancellationToken)
         {
             return GetAsync<List<FuelDto>>("Fuels", cancellationToken, functionKey: code);

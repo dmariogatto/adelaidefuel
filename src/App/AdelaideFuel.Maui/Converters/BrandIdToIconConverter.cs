@@ -1,26 +1,23 @@
-﻿using System.Globalization;
+﻿using AdelaideFuel.Maui.Extensions;
+using AdelaideFuel.Services;
+using System.Globalization;
 
 namespace AdelaideFuel.Maui.Converters
 {
     public class BrandIdToIconConverter : IValueConverter
     {
-        private readonly Lazy<bool> _2x = new Lazy<bool>(() => IoC.Resolve<IDeviceDisplay>().MainDisplayInfo.Density < 3);
-        private readonly string _iconUrlFormat = Path.Combine(Constants.ApiUrlBase, "Brand/Img/{0}%40{1}.png?code=" + Constants.ApiKeyBrandImg);
+        private readonly Lazy<IBrandService> _brandService = new Lazy<IBrandService>(IoC.Resolve<IBrandService>);
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int id && id > 0)
-            {
-                var size = _2x.Value ? "2x" : "3x";
-                return new UriImageSource()
-                {
-                    Uri = new Uri(string.Format(_iconUrlFormat, id, size)),
-                    CachingEnabled = true,
-                    CacheValidity = TimeSpan.FromDays(7)
-                };
-            }
+            var path = value is int id && id > 0
+                ? _brandService.Value.GetBrandImagePath(id)
+                : string.Empty;
 
-            return null;
+            return new FileImageSource()
+            {
+                File = !string.IsNullOrEmpty(path) ? path : App.Current.FindResource<string>(Styles.Keys.FuelImg)
+            };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

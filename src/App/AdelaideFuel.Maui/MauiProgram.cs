@@ -10,7 +10,6 @@ using AiForms.Settings;
 using BetterMaps.Maui;
 using BetterMaps.Maui.Handlers;
 using Cats.Maui.AdMob;
-using FFImageLoading.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
@@ -102,7 +101,6 @@ public static class MauiProgram
                 fonts.AddFont("NunitoSans-Bold.ttf", "NunitoSans-Bold");
                 fonts.AddFont("NunitoSans-BoldItalic.ttf", "NunitoSans-BoldItalic");
             })
-            .UseFFImageLoading()
             .UseSharpnadoCollectionView(false);
 
 #if DEBUG
