@@ -58,7 +58,5 @@ namespace AdelaideFuel.Maui.Controls
             get => (int)GetValue(BrandIdProperty);
             set => SetValue(BrandIdProperty, value);
         }
-
-        protected override void OnSizeAllocated(double width, double height) => base.OnSizeAllocated(width, height);
     }
 }
