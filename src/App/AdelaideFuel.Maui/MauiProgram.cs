@@ -3,6 +3,7 @@ using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Effects;
 using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Helpers;
+using AdelaideFuel.Maui.ImageSources;
 using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
@@ -101,7 +102,18 @@ public static class MauiProgram
                 fonts.AddFont("NunitoSans-Bold.ttf", "NunitoSans-Bold");
                 fonts.AddFont("NunitoSans-BoldItalic.ttf", "NunitoSans-BoldItalic");
             })
+            .ConfigureImageSources(services =>
+            {
+                services.AddService<IFileAsyncImageSource>(svcs =>
+                {
+                    var provider = svcs.GetService<IImageSourceServiceProvider>();
+                    var fileImageSourceService = provider.GetImageSourceService(typeof(IFileImageSource)) as IImageSourceService<IFileImageSource>;
+                    var logger = svcs.GetService<ILogger<FileAsyncImageSourceService>>();
+                    return new FileAsyncImageSourceService(fileImageSourceService, logger);
+                });
+            })
             .UseSharpnadoCollectionView(false);
+
 
 #if DEBUG
         // Configure logging
