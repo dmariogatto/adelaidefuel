@@ -11,6 +11,8 @@ namespace AdelaideFuel.Maui.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            var fallbackImg = App.Current.FindResource<string>(Styles.Keys.FuelImg);
+
             if (value is int id && id > 0)
             {
                 return new FileAsyncImageSource()
@@ -18,13 +20,13 @@ namespace AdelaideFuel.Maui.Converters
                     File = async (ct) =>
                     {
                         var path = await _brandService.Value.GetBrandImagePathAsync(id, ct);
-                        return File.Exists(path) ? path : App.Current.FindResource<string>(Styles.Keys.FuelImg);
+                        return File.Exists(path) ? path : fallbackImg;
 
                     }
                 };
             }
 
-            return ImageSource.FromFile(App.Current.FindResource<string>(Styles.Keys.FuelImg));
+            return ImageSource.FromFile(fallbackImg);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

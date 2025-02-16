@@ -8,6 +8,6 @@ namespace AdelaideFuel.Services
     {
         string GetBrandImagePath(int brandId);
         Task<string> GetBrandImagePathAsync(int brandId, CancellationToken cancellationToken);
-        Task<IReadOnlyDictionary<int, string>> GetBrandImagePathsAsync(IReadOnlyList<int> brandIds, CancellationToken cancellationToken);
+        Task<IReadOnlyDictionary<int, string>> GetBrandImagePathsAsync(IReadOnlyList<int> brandIds, bool preferCache, CancellationToken cancellationToken);
     }
 }

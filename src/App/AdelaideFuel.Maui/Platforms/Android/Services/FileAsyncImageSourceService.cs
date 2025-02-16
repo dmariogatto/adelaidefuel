@@ -31,7 +31,7 @@ namespace AdelaideFuel.Services
 
                 try
                 {
-                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken).ConfigureAwait(false);
+                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -41,7 +41,7 @@ namespace AdelaideFuel.Services
 
                 if (!string.IsNullOrEmpty(file))
                 {
-                    return await _fileImageSourceService.GetDrawableAsync(ImageSource.FromFile(file), context, cancellationToken).ConfigureAwait(false);
+                    return await _fileImageSourceService.GetDrawableAsync(ImageSource.FromFile(file), context, cancellationToken);
                 }
             }
 
@@ -58,7 +58,7 @@ namespace AdelaideFuel.Services
 
                 try
                 {
-                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken).ConfigureAwait(false);
+                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -68,7 +68,7 @@ namespace AdelaideFuel.Services
 
                 if (!string.IsNullOrEmpty(file))
                 {
-                    return await _fileImageSourceService.LoadDrawableAsync(ImageSource.FromFile(file), imageView, cancellationToken).ConfigureAwait(false);
+                    return await _fileImageSourceService.LoadDrawableAsync(ImageSource.FromFile(file), imageView, cancellationToken);
                 }
             }
 
