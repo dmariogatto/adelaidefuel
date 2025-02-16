@@ -339,7 +339,7 @@ namespace AdelaideFuel.Services
                     SyncSortableEntitiesWithApi(apiBrands, userBrands);
                     success = true;
 
-                    _ = _brandService.GetBrandImagePathsAsync(apiBrands.Select(i => i.Id).ToList(), CancellationToken.None);
+                    _ = _brandService.GetBrandImagePathsAsync(apiBrands.Select(i => i.Id).ToList(), false, CancellationToken.None);
                 }
             }
             catch (Exception ex)

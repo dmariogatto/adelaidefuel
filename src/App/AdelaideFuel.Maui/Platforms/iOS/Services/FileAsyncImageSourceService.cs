@@ -29,7 +29,7 @@ namespace AdelaideFuel.Services
 
                 try
                 {
-                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken).ConfigureAwait(false);
+                    file = await fileAsyncImageSource.GetFileAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -39,7 +39,7 @@ namespace AdelaideFuel.Services
 
                 if (!string.IsNullOrEmpty(file))
                 {
-                    return await _fileImageSourceService.GetImageAsync(ImageSource.FromFile(file), scale, cancellationToken).ConfigureAwait(false);
+                    return await _fileImageSourceService.GetImageAsync(ImageSource.FromFile(file), scale, cancellationToken);
                 }
             }
 

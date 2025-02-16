@@ -47,17 +47,23 @@ namespace AdelaideFuel.Services
         public string GetBrandImagePath(int brandId)
         {
             var path = string.Format(_imgPathFormat, brandId);
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
             _ = GetBrandImagePathAsync(brandId, CancellationToken.None);
-            return File.Exists(path) ? path : string.Empty;
+            return string.Empty;
         }
 
         public async Task<string> GetBrandImagePathAsync(int brandId, CancellationToken cancellationToken)
         {
-            var result = await GetBrandImagePathsAsync([brandId], cancellationToken).ConfigureAwait(false);
+            var result = await GetBrandImagePathsAsync([brandId], true, cancellationToken).ConfigureAwait(false);
             return result.TryGetValue(brandId, out var path) ? path : string.Empty;
         }
 
-        public async Task<IReadOnlyDictionary<int, string>> GetBrandImagePathsAsync(IReadOnlyList<int> brandIds, CancellationToken cancellationToken)
+        public async Task<IReadOnlyDictionary<int, string>> GetBrandImagePathsAsync(IReadOnlyList<int> brandIds, bool preferCache, CancellationToken cancellationToken)
         {
             var result = brandIds.ToDictionary(i => i, i => string.Format(_imgPathFormat, i));
 
@@ -66,7 +72,7 @@ namespace AdelaideFuel.Services
             try
             {
                 var expired = result
-                    .Where(i => IsBrandImageExpired(i.Value))
+                    .Where(i => IsBrandImageExpired(i.Value, preferCache))
                     .ToDictionary(i => i.Key, i => i.Value);
 
                 await Parallel.ForEachAsync(expired, cancellationToken, async (kv, ct) =>
@@ -79,7 +85,7 @@ namespace AdelaideFuel.Services
                         var imgBytes = await _fuelApi.GetBrandImageAsync(Constants.ApiKeyBrandImg, kv.Key, _isHighDensity, ct).ConfigureAwait(false);
                         if (imgBytes?.Length > 0)
                         {
-                            await File.WriteAllBytesAsync(kv.Value, imgBytes, ct).ConfigureAwait(false);
+                            await File.WriteAllBytesAsync(kv.Value, imgBytes, CancellationToken.None).ConfigureAwait(false);
                         }
                     }
                     catch (Exception ex)
@@ -108,7 +114,7 @@ namespace AdelaideFuel.Services
             return result;
         }
 
-        private bool IsBrandImageExpired(string imgPath)
-            => !File.Exists(imgPath) || File.GetCreationTimeUtc(imgPath) + CacheExpireTimeSpan < DateTime.UtcNow;
+        private bool IsBrandImageExpired(string imgPath, bool preferCache)
+            => !File.Exists(imgPath) || preferCache || File.GetCreationTimeUtc(imgPath) + CacheExpireTimeSpan < DateTime.UtcNow;
     }
 }
