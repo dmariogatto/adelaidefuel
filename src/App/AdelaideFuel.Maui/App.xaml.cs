@@ -27,7 +27,11 @@ public partial class App : Application
     {
         var mainPage = IoC.Resolve<INavigationService>().GetMainPage();
 
-        _ = AppReviewRequestAsync();
+        Dispatcher.DispatchAsync(async () =>
+        {
+            await Task.Delay(2000);
+            await AppReviewRequestAsync();
+        });
 
         return new Window(mainPage);
     }
