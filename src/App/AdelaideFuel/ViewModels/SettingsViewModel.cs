@@ -162,7 +162,7 @@ namespace AdelaideFuel.ViewModels
             {
                 Logger.Error(ex);
 
-                UserDialogs.Alert(Resources.EmailDirectly, Resources.UnableToSendEmail, Resources.OK);
+                DialogService.Alert(Resources.EmailDirectly, Resources.UnableToSendEmail, Resources.OK);
             }
         }
 
@@ -209,11 +209,11 @@ namespace AdelaideFuel.ViewModels
             if (!string.IsNullOrEmpty(log))
             {
                 await _clipboard.SetTextAsync(log);
-                await UserDialogs.AlertAsync(log, "Log", Resources.OK);
+                await DialogService.AlertAsync(log, "Log", Resources.OK);
             }
             else
             {
-                await UserDialogs.AlertAsync("EMPTY 👍", "Log", Resources.OK);
+                await DialogService.AlertAsync("EMPTY 👍", "Log", Resources.OK);
             }
         }
 

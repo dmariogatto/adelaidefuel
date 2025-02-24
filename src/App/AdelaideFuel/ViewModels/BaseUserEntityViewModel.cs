@@ -165,7 +165,7 @@ namespace AdelaideFuel.ViewModels
                 var active = Entities.Where(i => i.IsActive).ToList();
                 if (active.Count == 1 && active.First() == entity)
                 {
-                    await UserDialogs.AlertAsync(
+                    await DialogService.AlertAsync(
                         string.Format(Resources.MustHaveAtLeastOneActiveItem, EntityName.ToLower()),
                         Resources.Oops,
                         Resources.OK);
@@ -190,7 +190,7 @@ namespace AdelaideFuel.ViewModels
             {
                 if (Entities.Count == 1 && Entities.First() == entity)
                 {
-                    await UserDialogs.AlertAsync(
+                    await DialogService.AlertAsync(
                         string.Format(Resources.MustHaveAtLeastOneActiveItem, EntityName.ToLower()),
                         Resources.Oops,
                         Resources.OK);

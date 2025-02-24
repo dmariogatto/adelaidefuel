@@ -146,7 +146,7 @@ namespace AdelaideFuel.ViewModels
             {
                 if (_versionTracking.IsFirstLaunchEver)
                 {
-                    var config = await UserDialogs.ConfirmAsync(
+                    var config = await DialogService.ConfirmAsync(
                                     Resources.FuelSetup,
                                     Resources.SaBowser,
                                     Resources.Now,

@@ -1,5 +1,6 @@
 ﻿using AdelaideFuel.Localisation;
 using AdelaideFuel.Models;
+using AdelaideFuel.Services;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace AdelaideFuel.ViewModels
         {
             try
             {
-                var confirm = await UserDialogs.ConfirmAsync(
+                var confirm = await DialogService.ConfirmAsync(
                     Resources.RestoreDefaultSettings,
                     Resources.Reset,
                     Resources.OK,
@@ -60,16 +61,16 @@ namespace AdelaideFuel.ViewModels
         {
             try
             {
-                var prompt = await UserDialogs.PromptAsync(
+                var prompt = await DialogService.PromptAsync(
                     Resources.EnterNewRadius,
                     Resources.Add,
                     Resources.OK,
                     Resources.Cancel,
                     Resources.Kilometres,
-                    Acr.UserDialogs.InputType.Number);
+                    keyboard: KeyboardType.Numeric);
 
-                if (prompt?.Ok == true &&
-                    int.TryParse(prompt.Value, out var km) &&
+                if (prompt is not null &&
+                    int.TryParse(prompt, out var km) &&
                     km > 0 &&
                     Entities.All(i => i.Id != km))
                 {

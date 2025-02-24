@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using AdelaideFuel.Services;
+﻿using AdelaideFuel.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
@@ -14,7 +13,7 @@ namespace AdelaideFuel.ViewModels
         protected readonly IFuelService FuelService;
         protected readonly INavigationService NavigationService;
         protected readonly IAppPreferences AppPrefs;
-        protected readonly IUserDialogs UserDialogs;
+        protected readonly IDialogService DialogService;
         protected readonly ILogger Logger;
 
         private readonly IBrowser _browser;
@@ -26,7 +25,7 @@ namespace AdelaideFuel.ViewModels
             FuelService = bvmConstructor.FuelService;
             NavigationService = bvmConstructor.NavigationService;
             AppPrefs = bvmConstructor.AppPrefs;
-            UserDialogs = bvmConstructor.UserDialogs;
+            DialogService = bvmConstructor.DialogService;
             Logger = bvmConstructor.Logger;
 
             _browser = bvmConstructor.Browser;
@@ -118,7 +117,7 @@ namespace AdelaideFuel.ViewModels
             {
                 Logger.Error(ex);
 
-                UserDialogs.Alert(
+                DialogService.Alert(
                     string.Format(Localisation.Resources.IssueOpeningUrlItem, uri.ToString()),
                     Localisation.Resources.Error,
                     Localisation.Resources.OK);

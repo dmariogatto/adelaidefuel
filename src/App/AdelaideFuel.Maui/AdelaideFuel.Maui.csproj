@@ -72,7 +72,6 @@
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
 
-    <PackageReference Include="Acr.UserDialogs" Version="9.1.0" />
     <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.17" />
     <PackageReference Include="BetterMaps.Maui" Version="1.0.0" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre4" />
