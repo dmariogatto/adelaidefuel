@@ -176,7 +176,7 @@ namespace AdelaideFuel.ViewModels
             catch (Exception ex)
             {
                 Logger.Error(ex);
-                await UserDialogs.AlertAsync(
+                await DialogService.AlertAsync(
                     Resources.UnableToLoadStations,
                     Resources.Error,
                     Resources.OK);

@@ -100,7 +100,7 @@ namespace AdelaideFuel.ViewModels
                 SubscriptionProduct = null;
 
                 Logger.Error(ex);
-                await UserDialogs.AlertAsync(ex.Message, Resources.Error, Resources.OK);
+                await DialogService.AlertAsync(ex.Message, Resources.Error, Resources.OK);
             }
             finally
             {
@@ -123,7 +123,7 @@ namespace AdelaideFuel.ViewModels
             catch (Exception ex)
             {
                 Logger.Error(ex);
-                await UserDialogs.AlertAsync(ex.Message, Resources.Error, Resources.OK);
+                await DialogService.AlertAsync(ex.Message, Resources.Error, Resources.OK);
             }
             finally
             {
@@ -146,7 +146,7 @@ namespace AdelaideFuel.ViewModels
             catch (Exception ex)
             {
                 Logger.Error(ex);
-                await UserDialogs.AlertAsync(ex.Message, Resources.Error, Resources.OK);
+                await DialogService.AlertAsync(ex.Message, Resources.Error, Resources.OK);
             }
             finally
             {

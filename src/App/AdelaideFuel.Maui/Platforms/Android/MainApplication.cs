@@ -11,11 +11,5 @@ public class MainApplication : MauiApplication
     {
     }
 
-    public override void OnCreate()
-    {
-        Acr.UserDialogs.UserDialogs.Init(this);
-        base.OnCreate();
-    }
-
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 }

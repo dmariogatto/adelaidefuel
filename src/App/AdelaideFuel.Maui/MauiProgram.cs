@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using AdelaideFuel.Maui.Controls;
+﻿using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Effects;
 using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Helpers;
@@ -134,7 +133,7 @@ public static class MauiProgram
 
         builder.Services.ConfigureIoC();
 
-        builder.Services.AddSingleton<IUserDialogs>(_ => UserDialogs.Instance);
+        builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<ILogger, Logger>();
         builder.Services.AddSingleton<ILocalise, LocalisePlatformService>();
         builder.Services.AddSingleton<IEnvironmentService, EnvironmentPlatformService>();

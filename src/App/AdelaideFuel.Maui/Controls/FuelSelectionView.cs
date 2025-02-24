@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using AdelaideFuel.Maui.Converters;
+﻿using AdelaideFuel.Maui.Converters;
 using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
@@ -27,7 +26,7 @@ namespace AdelaideFuel.Maui.Controls
 
         private static readonly HeightToRoundRectangleConverter ToRoundRectangleConverter = new HeightToRoundRectangleConverter();
 
-        private readonly IUserDialogs _userDialogs;
+        private readonly IDialogService _dialogService;
         private readonly ILogger _logger;
 
         public FuelSelectionView()
@@ -74,7 +73,7 @@ namespace AdelaideFuel.Maui.Controls
 
             Content = stackLayout;
 
-            _userDialogs = IoC.Resolve<IUserDialogs>();
+            _dialogService = IoC.Resolve<IDialogService>();
             _logger = IoC.Resolve<ILogger>();
 
             var tapGesture = new TapGestureRecognizer();
@@ -105,11 +104,10 @@ namespace AdelaideFuel.Maui.Controls
             try
             {
                 var fuelNames = FuelsSource.Select(i => i.Name).ToArray();
-                var result = await _userDialogs.ActionSheetAsync(
+                var result = await _dialogService.ActionSheetAsync(
                     Localisation.Resources.Fuels,
                     Localisation.Resources.Cancel,
-                    default,
-                    default,
+                    null,
                     fuelNames);
 
                 if (!string.IsNullOrEmpty(result) &&

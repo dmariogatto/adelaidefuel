@@ -1,5 +1,4 @@
-﻿using Acr.UserDialogs;
-using AdelaideFuel.Services;
+﻿using AdelaideFuel.Services;
 using Microsoft.Maui.ApplicationModel;
 
 namespace AdelaideFuel.ViewModels
@@ -9,7 +8,7 @@ namespace AdelaideFuel.ViewModels
         public IFuelService FuelService { get; }
         public INavigationService NavigationService { get; }
         public IAppPreferences AppPrefs { get; }
-        public IUserDialogs UserDialogs { get; }
+        public IDialogService DialogService { get; }
         public ILogger Logger { get; }
 
         public IThemeService ThemeService { get; }
@@ -20,7 +19,7 @@ namespace AdelaideFuel.ViewModels
             IFuelService fuelService,
             INavigationService navigationService,
             IAppPreferences appPrefs,
-            IUserDialogs userDialogs,
+            IDialogService dialogService,
             ILogger log,
             IThemeService themeService,
             IBrowser browser) : base()
@@ -28,7 +27,7 @@ namespace AdelaideFuel.ViewModels
             FuelService = fuelService;
             NavigationService = navigationService;
             AppPrefs = appPrefs;
-            UserDialogs = userDialogs;
+            DialogService = dialogService;
             Logger = log;
 
             ThemeService = themeService;

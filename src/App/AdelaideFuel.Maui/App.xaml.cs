@@ -61,7 +61,7 @@ public partial class App : Application
             {
                 Dispatcher.Dispatch(async () =>
                 {
-                    var goToSubscriptionPage = await Acr.UserDialogs.UserDialogs.Instance.ConfirmAsync(
+                    var goToSubscriptionPage = await IoC.Resolve<IDialogService>().ConfirmAsync(
                             Localisation.Resources.SubscriptionExpiredDescription,
                             Localisation.Resources.SubscriptionExpired,
                             Localisation.Resources.GoToSubscription,
