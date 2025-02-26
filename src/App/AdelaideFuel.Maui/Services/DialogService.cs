@@ -5,7 +5,7 @@ namespace AdelaideFuel.Maui.Services
 {
     public class DialogService : IDialogService
     {
-        private Page MainPage
+        private static Page MainPage
         {
             get
             {
