@@ -84,15 +84,15 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.10.0" />
-    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.0" />
+    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.10.1" />
+    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1" />
     <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.4.5.2" />
     <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.4.5.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.8.7.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.7.2" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.7.2" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="123.6.0.1" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.0.0.4" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.1.0" />
   </ItemGroup>
 
   <ItemGroup>
