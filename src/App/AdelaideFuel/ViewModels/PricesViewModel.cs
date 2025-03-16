@@ -17,6 +17,7 @@ namespace AdelaideFuel.ViewModels
         private readonly IConnectivity _connectivity;
         private readonly IPermissions _permissions;
         private readonly IVersionTracking _versionTracking;
+        private readonly IAppActions _appActions;
 
         private IReadOnlyList<UserFuel> _userFuels = [];
         private IReadOnlyList<UserRadius> _userRadii = [];
@@ -25,11 +26,13 @@ namespace AdelaideFuel.ViewModels
             IConnectivity connectivity,
             IPermissions permissions,
             IVersionTracking versionTracking,
+            IAppActions appActions,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             _connectivity = connectivity;
             _permissions = permissions;
             _versionTracking = versionTracking;
+            _appActions = appActions;
 
             Title = Resources.Prices;
 
@@ -291,7 +294,7 @@ namespace AdelaideFuel.ViewModels
                     .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
                     .ToArray();
 
-                await AppActions.SetAsync(actions);
+                await _appActions.SetAsync(actions);
             }
             catch (Exception ex)
             {
