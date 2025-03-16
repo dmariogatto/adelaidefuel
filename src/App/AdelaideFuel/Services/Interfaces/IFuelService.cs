@@ -18,7 +18,7 @@ namespace AdelaideFuel.Services
 
         Task<(IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc)> GetSitePricesAsync(CancellationToken cancellationToken);
 
-        Task<(IReadOnlyList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
+        Task<(IReadOnlyList<PriceItemByFuelGrouping> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken);
 
         Task<bool> SyncBrandsAsync(CancellationToken cancellationToken);
         Task<bool> SyncFuelsAsync(CancellationToken cancellationToken);
