@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace AdelaideFuel.Models
 {
-    public class SiteFuelPriceItemGroup : Grouping<UserFuel, SiteFuelPriceItem>
+    public class PriceItemByFuelGrouping : Grouping<UserFuel, SiteFuelPriceItem>
     {
-        public SiteFuelPriceItemGroup(UserFuel key, IEnumerable<SiteFuelPriceItem> items) : base(key, items)
+        public PriceItemByFuelGrouping(UserFuel key, IEnumerable<SiteFuelPriceItem> items) : base(key, items)
         {
         }
 

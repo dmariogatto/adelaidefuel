@@ -64,8 +64,8 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private IReadOnlyList<Grouping<UserFuel, SiteFuelPrice>> _filteredSites;
-        public IReadOnlyList<Grouping<UserFuel, SiteFuelPrice>> FilteredSites
+        private IReadOnlyList<PriceByFuelGrouping> _filteredSites;
+        public IReadOnlyList<PriceByFuelGrouping> FilteredSites
         {
             get => _filteredSites;
             private set => SetProperty(ref _filteredSites, value);
@@ -110,7 +110,7 @@ namespace AdelaideFuel.ViewModels
 
                 await delayTask;
 
-                FilteredSites = _sitePrices.Select(i => new Grouping<UserFuel, SiteFuelPrice>(i.Key, i.Value)).ToList();
+                FilteredSites = _sitePrices.Select(i => new PriceByFuelGrouping(i.Key, i.Value)).ToList();
             }
             catch (Exception ex)
             {
@@ -152,14 +152,14 @@ namespace AdelaideFuel.ViewModels
                 }
 
                 var filteredSiteIds = new HashSet<int>(filtered.Select(i => i.SiteId));
-                var filteredSites = new List<Grouping<UserFuel, SiteFuelPrice>>();
+                var filteredSites = new List<PriceByFuelGrouping>();
 
                 foreach (var kv in _sitePrices)
                 {
                     var prices = kv.Value.Where(i => filteredSiteIds.Contains(i.SiteId));
                     if (prices.Any())
                     {
-                        filteredSites.Add(new Grouping<UserFuel, SiteFuelPrice>(
+                        filteredSites.Add(new PriceByFuelGrouping(
                             new UserFuel()
                             {
                                 Id = prices.First().FuelId,

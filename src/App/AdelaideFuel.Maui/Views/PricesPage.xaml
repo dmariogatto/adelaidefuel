@@ -23,7 +23,7 @@
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
             <converters:IntToBoolConverter x:Key="intToBoolConverter" />
 
-            <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:SiteFuelPriceItemGroup">
+            <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:PriceItemByFuelGrouping">
                 <VerticalStackLayout Margin="{StaticResource XSmallTopThickness}" IsVisible="{Binding HasPrices}">
                     <Label Style="{DynamicResource LabelTitleStyle}" Text="{Binding Key.Name}" />
                     <controls:ItemCard>

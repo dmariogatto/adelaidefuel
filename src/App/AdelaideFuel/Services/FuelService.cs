@@ -219,7 +219,7 @@ namespace AdelaideFuel.Services
             return result;
         }
 
-        public async Task<(IReadOnlyList<SiteFuelPriceItemGroup> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
+        public async Task<(IReadOnlyList<PriceItemByFuelGrouping> groups, Location location, DateTime modifiedUtc)> GetFuelPricesByRadiusAsync(CancellationToken cancellationToken)
         {
             async Task<Location> getLocationAsync(CancellationToken ct)
             {
@@ -250,7 +250,7 @@ namespace AdelaideFuel.Services
 
             var (prices, modifiedUtc) = await pricesTask.ConfigureAwait(false);
 
-            var fuelGroups = new List<SiteFuelPriceItemGroup>();
+            var fuelGroups = new List<PriceItemByFuelGrouping>();
             var gpsLocation = default(Location);
 
             if (prices?.Any() == true)
@@ -285,7 +285,7 @@ namespace AdelaideFuel.Services
                     fuelPriceData.Add(new SiteFuelPriceAndDistance(fp, distanceKm, radiusKm));
                 }
 
-                var currentGroup = default(SiteFuelPriceItemGroup);
+                var currentGroup = default(PriceItemByFuelGrouping);
                 var currentRadius = -1;
                 var currentCheapest = double.MaxValue;
 
@@ -297,7 +297,7 @@ namespace AdelaideFuel.Services
                     {
                         var fuel = userFuels[currentFuelId];
 
-                        currentGroup = new SiteFuelPriceItemGroup(fuel, Array.Empty<SiteFuelPriceItem>());
+                        currentGroup = new PriceItemByFuelGrouping(fuel, Array.Empty<SiteFuelPriceItem>());
                         currentRadius = -1;
                         currentCheapest = double.MaxValue;
 

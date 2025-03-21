@@ -17,6 +17,7 @@ namespace AdelaideFuel.ViewModels
         private readonly IConnectivity _connectivity;
         private readonly IPermissions _permissions;
         private readonly IVersionTracking _versionTracking;
+        private readonly IAppActions _appActions;
 
         private IReadOnlyList<UserFuel> _userFuels = [];
         private IReadOnlyList<UserRadius> _userRadii = [];
@@ -25,11 +26,13 @@ namespace AdelaideFuel.ViewModels
             IConnectivity connectivity,
             IPermissions permissions,
             IVersionTracking versionTracking,
+            IAppActions appActions,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
         {
             _connectivity = connectivity;
             _permissions = permissions;
             _versionTracking = versionTracking;
+            _appActions = appActions;
 
             Title = Resources.Prices;
 
@@ -99,8 +102,8 @@ namespace AdelaideFuel.ViewModels
             set => SetProperty(ref _noLocation, value);
         }
 
-        private IReadOnlyList<SiteFuelPriceItemGroup> _fuelPriceGroups = [];
-        public IReadOnlyList<SiteFuelPriceItemGroup> FuelPriceGroups
+        private IReadOnlyList<PriceItemByFuelGrouping> _fuelPriceGroups = [];
+        public IReadOnlyList<PriceItemByFuelGrouping> FuelPriceGroups
         {
             get => _fuelPriceGroups;
             private set => SetProperty(ref _fuelPriceGroups, value);
@@ -198,13 +201,13 @@ namespace AdelaideFuel.ViewModels
             {
                 if (!_userFuels.SequenceEqual(fuels) || !_userRadii.SequenceEqual(radii))
                 {
-                    var fuelPriceGroups = new List<SiteFuelPriceItemGroup>();
+                    var fuelPriceGroups = new List<PriceItemByFuelGrouping>();
                     var range = Enumerable.Range(0, radii.Count);
 
                     foreach (var f in fuels)
                     {
                         var fuelPrices = range.Select(_ => new SiteFuelPriceItem()).ToList();
-                        fuelPriceGroups.Add(new SiteFuelPriceItemGroup(f, fuelPrices));
+                        fuelPriceGroups.Add(new PriceItemByFuelGrouping(f, fuelPrices));
                     }
 
                     HasPrices = false;
@@ -291,7 +294,7 @@ namespace AdelaideFuel.ViewModels
                     .Select(i => new AppAction($"{nameof(UserFuel)}_{i.Id}", i.Name, icon: "fuel_shortcut"))
                     .ToArray();
 
-                await AppActions.SetAsync(actions);
+                await _appActions.SetAsync(actions);
             }
             catch (Exception ex)
             {
