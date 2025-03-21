@@ -39,4 +39,18 @@ public class MainActivity : MauiAppCompatActivity
             .Build();
 #endif
     }
+
+    protected override void OnResume()
+    {
+        base.OnResume();
+
+        Platform.OnResume(this);
+    }
+
+    protected override void OnNewIntent(Intent intent)
+    {
+        base.OnNewIntent(intent);
+
+        Platform.OnNewIntent(intent);
+    }
 }
