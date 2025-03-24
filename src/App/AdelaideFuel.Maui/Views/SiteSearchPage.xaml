@@ -4,7 +4,6 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
-    xmlns:ffimg="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Compat.Maui"
     xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
     xmlns:models="clr-namespace:AdelaideFuel.Models;assembly=AdelaideFuel"
@@ -33,7 +32,7 @@
                 SelectionMode="None"
                 SeparatorVisibility="None">
                 <ListView.GroupHeaderTemplate>
-                    <DataTemplate x:DataType="{x:Null}">
+                    <DataTemplate x:DataType="models:PriceByFuelGrouping">
                         <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">
                             <HorizontalStackLayout Padding="{StaticResource SmallThickness}" Spacing="{StaticResource XSmallSpacing}">
                                 <controls:TintImage
