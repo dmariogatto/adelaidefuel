@@ -11,7 +11,7 @@ namespace AdelaideFuel.Maui.Views
         private static readonly CoordsToPositionConverter PositionConverter = new CoordsToPositionConverter();
         private static readonly PriceCategoryToColorConverter PriceCategoryConverter = new PriceCategoryToColorConverter();
 
-        private static Pin CreatePinTemplate(Type t)
+        private static Pin CreatePin(Type t)
         {
             if (t != typeof(Site))
                 throw new ArgumentOutOfRangeException(nameof(t));
@@ -30,7 +30,7 @@ namespace AdelaideFuel.Maui.Views
             return pin;
         }
 
-        public DataTemplate SiteTemplate { get; set; } = new DataTemplate(() => CreatePinTemplate(typeof(Site)));
+        public static readonly DataTemplate SiteTemplate = new DataTemplate(() => CreatePin(typeof(Site)));
 
         protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
         {
