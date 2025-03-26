@@ -25,8 +25,6 @@
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
             <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
             <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
-
-            <views:MapPinDataTemplateSelector x:Key="mapPinDataSelector" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -35,7 +33,7 @@
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
-                ItemTemplateSelector="{StaticResource mapPinDataSelector}"
+                ItemTemplate="{x:Static views:MapPinDataTemplateSelector.SiteTemplate}"
                 ItemsSource="{Binding FilteredSites}"
                 PropertyChanged="SiteMapPropertyChanged"
                 ShowUserLocationButton="{Binding EnableMyLocation}" />
