@@ -80,7 +80,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.2.0" />
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.3.0" />
+    <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
@@ -104,7 +105,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-    <PackageReference Include="Sentry.Maui" Version="5.5.1" />
+    <PackageReference Include="Sentry.Maui" Version="5.6.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
