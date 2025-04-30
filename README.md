@@ -16,13 +16,9 @@ The [maps package](https://www.nuget.org/packages/BetterMaps.Maui/) is based on 
 ### UI
 
 - [AiForms.Maui.SettingsView](https://github.com/muak/AiForms.Maui.SettingsView)
-- [FFImageLoading](https://github.com/Redth/FFImageLoading.Compat)
 - [Sharpnado - CollectionView](https://github.com/roubachof/Sharpnado.CollectionView)
 
 ### Platform
 
-- [Mvvm Helpers](https://github.com/jamesmontemagno/mvvm-helpers)
 - [Polly](https://github.com/App-vNext/Polly)
 - [StoreReviewPlugin](https://github.com/jamesmontemagno/StoreReviewPlugin)
-- [UserDialogs](https://github.com/aritchie/userdialogs)
-

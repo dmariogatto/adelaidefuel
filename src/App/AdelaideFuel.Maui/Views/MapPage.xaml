@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
-    xmlns:ffimg="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Compat.Maui"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
@@ -25,8 +24,6 @@
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
             <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
             <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
-
-            <views:MapPinDataTemplateSelector x:Key="mapPinDataSelector" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -35,7 +32,7 @@
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
-                ItemTemplateSelector="{StaticResource mapPinDataSelector}"
+                ItemTemplate="{x:Static views:MapPinDataTemplateSelector.SiteTemplate}"
                 ItemsSource="{Binding FilteredSites}"
                 PropertyChanged="SiteMapPropertyChanged"
                 ShowUserLocationButton="{Binding EnableMyLocation}" />
