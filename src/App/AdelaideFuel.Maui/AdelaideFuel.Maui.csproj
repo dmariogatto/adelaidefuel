@@ -73,14 +73,13 @@
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
 
     <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.17" />
-    <PackageReference Include="BetterMaps.Maui" Version="1.0.0" />
+    <PackageReference Include="BetterMaps.Maui" Version="2.0.0-beta1" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.3.0" />
     <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.0.0" />
   </ItemGroup>
 
@@ -118,6 +117,10 @@
 
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.4.0" />
   </ItemGroup>
 
   <Target Name="SelectStaticRegistrar" AfterTargets="SelectRegistrar">
