@@ -80,6 +80,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.4.0" />
     <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.0.0" />
   </ItemGroup>
 
@@ -117,10 +118,6 @@
 
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.4.0" />
   </ItemGroup>
 
   <Target Name="SelectStaticRegistrar" AfterTargets="SelectRegistrar">
