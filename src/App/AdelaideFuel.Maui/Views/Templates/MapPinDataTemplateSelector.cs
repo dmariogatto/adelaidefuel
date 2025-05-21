@@ -11,6 +11,8 @@ namespace AdelaideFuel.Maui.Views
         private static readonly CoordsToPositionConverter PositionConverter = new CoordsToPositionConverter();
         private static readonly PriceCategoryToColorConverter PriceCategoryConverter = new PriceCategoryToColorConverter();
 
+        private static readonly string TwoToneImg = Application.Current.FindResource<string>(Styles.Keys.TwoToneCircleImg);
+
         private static Pin CreatePin(Type t)
         {
             if (t != typeof(Site))
@@ -25,7 +27,7 @@ namespace AdelaideFuel.Maui.Views
             pin.SetBinding(Pin.TintColorProperty, static (Site i) => i.PriceCategory, converter: PriceCategoryConverter, mode: BindingMode.OneWay);
 
             pin.Anchor = new Point(0.5, 0.5);
-            pin.ImageSource = Application.Current.FindResource<string>(Styles.Keys.TwoToneCircleImg);
+            pin.ImageSource = TwoToneImg;
 
             return pin;
         }

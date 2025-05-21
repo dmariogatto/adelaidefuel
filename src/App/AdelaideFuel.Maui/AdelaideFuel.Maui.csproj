@@ -94,6 +94,7 @@
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.7.3" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.1" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.1" />
+    <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.3" />
   </ItemGroup>
 
   <ItemGroup>

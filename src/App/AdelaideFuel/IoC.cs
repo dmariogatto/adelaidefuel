@@ -13,8 +13,6 @@ using Microsoft.Maui.Media;
 using Microsoft.Maui.Networking;
 using Microsoft.Maui.Storage;
 using Plugin.InAppBilling;
-using Plugin.StoreReview;
-using Plugin.StoreReview.Abstractions;
 using System;
 using System.Net.Http;
 
@@ -55,7 +53,6 @@ namespace AdelaideFuel
             });
 
             services.AddSingleton<IInAppBilling>(_ => CrossInAppBilling.Current);
-            services.AddSingleton<IStoreReview>(_ => CrossStoreReview.Current);
 
             services.AddSingleton<IAppClock, AppClock>();
             services.AddSingleton<ICacheService, CacheService>();
