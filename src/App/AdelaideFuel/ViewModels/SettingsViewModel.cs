@@ -5,7 +5,6 @@ using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Devices;
-using Plugin.StoreReview.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,7 +54,7 @@ namespace AdelaideFuel.ViewModels
             });
 
             SendFeedbackCommand = new AsyncRelayCommand(SendFeedbackAsync);
-            RateAppCommand = new RelayCommand(RateApp);
+            RateAppCommand = new AsyncRelayCommand(RateAppAsync);
             OpenAppSettingsCommand = new RelayCommand(_appInfo.ShowSettingsUI);
             GoToSubscriptionCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<SubscriptionViewModel>());
             GoToBrandsCommand = new AsyncRelayCommand(() => NavigationService.NavigateToAsync<BrandsViewModel>());
@@ -139,7 +138,7 @@ namespace AdelaideFuel.ViewModels
 
         public RelayCommand LoadSettingsCommand { get; private set; }
         public AsyncRelayCommand SendFeedbackCommand { get; private set; }
-        public RelayCommand RateAppCommand { get; private set; }
+        public AsyncRelayCommand RateAppCommand { get; private set; }
         public RelayCommand OpenAppSettingsCommand { get; private set; }
         public AsyncRelayCommand GoToSubscriptionCommand { get; private set; }
         public AsyncRelayCommand GoToBrandsCommand { get; private set; }
@@ -166,12 +165,11 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
-        private void RateApp()
+        private async Task RateAppAsync()
         {
             var id = Constants.AppId;
-
             if (!string.IsNullOrEmpty(id))
-                _storeReview.OpenStoreReviewPage(id);
+                await _storeReview.OpenStoreReviewPageAsync(id);
         }
 
         private async Task BuildTappedAsync()

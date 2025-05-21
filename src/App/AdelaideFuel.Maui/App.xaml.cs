@@ -2,7 +2,6 @@
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
 using Cats.Maui.AdMob;
-using Plugin.StoreReview;
 using Polly;
 using System.Web;
 
@@ -166,7 +165,7 @@ public partial class App : Application
 #if DEBUG
                 testMode = true;
 #endif
-                await CrossStoreReview.Current.RequestReview(testMode);
+                await IoC.Resolve<IStoreReview>().RequestReviewAsync(testMode);
                 appPrefs.ReviewRequested = true;
                 IoC.Resolve<ILogger>().Event(Events.Action.ReviewRequested, new Dictionary<string, string>(1)
                     {

@@ -140,6 +140,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRetryPolicyService, RetryPolicyPlatformService>();
         builder.Services.AddSingleton<INavigationService, TabbedNavigationService>();
         builder.Services.AddSingleton<IThemeService, ThemeService>();
+        builder.Services.AddSingleton<IStoreReview, StoreReview>();
 
 #if DEBUG
         builder.Logging.AddDebug();
