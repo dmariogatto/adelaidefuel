@@ -80,21 +80,21 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.4.0" />
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.5.0" />
     <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.10.1.1" />
-    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.1" />
-    <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.5.0.1" />
-    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.8.7.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.7.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.7.3" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.1" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.1" />
-    <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.3" />
+    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.10.1.2" />
+    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.2" />
+    <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.5.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.8.7.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.7.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.7.4" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.2" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.2" />
+    <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -106,7 +106,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-    <PackageReference Include="Sentry.Maui" Version="5.7.0" />
+    <PackageReference Include="Sentry.Maui" Version="5.10.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
