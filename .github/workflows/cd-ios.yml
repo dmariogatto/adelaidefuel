@@ -79,7 +79,7 @@ jobs:
 
     - name: Download Provisioning Profiles
       id: provisioning_app
-      uses: poad/apple-provisioning-profiles-downloader@v1.0.8
+      uses: apple-actions/download-provisioning-profiles@v4
       with: 
         bundle-id: ${{ inputs.package-name }}
         profile-type: 'IOS_APP_STORE'
@@ -134,7 +134,7 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
 
     - name: Upload to TestFlight
-      uses: henrik1/upload-testflight@v2
+      uses: apple-actions/upload-testflight-build@v3
       with:
         app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-name }}.Maui.ipa
         issuer-id: ${{ secrets.appstore-issuer }}
