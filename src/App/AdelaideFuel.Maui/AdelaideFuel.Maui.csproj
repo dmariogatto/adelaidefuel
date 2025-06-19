@@ -89,9 +89,9 @@
     <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.2" />
     <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.5.0.2" />
     <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.8.7.4" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.7.4" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.7.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.9.0" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.9.0" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.9.0" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.2" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.2" />
     <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.4" />
