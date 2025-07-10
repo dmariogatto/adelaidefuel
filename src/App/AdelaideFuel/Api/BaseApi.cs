@@ -24,7 +24,7 @@ namespace AdelaideFuel.Api
 
             using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var result = await JsonSerializer.DeserializeAsync<TResponse>(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
             return result;
         }
@@ -41,7 +41,7 @@ namespace AdelaideFuel.Api
 
             using var response = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var result = await JsonSerializer.DeserializeAsync<TResponse>(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
             return result;
         }
