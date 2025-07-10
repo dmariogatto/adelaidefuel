@@ -67,20 +67,13 @@ namespace AdelaideFuel.ViewModels
             {
                 async Task loadEntitiesAsync()
                 {
-                    switch (typeof(T))
+                    Entities = typeof(T) switch
                     {
-                        case Type t when t == typeof(UserBrand):
-                            Entities = await FuelService.GetUserBrandsAsync(default);
-                            break;
-                        case Type t when t == typeof(UserFuel):
-                            Entities = await FuelService.GetUserFuelsAsync(default);
-                            break;
-                        case Type t when t == typeof(UserRadius):
-                            Entities = await FuelService.GetUserRadiiAsync(default);
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unsupported type {typeof(T).Name}");
-                    }
+                        var t when t == typeof(UserBrand) => await FuelService.GetUserBrandsAsync(default),
+                        var t when t == typeof(UserFuel) => await FuelService.GetUserFuelsAsync(default),
+                        var t when t == typeof(UserRadius) => await FuelService.GetUserRadiiAsync(default),
+                        _ => throw new InvalidOperationException($"Unsupported type {typeof(T).Name}")
+                    };
                 };
 
                 await loadEntitiesAsync();
@@ -116,27 +109,33 @@ namespace AdelaideFuel.ViewModels
             {
                 if (typeof(T) == typeof(UserRadius))
                 {
-                    var toSave = Entities.Except(_originalEntities).ToList();
-                    var toRemove = _originalEntities.Where(o => Entities.All(e => e.Id != o.Id)).ToList();
+                    var toSave = Entities
+                        .Except(_originalEntities)
+                        .OfType<UserRadius>()
+                        .ToList();
+                    var toRemove = _originalEntities
+                        .Where(o => Entities.All(e => e.Id != o.Id))
+                        .OfType<UserRadius>()
+                        .ToList();
 
-                    if (toSave.Any())
-                        await FuelService.UpsertUserRadiiAsync(toSave.OfType<UserRadius>().ToList(), default);
-                    if (toRemove.Any())
-                        await FuelService.RemoveUserRadiiAsync(toRemove.OfType<UserRadius>().ToList(), default);
+                    if (toSave.Count != 0)
+                        await FuelService.UpsertUserRadiiAsync(toSave, default);
+                    if (toRemove.Count != 0)
+                        await FuelService.RemoveUserRadiiAsync(toRemove, default);
                 }
                 else
                 {
                     Entities.ForEach((idx, e) => e.SortOrder = idx);
-                    var toSave = Entities.Except(_originalEntities).ToList();
+                    var toSave = Entities.Except(_originalEntities);
 
                     if (toSave.Any())
                     {
                         switch (typeof(T))
                         {
-                            case Type t when t == typeof(UserBrand):
+                            case var t when t == typeof(UserBrand):
                                 await FuelService.UpsertUserBrandsAsync(toSave.OfType<UserBrand>().ToList(), default);
                                 break;
-                            case Type t when t == typeof(UserFuel):
+                            case var t when t == typeof(UserFuel):
                                 await FuelService.UpsertUserFuelsAsync(toSave.OfType<UserFuel>().ToList(), default);
                                 break;
                             default:
@@ -157,13 +156,13 @@ namespace AdelaideFuel.ViewModels
 
         private async Task EntityTappedAsync(IUserSortableEntity entity)
         {
-            if (entity is null || (entity is UserRadius ur && ur.Id == int.MaxValue))
+            if (entity is null or UserRadius { Id: int.MaxValue })
                 return;
 
             try
             {
                 var active = Entities.Where(i => i.IsActive).ToList();
-                if (active.Count == 1 && active.First() == entity)
+                if (active.Count == 1 && active[0].Equals(entity))
                 {
                     await DialogService.AlertAsync(
                         string.Format(Resources.MustHaveAtLeastOneActiveItem, EntityName.ToLower()),
@@ -183,12 +182,12 @@ namespace AdelaideFuel.ViewModels
 
         private async Task EntityRemoveAsync(IUserSortableEntity entity)
         {
-            if (entity is null || (entity is UserRadius ur && ur.Id == int.MaxValue))
+            if (entity is null or UserRadius { Id: int.MaxValue })
                 return;
 
             try
             {
-                if (Entities.Count == 1 && Entities.First() == entity)
+                if (Entities.Count == 1 && Entities[0].Equals(entity))
                 {
                     await DialogService.AlertAsync(
                         string.Format(Resources.MustHaveAtLeastOneActiveItem, EntityName.ToLower()),
