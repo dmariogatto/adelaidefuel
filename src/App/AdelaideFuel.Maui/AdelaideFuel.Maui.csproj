@@ -75,7 +75,7 @@
     <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.17" />
     <PackageReference Include="BetterMaps.Maui" Version="2.0.0-beta1" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.11" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
   </ItemGroup>
 
