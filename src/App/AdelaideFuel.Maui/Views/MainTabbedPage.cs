@@ -100,9 +100,10 @@ namespace AdelaideFuel.Maui.Views
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
                 titleContent.SetDynamicResource(View.BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
-                titleLbl.SetDynamicResource(Label.TextColorProperty, Styles.FontSizes.Title);
+                titleContent.Padding = App.Current.FindResource<Thickness>(Styles.Keys.MediumBottomThickness);
+                titleLbl.SetDynamicResource(Label.FontSizeProperty, Styles.FontSizes.Title);
                 titleLbl.TextColor = Colors.White;
-                titleLbl.Padding = App.Current.FindResource<Thickness>(Styles.Keys.SmallLeftThickness);
+                titleLbl.Padding = App.Current.FindResource<Thickness>(Styles.Keys.MediumLeftThickness);
                 titleLbl.HorizontalOptions = LayoutOptions.Start;
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
@@ -113,10 +114,10 @@ namespace AdelaideFuel.Maui.Views
                 titleLbl.HorizontalOptions = LayoutOptions.Center;
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
-
-            mainGrid.Add(titleContent, 0, 0);
+                        
             mainGrid.Add(_viewSwitcher, 0, 1);
             mainGrid.Add(_tabHostView, 0, 2);
+            mainGrid.Add(titleContent, 0, 0);
 
             Content = mainGrid;
         }

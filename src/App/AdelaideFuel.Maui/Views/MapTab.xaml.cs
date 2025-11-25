@@ -75,7 +75,7 @@ namespace AdelaideFuel.Maui.Views
 
             SetupAutoRefresh();
 
-            BottomDrawerControl.FadeTo(1);
+            BottomDrawerControl.FadeToAsync(1);
         }
 
         public override void OnDisappearing()
@@ -87,7 +87,7 @@ namespace AdelaideFuel.Maui.Views
             FuelId = string.Empty;
             SiteId = string.Empty;
 
-            BottomDrawerControl.FadeTo(0);
+            BottomDrawerControl.FadeToAsync(0);
         }
 
         private void SetupAutoRefresh()

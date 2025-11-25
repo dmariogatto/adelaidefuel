@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage
-    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    Title="{Binding Title}"
     x:Class="AdelaideFuel.Maui.Views.SubscriptionPage"
-    x:DataType="viewModels:SubscriptionViewModel"
-    x:TypeArguments="viewModels:SubscriptionViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:const="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    Title="{Binding Title}"
+    x:DataType="viewModels:SubscriptionViewModel"
+    x:TypeArguments="viewModels:SubscriptionViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -31,7 +31,7 @@
                 </OnPlatform.Platforms>
             </OnPlatform>
 
-            <Style TargetType="Button" x:Key="SubscriptionButton">
+            <Style x:Key="SubscriptionButton" TargetType="Button">
                 <Setter Property="HeightRequest" Value="{StaticResource ButtonHeight}" />
                 <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
                 <Setter Property="Padding" Value="6,0,6,0" />
@@ -51,18 +51,18 @@
                 Spacing="{StaticResource SmallSpacing}"
                 VerticalOptions="Start">
                 <Label
+                    Margin="{StaticResource DefaultMargin}"
                     FontAttributes="Bold"
                     HorizontalTextAlignment="Center"
                     IsVisible="{Binding ExpiryDate, Converter={StaticResource IsNotNullConverter}}"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{local:Translate SubscriptionThankyou}" />
 
                 <Label
+                    Margin="{StaticResource DefaultMargin}"
                     FontFamily="{StaticResource BoldFontFamily}"
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionActiveUntilFormat}}">
                     <View.Triggers>
@@ -77,10 +77,10 @@
                 </Label>
 
                 <Label
+                    Margin="{StaticResource DefaultMargin}"
                     FontFamily="{StaticResource BoldFontFamily}"
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{Binding ExpiryDate, StringFormat={local:Translate SubscriptionExpiredOnFormat}}">
                     <View.Triggers>
@@ -95,10 +95,10 @@
                 </Label>
 
                 <Label
+                    Margin="{StaticResource DefaultMargin}"
                     FontFamily="{StaticResource BoldFontFamily}"
                     HorizontalTextAlignment="Center"
                     IsVisible="False"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{local:Translate Suspended,
                                            Transform=Uppercase}">
@@ -120,14 +120,14 @@
 
                 <Grid BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" RowDefinitions="1,Auto,1,Auto,1">
                     <BoxView
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         HeightRequest="1"
-                        HorizontalOptions="Fill" />
+                        HorizontalOptions="Fill"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <Grid
-                        ColumnDefinitions="*,Auto"
                         Grid.Row="1"
                         Padding="{StaticResource MediumThickness}"
+                        ColumnDefinitions="*,Auto"
                         RowDefinitions="Auto,Auto,Auto,Auto">
                         <controls:AppIconView
                             Grid.RowSpan="4"
@@ -146,40 +146,40 @@
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding SubscriptionProduct.LocalizedPrice, StringFormat={local:Translate ItemPerYear}}" />
                         <Button
-                            Command="{Binding PurchaseCommand}"
-                            Grid.Column="1"
                             Grid.Row="1"
+                            Grid.Column="1"
+                            Command="{Binding PurchaseCommand}"
                             IsVisible="{Binding HasExpired}"
                             Style="{StaticResource SubscriptionButton}"
                             Text="{local:Translate Subscribe}" />
                         <Button
-                            Command="{Binding ManageSubscriptionsCommand}"
-                            Grid.Column="1"
                             Grid.Row="2"
+                            Grid.Column="1"
+                            Command="{Binding ManageSubscriptionsCommand}"
                             IsVisible="{Binding HasExpired, Converter={StaticResource InverseBoolConverter}}"
                             Style="{StaticResource SubscriptionButton}"
                             Text="{local:Translate ChangeOrCancelSubscription}" />
                         <Button
-                            Command="{Binding RestorePurchasesCommand}"
-                            Grid.Column="1"
                             Grid.Row="3"
+                            Grid.Column="1"
+                            Command="{Binding RestorePurchasesCommand}"
                             Style="{StaticResource SubscriptionButton}"
                             Text="{local:Translate RestorePreviousPurchases}" />
                     </Grid>
 
                     <BoxView
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         Grid.Row="2"
+                        Margin="12,0,0,0"
                         HeightRequest="1"
                         HorizontalOptions="Fill"
-                        Margin="12,0,0,0" />
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <Grid
+                        Grid.Row="3"
+                        Margin="12,8,12,8"
                         ColumnDefinitions="*,Auto"
                         ColumnSpacing="{StaticResource SmallSpacing}"
-                        Grid.Row="3"
                         IsEnabled="{Binding HasValidSubscription}"
-                        Margin="12,8,12,8"
                         Opacity="{StaticResource UnselectedOpacity}"
                         RowDefinitions="Auto,Auto"
                         RowSpacing="{StaticResource SmallSpacing}">
@@ -193,20 +193,20 @@
                         </View.Triggers>
 
                         <Label
+                            x:Name="BannerAdsLabel"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Medium}}"
                             HorizontalOptions="Start"
                             Style="{DynamicResource LabelStyle}"
                             Text="{local:Translate BannerAds}"
-                            VerticalOptions="Center"
-                            x:Name="BannerAdsLabel" />
+                            VerticalOptions="Center" />
                         <Label
-                            FontSize="{DynamicResource {x:Static styles:FontSizes.Caption}}"
                             Grid.Row="1"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Caption}}"
                             Text="{local:Translate BannerAdsDescription}"
                             TextColor="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                         <Switch
-                            Grid.Column="1"
                             Grid.RowSpan="2"
+                            Grid.Column="1"
                             HorizontalOptions="Center"
                             IsToggled="{Binding BannerAds}"
                             SemanticProperties.Description="{local:Translate BannerAdsDescription}"
@@ -214,10 +214,10 @@
                     </Grid>
 
                     <BoxView
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
                         Grid.Row="4"
                         HeightRequest="1"
-                        HorizontalOptions="Fill" />
+                        HorizontalOptions="Fill"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 </Grid>
 
                 <Label
@@ -227,18 +227,18 @@
                                       iOS={local:Translate AppleSubscriptionDisclaimer}}" />
 
                 <Button
+                    Margin="{StaticResource DefaultMargin}"
                     BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="{x:Static const:Constants.PrivacyUrl}"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{StaticResource SubscriptionButton}"
                     Text="{local:Translate PrivacyPolicy}"
                     TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
                 <Button
+                    Margin="{StaticResource DefaultMargin}"
                     BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="{x:Static const:Constants.TermsOfUseUrl}"
-                    Margin="{StaticResource DefaultMargin}"
                     Style="{StaticResource SubscriptionButton}"
                     Text="{local:Translate TermsOfUse}"
                     TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />

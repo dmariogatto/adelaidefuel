@@ -25,7 +25,7 @@ namespace AdelaideFuel.Maui.Views
             Search.SetBinding(SearchBar.PlaceholderProperty, static (ISearchPage i) => i.Placeholder, mode: BindingMode.OneWay, source: this);
         }
 
-        private void ListViewItemTapped(object sender, ItemTappedEventArgs e)
+        private void ItemTapped(object sender, TappedEventArgs e)
         {
             if (Search.IsSoftInputShowing())
             {
@@ -34,7 +34,7 @@ namespace AdelaideFuel.Maui.Views
 
             Search.Unfocus();
 
-            if (e.Item is SiteFuelPrice model)
+            if (sender is View v && v.BindingContext is SiteFuelPrice model)
             {
                 ViewModel.TappedCommand.ExecuteAsync(model);
             }

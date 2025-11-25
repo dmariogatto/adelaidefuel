@@ -1,12 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:BaseTabAdView
-    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    IconImageSource="{StaticResource MapImg}"
-    Title="{Binding Title}"
     x:Class="AdelaideFuel.Maui.Views.MapTab"
-    x:DataType="viewModels:MapViewModel"
-    x:TypeArguments="viewModels:MapViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
@@ -14,7 +10,11 @@
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    Title="{Binding Title}"
+    x:DataType="viewModels:MapViewModel"
+    x:TypeArguments="viewModels:MapViewModel"
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    IconImageSource="{StaticResource MapImg}">
 
     <View.Resources>
         <ResourceDictionary>
@@ -29,19 +29,19 @@
     <views:BaseTabAdView.MainContent>
         <Grid SafeAreaEdges="None" SizeChanged="BottomSheetSizeChanged">
             <controls:FuelMap
+                x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
                 ItemTemplate="{x:Static views:MapPinDataTemplateSelector.SiteTemplate}"
                 ItemsSource="{Binding FilteredSites}"
                 PropertyChanged="SiteMapPropertyChanged"
-                ShowUserLocationButton="{Binding EnableMyLocation}"
-                x:Name="SiteMap" />
+                ShowUserLocationButton="{Binding EnableMyLocation}" />
 
             <VerticalStackLayout
+                Margin="{StaticResource XSmallTopThickness}"
+                Padding="{StaticResource XLargeTopThickness}"
                 CascadeInputTransparent="False"
                 HorizontalOptions="Center"
                 InputTransparent="True"
-                Margin="{StaticResource XSmallTopThickness}"
-                Padding="{StaticResource XLargeTopThickness}"
                 Spacing="{StaticResource SmallSpacing}">
                 <controls:FuelSelectionView
                     FuelsSource="{Binding Fuels}"
@@ -51,15 +51,15 @@
             </VerticalStackLayout>
 
             <controls:ItemCard
+                x:Name="SearchButtonLayout"
+                Margin="{StaticResource LargeRightThickness}"
+                Padding="0"
                 HeightRequest="44"
                 HorizontalOptions="End"
                 IsVisible="{Binding InitialLoadComplete}"
-                Margin="{StaticResource LargeRightThickness}"
-                Padding="0"
                 StrokeShape="RoundRectangle 22,22,22,22"
                 VerticalOptions="Center"
-                WidthRequest="44"
-                x:Name="SearchButtonLayout">
+                WidthRequest="44">
                 <View.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToSiteSearchCommand}" />
                 </View.GestureRecognizers>
@@ -71,27 +71,27 @@
             </controls:ItemCard>
 
             <controls:BottomDrawer
-                IsVisible="{Binding InitialLoadComplete}"
+                x:Name="BottomDrawerControl"
                 Margin="0,1000,0,-1000"
                 Padding="{StaticResource SmallThickness}"
-                PropertyChanged="BottomDrawerControlPropertyChanged"
-                x:Name="BottomDrawerControl">
+                IsVisible="{Binding InitialLoadComplete}"
+                PropertyChanged="BottomDrawerControlPropertyChanged">
                 <VerticalStackLayout SizeChanged="BottomSheetSizeChanged" VerticalOptions="Start">
                     <BoxView
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
+                        x:Name="BottomDrawerHandle"
+                        Margin="0,8,0,10"
                         CornerRadius="2"
                         HeightRequest="4"
                         HorizontalOptions="Center"
                         IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
-                        Margin="0,8,0,10"
                         WidthRequest="60"
-                        x:Name="BottomDrawerHandle" />
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <Label
+                        Margin="{StaticResource SmallBottomThickness}"
                         FontFamily="{StaticResource BoldFontFamily}"
                         HorizontalTextAlignment="Center"
                         IsVisible="{Binding SelectedSite, Converter={StaticResource IsNullConverter}}"
-                        Margin="{StaticResource SmallBottomThickness}"
                         Style="{DynamicResource LabelStyle}"
                         Text="{local:Translate Prices}">
                         <View.Triggers>
@@ -112,30 +112,30 @@
                         IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
                         RowDefinitions="Auto,Auto"
                         RowSpacing="{StaticResource DefaultSpacing}">
-                        <controls:BrandIconView BrandId="{Binding SelectedSite.BrandId}" Grid.RowSpan="3" />
+                        <controls:BrandIconView Grid.RowSpan="3" BrandId="{Binding SelectedSite.BrandId}" />
                         <Label
-                            FontFamily="{StaticResource BoldFontFamily}"
                             Grid.Column="1"
-                            LineBreakMode="TailTruncation"
                             Margin="{StaticResource XSmallLeftThickness}"
+                            FontFamily="{StaticResource BoldFontFamily}"
+                            LineBreakMode="TailTruncation"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding SelectedSite.Label}" />
                         <Label
+                            Grid.Column="2"
                             FontFamily="{StaticResource BoldItalicFontFamily}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
-                            Grid.Column="2"
                             HorizontalTextAlignment="Start"
                             Style="{DynamicResource LabelTitleStyle}"
                             Text="{Binding SelectedSite.OpeningHours, Converter={StaticResource openingHoursToStringConverter}}"
                             VerticalTextAlignment="Center" />
                         <Label
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="{StaticResource XSmallLeftThickness}"
                             FontFamily="{StaticResource BoldItalicFontFamily}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
-                            Grid.Column="1"
-                            Grid.Row="1"
                             HorizontalOptions="Start"
                             LineBreakMode="TailTruncation"
-                            Margin="{StaticResource XSmallLeftThickness}"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding SelectedSite.Address}"
                             TextColor="{DynamicResource {x:Static styles:Keys.LinkColor}}">
@@ -144,9 +144,9 @@
                             </View.GestureRecognizers>
                         </Label>
                         <Label
-                            FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
-                            Grid.Column="2"
                             Grid.Row="1"
+                            Grid.Column="2"
+                            FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
                             HorizontalTextAlignment="End"
                             Style="{DynamicResource LabelTitleStyle}"
                             Text="{Binding SelectedSite.LastKnownDistanceKm, Converter={StaticResource kmToStringConverter}}"
@@ -154,30 +154,30 @@
                     </Grid>
 
                     <BoxView
-                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}"
-                        HeightRequest="1"
+                        x:Name="BottomSheetDivider"
                         Margin="{StaticResource MediumLeftTopThickness}"
-                        x:Name="BottomSheetDivider" />
+                        HeightRequest="1"
+                        Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
                     <controls:PricesBoardView Padding="{StaticResource MediumLeftTopThickness}" SiteFuelPrices="{Binding SelectedSite.Prices}" />
 
                     <Grid
+                        Padding="{StaticResource MediumLeftThickness}"
                         ColumnDefinitions="*,*"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
-                        Padding="{StaticResource MediumLeftThickness}">
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}">
                         <Button
+                            Padding="0,8,0,8"
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{x:Static shared:Constants.PriceErrorFormUrl}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
                             HorizontalOptions="Start"
-                            Padding="0,8,0,8"
                             Style="{DynamicResource ButtonStyle}"
                             Text="{local:Translate ReportPriceError}"
                             VerticalOptions="Center" />
                         <Label
+                            Grid.Column="1"
                             FontFamily="{StaticResource ItalicFontFamily}"
                             FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
-                            Grid.Column="1"
                             HorizontalOptions="End"
                             Style="{DynamicResource LabelStyle}"
                             Text="{Binding SelectedSite.LastUpdatedUtc, Converter={StaticResource dateToLocalConverter}, StringFormat='{0:g}'}"

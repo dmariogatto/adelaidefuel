@@ -12,7 +12,6 @@
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
     Title="{Binding Title}"
-    ios:Page.UseSafeArea="True"
     x:DataType="viewModels:SiteSearchViewModel"
     x:TypeArguments="viewModels:SiteSearchViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
@@ -20,20 +19,15 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="Auto,*">
-            <ListView
+            <CollectionView
                 Grid.Row="1"
-                Margin="{StaticResource ListViewMargin}"
                 BackgroundColor="Transparent"
-                CachingStrategy="RecycleElement"
-                HasUnevenRows="True"
-                IsGroupingEnabled="True"
-                ItemTapped="ListViewItemTapped"
+                IsGrouped="True"
                 ItemsSource="{Binding FilteredSites}"
-                SelectionMode="None"
-                SeparatorVisibility="None">
-                <ListView.GroupHeaderTemplate>
+                SelectionMode="None">
+                <CollectionView.GroupHeaderTemplate>
                     <DataTemplate x:DataType="models:PriceByFuelGrouping">
-                        <ViewCell ios:Cell.DefaultBackgroundColor="Transparent">
+                        <ContentView>
                             <HorizontalStackLayout Padding="{StaticResource SmallThickness}" Spacing="{StaticResource XSmallSpacing}">
                                 <controls:TintImage
                                     HeightRequest="24"
@@ -46,63 +40,64 @@
                                     Text="{Binding Key.Name}"
                                     VerticalTextAlignment="Center" />
                             </HorizontalStackLayout>
-                        </ViewCell>
+                        </ContentView>
                     </DataTemplate>
-                </ListView.GroupHeaderTemplate>
-                <ListView.ItemTemplate>
+                </CollectionView.GroupHeaderTemplate>
+                <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:SiteFuelPrice">
-                        <ViewCell>
-                            <ContentView>
-                                <controls:ItemCard>
-                                    <Grid
-                                        ColumnDefinitions="48,*,Auto"
-                                        ColumnSpacing="{StaticResource XSmallSpacing}"
-                                        RowDefinitions="Auto,Auto"
-                                        RowSpacing="{StaticResource XSmallSpacing}">
-                                        <controls:BrandIconView
-                                            Grid.RowSpan="3"
-                                            BrandId="{Binding BrandId}"
-                                            Size="40" />
-                                        <Label
-                                            Grid.Column="1"
-                                            Style="{DynamicResource LabelTitleStyle}"
-                                            Text="{Binding SiteName}" />
-                                        <Label
-                                            Grid.Row="1"
-                                            Grid.Column="1"
-                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
-                                            Style="{DynamicResource LabelStyle}">
-                                            <Label.Text>
-                                                <MultiBinding StringFormat="{}{0}, {1}">
-                                                    <Binding Path="SiteAddress" />
-                                                    <Binding Path="SitePostcode" />
-                                                </MultiBinding>
-                                            </Label.Text>
-                                        </Label>
-                                        <Label
-                                            Grid.RowSpan="2"
-                                            Grid.Column="2"
-                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
-                                            HorizontalTextAlignment="End"
-                                            Style="{DynamicResource LabelStyle}"
-                                            Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
-                                            VerticalTextAlignment="Center">
-                                            <View.Triggers>
-                                                <DataTrigger
-                                                    Binding="{Binding PriceInCents}"
-                                                    TargetType="View"
-                                                    Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
-                                                    <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
-                                                </DataTrigger>
-                                            </View.Triggers>
-                                        </Label>
-                                    </Grid>
-                                </controls:ItemCard>
-                            </ContentView>
-                        </ViewCell>
+                        <ContentView>
+                            <controls:ItemCard>
+                                <View.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="ItemTapped" />
+                                </View.GestureRecognizers>
+                                <Grid
+                                    ColumnDefinitions="48,*,Auto"
+                                    ColumnSpacing="{StaticResource XSmallSpacing}"
+                                    RowDefinitions="Auto,Auto"
+                                    RowSpacing="{StaticResource XSmallSpacing}">
+                                    <controls:BrandIconView
+                                        Grid.RowSpan="3"
+                                        BrandId="{Binding BrandId}"
+                                        Size="40" />
+                                    <Label
+                                        Grid.Column="1"
+                                        Style="{DynamicResource LabelTitleStyle}"
+                                        Text="{Binding SiteName}" />
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Small}}"
+                                        Style="{DynamicResource LabelStyle}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0}, {1}">
+                                                <Binding Path="SiteAddress" />
+                                                <Binding Path="SitePostcode" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                    <Label
+                                        Grid.RowSpan="2"
+                                        Grid.Column="2"
+                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
+                                        HorizontalTextAlignment="End"
+                                        Style="{DynamicResource LabelStyle}"
+                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                        VerticalTextAlignment="Center">
+                                        <View.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding PriceInCents}"
+                                                TargetType="View"
+                                                Value="{x:Static shared:Constants.OutOfStockPriceInCents}">
+                                                <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
+                                            </DataTrigger>
+                                        </View.Triggers>
+                                    </Label>
+                                </Grid>
+                            </controls:ItemCard>
+                        </ContentView>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
             <SearchBar
                 x:Name="Search"
