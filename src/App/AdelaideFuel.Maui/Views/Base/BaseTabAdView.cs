@@ -1,17 +1,13 @@
-﻿using AdelaideFuel.Maui.Controls;
-using AdelaideFuel.Maui.Converters;
-using AdelaideFuel.Services;
-using AdelaideFuel.ViewModels;
-using Cats.Maui.AdMob;
+﻿using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
 {
     [ContentProperty(nameof(MainContent))]
-    public class BaseAdPage<T> : BasePage<T> where T : BaseViewModel
+    public class BaseTabAdView<T> : BaseTabView<T> where T : BaseViewModel
     {
         private AdContentView _mainView;
 
-        public BaseAdPage() : base()
+        public BaseTabAdView() : base()
         {
             Content = _mainView = new AdContentView();
         }
@@ -28,14 +24,14 @@ namespace AdelaideFuel.Maui.Views
             set => _mainView.AdUnitId = value;
         }
 
-        protected override void OnAppearing()
+        public override void OnAppearing()
         {
             base.OnAppearing();
 
             _mainView.OnAppearing();
         }
 
-        protected override void OnDisappearing()
+        public override void OnDisappearing()
         {
             base.OnDisappearing();
 

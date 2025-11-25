@@ -30,7 +30,7 @@ namespace AdelaideFuel.Maui.Services
             }
         }
 
-        private TabbedPage TabbedPage => MainPage?.RootPage as TabbedPage;
+        private MainTabbedPage TabbedPage => MainPage?.RootPage as MainTabbedPage;
 
         public TabbedNavigationService(ILogger logger) : base(logger)
         {
@@ -44,45 +44,9 @@ namespace AdelaideFuel.Maui.Services
         {
             if (Application.Current.Windows.Count == 0)
             {
-                var tabbedPage = new TabbedPage();
-                tabbedPage.SetDynamicResource(TabbedPage.StyleProperty, Styles.Keys.BaseTabbedPageStyle);
+                var tabbedPage = new MainTabbedPage();
 
-                TabbedPage_Droid.SetToolbarPlacement(tabbedPage, ToolbarPlacement_Droid.Bottom);
-                TabbedPage_Droid.SetIsSwipePagingEnabled(tabbedPage, false);
                 NavigationPage.SetHasNavigationBar(tabbedPage, false);
-
-                tabbedPage.Children.Add(new NavigationPage()
-                {
-                    IconImageSource = ImageSource.FromFile(Application.Current.Resources[Styles.Keys.FuelImg]?.ToString()),
-                    Title = Localisation.Resources.Prices,
-                });
-                tabbedPage.Children.Add(new NavigationPage()
-                {
-                    IconImageSource = ImageSource.FromFile(Application.Current.Resources[Styles.Keys.MapImg]?.ToString()),
-                    Title = Localisation.Resources.Map
-                });
-                tabbedPage.Children.Add(new NavigationPage()
-                {
-                    IconImageSource = ImageSource.FromFile(Application.Current.Resources[Styles.Keys.CogImg]?.ToString()),
-                    Title = Localisation.Resources.Settings
-                });
-
-                ApplyNavigationPageStyle(tabbedPage.Children[2]);
-
-                tabbedPage.CurrentPage = tabbedPage.Children.First();
-
-                if (DeviceInfo.Platform == DevicePlatform.Android)
-                {
-                    LoadTab(tabbedPage, (NavigationPage)tabbedPage.CurrentPage);
-                    // lazy load tabs for the slight start-up gain
-                    tabbedPage.CurrentPageChanged += CurrentPageChanged;
-                }
-                else
-                {
-                    LoadTab(tabbedPage, (NavigationPage)tabbedPage.Children[0]);
-                    LoadTab(tabbedPage, (NavigationPage)tabbedPage.Children[1]);
-                    LoadTab(tabbedPage, (NavigationPage)tabbedPage.Children[2]);
-                }
 
                 var mainNavPage = new NavigationPage(tabbedPage);
                 mainNavPage.Popped += OnMainNavigationPopped;
@@ -103,23 +67,22 @@ namespace AdelaideFuel.Maui.Services
             {
                 var vmType = typeof(T);
 
-                var navigatedPage = default(Page);
+                var navigatedPage = default(IView);
                 var navFunc = default(Func<Task>);
 
-                if (_tabViewModels.Contains(vmType))
+                if (TabbedPage.GetIndexForViewModel(vmType) is var i and >= 0)
                 {
-                    var navTab = (NavigationPage)TabbedPage.Children[Array.IndexOf(_tabViewModels, vmType)];
-                    navigatedPage = navTab.RootPage ?? LoadTab(TabbedPage, navTab);
+                    navigatedPage = TabbedPage.GetTabForIndex(i);
                     navFunc = () =>
                     {
-                        TabbedPage.CurrentPage = navTab;
+                        TabbedPage.SelectedIndex = i;
                         return Task.CompletedTask;
                     };
                 }
                 else
                 {
                     navigatedPage = CreatePage<T>();
-                    navFunc = () => MainPage.PushAsync(navigatedPage, animated);
+                    navFunc = () => MainPage.PushAsync(navigatedPage as Page, animated);
                 }
 
                 if (navigatedPage is not null && parameters?.Any() == true)
@@ -210,50 +173,6 @@ namespace AdelaideFuel.Maui.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
-            }
-        }
-
-        private void CurrentPageChanged(object sender, EventArgs e)
-        {
-            if (sender is TabbedPage tabbedPage &&
-                tabbedPage.CurrentPage is NavigationPage navPage)
-            {
-                if (navPage.RootPage is null)
-                    LoadTab(tabbedPage, navPage);
-
-                if (tabbedPage.Children.OfType<NavigationPage>().All(np => np.RootPage is not null))
-                    tabbedPage.CurrentPageChanged -= CurrentPageChanged;
-            }
-        }
-
-        private Page LoadTab(TabbedPage tabbedPage, NavigationPage navPage)
-        {
-            if (navPage.RootPage is null && tabbedPage.Children.Count == _tabViewModels.Length)
-            {
-                var index = tabbedPage.Children.IndexOf(navPage);
-                if (index >= 0)
-                {
-                    var vmType = _tabViewModels[index];
-                    var page = CreatePage(vmType);
-
-                    if (vmType == typeof(MapViewModel))
-                        NavigationPage.SetHasNavigationBar(page, false);
-
-                    navPage.PushAsync(page, false);
-                    return page;
-                }
-            }
-
-            return null;
-        }
-
-        private static void ApplyNavigationPageStyle(Page page)
-        {
-            if (DeviceInfo.Platform == DevicePlatform.iOS &&
-                DeviceInfo.Version.Major > 12 &&
-                page is NavigationPage navPage)
-            {
-                NavigationPage_iOS.SetPrefersLargeTitles(navPage, true);
             }
         }
     }

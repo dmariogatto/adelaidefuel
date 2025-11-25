@@ -1,75 +1,75 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<views:BasePage
-    x:Class="AdelaideFuel.Maui.Views.SettingsPage"
+<views:BaseTabView
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    IconImageSource="{StaticResource CogImg}"
+    Title="{Binding Title}"
+    x:Class="AdelaideFuel.Maui.Views.SettingsTab"
+    x:DataType="viewModels:SettingsViewModel"
+    x:TypeArguments="viewModels:SettingsViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
-    xmlns:services="clr-namespace:AdelaideFuel.Services;assembly=AdelaideFuel"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:sv="clr-namespace:AiForms.Settings;assembly=SettingsView"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    Title="{Binding Title}"
-    x:DataType="viewModels:SettingsViewModel"
-    x:TypeArguments="viewModels:SettingsViewModel"
-    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    IconImageSource="{StaticResource CogImg}">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <ContentPage.Resources>
+    <View.Resources>
         <ResourceDictionary>
             <converters:BytesToKbConverter x:Key="bytesToKbConverter" />
             <converters:EnumToDescriptionConverter x:Key="enumToDescriptionConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>
-    <ContentPage.Content>
+    </View.Resources>
+
+    <views:BaseTabView.Content>
         <sv:SettingsView HasUnevenRows="True">
             <sv:Section Title="{local:Translate SaBowser}">
                 <sv:CommandCell
-                    Title="{local:Translate Fuels}"
                     Command="{Binding GoToFuelsCommand}"
-                    Description="{local:Translate FuelsDescription}" />
+                    Description="{local:Translate FuelsDescription}"
+                    Title="{local:Translate Fuels}" />
                 <sv:CommandCell
-                    Title="{local:Translate Radii}"
                     Command="{Binding GoToRadiiCommand}"
-                    Description="{local:Translate RadiiDescription}" />
+                    Description="{local:Translate RadiiDescription}"
+                    Title="{local:Translate Radii}" />
                 <sv:CommandCell
-                    Title="{local:Translate Brands}"
                     Command="{Binding GoToBrandsCommand}"
-                    Description="{local:Translate BrandsDescription}" />
+                    Description="{local:Translate BrandsDescription}"
+                    Title="{local:Translate Brands}" />
                 <sv:CommandCell
-                    Title="{local:Translate OpenAppSettings}"
                     Command="{Binding OpenAppSettingsCommand}"
-                    Description="{local:Translate OpenAppSettingsDescription}" />
+                    Description="{local:Translate OpenAppSettingsDescription}"
+                    Title="{local:Translate OpenAppSettings}" />
             </sv:Section>
             <sv:Section Title="{local:Translate Extras}">
                 <sv:CommandCell
-                    Title="{local:Translate ShouldIFuelPremium}"
                     Command="{Binding GoToSubscriptionCommand}"
-                    Description="{local:Translate ControlAdsSupportDevelopment}" />
+                    Description="{local:Translate ControlAdsSupportDevelopment}"
+                    Title="{local:Translate ShouldIFuelPremium}" />
             </sv:Section>
             <sv:Section Title="{local:Translate Feedback}">
                 <sv:CommandCell
-                    Title="{local:Translate SendFeedback}"
                     Command="{Binding SendFeedbackCommand}"
-                    Description="{local:Translate SendFeedbackDescription}" />
-                <sv:CommandCell Title="{local:Translate PleaseRateSif}" Command="{Binding RateAppCommand}" />
+                    Description="{local:Translate SendFeedbackDescription}"
+                    Title="{local:Translate SendFeedback}" />
+                <sv:CommandCell Command="{Binding RateAppCommand}" Title="{local:Translate PleaseRateSif}" />
             </sv:Section>
-            <sv:Section x:Name="AccessibilitySection" Title="{local:Translate Accessibility}">
+            <sv:Section Title="{local:Translate Accessibility}" x:Name="AccessibilitySection">
                 <sv:TextPickerCell
-                    x:Name="ThemePicker"
-                    Title="{local:Translate Theme}"
                     Items="{Binding Themes}"
                     SelectedItem="{Binding AppTheme, Converter={StaticResource enumToDescriptionConverter}}"
-                    ValueTextFontSize="{DynamicResource {x:Static styles:FontSizes.Medium}}" />
+                    Title="{local:Translate Theme}"
+                    ValueTextFontSize="{DynamicResource {x:Static styles:FontSizes.Medium}}"
+                    x:Name="ThemePicker" />
             </sv:Section>
-            <sv:Section x:Name="AttributionSection" Title="{local:Translate Attributions}">
+            <sv:Section Title="{local:Translate Attributions}" x:Name="AttributionSection">
                 <sv:CommandCell
-                    Title="{local:Translate SaFuelPricingScheme}"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="{x:Static shared:Constants.FuelInfoForMotoristsUrl}"
-                    Description="{local:Translate InformationForMotorists}" />
+                    Description="{local:Translate InformationForMotorists}"
+                    Title="{local:Translate SaFuelPricingScheme}" />
                 <sv:CustomCell>
                     <Label
                         FontAttributes="Italic"
@@ -82,19 +82,19 @@
             <sv:Section Title="{local:Translate ShouldIFuel}">
                 <sv:LabelCell Title="{local:Translate Version}" ValueText="{Binding Version}" />
                 <sv:LabelCell
-                    Title="{local:Translate Build}"
                     Tapped="BuildOnTapped"
+                    Title="{local:Translate Build}"
                     ValueText="{Binding Build}" />
             </sv:Section>
-            <sv:Section Title="{local:Translate Development}" IsVisible="{Binding IsDevelopment}">
-                <sv:SwitchCell Title="{local:Translate ShowRadiiOnMap}" On="{Binding ShowRadiiOnMap}" />
-                <sv:ButtonCell Title="{local:Translate GenerateTestCrash}" Command="{Binding GenerateTestCrashCommand}" />
+            <sv:Section IsVisible="{Binding IsDevelopment}" Title="{local:Translate Development}">
+                <sv:SwitchCell On="{Binding ShowRadiiOnMap}" Title="{local:Translate ShowRadiiOnMap}" />
+                <sv:ButtonCell Command="{Binding GenerateTestCrashCommand}" Title="{local:Translate GenerateTestCrash}" />
                 <sv:LabelCell Title="{local:Translate LogSize}" ValueText="{Binding LogDataSize, Converter={StaticResource bytesToKbConverter}}" />
-                <sv:ButtonCell Title="{local:Translate ViewLog}" Command="{Binding ViewLogCommand}" />
-                <sv:ButtonCell Title="{local:Translate ClearLog}" Command="{Binding DeleteLogCommand}" />
+                <sv:ButtonCell Command="{Binding ViewLogCommand}" Title="{local:Translate ViewLog}" />
+                <sv:ButtonCell Command="{Binding DeleteLogCommand}" Title="{local:Translate ClearLog}" />
                 <sv:LabelCell Title="{local:Translate CacheData}" ValueText="{Binding CacheDataSize, Converter={StaticResource bytesToKbConverter}}" />
-                <sv:ButtonCell Title="{local:Translate ClearCache}" Command="{Binding ClearCacheCommand}" />
+                <sv:ButtonCell Command="{Binding ClearCacheCommand}" Title="{local:Translate ClearCache}" />
             </sv:Section>
         </sv:SettingsView>
-    </ContentPage.Content>
-</views:BasePage>
+    </views:BaseTabView.Content>
+</views:BaseTabView>

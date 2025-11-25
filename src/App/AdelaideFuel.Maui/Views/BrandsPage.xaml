@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:BasePage
+    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
+    Title="{Binding Title}"
     x:Class="AdelaideFuel.Maui.Views.BrandsPage"
+    x:DataType="viewModels:BrandsViewModel"
+    x:TypeArguments="viewModels:BrandsViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
     xmlns:sho="http://sharpnado.com"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    Title="{Binding Title}"
-    x:DataType="viewModels:BrandsViewModel"
-    x:TypeArguments="viewModels:BrandsViewModel"
-    BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -23,7 +23,6 @@
     <ContentPage.Content>
         <Grid>
             <sho:HorizontalListView
-                Margin="{StaticResource ListViewMargin}"
                 BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
                 CollectionLayout="Vertical"
                 EnableDragAndDrop="True"
@@ -32,6 +31,7 @@
                 ItemSpacing="0"
                 ItemTemplate="{StaticResource userEntityDataTemplateSelector}"
                 ItemsSource="{Binding Entities, Mode=OneWay}"
+                Margin="{StaticResource ListViewMargin}"
                 TapCommand="{Binding EntityTappedCommand, Mode=OneTime}" />
 
             <VerticalStackLayout

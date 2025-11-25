@@ -3,9 +3,9 @@ using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
 {
-    public partial class SettingsPage : BasePage<SettingsViewModel>
+    public partial class SettingsTab : BaseTabView<SettingsViewModel>
     {
-        public SettingsPage() : base()
+        public SettingsTab() : base()
         {
             InitializeComponent();
 
