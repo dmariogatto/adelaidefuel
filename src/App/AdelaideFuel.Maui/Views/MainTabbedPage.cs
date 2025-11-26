@@ -114,10 +114,12 @@ namespace AdelaideFuel.Maui.Views
                 titleLbl.HorizontalOptions = LayoutOptions.Center;
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
-                        
+
             mainGrid.Add(_viewSwitcher, 0, 1);
             mainGrid.Add(_tabHostView, 0, 2);
             mainGrid.Add(titleContent, 0, 0);
+
+            this.SetBinding(Page.TitleProperty, static (MainTabbedPage i) => i.SelectedTab?.Title, BindingMode.OneWay, source: this);
 
             Content = mainGrid;
         }
