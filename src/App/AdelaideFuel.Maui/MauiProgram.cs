@@ -7,7 +7,6 @@ using AdelaideFuel.Maui.Services;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
 using AiForms.Settings;
-using Android.Gms.Maps;
 using BetterMaps.Maui;
 using BetterMaps.Maui.Handlers;
 using Cats.Maui.AdMob;
@@ -83,7 +82,7 @@ public static class MauiProgram
 
                 SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
 #elif ANDROID
-                MapHandler.CommandMapper.AppendToMapping(nameof(GoogleMap.IOnMapLoadedCallback.OnMapLoaded), MapCustomHandler.MapOnMapLoaded);
+                MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.GoogleMap.IOnMapLoadedCallback.OnMapLoaded), MapCustomHandler.MapOnMapLoaded);
 #endif
             })
             .ConfigureEffects(effects =>
