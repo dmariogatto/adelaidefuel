@@ -75,13 +75,13 @@
     <PackageReference Include="AiForms.Maui.SettingsView" Version="1.0.17" />
     <PackageReference Include="BetterMaps.Maui" Version="2.0.0-beta1" />
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.11" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.12.0" />
-    <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.0.0" />
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="12.14.0" />
+    <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
@@ -89,9 +89,9 @@
     <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.11.0" />
     <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.5.0.3" />
     <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.9.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.9.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.9.3" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.9.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.9.4" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.9.4" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.3" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.3" />
     <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.5" />
@@ -106,7 +106,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-    <PackageReference Include="Sentry.Maui" Version="5.16.1" />
+    <PackageReference Include="Sentry.Maui" Version="5.16.2" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
