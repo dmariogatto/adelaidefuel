@@ -1,5 +1,4 @@
 ﻿using Android.Content.Res;
-using Android.Gms.Maps;
 using Android.OS;
 using Android.Views;
 using Android.Widget;
@@ -13,16 +12,16 @@ namespace AdelaideFuel.Maui.Handlers
 {
     public static class MapCustomHandler
     {
-        public static void MapViewAttachedToWindow(IMapHandler handler, IMap map, object arg)
-        {            
-            if (arg is not MapView mapView)
+        public static void MapOnMapLoaded(IMapHandler handler, IMap map, object arg)
+        {
+            if (handler.PlatformView is not ViewGroup viewGroup)
                 return;
 
-            if (mapView.FindViewWithTag("GoogleMapMyLocationButton") is not AView myLocation)
+            if (viewGroup.FindViewWithTag("GoogleMapMyLocationButton") is not AView myLocation)
                 return;
-            if (mapView.FindViewWithTag("GoogleMapCompass") is not AView compass)
+            if (viewGroup.FindViewWithTag("GoogleMapCompass") is not AView compass)
                 return;
-                        
+
             var topInset = 0;
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
@@ -32,15 +31,18 @@ namespace AdelaideFuel.Maui.Handlers
                 topInset = systemBars?.Top ?? 0;
             }
 
-            var rlp = new RL.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
-            rlp.AddRule(LayoutRules.Below, myLocation.Id);
-            rlp.AddRule(LayoutRules.AlignParentRight);
+            var locationTopMargin = (int)(38 * Resources.System.DisplayMetrics.Density);
+            var locationRlp = myLocation.LayoutParameters as RL.LayoutParams;
+            locationRlp?.SetMargins(locationRlp.LeftMargin, locationRlp.TopMargin + topInset + locationTopMargin, locationRlp.RightMargin, locationRlp.BottomMargin);
 
-            var topMargin = (int)(14 * Resources.System.DisplayMetrics.Density) + topInset;
-            var rightMargin = (int)(10 * Resources.System.DisplayMetrics.Density);
-            rlp.SetMargins(0, topMargin, rightMargin, 0);
+            var compassRlp = new RL.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
+            compassRlp.AddRule(LayoutRules.Below, myLocation.Id);
+            compassRlp.AddRule(LayoutRules.AlignParentRight);
 
-            compass.LayoutParameters = rlp;
+            var compassTopMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
+            compassRlp.SetMargins(0, locationTopMargin, locationRlp.RightMargin, 0);
+
+            compass.LayoutParameters = compassRlp;
         }
     }
 }

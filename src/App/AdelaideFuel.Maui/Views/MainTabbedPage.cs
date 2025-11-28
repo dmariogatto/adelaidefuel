@@ -99,11 +99,10 @@ namespace AdelaideFuel.Maui.Views
 
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
-                titleContent.SetDynamicResource(View.BackgroundColorProperty, Styles.Keys.PrimaryAccentColor);
-                titleContent.Padding = App.Current.FindResource<Thickness>(Styles.Keys.MediumBottomThickness);
+                titleContent.SetDynamicResource(View.BackgroundColorProperty, Styles.Keys.NavigationBarColor);
+                titleContent.Padding = App.Current.FindResource<Thickness>(Styles.Keys.MediumThickness);
                 titleLbl.SetDynamicResource(Label.FontSizeProperty, Styles.FontSizes.Title);
                 titleLbl.TextColor = Colors.White;
-                titleLbl.Padding = App.Current.FindResource<Thickness>(Styles.Keys.MediumLeftThickness);
                 titleLbl.HorizontalOptions = LayoutOptions.Start;
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
