@@ -11,7 +11,7 @@ namespace AdelaideFuel.Maui.Views
         private static readonly CoordsToPositionConverter PositionConverter = new CoordsToPositionConverter();
         private static readonly PriceCategoryToColorConverter PriceCategoryConverter = new PriceCategoryToColorConverter();
 
-        private static readonly ImageSource TwoToneImg = ImageSource.FromFile("twotone_circle.png");
+        private static readonly string TwoToneImg = Application.Current.FindResource<string>(Styles.Keys.TwoToneCircleImg);
 
         private static Pin CreatePin(Type t)
         {
