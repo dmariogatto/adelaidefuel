@@ -109,7 +109,7 @@ namespace AdelaideFuel.Maui.Views
             else
             {
                 titleContent.SetDynamicResource(View.BackgroundColorProperty, Styles.Keys.PageBackgroundColor);
-                titleLbl.Padding = App.Current.FindResource<Thickness>(Styles.Keys.SmallBottomThickness);
+                titleLbl.Padding = App.Current.FindResource<Thickness>(Styles.Keys.SmallThickness);
                 titleLbl.HorizontalOptions = LayoutOptions.Center;
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
