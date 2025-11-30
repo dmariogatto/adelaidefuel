@@ -31,7 +31,7 @@ namespace AdelaideFuel.Maui.Handlers
                 topInset = systemBars?.Top ?? 0;
             }
 
-            var locationTopMargin = (int)(38 * Resources.System.DisplayMetrics.Density);
+            var locationTopMargin = (int)(72 * Resources.System.DisplayMetrics.Density);
             var locationRlp = myLocation.LayoutParameters as RL.LayoutParams;
             locationRlp?.SetMargins(locationRlp.LeftMargin, locationRlp.TopMargin + topInset + locationTopMargin, locationRlp.RightMargin, locationRlp.BottomMargin);
 
