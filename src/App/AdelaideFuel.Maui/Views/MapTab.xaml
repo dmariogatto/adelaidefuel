@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<views:BaseAdPage
-    x:Class="AdelaideFuel.Maui.Views.MapPage"
+<views:BaseTabAdView
+    x:Class="AdelaideFuel.Maui.Views.MapTab"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
@@ -14,10 +14,9 @@
     x:DataType="viewModels:MapViewModel"
     x:TypeArguments="viewModels:MapViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
-    IconImageSource="{StaticResource MapImg}"
-    NavigationPage.HasNavigationBar="False">
+    IconImageSource="{StaticResource MapImg}">
 
-    <ContentPage.Resources>
+    <View.Resources>
         <ResourceDictionary>
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
             <converters:PriceCategoryToColorConverter x:Key="priceCategoryToColorConverter" />
@@ -25,10 +24,10 @@
             <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
             <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </View.Resources>
 
-    <views:BaseAdPage.MainContent>
-        <Grid IgnoreSafeArea="True" SizeChanged="BottomSheetSizeChanged">
+    <views:BaseTabAdView.MainContent>
+        <Grid SafeAreaEdges="None" SizeChanged="BottomSheetSizeChanged">
             <controls:FuelMap
                 x:Name="SiteMap"
                 IsShowingUser="{Binding EnableMyLocation}"
@@ -187,5 +186,5 @@
                 </VerticalStackLayout>
             </controls:BottomDrawer>
         </Grid>
-    </views:BaseAdPage.MainContent>
-</views:BaseAdPage>
+    </views:BaseTabAdView.MainContent>
+</views:BaseTabAdView>

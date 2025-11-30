@@ -1,5 +1,6 @@
 ﻿using Android.Content.Res;
-using Android.Gms.Maps;
+using Android.OS;
+using Android.Views;
 using Android.Widget;
 using BetterMaps.Maui.Handlers;
 using static Android.Views.ViewGroup;
@@ -11,25 +12,37 @@ namespace AdelaideFuel.Maui.Handlers
 {
     public static class MapCustomHandler
     {
-        public static void MapViewAttachedToWindow(IMapHandler handler, IMap map, object arg)
+        public static void MapOnMapLoaded(IMapHandler handler, IMap map, object arg)
         {
-            if (handler?.PlatformView is not MapView mapView)
+            if (handler.PlatformView is not ViewGroup viewGroup)
                 return;
 
-            if (mapView.FindViewWithTag("GoogleMapMyLocationButton") is not AView myLocation)
+            if (viewGroup.FindViewWithTag("GoogleMapMyLocationButton") is not AView myLocation)
                 return;
-            if (mapView.FindViewWithTag("GoogleMapCompass") is not AView compass)
+            if (viewGroup.FindViewWithTag("GoogleMapCompass") is not AView compass)
                 return;
 
-            var rlp = new RL.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
-            rlp.AddRule(LayoutRules.Below, myLocation.Id);
-            rlp.AddRule(LayoutRules.AlignParentRight);
+            var topInset = 0;
 
-            var topMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
-            var rightMargin = (int)(10 * Resources.System.DisplayMetrics.Density);
-            rlp.SetMargins(0, topMargin, rightMargin, 0);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            {
+                var insets = Platform.CurrentActivity?.Window?.DecorView?.RootWindowInsets;
+                var systemBars = insets?.GetInsets(WindowInsets.Type.SystemBars());
+                topInset = systemBars?.Top ?? 0;
+            }
 
-            compass.LayoutParameters = rlp;
+            var locationTopMargin = (int)(72 * Resources.System.DisplayMetrics.Density);
+            var locationRlp = myLocation.LayoutParameters as RL.LayoutParams;
+            locationRlp?.SetMargins(locationRlp.LeftMargin, locationRlp.TopMargin + topInset + locationTopMargin, locationRlp.RightMargin, locationRlp.BottomMargin);
+
+            var compassRlp = new RL.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
+            compassRlp.AddRule(LayoutRules.Below, myLocation.Id);
+            compassRlp.AddRule(LayoutRules.AlignParentRight);
+
+            var compassTopMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
+            compassRlp.SetMargins(0, locationTopMargin, locationRlp.RightMargin, 0);
+
+            compass.LayoutParameters = compassRlp;
         }
     }
 }

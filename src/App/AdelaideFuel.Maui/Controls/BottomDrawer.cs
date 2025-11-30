@@ -164,9 +164,9 @@ namespace AdelaideFuel.Maui.Controls
                 {
                     var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(drawer.GetProportionCoordinate(expandValue)));
                     if (expandValue < 0)
-                        drawer.TranslateTo(0, finalTranslation, 250, Easing.SpringIn);
+                        drawer.TranslateToAsync(0, finalTranslation, 250, Easing.SpringIn);
                     else
-                        drawer.TranslateTo(0, finalTranslation, 250, Easing.SpringOut);
+                        drawer.TranslateToAsync(0, finalTranslation, 250, Easing.SpringOut);
                 }
             }
         }
@@ -192,9 +192,9 @@ namespace AdelaideFuel.Maui.Controls
 
                     // Depending on Swipe Up or Down - change the snapping animation
                     if (DetectSwipeUp(e))
-                        this.TranslateTo(0, finalTranslation, 250, Easing.SpringIn);
+                        this.TranslateToAsync(0, finalTranslation, 250, Easing.SpringIn);
                     else
-                        this.TranslateTo(0, finalTranslation, 250, Easing.SpringOut);
+                        this.TranslateToAsync(0, finalTranslation, 250, Easing.SpringOut);
                     ExpandedPercentage = GetClosestLockState(e.TotalY + this.TranslationY);
                     _isDragging = false;
                     break;
@@ -280,7 +280,7 @@ namespace AdelaideFuel.Maui.Controls
         public void Dismiss()
         {
             var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(GetProportionCoordinate(LockStates[0])));
-            this.TranslateTo(0, finalTranslation, 450, DeviceInfo.Current.Platform == DevicePlatform.Android ? Easing.SpringOut : null);
+            this.TranslateToAsync(0, finalTranslation, 450, DeviceInfo.Current.Platform == DevicePlatform.Android ? Easing.SpringOut : null);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace AdelaideFuel.Maui.Controls
         public void Open()
         {
             var finalTranslation = Math.Max(Math.Min(0, -1000), -Math.Abs(GetProportionCoordinate(LockStates.Last())));
-            this.TranslateTo(0, finalTranslation, 150, DeviceInfo.Current.Platform == DevicePlatform.Android ? Easing.SpringIn : null);
+            this.TranslateToAsync(0, finalTranslation, 150, DeviceInfo.Current.Platform == DevicePlatform.Android ? Easing.SpringIn : null);
         }
         #endregion Public
     }

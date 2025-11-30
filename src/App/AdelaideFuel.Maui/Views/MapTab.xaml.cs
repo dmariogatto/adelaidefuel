@@ -13,14 +13,14 @@ namespace AdelaideFuel.Maui.Views
 {
     [QueryProperty(nameof(SiteId), NavigationKeys.SiteIdQueryProperty)]
     [QueryProperty(nameof(FuelId), NavigationKeys.FuelIdQueryProperty)]
-    public partial class MapPage : BaseAdPage<MapViewModel>
+    public partial class MapTab : BaseTabAdView<MapViewModel>
     {
         private const string BottomDrawerHandleShake = nameof(BottomDrawerHandleShake);
 
         private IDispatcherTimer _timer;
         private CancellationTokenSource _timerCancellation;
 
-        public MapPage() : base()
+        public MapTab() : base()
         {
             InitializeComponent();
 
@@ -32,8 +32,8 @@ namespace AdelaideFuel.Maui.Views
             if (DeviceInfo.Current.Idiom == DeviceIdiom.Tablet)
             {
                 BottomDrawerControl.HorizontalOptions = LayoutOptions.Center;
-                BottomDrawerControl.SetBinding(Page.WidthRequestProperty,
-                    static (MapPage i) => i.Width,
+                BottomDrawerControl.SetBinding(WidthRequestProperty,
+                    static (MapTab i) => i.Width,
                     converter: App.Current.FindResource<IValueConverter>(nameof(MultiplyByConverter)),
                     converterParameter: 0.7d,
                     mode: BindingMode.OneWay,
@@ -69,16 +69,16 @@ namespace AdelaideFuel.Maui.Views
             }
         }
 
-        protected override void OnAppearing()
+        public override void OnAppearing()
         {
             base.OnAppearing();
 
             SetupAutoRefresh();
 
-            BottomDrawerControl.FadeTo(1);
+            BottomDrawerControl.FadeToAsync(1);
         }
 
-        protected override void OnDisappearing()
+        public override void OnDisappearing()
         {
             base.OnDisappearing();
 
@@ -87,7 +87,7 @@ namespace AdelaideFuel.Maui.Views
             FuelId = string.Empty;
             SiteId = string.Empty;
 
-            BottomDrawerControl.FadeTo(0);
+            BottomDrawerControl.FadeToAsync(0);
         }
 
         private void SetupAutoRefresh()

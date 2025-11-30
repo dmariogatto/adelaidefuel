@@ -13,6 +13,7 @@ using Cats.Maui.AdMob;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
+using Sharpnado.Tabs;
 using ILogger = AdelaideFuel.Services.ILogger;
 using IMap = BetterMaps.Maui.IMap;
 
@@ -76,16 +77,12 @@ public static class MauiProgram
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
 
                 handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
+                handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
 
                 SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
-
-                if (DeviceInfo.Version.Major <= 12)
-                {
-                    handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
-                }
 #elif ANDROID
-                MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.MapView.ViewAttachedToWindow), MapCustomHandler.MapViewAttachedToWindow);
+                MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.GoogleMap.IOnMapLoadedCallback.OnMapLoaded), MapCustomHandler.MapOnMapLoaded);
 #endif
             })
             .ConfigureEffects(effects =>
@@ -111,6 +108,7 @@ public static class MauiProgram
                     return new FileAsyncImageSourceService(fileImageSourceService, logger);
                 });
             })
+            .UseSharpnadoTabs(loggerEnable: false)
             .UseSharpnadoCollectionView(false);
 
 

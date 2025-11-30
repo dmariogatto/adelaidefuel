@@ -61,7 +61,7 @@ namespace AdelaideFuel.Maui.Controls
                 VerticalTextAlignment = TextAlignment.Center,
             };
             fuelLbl.SetDynamicResource(Label.StyleProperty, Styles.Keys.LabelStyle);
-            fuelLbl.SetBinding(Label.TextProperty, static (FuelSelectionView i) => i.SelectedFuel.Name, mode: BindingMode.OneWay, source: this);
+            fuelLbl.SetBinding(Label.TextProperty, static (FuelSelectionView i) => i.SelectedFuel?.Name, mode: BindingMode.OneWay, source: this);
 
             var stackLayout = new HorizontalStackLayout()
             {

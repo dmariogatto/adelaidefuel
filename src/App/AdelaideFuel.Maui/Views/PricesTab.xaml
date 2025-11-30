@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<views:BaseAdPage
-    x:Class="AdelaideFuel.Maui.Views.PricesPage"
+<views:BaseTabAdView
+    x:Class="AdelaideFuel.Maui.Views.PricesTab"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:AdelaideFuel.Maui.Controls"
@@ -17,7 +17,7 @@
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
     IconImageSource="{StaticResource FuelImg}">
 
-    <ContentPage.Resources>
+    <View.Resources>
         <ResourceDictionary>
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
@@ -93,9 +93,9 @@
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </View.Resources>
 
-    <views:BaseAdPage.MainContent>
+    <views:BaseTabAdView.MainContent>
         <Grid RowDefinitions="Auto,*">
             <ScrollView Grid.Row="1" Padding="{StaticResource ItemMargin}">
                 <VerticalStackLayout IsVisible="{Binding HasPrices}">
@@ -205,5 +205,5 @@
                 <controls:LoadingIndicator />
             </ContentView>
         </Grid>
-    </views:BaseAdPage.MainContent>
-</views:BaseAdPage>
+    </views:BaseTabAdView.MainContent>
+</views:BaseTabAdView>

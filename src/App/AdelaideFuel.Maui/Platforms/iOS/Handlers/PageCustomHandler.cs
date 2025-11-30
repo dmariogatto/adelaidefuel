@@ -24,7 +24,7 @@ namespace AdelaideFuel.Maui.Handlers
         {
             if (ViewController?.ParentViewController?.NavigationController?.NavigationBar is UINavigationBar navBar)
             {
-                navBar.ClipsToBounds = true;
+                //navBar.ClipsToBounds = true;
             }
         }
     }

@@ -4,7 +4,7 @@ using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
 {
-    public partial class PricesPage : BaseAdPage<PricesViewModel>
+    public partial class PricesTab : BaseTabAdView<PricesViewModel>
     {
         private readonly IPermissions _permissions;
 
@@ -12,7 +12,7 @@ namespace AdelaideFuel.Maui.Views
         private IDispatcherTimer _timer;
         private CancellationTokenSource _timerCancellation;
 
-        public PricesPage() : base()
+        public PricesTab() : base()
         {
             InitializeComponent();
 
@@ -21,7 +21,7 @@ namespace AdelaideFuel.Maui.Views
             AdUnitId = Constants.AdMobPricesUnitId;
         }
 
-        protected override void OnAppearing()
+        public override void OnAppearing()
         {
             base.OnAppearing();
 
@@ -41,7 +41,7 @@ namespace AdelaideFuel.Maui.Views
                     TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        protected override void OnDisappearing()
+        public override void OnDisappearing()
         {
             base.OnDisappearing();
 

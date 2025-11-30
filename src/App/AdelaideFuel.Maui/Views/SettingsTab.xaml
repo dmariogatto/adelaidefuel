@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<views:BasePage
-    x:Class="AdelaideFuel.Maui.Views.SettingsPage"
+<views:BaseTabView
+    x:Class="AdelaideFuel.Maui.Views.SettingsTab"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
     xmlns:local="clr-namespace:AdelaideFuel.Maui"
-    xmlns:services="clr-namespace:AdelaideFuel.Services;assembly=AdelaideFuel"
     xmlns:shared="clr-namespace:AdelaideFuel;assembly=AdelaideFuel"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:sv="clr-namespace:AiForms.Settings;assembly=SettingsView"
@@ -17,13 +16,14 @@
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
     IconImageSource="{StaticResource CogImg}">
 
-    <ContentPage.Resources>
+    <View.Resources>
         <ResourceDictionary>
             <converters:BytesToKbConverter x:Key="bytesToKbConverter" />
             <converters:EnumToDescriptionConverter x:Key="enumToDescriptionConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>
-    <ContentPage.Content>
+    </View.Resources>
+
+    <views:BaseTabView.Content>
         <sv:SettingsView HasUnevenRows="True">
             <sv:Section Title="{local:Translate SaBowser}">
                 <sv:CommandCell
@@ -96,5 +96,5 @@
                 <sv:ButtonCell Title="{local:Translate ClearCache}" Command="{Binding ClearCacheCommand}" />
             </sv:Section>
         </sv:SettingsView>
-    </ContentPage.Content>
-</views:BasePage>
+    </views:BaseTabView.Content>
+</views:BaseTabView>

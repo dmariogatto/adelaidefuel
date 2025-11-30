@@ -26,12 +26,12 @@ namespace AdelaideFuel.Maui.Services
 
         public Task AlertAsync(string message, string title = null, string ok = null)
         {
-            return MainPage.DisplayAlert(title, message, ok ?? Resources.OK);
+            return MainPage.DisplayAlertAsync(title, message, ok ?? Resources.OK);
         }
 
         public Task<bool> ConfirmAsync(string message, string title = null, string ok = null, string cancel = null)
         {
-            return MainPage.DisplayAlert(title, message, ok ?? Resources.OK, cancel ?? Resources.Cancel);
+            return MainPage.DisplayAlertAsync(title, message, ok ?? Resources.OK, cancel ?? Resources.Cancel);
         }
 
         public Task<string> PromptAsync(string message, string title = null, string ok = null, string cancel = null, string placeholder = null, int maxLength = -1, KeyboardType keyboard = KeyboardType.Default, string initialValue = null)
@@ -41,7 +41,7 @@ namespace AdelaideFuel.Maui.Services
 
         public Task<string> ActionSheetAsync(string title, string cancel, string destruction, params string[] buttons)
         {
-            return MainPage.DisplayActionSheet(title, cancel, destruction, buttons);
+            return MainPage.DisplayActionSheetAsync(title, cancel, destruction, buttons);
         }
 
         private static Keyboard KeyboardTypeToKeyboard(KeyboardType type)
