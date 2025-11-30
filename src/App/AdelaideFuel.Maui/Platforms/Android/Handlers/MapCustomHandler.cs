@@ -27,8 +27,10 @@ namespace AdelaideFuel.Maui.Handlers
             if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
             {
                 var insets = Platform.CurrentActivity?.Window?.DecorView?.RootWindowInsets;
+#pragma warning disable CA1416 // Validate platform compatibility
                 var systemBars = insets?.GetInsets(WindowInsets.Type.SystemBars());
                 topInset = systemBars?.Top ?? 0;
+#pragma warning restore CA1416 // Validate platform compatibility
             }
 
             var locationTopMargin = (int)(72 * Resources.System.DisplayMetrics.Density);
