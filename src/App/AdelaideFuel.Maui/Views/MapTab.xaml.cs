@@ -258,6 +258,10 @@ namespace AdelaideFuel.Maui.Views
 
                         SearchButtonLayout.Opacity = opacity;
                         SearchButtonLayout.InputTransparent = opacity == 0;
+
+                        var mapBtnLayoutMargin =
+                            SiteMap.Height + BottomDrawerControl.Margin.Bottom + BottomDrawerControl.TranslationY * -1;
+                        SiteMap.LayoutMargin = new Thickness(0, 0, 0, mapBtnLayoutMargin);
                     }
                     break;
             }
@@ -308,8 +312,10 @@ namespace AdelaideFuel.Maui.Views
                     offset = heightAcc;
                     var offsetMargin = parent.Height - offset;
                     // So we can see the dividing line ---
-                    offsetMargin--;
+                    // offsetMargin--;
                     drawer.Margin = new Thickness(0, offsetMargin, 0, -offsetMargin);
+                    if (DeviceInfo.Current.Idiom == DeviceIdiom.Phone)
+                        SiteMap.LayoutMargin = new Thickness(0, 0, 0, offset);
                 }
             }
 
