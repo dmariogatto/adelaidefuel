@@ -87,7 +87,6 @@ public static class MauiProgram
             })
             .ConfigureEffects(effects =>
             {
-                effects.Add<SafeAreaInsetEffect, SafeAreaInsetPlatformEffect>();
                 effects.Add<SearchBarIconEffect, SearchBarIconPlatformEffect>();
             })
             .ConfigureFonts(fonts =>
