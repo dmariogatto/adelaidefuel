@@ -99,7 +99,7 @@ namespace AdelaideFuel.Maui.Views
             var cts = _timerCancellation;
 
             // delay until navigation completes
-            Task.Delay(!ViewModel.InitialLoadComplete ? 0 : 350).ContinueWith(r =>
+            Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(!ViewModel.InitialLoadComplete ? 0 : 350), () =>
             {
                 if (cts.IsCancellationRequested)
                     return;
@@ -129,7 +129,7 @@ namespace AdelaideFuel.Maui.Views
                     _ = DrawRadiiAsync(cts.Token);
                 else if (SiteMap.MapElements.Any())
                     SiteMap.MapElements.Clear();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
         private void TearDownAutoRefresh()
