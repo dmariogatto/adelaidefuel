@@ -76,8 +76,17 @@
                                         </Label.Text>
                                     </Label>
                                     <Label
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
+                                        HorizontalOptions="End"
+                                        Style="{DynamicResource LabelStyle}"
+                                        Text="{Binding FuelName}"
+                                        VerticalOptions="Center" />
+                                    <Label
                                         Grid.RowSpan="2"
                                         Grid.Column="2"
+                                        Padding="{StaticResource SmallBottomThickness}"
                                         FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
                                         HorizontalTextAlignment="End"
                                         Style="{DynamicResource LabelStyle}"
