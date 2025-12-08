@@ -76,7 +76,6 @@ public static class MauiProgram
 #if IOS || MACCATALYST
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
 
-                handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
 
