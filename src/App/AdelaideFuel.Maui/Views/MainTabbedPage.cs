@@ -8,7 +8,7 @@ namespace AdelaideFuel.Maui.Views
         private readonly ViewSwitcher _viewSwitcher;
         private readonly TabHostView _tabHostView;
 
-        public MainTabbedPage() : base()
+        public MainTabbedPage()
         {
             SafeAreaEdges = SafeAreaEdges.None;
 
@@ -45,6 +45,7 @@ namespace AdelaideFuel.Maui.Views
             foreach (var i in _viewSwitcher.Children)
             {
                 var tab = new BottomTabItem();
+                tab.Margin = new Thickness(0, 2, 0, 0);
                 tab.SetBinding(
                     TabTextItem.LabelProperty,
                     static (IBaseTabView i) => i.Title,
