@@ -57,7 +57,7 @@ namespace AdelaideFuel.Maui.Views
             var cts = _timerCancellation;
 
             // delay until navigation completes
-            Task.Delay(!ViewModel.FuelPriceGroups.Any() ? 0 : 350).ContinueWith(r =>
+            Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(!ViewModel.FuelPriceGroups.Any() ? 0 : 350), () =>
             {
                 if (cts.IsCancellationRequested)
                     return;
@@ -80,7 +80,7 @@ namespace AdelaideFuel.Maui.Views
                     ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
                     return true;
                 });
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
         private void TearDownAutoRefresh()

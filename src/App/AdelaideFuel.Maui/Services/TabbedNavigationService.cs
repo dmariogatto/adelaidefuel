@@ -2,21 +2,11 @@ using AdelaideFuel.Maui.Views;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
 using System.Reflection;
-using NavigationPage_iOS = Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.NavigationPage;
-using TabbedPage_Droid = Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.TabbedPage;
-using ToolbarPlacement_Droid = Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.ToolbarPlacement;
 
 namespace AdelaideFuel.Maui.Services
 {
     public class TabbedNavigationService : BaseNavigationService, INavigationService
     {
-        private readonly Type[] _tabViewModels = new[]
-        {
-            typeof(PricesViewModel),
-            typeof(MapViewModel),
-            typeof(SettingsViewModel)
-        };
-
         private NavigationPage MainPage
         {
             get

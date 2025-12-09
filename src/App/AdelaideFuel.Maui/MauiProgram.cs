@@ -76,7 +76,6 @@ public static class MauiProgram
 #if IOS || MACCATALYST
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
 
-                handlers.AddHandler(typeof(ContentPage), typeof(PageCustomHandler));
                 handlers.AddHandler(typeof(NavigationPage), typeof(NavigationCustomRenderer));
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
 
@@ -87,7 +86,6 @@ public static class MauiProgram
             })
             .ConfigureEffects(effects =>
             {
-                effects.Add<SafeAreaInsetEffect, SafeAreaInsetPlatformEffect>();
                 effects.Add<SearchBarIconEffect, SearchBarIconPlatformEffect>();
             })
             .ConfigureFonts(fonts =>
