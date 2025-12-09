@@ -75,23 +75,11 @@
                                             </MultiBinding>
                                         </Label.Text>
                                     </Label>
-                                    <Label
-                                        Grid.Row="1"
-                                        Grid.Column="2"
-                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
-                                        HorizontalOptions="End"
-                                        Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding FuelName}"
-                                        VerticalOptions="Center" />
-                                    <Label
+                                    <VerticalStackLayout
                                         Grid.RowSpan="2"
                                         Grid.Column="2"
-                                        Padding="{StaticResource SmallBottomThickness}"
-                                        FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
-                                        HorizontalTextAlignment="End"
-                                        Style="{DynamicResource LabelStyle}"
-                                        Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
-                                        VerticalTextAlignment="Center">
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center">
                                         <View.Triggers>
                                             <DataTrigger
                                                 Binding="{Binding PriceInCents}"
@@ -100,7 +88,19 @@
                                                 <Setter Property="Opacity" Value="{StaticResource UnselectedOpacity}" />
                                             </DataTrigger>
                                         </View.Triggers>
-                                    </Label>
+                                        <Label
+                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Large}}"
+                                            HorizontalOptions="End"
+                                            Style="{DynamicResource LabelStyle}"
+                                            Text="{Binding PriceInCents, StringFormat='{0:#.0}'}"
+                                            VerticalOptions="Start" />
+                                        <Label
+                                            FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
+                                            HorizontalOptions="End"
+                                            Style="{DynamicResource LabelStyle}"
+                                            Text="{Binding FuelName}"
+                                            VerticalOptions="Start" />
+                                    </VerticalStackLayout>
                                 </Grid>
                             </controls:ItemCard>
                         </ContentView>
