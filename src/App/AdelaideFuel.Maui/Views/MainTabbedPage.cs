@@ -45,7 +45,7 @@ namespace AdelaideFuel.Maui.Views
             foreach (var i in _viewSwitcher.Children)
             {
                 var tab = new BottomTabItem();
-                tab.Margin = new Thickness(0, 2, 0, 0);
+                tab.Margin = new Thickness(0, 2);
                 tab.SetBinding(
                     TabTextItem.LabelProperty,
                     static (IBaseTabView i) => i.Title,
