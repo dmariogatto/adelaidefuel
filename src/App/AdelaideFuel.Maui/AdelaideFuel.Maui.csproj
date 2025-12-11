@@ -107,7 +107,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-    <PackageReference Include="Sentry.Maui" Version="5.16.2" />
+    <PackageReference Include="Sentry.Maui" Version="6.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
