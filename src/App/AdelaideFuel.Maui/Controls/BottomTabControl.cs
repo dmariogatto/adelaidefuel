@@ -53,7 +53,7 @@ namespace AdelaideFuel.Maui.Controls
             AutomationProperties.SetIsInAccessibleTree(_selectedMarker, false);
             _selectedMarker.SetBinding(BackgroundProperty, static (BottomTabControl i) => i.PrimaryColor, source: this);
 
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Absolute) });
+            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Absolute) });
             this.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             _selectedMarker.HeightRequest = this.RowDefinitions[0].Height.Value;
@@ -126,7 +126,7 @@ namespace AdelaideFuel.Maui.Controls
 
         private void UpdateSelectedBorderPosition()
         {
-            const int animationLengthMs = 250;
+            const int animationLengthMs = 350;
 
             if (_children.Count == 0)
                 return;
