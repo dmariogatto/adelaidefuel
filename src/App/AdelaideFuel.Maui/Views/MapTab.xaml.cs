@@ -6,6 +6,7 @@ using AdelaideFuel.Models;
 using AdelaideFuel.Services;
 using AdelaideFuel.ViewModels;
 using BetterMaps.Maui;
+using Microsoft.Maui.Controls.Shapes;
 using System.ComponentModel;
 using Map = BetterMaps.Maui.Map;
 
@@ -272,6 +273,14 @@ namespace AdelaideFuel.Maui.Views
 
         private void BottomSheetSizeChanged(object sender, EventArgs e)
         {
+            if (sender is Grid grid && grid.Width > 0 && grid.Height > 0)
+            {
+                grid.Clip = new RectangleGeometry
+                {
+                    Rect = new Rect(0, 0, grid.Width, grid.Height)
+                };
+            }
+
             DispatchCalculateLockStates();
         }
 

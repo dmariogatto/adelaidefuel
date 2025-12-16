@@ -13,7 +13,6 @@ using Cats.Maui.AdMob;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Sharpnado.CollectionView;
-using Sharpnado.Tabs;
 using ILogger = AdelaideFuel.Services.ILogger;
 using IMap = BetterMaps.Maui.IMap;
 
@@ -106,7 +105,6 @@ public static class MauiProgram
                     return new FileAsyncImageSourceService(fileImageSourceService, logger);
                 });
             })
-            .UseSharpnadoTabs(loggerEnable: false)
             .UseSharpnadoCollectionView(false);
 
 

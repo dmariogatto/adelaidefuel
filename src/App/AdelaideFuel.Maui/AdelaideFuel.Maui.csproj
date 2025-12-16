@@ -77,7 +77,6 @@
     <PackageReference Include="Cats.Maui.AdMob" Version="1.0.0-pre4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
-    <PackageReference Include="Sharpnado.Tabs.Maui" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">

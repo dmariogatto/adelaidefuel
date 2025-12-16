@@ -1,70 +1,59 @@
-﻿using AdelaideFuel.Maui.Extensions;
-using Sharpnado.Tabs;
+﻿using AdelaideFuel.Maui.Controls;
+using AdelaideFuel.Maui.Extensions;
+using AdelaideFuel.Services;
+using System.ComponentModel;
+using PropertyChangingEventArgs = Microsoft.Maui.Controls.PropertyChangingEventArgs;
 
 namespace AdelaideFuel.Maui.Views
 {
     public class MainTabbedPage : ContentPage
     {
-        private readonly ViewSwitcher _viewSwitcher;
-        private readonly TabHostView _tabHostView;
+        private readonly List<View> _tabViews = new List<View>();
+        private readonly BottomTabControl _bottomTabs = new BottomTabControl();
 
         public MainTabbedPage() : base()
         {
             SafeAreaEdges = SafeAreaEdges.None;
 
-            _viewSwitcher = new ViewSwitcher()
-            {
-                Animate = false,
-                Children =
-                {
-                    new PricesTab(),
-                    new MapTab(),
-                    new SettingsTab(),
-                },
-                SafeAreaEdges =  SafeAreaEdges.None,
-            };
+            _tabViews.Add(new PricesTab());
+            _tabViews.Add(new MapTab());
+            _tabViews.Add(new SettingsTab());
 
-            _tabHostView = new TabHostView();
-            _tabHostView.PropertyChanging += (_, args) =>
+            for (var i = 0; i < _tabViews.Count; i++)
             {
-                if (args.PropertyName == nameof(TabHostView.SelectedIndex))
+                _tabViews[i].IsVisible = false;
+                var viewTrigger = new DataTrigger(typeof(View))
                 {
-                    OnPropertyChanging(nameof(SelectedTab));
-                    SelectedTab?.OnDisappearing();
-                }
-            };
-            _tabHostView.PropertyChanged += (_, args) =>
-            {
-                if (args.PropertyName == nameof(TabHostView.SelectedIndex))
-                {
-                    OnPropertyChanged(nameof(SelectedTab));
-                    SelectedTab?.OnAppearing();
-                }
-            };
+                    Binding = Binding.Create(static (BottomTabControl i) => i.SelectedIndex, mode: BindingMode.OneWay, source: _bottomTabs),
+                    Value = i
+                };
+                viewTrigger.Setters.Add(new Setter() { Property = View.IsVisibleProperty, Value = true });
+                _tabViews[i].Triggers.Add(viewTrigger);
+            }
 
-            foreach (var i in _viewSwitcher.Children)
+            _bottomTabs.SetDynamicResource(BottomTabControl.BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
+            _bottomTabs.SetDynamicResource(BottomTabControl.PrimaryColorProperty, Styles.Keys.PrimaryAccentColor);
+
+            foreach (var i in _tabViews)
             {
                 var tab = new BottomTabItem();
+
+                tab.SetDynamicResource(BottomTabItem.UnselectedColorProperty, Styles.Keys.UnselectedTabColor);
+                tab.SetDynamicResource(BottomTabItem.SelectedColorProperty, Styles.Keys.PrimaryAccentColor);
+
                 tab.SetBinding(
-                    TabTextItem.LabelProperty,
+                    BottomTabItem.TextProperty,
                     static (IBaseTabView i) => i.Title,
                     BindingMode.OneWay,
                     source: i);
                 tab.SetBinding(
-                    BottomTabItem.IconImageSourceProperty,
+                    BottomTabItem.IconSourceProperty,
                     static (IBaseTabView i) => i.IconImageSource,
                     BindingMode.OneWay,
                     source: i);
-                _tabHostView.Tabs.Add(tab);
+
+                _bottomTabs.Children.Add(tab);
             }
-
-            _viewSwitcher.SetBinding(
-                ViewSwitcher.SelectedIndexProperty,
-                static (TabHostView i) => i.SelectedIndex,
-                BindingMode.OneWay,
-                source: _tabHostView);
-
-            _tabHostView.SelectedIndex = 0;
 
             var mainGrid = new Grid()
             {
@@ -74,22 +63,29 @@ namespace AdelaideFuel.Maui.Views
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
                 ],
-                SafeAreaEdges = SafeAreaEdges.None,
+                SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.Default),
             };
+            mainGrid.SetDynamicResource(BackgroundProperty, Styles.Keys.CardBackgroundColor);
 
             var titleContent = new ContentView() { SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.Container) };
-            var titleTrigger = new DataTrigger(typeof(View))
+            foreach (var i in new[] { _tabViews.FirstIndexOf(i => i is MapTab) })
             {
-                Binding = Binding.Create(static (ViewSwitcher i) => i.SelectedIndex, mode: BindingMode.OneWay, source: _viewSwitcher),
-                Value = 1
-            };
-            titleTrigger.Setters.Add(new Setter() { Property = View.IsVisibleProperty, Value = false });
-            titleContent.Triggers.Add(titleTrigger);
+                if (i < 0)
+                    continue;
+
+                var titleTrigger = new DataTrigger(typeof(View))
+                {
+                    Binding = Binding.Create(static (BottomTabControl i) => i.SelectedIndex, mode: BindingMode.OneWay, source: _bottomTabs),
+                    Value = i
+                };
+                titleTrigger.Setters.Add(new Setter() { Property = View.IsVisibleProperty, Value = false });
+                titleContent.Triggers.Add(titleTrigger);
+            }
 
             var titleLbl = new Label();
             titleLbl.SetBinding(
                 Label.TextProperty,
-                static (MainTabbedPage i) => i.SelectedTab.Title,
+                static (MainTabbedPage i) => i.SelectedTab?.Title,
                 BindingMode.OneWay,
                 source: this);
             titleLbl.SetDynamicResource(View.StyleProperty, Styles.Keys.LabelStyle);
@@ -114,8 +110,10 @@ namespace AdelaideFuel.Maui.Views
                 titleLbl.VerticalOptions = LayoutOptions.Center;
             }
 
-            mainGrid.Add(_viewSwitcher, 0, 1);
-            mainGrid.Add(_tabHostView, 0, 2);
+            foreach (var v in _tabViews)
+                mainGrid.Add(v, 0, 1);
+
+            mainGrid.Add(_bottomTabs, 0, 2);
             mainGrid.Add(titleContent, 0, 0);
 
             this.SetBinding(Page.TitleProperty, static (MainTabbedPage i) => i.SelectedTab?.Title, BindingMode.OneWay, source: this);
@@ -124,19 +122,19 @@ namespace AdelaideFuel.Maui.Views
         }
 
         public IBaseTabView SelectedTab =>
-            _viewSwitcher.Children[Math.Max(0, _tabHostView.SelectedIndex)] as IBaseTabView;
+            _tabViews[Math.Max(0, _bottomTabs.SelectedIndex)] as IBaseTabView;
 
         public int SelectedIndex
         {
-            get => _tabHostView.SelectedIndex;
-            set => _tabHostView.SelectedIndex = value;
+            get => _bottomTabs.SelectedIndex;
+            set => _bottomTabs.SelectedIndex = value;
         }
 
         public int GetIndexForViewModel(Type viewModelType)
         {
-            for (var i = 0; i < _viewSwitcher.Children.Count; i++)
+            for (var i = 0; i < _tabViews.Count; i++)
             {
-                if (_viewSwitcher.Children[i] is View tab && tab.BindingContext.GetType() == viewModelType)
+                if (_tabViews[i].BindingContext.GetType() == viewModelType)
                     return i;
             }
 
@@ -145,8 +143,8 @@ namespace AdelaideFuel.Maui.Views
 
         public IBaseTabView GetTabForIndex(int index)
         {
-            if (index >= 0 && index < _viewSwitcher.Children.Count)
-                return _viewSwitcher.Children[index] as IBaseTabView;
+            if (index >= 0 && index < _tabViews.Count)
+                return _tabViews[index] as IBaseTabView;
 
             return null;
         }
@@ -160,6 +158,9 @@ namespace AdelaideFuel.Maui.Views
             base.OnAppearing();
 
             SelectedTab?.OnAppearing();
+
+            _bottomTabs.PropertyChanging += BottomTabsOnPropertyChanging;
+            _bottomTabs.PropertyChanged += BottomTabsOnPropertyChanged;
         }
 
         protected override void OnDisappearing()
@@ -167,6 +168,27 @@ namespace AdelaideFuel.Maui.Views
             base.OnDisappearing();
 
             SelectedTab?.OnDisappearing();
+
+            _bottomTabs.PropertyChanging -= BottomTabsOnPropertyChanging;
+            _bottomTabs.PropertyChanged -= BottomTabsOnPropertyChanged;
+        }
+
+        private void BottomTabsOnPropertyChanging(object sender, PropertyChangingEventArgs e)
+        {
+            if (e.PropertyName == nameof(BottomTabControl.SelectedIndex))
+            {
+                OnPropertyChanging(nameof(SelectedTab));
+                SelectedTab?.OnDisappearing();
+            }
+        }
+
+        private void BottomTabsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BottomTabControl.SelectedIndex))
+            {
+                OnPropertyChanged(nameof(SelectedTab));
+                SelectedTab?.OnAppearing();
+            }
         }
     }
 }
