@@ -65,7 +65,7 @@ namespace AdelaideFuel.Maui.Views
                 ],
                 SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.Default),
             };
-            mainGrid.SetDynamicResource(BackgroundProperty, Styles.Keys.CardBackgroundColor);
+            mainGrid.SetDynamicResource(BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
 
             var titleContent = new ContentView() { SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.Container) };
             foreach (var i in new[] { _tabViews.FirstIndexOf(i => i is MapTab) })
