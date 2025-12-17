@@ -275,6 +275,7 @@ namespace AdelaideFuel.Maui.Controls
 
             _label.HorizontalOptions = LayoutOptions.Center;
             _label.VerticalOptions = LayoutOptions.Start;
+            SemanticProperties.SetHeadingLevel(_label, SemanticHeadingLevel.Level1);
 
             _image.SetBinding(TintImage.SourceProperty, static (BottomTabItem i) => i.IconSource, source: this);
             _image.SetBinding(TintImage.HeightRequestProperty, static (BottomTabItem i) => i.IconSize, source: this);
