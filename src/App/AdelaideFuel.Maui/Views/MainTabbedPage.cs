@@ -1,12 +1,11 @@
 ﻿using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Extensions;
-using AdelaideFuel.Services;
 using System.ComponentModel;
 using PropertyChangingEventArgs = Microsoft.Maui.Controls.PropertyChangingEventArgs;
 
 namespace AdelaideFuel.Maui.Views
 {
-    public class MainTabbedPage : ContentPage
+    public class MainTabbedPage : ContentPage, IBasePage
     {
         private readonly List<View> _tabViews = new List<View>();
         private readonly BottomTabControl _bottomTabs = new BottomTabControl();
@@ -153,6 +152,8 @@ namespace AdelaideFuel.Maui.Views
 
         public virtual void OnDestroy()
         {
+            foreach (var i in _tabViews.OfType<IBaseTabView>())
+                i.OnDestroy();
         }
 
         protected override void OnAppearing()
