@@ -120,6 +120,13 @@
                 <Setter Property="BarTextColor" Value="{DynamicResource {x:Static styles:Keys.NavigationBarTextColor}}" />
             </Style>
 
+            <Style TargetType="SearchBar">
+                <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}" />
+                <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+                <Setter Property="PlaceholderColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
+                <Setter Property="SearchIconColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
+            </Style>
+
             <Style TargetType="Label" x:Key="LabelHeaderStyle">
                 <Setter Property="FontFamily" Value="{StaticResource SemiBoldFontFamily}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static styles:FontSizes.Title}}" />

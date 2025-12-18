@@ -1,5 +1,4 @@
 ﻿using AdelaideFuel.Maui.Controls;
-using AdelaideFuel.Maui.Effects;
 using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Helpers;
 using AdelaideFuel.Maui.ImageSources;
@@ -79,13 +78,10 @@ public static class MauiProgram
                 handlers.AddHandler(typeof(Border), typeof(BorderCustomHandler));
 
                 SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
+                SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SearchBarStyle = UIKit.UISearchBarStyle.Minimal);
 #elif ANDROID
                 MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.GoogleMap.IOnMapLoadedCallback.OnMapLoaded), MapCustomHandler.MapOnMapLoaded);
 #endif
-            })
-            .ConfigureEffects(effects =>
-            {
-                effects.Add<SearchBarIconEffect, SearchBarIconPlatformEffect>();
             })
             .ConfigureFonts(fonts =>
             {
