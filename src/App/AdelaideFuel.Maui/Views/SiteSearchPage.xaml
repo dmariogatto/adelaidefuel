@@ -107,9 +107,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <SearchBar
-                x:Name="Search"
-                SearchButtonPressed="OnSearchButtonPressed" />
+            <SearchBar x:Name="Search" SearchButtonPressed="OnSearchButtonPressed" />
 
             <Label
                 Grid.Row="1"

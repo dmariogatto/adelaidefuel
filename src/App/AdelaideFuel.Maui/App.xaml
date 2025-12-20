@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Application
-    android:Application.WindowSoftInputModeAdjust="Resize"
     x:Class="AdelaideFuel.Maui.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:sv="clr-namespace:AiForms.Settings;assembly=SettingsView"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    android:Application.WindowSoftInputModeAdjust="Resize">
     <Application.Resources>
         <ResourceDictionary>
             <x:String x:Key="MapImg">map.png</x:String>
@@ -108,7 +108,7 @@
             <converters:DivideByConverter x:Key="DivideByConverter" />
             <converters:CollectionToCountConverter x:Key="CollectionToCountConverter" />
 
-            <Style TargetType="TabbedPage" x:Key="BaseTabbedPageStyle">
+            <Style x:Key="BaseTabbedPageStyle" TargetType="TabbedPage">
                 <Setter Property="BarBackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="SelectedTabColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
                 <Setter Property="UnselectedTabColor" Value="{DynamicResource {x:Static styles:Keys.UnselectedTabColor}}" />
@@ -127,7 +127,7 @@
                 <Setter Property="SearchIconColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
             </Style>
 
-            <Style TargetType="Label" x:Key="LabelHeaderStyle">
+            <Style x:Key="LabelHeaderStyle" TargetType="Label">
                 <Setter Property="FontFamily" Value="{StaticResource SemiBoldFontFamily}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static styles:FontSizes.Title}}" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.ContrastColor}}" />
@@ -135,7 +135,7 @@
                 <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
-            <Style TargetType="Label" x:Key="LabelTitleStyle">
+            <Style x:Key="LabelTitleStyle" TargetType="Label">
                 <Setter Property="FontFamily" Value="{StaticResource BoldFontFamily}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static styles:FontSizes.Medium}}" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
@@ -143,7 +143,7 @@
                 <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
-            <Style TargetType="Label" x:Key="LabelStyle">
+            <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
                 <Setter Property="FontFamily" Value="{StaticResource RegFontFamily}" />
                 <Setter Property="FontSize" Value="{DynamicResource {x:Static styles:FontSizes.Medium}}" />
@@ -151,13 +151,13 @@
                 <Setter Property="VerticalOptions" Value="Fill" />
             </Style>
 
-            <Style TargetType="Button" x:Key="ButtonStyle">
+            <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="FontFamily" Value="{StaticResource BoldFontFamily}" />
                 <Setter Property="BackgroundColor" Value="Transparent" />
                 <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
             </Style>
 
-            <Style TargetType="Border" x:Key="CardBorderStyle">
+            <Style x:Key="CardBorderStyle" TargetType="Border">
                 <Setter Property="Margin">
                     <OnPlatform x:TypeArguments="Thickness">
                         <On Platform="Android">6,4,6,4</On>
