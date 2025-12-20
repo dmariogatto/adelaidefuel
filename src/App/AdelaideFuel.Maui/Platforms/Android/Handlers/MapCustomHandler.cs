@@ -42,7 +42,7 @@ namespace AdelaideFuel.Maui.Handlers
             compassRlp.AddRule(LayoutRules.AlignParentRight);
 
             var compassTopMargin = (int)(14 * Resources.System.DisplayMetrics.Density);
-            compassRlp.SetMargins(0, locationTopMargin, locationRlp.RightMargin, 0);
+            compassRlp.SetMargins(0, compassTopMargin, locationRlp.RightMargin, 0);
 
             compass.LayoutParameters = compassRlp;
         }

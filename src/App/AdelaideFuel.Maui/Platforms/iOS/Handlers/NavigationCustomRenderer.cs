@@ -21,13 +21,9 @@ namespace AdelaideFuel.Maui.Handlers
                 return;
             if (navPage.Navigation.NavigationStack.Count <= 1)
                 return;
-            if (navPage.Navigation.NavigationStack[^2] is not { } previousPage)
-                return;
 
             TopViewController.NavigationItem.BackButtonTitle =
-                !string.IsNullOrWhiteSpace(previousPage.Title)
-                ? previousPage.Title
-                : Localisation.Resources.Back;
+                Localisation.Resources.Back;
         }
     }
 }

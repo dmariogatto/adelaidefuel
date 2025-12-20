@@ -5,10 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
     xmlns:converters="clr-namespace:AdelaideFuel.Maui.Converters"
-    xmlns:local="clr-namespace:AdelaideFuel.Maui"
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:sv="clr-namespace:AiForms.Settings;assembly=SettingsView"
-    xmlns:tabs="http://sharpnado.com"
     android:Application.WindowSoftInputModeAdjust="Resize">
     <Application.Resources>
         <ResourceDictionary>
@@ -116,22 +114,17 @@
                 <Setter Property="UnselectedTabColor" Value="{DynamicResource {x:Static styles:Keys.UnselectedTabColor}}" />
             </Style>
 
-            <Style TargetType="tabs:TabHostView">
-                <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
-            </Style>
-
-            <Style TargetType="tabs:BottomTabItem">
-                <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
-                <Setter Property="SelectedTabColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
-                <Setter Property="SelectedTabTextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
-                <Setter Property="UnselectedIconColor" Value="{DynamicResource {x:Static styles:Keys.UnselectedTabColor}}" />
-                <Setter Property="UnselectedLabelColor" Value="{DynamicResource {x:Static styles:Keys.UnselectedTabColor}}" />
-            </Style>
-
             <Style TargetType="NavigationPage">
                 <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}" />
                 <Setter Property="BarBackgroundColor" Value="{DynamicResource {x:Static styles:Keys.NavigationBarColor}}" />
                 <Setter Property="BarTextColor" Value="{DynamicResource {x:Static styles:Keys.NavigationBarTextColor}}" />
+            </Style>
+
+            <Style TargetType="SearchBar">
+                <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}" />
+                <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+                <Setter Property="PlaceholderColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
+                <Setter Property="SearchIconColor" Value="{DynamicResource {x:Static styles:Keys.SecondaryTextColor}}" />
             </Style>
 
             <Style x:Key="LabelHeaderStyle" TargetType="Label">
