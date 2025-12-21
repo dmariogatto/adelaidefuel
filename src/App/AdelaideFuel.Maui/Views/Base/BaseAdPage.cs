@@ -1,8 +1,4 @@
-﻿using AdelaideFuel.Maui.Controls;
-using AdelaideFuel.Maui.Converters;
-using AdelaideFuel.Services;
-using AdelaideFuel.ViewModels;
-using Cats.Maui.AdMob;
+﻿using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
 {
