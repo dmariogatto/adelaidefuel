@@ -75,11 +75,13 @@ namespace AdelaideFuel.Maui.Controls
 
                 _children.Add((View)args.Element);
                 Redraw();
+                UpdateSelectedBorderPosition();
             };
             ChildRemoved += (sender, args) =>
             {
                 _children.Remove((View)args.Element);
                 Redraw();
+                UpdateSelectedBorderPosition();
             };
         }
 
@@ -118,10 +120,12 @@ namespace AdelaideFuel.Maui.Controls
                 Grid.SetRow(_children[i], 1);
                 Grid.SetColumn(_children[i], i);
 
-                (_children[i] as BottomTabItem)?.SetSelected(i == SelectedIndex);
+                var selected = i == SelectedIndex;
+                if (_children[i] is BottomTabItem tabItem)
+                    tabItem.SetSelected(selected);
+                if (selected)
+                    _selectedView = _children[i];
             }
-
-            SelectedIndex = _children.Any() ? Math.Max(0, SelectedIndex) : -1;
         }
 
         private void UpdateSelectedBorderPosition()
@@ -132,6 +136,17 @@ namespace AdelaideFuel.Maui.Controls
                 return;
             if (Width <= 0)
                 return;
+
+            _selectedMarker.CancelAnimations();
+
+            if (_selectedView is null)
+            {
+                _selectedMarker.TranslationX = 0;
+                _selectedMarker.IsVisible = false;
+                return;
+            }
+
+            _selectedMarker.IsVisible = true;
 
             var columnWidth = Width / _children.Count;
             var markerWidth = _selectedMarker.Width > 0
@@ -148,8 +163,6 @@ namespace AdelaideFuel.Maui.Controls
                 _selectedMarker.ScaleX = 1d;
                 return;
             }
-
-            _selectedMarker.CancelAnimations();
 
             _ = _selectedMarker.TranslateToAsync(Math.Max(0, tranX), 0, animationLengthMs, Easing.CubicOut);
             _ = _selectedMarker.ScaleXToAsync(3d, animationLengthMs / 2, Easing.CubicOut)
@@ -173,16 +186,6 @@ namespace AdelaideFuel.Maui.Controls
             if (oldIdx != newIdx && _selectedView is BottomTabItem item)
             {
                 SemanticScreenReader.Announce($"'{item.Text}' tab selected");
-            }
-
-            if (newSelected is not null)
-            {
-                _selectedMarker.IsVisible = true;
-            }
-            else
-            {
-                _selectedMarker.TranslationX = 0;
-                _selectedMarker.IsVisible = false;
             }
 
             IndexChanged?.Invoke(this, new IndexChangedArgs(oldIdx, newIdx));
@@ -247,6 +250,8 @@ namespace AdelaideFuel.Maui.Controls
         private readonly TintImage _image = new TintImage();
         private readonly Label _label = new Label();
 
+        private bool _selected;
+
         public BottomTabItem()
         {
             AutomationProperties.SetIsInAccessibleTree(this, true);
@@ -287,6 +292,8 @@ namespace AdelaideFuel.Maui.Controls
             Children.Add(_label);
         }
 
+        public bool Selected => _selected;
+
         public Color UnselectedColor
         {
             get => (Color)GetValue(UnselectedColorProperty);
@@ -325,6 +332,8 @@ namespace AdelaideFuel.Maui.Controls
 
         public void SetSelected(bool selected)
         {
+            _selected = selected;
+
             if (selected)
             {
                 _image.SetBinding(TintImage.TintColorProperty, static (BottomTabItem i) => i.SelectedColor, source: this);

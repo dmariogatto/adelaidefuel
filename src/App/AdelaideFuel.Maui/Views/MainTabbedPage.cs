@@ -1,7 +1,5 @@
 ﻿using AdelaideFuel.Maui.Controls;
 using AdelaideFuel.Maui.Extensions;
-using System.ComponentModel;
-using PropertyChangingEventArgs = Microsoft.Maui.Controls.PropertyChangingEventArgs;
 
 namespace AdelaideFuel.Maui.Views
 {
@@ -10,6 +8,8 @@ namespace AdelaideFuel.Maui.Views
         private readonly List<View> _tabViews = new List<View>();
         private readonly BottomTabControl _bottomTabs = new BottomTabControl();
 
+        private int _previousSelectedIndex = -1;
+
         public MainTabbedPage() : base()
         {
             SafeAreaEdges = SafeAreaEdges.None;
@@ -17,18 +17,6 @@ namespace AdelaideFuel.Maui.Views
             _tabViews.Add(new PricesTab());
             _tabViews.Add(new MapTab());
             _tabViews.Add(new SettingsTab());
-
-            for (var i = 0; i < _tabViews.Count; i++)
-            {
-                _tabViews[i].IsVisible = false;
-                var viewTrigger = new DataTrigger(typeof(View))
-                {
-                    Binding = Binding.Create(static (BottomTabControl i) => i.SelectedIndex, mode: BindingMode.OneWay, source: _bottomTabs),
-                    Value = i
-                };
-                viewTrigger.Setters.Add(new Setter() { Property = View.IsVisibleProperty, Value = true });
-                _tabViews[i].Triggers.Add(viewTrigger);
-            }
 
             _bottomTabs.SetDynamicResource(BottomTabControl.BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
             _bottomTabs.SetDynamicResource(BottomTabControl.PrimaryColorProperty, Styles.Keys.PrimaryAccentColor);
@@ -53,6 +41,26 @@ namespace AdelaideFuel.Maui.Views
 
                 _bottomTabs.Children.Add(tab);
             }
+
+            _bottomTabs.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName != BottomTabControl.SelectedIndexProperty.PropertyName)
+                    return;
+
+                for (var i = 0; i < _tabViews.Count; i++)
+                    _tabViews[i].IsVisible = i == _bottomTabs.SelectedIndex;
+
+                if (_previousSelectedIndex >= 0 && _previousSelectedIndex < _tabViews.Count)
+                {
+                    (_tabViews[_previousSelectedIndex] as IBaseTabView)?.OnDisappearing();
+                    SelectedTab?.OnAppearing();
+                }
+
+                _previousSelectedIndex = _bottomTabs.SelectedIndex;
+                OnPropertyChanged(nameof(SelectedTab));
+            };
+
+            _bottomTabs.SelectedIndex = 0;
 
             var mainGrid = new Grid()
             {
@@ -123,7 +131,9 @@ namespace AdelaideFuel.Maui.Views
         }
 
         public IBaseTabView SelectedTab =>
-            _tabViews[Math.Max(0, _bottomTabs.SelectedIndex)] as IBaseTabView;
+            _bottomTabs.SelectedIndex >= 0 && _bottomTabs.SelectedIndex < _tabViews.Count
+            ? _tabViews[_bottomTabs.SelectedIndex] as IBaseTabView
+            : null;
 
         public int SelectedIndex
         {
@@ -161,9 +171,6 @@ namespace AdelaideFuel.Maui.Views
             base.OnAppearing();
 
             SelectedTab?.OnAppearing();
-
-            _bottomTabs.PropertyChanging += BottomTabsOnPropertyChanging;
-            _bottomTabs.PropertyChanged += BottomTabsOnPropertyChanged;
         }
 
         protected override void OnDisappearing()
@@ -171,27 +178,6 @@ namespace AdelaideFuel.Maui.Views
             base.OnDisappearing();
 
             SelectedTab?.OnDisappearing();
-
-            _bottomTabs.PropertyChanging -= BottomTabsOnPropertyChanging;
-            _bottomTabs.PropertyChanged -= BottomTabsOnPropertyChanged;
-        }
-
-        private void BottomTabsOnPropertyChanging(object sender, PropertyChangingEventArgs e)
-        {
-            if (e.PropertyName == nameof(BottomTabControl.SelectedIndex))
-            {
-                OnPropertyChanging(nameof(SelectedTab));
-                SelectedTab?.OnDisappearing();
-            }
-        }
-
-        private void BottomTabsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BottomTabControl.SelectedIndex))
-            {
-                OnPropertyChanged(nameof(SelectedTab));
-                SelectedTab?.OnAppearing();
-            }
         }
     }
 }
