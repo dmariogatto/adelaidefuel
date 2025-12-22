@@ -80,6 +80,7 @@ public static class MauiProgram
                 SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SetShowsCancelButton(false, false));
                 SearchBarHandler.Mapper.AppendToMapping(nameof(SearchBar.CancelButtonColor), (handler, _) => handler.PlatformView.SearchBarStyle = UIKit.UISearchBarStyle.Minimal);
 #elif ANDROID
+                MapHandler.Mapper.AppendToMapping(nameof(IMap.ShowUserLocationButton), (handler, view) => MapCustomHandler.MapOnMapLoaded(handler, view, null));
                 MapHandler.CommandMapper.AppendToMapping(nameof(Android.Gms.Maps.GoogleMap.IOnMapLoadedCallback.OnMapLoaded), MapCustomHandler.MapOnMapLoaded);
 #endif
             })
