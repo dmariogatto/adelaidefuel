@@ -46,8 +46,7 @@ namespace AdelaideFuel.Maui.Controls
             {
                 Padding = 0,
                 HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Fill,
-                IsVisible = false
+                VerticalOptions = LayoutOptions.Fill
             };
 
             AutomationProperties.SetIsInAccessibleTree(_selectedMarker, false);
