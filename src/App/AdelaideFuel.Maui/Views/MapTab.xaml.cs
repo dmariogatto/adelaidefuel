@@ -262,9 +262,6 @@ namespace AdelaideFuel.Maui.Views
 
                         var mapBtnLayoutMargin =
                             SiteMap.Height + BottomDrawerControl.Margin.Bottom + BottomDrawerControl.TranslationY * -1;
-#if ANDROID
-                        mapBtnLayoutMargin *= Android.Content.Res.Resources.System.DisplayMetrics.Density;
-#endif
                         SiteMap.LayoutMargin = new Thickness(0, 0, 0, mapBtnLayoutMargin);
                     }
                     break;
