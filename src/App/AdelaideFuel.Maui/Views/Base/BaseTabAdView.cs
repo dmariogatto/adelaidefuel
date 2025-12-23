@@ -1,4 +1,5 @@
-﻿using AdelaideFuel.ViewModels;
+﻿using AdelaideFuel.Maui.Controls;
+using AdelaideFuel.ViewModels;
 
 namespace AdelaideFuel.Maui.Views
 {

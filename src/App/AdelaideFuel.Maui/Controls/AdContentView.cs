@@ -1,9 +1,8 @@
-﻿using AdelaideFuel.Maui.Controls;
-using AdelaideFuel.Maui.Converters;
+﻿using AdelaideFuel.Maui.Converters;
 using AdelaideFuel.Services;
 using Cats.Maui.AdMob;
 
-namespace AdelaideFuel.Maui.Views
+namespace AdelaideFuel.Maui.Controls
 {
     [ContentProperty(nameof(Content))]
     public class AdContentView : Grid
