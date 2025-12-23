@@ -33,7 +33,7 @@ namespace AdelaideFuel.Maui.Handlers
 #pragma warning restore CA1416 // Validate platform compatibility
             }
 
-            var locationTopMargin = (int)(72 * Resources.System.DisplayMetrics.Density);
+            var locationTopMargin = (int)(60 * Resources.System.DisplayMetrics.Density);
             var locationRlp = myLocation.LayoutParameters as RL.LayoutParams;
             locationRlp?.SetMargins(locationRlp.LeftMargin, locationRlp.TopMargin + topInset + locationTopMargin, locationRlp.RightMargin, locationRlp.BottomMargin);
 
