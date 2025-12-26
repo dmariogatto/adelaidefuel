@@ -52,14 +52,14 @@
 
             <controls:ItemCard
                 x:Name="SearchButtonLayout"
-                Margin="{StaticResource LargeRightThickness}"
+                Margin="{StaticResource MediumRightThickness}"
                 Padding="0"
-                HeightRequest="44"
+                HeightRequest="48"
                 HorizontalOptions="End"
                 IsVisible="{Binding InitialLoadComplete}"
-                StrokeShape="RoundRectangle 22,22,22,22"
+                StrokeShape="RoundRectangle 24"
                 VerticalOptions="Center"
-                WidthRequest="44">
+                WidthRequest="48">
                 <View.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToSiteSearchCommand}" />
                 </View.GestureRecognizers>

@@ -107,6 +107,30 @@
       "size": "1024x1024",
       "idiom": "ios-marketing",
       "filename": "Icon1024.png"
+    },
+    {
+      "size": "1024x1024",
+      "idiom": "universal",
+      "platform": "ios",
+      "filename": "Dark1024.png",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ]
+    },
+    {
+      "size": "1024x1024",
+      "idiom": "universal",
+      "platform": "ios",
+      "filename": "Tinted1024.png",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "tinted"
+        }
+      ]
     }
   ],
   "properties": {},
