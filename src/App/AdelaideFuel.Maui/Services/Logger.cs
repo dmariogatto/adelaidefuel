@@ -93,6 +93,7 @@ namespace AdelaideFuel.Maui.Services
                              webEx.Message.Contains("unexpected end of stream", StringComparison.Ordinal):
                 case IOException ioEx
                         when ioEx.Message.Contains("Network subsystem is down", StringComparison.Ordinal):
+                    return false;
                 default:
                     return true;
             }
