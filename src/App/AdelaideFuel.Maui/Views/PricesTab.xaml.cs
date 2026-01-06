@@ -55,20 +55,21 @@ namespace AdelaideFuel.Maui.Views
 
             // safe copy
             var cts = _timerCancellation;
+            var token = _timerCancellation.Token;
 
             // delay until navigation completes
             Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(!ViewModel.FuelPriceGroups.Any() ? 0 : 350), () =>
             {
-                if (cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                     return;
 
                 ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(default);
 
                 _timer = Dispatcher.CreateAndStartTimer(TimeSpan.FromSeconds(60), () =>
                 {
-                    if (cts.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                     {
-                        if (cts == _timerCancellation)
+                        if (ReferenceEquals(cts, _timerCancellation))
                             _timerCancellation = null;
 
                         return false;
@@ -77,7 +78,7 @@ namespace AdelaideFuel.Maui.Views
                     if (ViewModel.IsBusy)
                         return true;
 
-                    ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(cts.Token);
+                    ViewModel.LoadFuelPriceGroupsCommand.ExecuteAsync(token);
                     return true;
                 });
             });
