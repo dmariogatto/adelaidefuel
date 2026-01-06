@@ -178,21 +178,32 @@ namespace AdelaideFuel.ViewModels
             {
                 BuildTappedCount++;
 
-                if (BuildTappedCount == 5)
+                if (BuildTappedCount % 5 == 0)
                 {
-                    var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
-
-                    if (Logger.LogFilePath() is string logFilePath && File.Exists(logFilePath))
+                    var logFilePath = Logger.LogFilePath();
+                    if (File.Exists(logFilePath))
                     {
-                        message.Attachments = new List<EmailAttachment>()
+                        var email = await DialogService.ConfirmAsync(
+                            "Email to developer, or copy to clipboard?",
+                            "Fuel Log File",
+                            "Email",
+                            "Copy");
+
+                        if (email)
                         {
-                            new EmailAttachment(logFilePath, "text/plain")
-                        };
+                            var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
+                            message.Attachments = new List<EmailAttachment>()
+                            {
+                                new EmailAttachment(logFilePath, "text/plain")
+                            };
+                            await _email.ComposeAsync(message);
+                        }
+                        else
+                        {
+                            var logText = await Logger.GetLogAsync();
+                            await _clipboard.SetTextAsync(logText);
+                        }
                     }
-
-                    await _email.ComposeAsync(message);
-
-                    BuildTappedCount = 0;
                 }
             }
             catch (Exception ex)
