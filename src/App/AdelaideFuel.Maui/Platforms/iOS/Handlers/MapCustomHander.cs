@@ -48,11 +48,11 @@ namespace AdelaideFuel.Maui.Handlers
             static NSLayoutConstraint[] getUserButtonConstraints(MauiMapView map)
             {
                 var margins = map.LayoutMarginsGuide;
-                var insets = WindowStateManager.Default.GetCurrentUIWindow().SafeAreaInsets;
+                var insets = WindowStateManager.Default?.GetCurrentUIWindow()?.SafeAreaInsets;
                 return new[]
                 {
-                    map.UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, insets.Top + 40),
-                    map.UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -8),
+                    map.UserTrackingButton.TopAnchor.ConstraintEqualTo(margins.TopAnchor, (insets?.Top ?? 0) + 40),
+                    map.UserTrackingButton.TrailingAnchor.ConstraintEqualTo(margins.TrailingAnchor, -4),
                     map.UserTrackingButton.WidthAnchor.ConstraintEqualTo(utSize),
                     map.UserTrackingButton.HeightAnchor.ConstraintEqualTo(map.UserTrackingButton.WidthAnchor),
                 };

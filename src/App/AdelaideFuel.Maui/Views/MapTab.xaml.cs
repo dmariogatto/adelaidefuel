@@ -98,11 +98,12 @@ namespace AdelaideFuel.Maui.Views
 
             // safe copy
             var cts = _timerCancellation;
+            var token = _timerCancellation.Token;
 
             // delay until navigation completes
             Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(!ViewModel.InitialLoadComplete ? 0 : 350), () =>
             {
-                if (cts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                     return;
 
                 ViewModel.LoadFuelsCommand.ExecuteAsync(int.TryParse(FuelId, out var fuelId) ? fuelId : -1);
@@ -111,9 +112,9 @@ namespace AdelaideFuel.Maui.Views
 
                 _timer = Dispatcher.CreateAndStartTimer(TimeSpan.FromSeconds(60), () =>
                 {
-                    if (cts.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                     {
-                        if (cts == _timerCancellation)
+                        if (ReferenceEquals(cts, _timerCancellation))
                             _timerCancellation = null;
 
                         return false;

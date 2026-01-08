@@ -11,6 +11,7 @@
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
+    x:Name="ThisView"
     Title="{Binding Title}"
     x:DataType="viewModels:PricesViewModel"
     x:TypeArguments="viewModels:PricesViewModel"
@@ -43,7 +44,7 @@
                     RowDefinitions="Auto,Auto,Auto,1"
                     RowSpacing="{StaticResource XSmallSpacing}">
                     <View.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding FuelPriceTappedCommand, Source={x:RelativeSource AncestorType={x:Type viewModels:PricesViewModel}}, x:DataType=viewModels:PricesViewModel}" CommandParameter="{Binding}" />
+                        <TapGestureRecognizer Command="{Binding ViewModel.FuelPriceTappedCommand, Source={x:Reference ThisView}, x:DataType=views:PricesTab}" CommandParameter="{Binding}" />
                     </View.GestureRecognizers>
                     <controls:BrandIconView Grid.RowSpan="3" BrandId="{Binding BrandId}" />
                     <Label
