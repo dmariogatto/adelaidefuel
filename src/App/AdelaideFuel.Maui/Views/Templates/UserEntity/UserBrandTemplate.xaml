@@ -37,7 +37,7 @@
                     HeightRequest="40"
                     HorizontalOptions="Center"
                     Source="{StaticResource DragIndicatorImg}"
-                    TintColor="{StaticResource PrimaryAccentColor}"
+                    TintColor="{DynamicResource PrimaryAccentColor}"
                     VerticalOptions="Center" />
             </Grid>
         </controls:ItemCard>
