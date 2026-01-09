@@ -1,5 +1,4 @@
-﻿using AdelaideFuel.Maui.Controls;
-using AdelaideFuel.Maui.Handlers;
+﻿using AdelaideFuel.Maui.Handlers;
 using AdelaideFuel.Maui.Helpers;
 using AdelaideFuel.Maui.ImageSources;
 using AdelaideFuel.Maui.Services;
@@ -69,8 +68,6 @@ public static class MauiProgram
             .ConfigureMauiHandlers(handlers =>
             {
                 handlers.AddSettingsViewHandler();
-
-                ImageHandler.Mapper.AppendToMapping(nameof(TintImage.TintColor), TintImageHandler.MapTintColor);
 #if IOS || MACCATALYST
                 MapHandler.Mapper.ModifyMapping(nameof(IMap.ShowUserLocationButton), (h, e, _) => MapCustomHandler.MapShowUserLocationButton(h, e));
 

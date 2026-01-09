@@ -16,7 +16,7 @@ namespace AdelaideFuel.Maui.Views
         public View MainContent
         {
             get => _mainView.Content;
-            set =>  _mainView.Content = value;
+            set => _mainView.Content = value;
         }
 
         public string AdUnitId

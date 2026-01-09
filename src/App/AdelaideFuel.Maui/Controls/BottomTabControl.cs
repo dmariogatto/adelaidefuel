@@ -273,7 +273,7 @@ namespace AdelaideFuel.Maui.Controls
 
             AutomationProperties.SetIsInAccessibleTree(_image, false);
 
-            _image.HorizontalOptions = LayoutOptions.Center;
+            _image.HorizontalOptions = LayoutOptions.Fill;
             _image.VerticalOptions = LayoutOptions.Start;
             _image.Aspect = Aspect.AspectFit;
 
@@ -281,8 +281,8 @@ namespace AdelaideFuel.Maui.Controls
             _label.VerticalOptions = LayoutOptions.Start;
             SemanticProperties.SetHeadingLevel(_label, SemanticHeadingLevel.Level1);
 
-            _image.SetBinding(TintImage.SourceProperty, static (BottomTabItem i) => i.IconSource, source: this);
-            _image.SetBinding(TintImage.HeightRequestProperty, static (BottomTabItem i) => i.IconSize, source: this);
+            _image.SetBinding(Image.SourceProperty, static (BottomTabItem i) => i.IconSource, source: this);
+            _image.SetBinding(Image.HeightRequestProperty, static (BottomTabItem i) => i.IconSize, source: this);
 
             _label.SetBinding(Label.TextProperty, static (BottomTabItem i) => i.Text, source: this);
             _label.SetBinding(Label.FontSizeProperty, static (BottomTabItem i) => i.TextSize, source: this);
