@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>AdelaideFuel.Maui</RootNamespace>
     <UseMaui>true</UseMaui>
-    <MauiVersion>10.0.11</MauiVersion>
+    <MauiVersion>10.0.20</MauiVersion>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
 
@@ -85,16 +85,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.11.0" />
-    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.11.0" />
-    <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.5.0.3" />
-    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.3" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.9.4" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.9.4" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.9.4" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.3" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.3" />
-    <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.5" />
+    <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.6" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.4" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.4" />
+    <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
+    <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.0.1" ExcludeAssets="all" />
+    <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.0.1" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
