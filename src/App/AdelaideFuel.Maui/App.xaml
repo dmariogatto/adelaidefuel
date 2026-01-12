@@ -102,7 +102,7 @@
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
             <converters:IsNullConverter x:Key="IsNullConverter" />
-            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:StringIsNotNullOrEmptyConverter x:Key="StringIsNotNullOrEmptyConverter" />
             <converters:EqualityConverter x:Key="EqualityConverter" />
             <converters:MultiplyByConverter x:Key="MultiplyByConverter" />
             <converters:DivideByConverter x:Key="DivideByConverter" />
