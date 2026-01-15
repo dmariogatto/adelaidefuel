@@ -17,11 +17,11 @@ namespace AdelaideFuel.Maui
 
     public static class ThemeManager
     {
-        private readonly static Lazy<IAppPreferences> AppPreferences = new Lazy<IAppPreferences>(() => IoC.Resolve<IAppPreferences>());
-        private readonly static Lazy<IEnvironmentService> EnvironmentService = new Lazy<IEnvironmentService>(() => IoC.Resolve<IEnvironmentService>());
+        private static readonly Lazy<IAppPreferences> AppPreferences = new Lazy<IAppPreferences>(() => IoC.Resolve<IAppPreferences>());
+        private static readonly Lazy<IEnvironmentService> EnvironmentService = new Lazy<IEnvironmentService>(() => IoC.Resolve<IEnvironmentService>());
 
-        private readonly static IDictionary<Theme, ResourceDictionary> Resources = new Dictionary<Theme, ResourceDictionary>();
-        private readonly static WeakEventManager WeakEventManager = new WeakEventManager();
+        private static readonly IDictionary<Theme, ResourceDictionary> Resources = new Dictionary<Theme, ResourceDictionary>();
+        private static readonly WeakEventManager WeakEventManager = new WeakEventManager();
 
         public static event EventHandler<ThemeEventArgs> CurrentThemeChanged
         {
@@ -59,6 +59,13 @@ namespace AdelaideFuel.Maui
 
                 mergedDictionaries.Remove(oldResources);
                 mergedDictionaries.Add(newResources);
+
+                Application.Current.UserAppTheme = CurrentTheme switch
+                {
+                    Theme.Light => AppTheme.Light,
+                    Theme.Dark => AppTheme.Dark,
+                    _ => AppTheme.Unspecified,
+                };
 
                 WeakEventManager.HandleEvent(Application.Current, new ThemeEventArgs(theme, oldTheme), nameof(ResolvedThemeChanged));
             }

@@ -18,28 +18,37 @@
         <ResourceDictionary>
             <Thickness x:Key="DefaultMargin">12,0,12,0</Thickness>
 
-            <OnPlatform x:Key="ButtonHeight" x:TypeArguments="x:Double">
-                <OnPlatform.Platforms>
-                    <On Platform="Android" Value="48" />
-                    <On Platform="iOS" Value="36" />
-                </OnPlatform.Platforms>
-            </OnPlatform>
-            <OnPlatform x:Key="ButtonCornerRadius" x:TypeArguments="x:Int32">
-                <OnPlatform.Platforms>
-                    <On Platform="Android" Value="24" />
-                    <On Platform="iOS" Value="18" />
-                </OnPlatform.Platforms>
-            </OnPlatform>
-
             <Style x:Key="SubscriptionButton" TargetType="Button">
-                <Setter Property="HeightRequest" Value="{StaticResource ButtonHeight}" />
-                <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
+                <Setter Property="HeightRequest">
+                    <OnPlatform x:TypeArguments="x:Double">
+                        <OnPlatform.Platforms>
+                            <On Platform="Android" Value="48" />
+                            <On Platform="iOS" Value="36" />
+                        </OnPlatform.Platforms>
+                    </OnPlatform>
+                </Setter>
+                <Setter Property="CornerRadius">
+                    <OnPlatform x:TypeArguments="x:Int32">
+                        <OnPlatform.Platforms>
+                            <On Platform="Android" Value="24" />
+                            <On Platform="iOS" Value="18" />
+                        </OnPlatform.Platforms>
+                    </OnPlatform>
+                </Setter>
                 <Setter Property="Padding" Value="6,0,6,0" />
                 <Setter Property="Margin" Value="0,4,0,4" />
                 <Setter Property="HorizontalOptions" Value="Fill" />
-                <Setter Property="BackgroundColor" Value="#005005" />
+                <Setter Property="BackgroundColor" Value="#007AFF" />
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <Style
+                x:Key="SubscriptionLinkButton"
+                BasedOn="{StaticResource SubscriptionButton}"
+                TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
+                <Setter Property="TextColor" Value="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -228,20 +237,16 @@
 
                 <Button
                     Margin="{StaticResource DefaultMargin}"
-                    BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="{x:Static const:Constants.PrivacyUrl}"
-                    Style="{StaticResource SubscriptionButton}"
-                    Text="{local:Translate PrivacyPolicy}"
-                    TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+                    Style="{StaticResource SubscriptionLinkButton}"
+                    Text="{local:Translate PrivacyPolicy}" />
                 <Button
                     Margin="{StaticResource DefaultMargin}"
-                    BackgroundColor="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="{x:Static const:Constants.TermsOfUseUrl}"
-                    Style="{StaticResource SubscriptionButton}"
-                    Text="{local:Translate TermsOfUse}"
-                    TextColor="{DynamicResource {x:Static styles:Keys.PrimaryTextColor}}" />
+                    Style="{StaticResource SubscriptionLinkButton}"
+                    Text="{local:Translate TermsOfUse}" />
             </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>

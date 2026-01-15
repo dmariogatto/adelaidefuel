@@ -2,7 +2,7 @@
 
 namespace AdelaideFuel.Maui.Converters
 {
-    public class StringToBoolConverter : IValueConverter
+    public class StringIsNotNullOrEmptyConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -4,6 +4,7 @@ using AdelaideFuel.Maui.Dispatching;
 using AdelaideFuel.Maui.Extensions;
 using AdelaideFuel.Models;
 using AdelaideFuel.Services;
+using AdelaideFuel.Shared;
 using AdelaideFuel.ViewModels;
 using BetterMaps.Maui;
 using Microsoft.Maui.Controls.Shapes;
@@ -239,32 +240,7 @@ namespace AdelaideFuel.Maui.Views
                 case nameof(BottomDrawer.Height):
                 case nameof(BottomDrawer.LockStates):
                 case nameof(BottomDrawer.TranslationY):
-                    if (DeviceInfo.Current.Idiom == DeviceIdiom.Phone)
-                    {
-                        var opacity = 1d;
-
-                        var lockState = BottomDrawerControl.LockStates.Length > 1
-                            ? BottomDrawerControl.LockStates.Last()
-                            : 0.45;
-                        var expandedPercentage = BottomDrawerControl.Height > 0
-                            ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
-                            : -1;
-
-                        if (expandedPercentage > 0 && lockState > 0)
-                        {
-                            opacity = 1 - expandedPercentage / lockState;
-
-                            if (opacity < 0) opacity = 0;
-                            if (opacity > 1) opacity = 1;
-                        }
-
-                        SearchButtonLayout.Opacity = opacity;
-                        SearchButtonLayout.InputTransparent = opacity == 0;
-
-                        var mapBtnLayoutMargin =
-                            SiteMap.Height + BottomDrawerControl.Margin.Bottom + BottomDrawerControl.TranslationY * -1;
-                        SiteMap.LayoutMargin = new Thickness(0, 0, 0, mapBtnLayoutMargin);
-                    }
+                    UpdateUiBasedOnPan();
                     break;
             }
         }
@@ -348,6 +324,43 @@ namespace AdelaideFuel.Maui.Views
             drawer.ExpandedPercentage = expIdx >= 0 && expIdx < lockStates.Count
                 ? lockStates[expIdx]
                 : 0;
+        }
+
+        private void UpdateUiBasedOnPan()
+        {
+            if (DeviceInfo.Current.Idiom != DeviceIdiom.Phone)
+                return;
+
+            var opacity = 1d;
+
+            var lockState = BottomDrawerControl.LockStates.Length > 1
+                ? BottomDrawerControl.LockStates[^1]
+                : 0.45;
+            var expandedPercentage = BottomDrawerControl.Height > 0
+                ? Math.Abs(BottomDrawerControl.TranslationY) / BottomDrawerControl.Height
+                : -1;
+
+            if (expandedPercentage > 0 && lockState > 0)
+            {
+                opacity = 1 - expandedPercentage / lockState;
+
+                if (opacity < 0) opacity = 0;
+                if (opacity > 1) opacity = 1;
+            }
+
+            if (!SearchButtonLayout.Opacity.FuzzyEquals(opacity, 0.05d))
+            {
+                SearchButtonLayout.Opacity = opacity;
+                SearchButtonLayout.InputTransparent = opacity == 0;
+            }
+
+            var mapBtnLayoutMargin =
+                SiteMap.Height + BottomDrawerControl.Margin.Bottom + BottomDrawerControl.TranslationY * -1;
+
+            if (!SiteMap.LayoutMargin.Bottom.FuzzyEquals(mapBtnLayoutMargin, 0.5d))
+            {
+                SiteMap.LayoutMargin = new Thickness(0, 0, 0, mapBtnLayoutMargin);
+            }
         }
 
         private async Task DrawRadiiAsync(CancellationToken ct)
