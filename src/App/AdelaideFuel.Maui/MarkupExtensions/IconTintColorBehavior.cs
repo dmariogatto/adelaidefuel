@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using AdelaideFuel.Maui.Controls;
 using Color = Microsoft.Maui.Graphics.Color;
 using ImageButton = Microsoft.Maui.Controls.ImageButton;
 using MauiView = Microsoft.Maui.Controls.View;
@@ -82,7 +83,9 @@ public sealed class IconTintColorBehavior : Behavior<MauiView>
 	{
 		if (e.PropertyName != Image.SourceProperty.PropertyName &&
 			e.PropertyName != ImageButton.SourceProperty.PropertyName &&
-			e.PropertyName != ImageButton.IsLoadingProperty.PropertyName)
+			e.PropertyName != ImageButton.IsLoadingProperty.PropertyName &&
+			e.PropertyName != TintImage.TintColorProperty.PropertyName &&
+			e.PropertyName != TintImageButton.TintColorProperty.PropertyName)
 		{
 			return;
 		}
@@ -215,9 +218,17 @@ public sealed class IconTintColorBehavior : Behavior<MauiView>
 				break;
 
 			case UIButton button when button.ImageView?.Image is not null:
-				button.ImageView.Image =
-					button.ImageView.Image.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
-				button.TintColor = uiColor;
+				var image = button.ImageForState(UIControlState.Normal);
+
+				button.TintColor = tintColor.ToPlatform();
+
+				var templated = image.ImageWithRenderingMode(
+					UIImageRenderingMode.AlwaysTemplate);
+
+				// IMPORTANT: set per control state
+				button.SetImage(templated, UIControlState.Normal);
+				button.SetImage(templated, UIControlState.Highlighted);
+				button.SetImage(templated, UIControlState.Disabled);
 				break;
 		}
 	}
@@ -235,8 +246,15 @@ public sealed class IconTintColorBehavior : Behavior<MauiView>
 				break;
 
 			case UIButton button when button.ImageView?.Image is not null:
-				button.ImageView.Image =
-					button.ImageView.Image.ImageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal);
+				var image = button.ImageForState(UIControlState.Normal);
+
+				button.TintColor = UIColor.Clear;
+
+				var original = image.ImageWithRenderingMode(UIImageRenderingMode.Automatic);
+
+				button.SetImage(original, UIControlState.Normal);
+				button.SetImage(original, UIControlState.Highlighted);
+				button.SetImage(original, UIControlState.Disabled);
 				break;
 		}
 	}
