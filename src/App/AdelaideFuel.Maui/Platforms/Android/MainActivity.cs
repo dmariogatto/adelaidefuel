@@ -15,7 +15,7 @@ namespace AdelaideFuel.Maui;
         ConfigChanges.ScreenLayout |
         ConfigChanges.SmallestScreenSize |
         ConfigChanges.Density,
-    LaunchMode = LaunchMode.SingleTask)]
+    LaunchMode = LaunchMode.Multiple)]
 [IntentFilter(
    new[] { Platform.Intent.ActionAppAction },
    Categories = new[] { Intent.CategoryDefault })]
