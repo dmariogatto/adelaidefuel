@@ -3,13 +3,16 @@
 csprojPath=$1
 buildNumber=$2
 buildOffset=$3
+versionName=$4
 
-manifestPath=$4
-droidAdmobAppId=$5
-droidGoogleMapsKey=$6
+manifestPath=$5
+droidAdmobAppId=$6
+droidGoogleMapsKey=$7
 
-plistPath=$7
-iosAdmobAppId=$8
+plistPath=$8
+iosAdmobAppId=$9
+
+appExtPlistPath=$10
 
 # exit if a command fails
 set -e
@@ -24,7 +27,7 @@ echo " (i) Provided build number: ${buildNumber}"
 echo " (i) Provided build offset: ${buildOffset}"
 
 newVersionCode=$((buildNumber + buildOffset))
-newVersionName="$(date -u +'%Y.%-m.%-d')"
+newVersionName="${versionName:-$(date -u +'%Y.%-m.%-d')}"
 
 echo " (i) New version code: ${newVersionCode}"
 echo " (i) New version name: ${newVersionName}"
@@ -54,4 +57,15 @@ if ([ ! -z $plistPath ] && [ -f $plistPath ]) ; then
   sed -i".bak" "s#{AdMobApplicationId}#$iosAdmobAppId#g" $plistPath
 
   echo " (i) Updated iOS plist '$plistPath'"
+fi
+
+## AppExt iOS Settings
+
+if ([ ! -z $appExtPlistPath ] && [ -f $appExtPlistPath ]) ; then
+  echo " (i) Updating AppExt iOS plist '$appExtPlistPath'"
+
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${newVersionCode}" "${appExtPlistPath}"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${newVersionName}" "${appExtPlistPath}"
+
+  echo " (i) Updated AppExt iOS plist '$appExtPlistPath'"
 fi
