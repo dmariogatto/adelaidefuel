@@ -23,7 +23,8 @@ namespace AdelaideFuel.Maui.Controls
 
             SafeAreaEdges = SafeAreaEdges.None;
 
-            RowDefinitions.Add(new RowDefinition() { Height = GridLength.Star });
+            RowDefinitions.Add(new RowDefinition(GridLength.Star));
+            RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         }
 
         public View Content
@@ -32,19 +33,23 @@ namespace AdelaideFuel.Maui.Controls
             set
             {
                 if (_mainView is not null)
-                    Children.Remove(_mainView);
+                    Remove(_mainView);
 
                 _mainView = value;
 
                 if (_mainView is not null)
-                    Children.Insert(0, _mainView);
+                    this.Add(_mainView, 0, 0);
             }
         }
 
         public string AdUnitId
         {
             get => _adBannerContainer.AdUnitId;
-            set => _adBannerContainer.AdUnitId = value;
+            set
+            {
+                _adBannerContainer.AdUnitId = value;
+                AddRemoveBannerAd();
+            }
         }
 
         public void OnAppearing()
@@ -63,7 +68,7 @@ namespace AdelaideFuel.Maui.Controls
 
         private void AddRemoveBannerAd()
         {
-            if (_subscriptionService.AdsEnabled && _adConsentService.CanServeAds)
+            if (_subscriptionService.AdsEnabled && _adConsentService.CanServeAds && !string.IsNullOrEmpty(AdUnitId))
             {
                 AddBannerAd();
             }
@@ -75,21 +80,14 @@ namespace AdelaideFuel.Maui.Controls
 
         private void AddBannerAd()
         {
-            if (_adBannerContainer.Parent is null)
+            if (!Children.Contains(_adBannerContainer))
             {
-                RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 this.Add(_adBannerContainer, 0, 1);
             }
         }
 
         private void RemoveBannerAd()
-        {
-            if (ReferenceEquals(_adBannerContainer.Parent, this))
-            {
-                Children.Remove(_adBannerContainer);
-                RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
-            }
-        }
+            => Children.Remove(_adBannerContainer);
 
         private class AdBannerContainer : Grid
         {
@@ -97,34 +95,27 @@ namespace AdelaideFuel.Maui.Controls
 
             public AdBannerContainer() : base()
             {
+                HorizontalOptions = LayoutOptions.Fill;
+                VerticalOptions = LayoutOptions.Start;
+
                 _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
 
-                var boxView = new BoxView();
                 var adSkeleton = new SkeletonView();
+                adSkeleton.HorizontalOptions = adSkeleton.VerticalOptions = LayoutOptions.Fill;
 
-                Children.Add(boxView);
+                var mainRowDefinition = new RowDefinition();
+
+                mainRowDefinition.SetBinding(
+                    RowDefinition.HeightProperty,
+                    static (AdSmartBanner i) => i.HeightRequest,
+                    mode: BindingMode.OneWay,
+                    source: _adBannerView);
+
+                RowDefinitions.Add(mainRowDefinition);
+
                 Children.Add(adSkeleton);
                 Children.Add(_adBannerView);
 
-                boxView.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PageBackgroundColor);
-                boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
-
-                boxView.SetBinding(
-                    HeightRequestProperty,
-                    static (AdSmartBanner i) => i.HeightRequest,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-                boxView.SetBinding(
-                    IsVisibleProperty,
-                    static (AdSmartBanner i) => i.IsVisible,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-
-                adSkeleton.SetBinding(
-                    HeightRequestProperty,
-                    static (AdSmartBanner i) => i.HeightRequest,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
                 adSkeleton.SetBinding(
                     IsVisibleProperty,
                     static (AdSmartBanner i) => i.AdStatus,
