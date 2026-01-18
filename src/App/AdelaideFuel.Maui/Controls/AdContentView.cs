@@ -10,7 +10,8 @@ namespace AdelaideFuel.Maui.Controls
         private readonly IAdConsentService _adConsentService;
         private readonly ISubscriptionService _subscriptionService;
 
-        private readonly AdBannerContainer _adBannerContainer;
+        private readonly AdSmartBanner _adBannerView;
+        private readonly SkeletonView _adSkeleton;
 
         private View _mainView;
 
@@ -19,11 +20,26 @@ namespace AdelaideFuel.Maui.Controls
             _adConsentService = IoC.Resolve<IAdConsentService>();
             _subscriptionService = IoC.Resolve<ISubscriptionService>();
 
-            _adBannerContainer = new AdBannerContainer();
-
             SafeAreaEdges = SafeAreaEdges.None;
 
-            RowDefinitions.Add(new RowDefinition() { Height = GridLength.Star });
+            _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
+
+            _adSkeleton = new SkeletonView()
+            {
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions =  LayoutOptions.Fill,
+            };
+
+            RowDefinitions.Add(new RowDefinition(GridLength.Star));
+            RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+
+            _adSkeleton.SetBinding(
+                IsVisibleProperty,
+                static (AdSmartBanner i) => i.AdStatus,
+                converter: new InverseEqualityConverter(),
+                converterParameter: AdLoadStatus.Loaded,
+                mode: BindingMode.OneWay,
+                source: _adBannerView);
         }
 
         public View Content
@@ -37,14 +53,14 @@ namespace AdelaideFuel.Maui.Controls
                 _mainView = value;
 
                 if (_mainView is not null)
-                    Children.Insert(0, _mainView);
+                    this.Add(_mainView, 0, 0);
             }
         }
 
         public string AdUnitId
         {
-            get => _adBannerContainer.AdUnitId;
-            set => _adBannerContainer.AdUnitId = value;
+            get => _adBannerView?.AdUnitId ?? string.Empty;
+            set => _adBannerView?.AdUnitId = value;
         }
 
         public void OnAppearing()
@@ -75,73 +91,19 @@ namespace AdelaideFuel.Maui.Controls
 
         private void AddBannerAd()
         {
-            if (_adBannerContainer.Parent is null)
+            if (_adBannerView.Parent is null)
             {
-                RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                this.Add(_adBannerContainer, 0, 1);
+                this.Add(_adSkeleton, 0, 1);
+                this.Add(_adBannerView, 0, 1);
             }
         }
 
         private void RemoveBannerAd()
         {
-            if (ReferenceEquals(_adBannerContainer.Parent, this))
+            if (ReferenceEquals(_adBannerView.Parent, this))
             {
-                Children.Remove(_adBannerContainer);
-                RowDefinitions.RemoveAt(RowDefinitions.Count - 1);
-            }
-        }
-
-        private class AdBannerContainer : Grid
-        {
-            private readonly AdSmartBanner _adBannerView;
-
-            public AdBannerContainer() : base()
-            {
-                _adBannerView = new AdSmartBanner() { HeightRequest = 0 };
-
-                var boxView = new BoxView();
-                var adSkeleton = new SkeletonView();
-
-                Children.Add(boxView);
-                Children.Add(adSkeleton);
-                Children.Add(_adBannerView);
-
-                boxView.SetDynamicResource(BoxView.ColorProperty, Styles.Keys.PageBackgroundColor);
-                boxView.HorizontalOptions = boxView.VerticalOptions = LayoutOptions.Fill;
-
-                boxView.SetBinding(
-                    HeightRequestProperty,
-                    static (AdSmartBanner i) => i.HeightRequest,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-                boxView.SetBinding(
-                    IsVisibleProperty,
-                    static (AdSmartBanner i) => i.IsVisible,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-
-                adSkeleton.SetBinding(
-                    HeightRequestProperty,
-                    static (AdSmartBanner i) => i.HeightRequest,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-                adSkeleton.SetBinding(
-                    IsVisibleProperty,
-                    static (AdSmartBanner i) => i.AdStatus,
-                    converter: new InverseEqualityConverter(),
-                    converterParameter: AdLoadStatus.Loaded,
-                    mode: BindingMode.OneWay,
-                    source: _adBannerView);
-            }
-
-            public string AdUnitId
-            {
-                get => _adBannerView?.AdUnitId ?? string.Empty;
-                set
-                {
-                    if (_adBannerView is not null)
-                        _adBannerView.AdUnitId = value;
-                }
+                Children.Remove(_adSkeleton);
+                Children.Remove(_adBannerView);
             }
         }
     }
