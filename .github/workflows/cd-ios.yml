@@ -36,6 +36,9 @@ on:
       build-offset:
         required: true
         type: string
+      version-name:
+        required: true
+        type: string
     secrets:      
       p12-cert:
         required: true
@@ -95,6 +98,7 @@ jobs:
         "${{ inputs.project-file }}" \
         "${{ inputs.build-number }}" \
         "${{ inputs.build-offset }}" \
+        "${{ inputs.version-name }}" \
         "" \
         "" \
         "" \

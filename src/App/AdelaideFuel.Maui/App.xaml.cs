@@ -12,6 +12,8 @@ public partial class App : Application
     public const string Scheme = "adl-sif";
     public const string Map = "map";
 
+    private readonly WeakEventManager _weakEventManager = new WeakEventManager();
+
     private readonly SemaphoreSlim _umpSemaphore = new SemaphoreSlim(1, 1);
 
     public App()
@@ -20,6 +22,12 @@ public partial class App : Application
 
         ThemeManager.LoadTheme();
         RequestedThemeChanged += (_, _) => ThemeManager.OsThemeChanged();
+    }
+
+    public event EventHandler<EventArgs> Resumed
+    {
+        add => _weakEventManager.AddEventHandler(value);
+        remove => _weakEventManager.RemoveEventHandler(value);
     }
 
     protected override Window CreateWindow(IActivationState activationState)
@@ -91,6 +99,8 @@ public partial class App : Application
         UpdateDayCount();
 
         Dispatcher.DispatchAsync(RequestAdConsentAsync);
+
+        _weakEventManager.HandleEvent(this, EventArgs.Empty, nameof(Resumed));
     }
 
     protected override void OnAppLinkRequestReceived(Uri uri)

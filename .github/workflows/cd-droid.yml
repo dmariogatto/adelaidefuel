@@ -33,6 +33,9 @@ on:
       build-offset:
         required: true
         type: string
+      version-name:
+        required: true
+        type: string
     secrets:
       keystore:
         required: true  
@@ -83,6 +86,7 @@ jobs:
         "${{ inputs.project-file }}" \
         "${{ inputs.build-number }}" \
         "${{ inputs.build-offset }}" \
+        "${{ inputs.version-name }}" \
         "${{ inputs.project-folder }}/Platforms/Android/AndroidManifest.xml" \
         "${{ secrets.admob-app-id }}" \
         "${{ secrets.google-maps-api-key }}" \
