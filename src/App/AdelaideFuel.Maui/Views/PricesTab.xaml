@@ -12,7 +12,6 @@
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
     x:Name="ThisView"
-    Title="{Binding Title}"
     x:DataType="viewModels:PricesViewModel"
     x:TypeArguments="viewModels:PricesViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
@@ -22,7 +21,6 @@
         <ResourceDictionary>
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
-            <converters:IntToBoolConverter x:Key="intToBoolConverter" />
 
             <DataTemplate x:Key="FuelPriceGroupTemplate" x:DataType="models:PriceItemByFuelGrouping">
                 <VerticalStackLayout Margin="{StaticResource XSmallTopThickness}" IsVisible="{Binding HasPrices}">

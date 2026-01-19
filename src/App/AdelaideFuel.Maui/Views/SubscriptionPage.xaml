@@ -9,7 +9,6 @@
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    Title="{Binding Title}"
     x:DataType="viewModels:SubscriptionViewModel"
     x:TypeArguments="viewModels:SubscriptionViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}">

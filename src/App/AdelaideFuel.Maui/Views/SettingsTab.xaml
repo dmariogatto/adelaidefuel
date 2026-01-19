@@ -10,7 +10,6 @@
     xmlns:sv="clr-namespace:AiForms.Settings;assembly=SettingsView"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    Title="{Binding Title}"
     x:DataType="viewModels:SettingsViewModel"
     x:TypeArguments="viewModels:SettingsViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"

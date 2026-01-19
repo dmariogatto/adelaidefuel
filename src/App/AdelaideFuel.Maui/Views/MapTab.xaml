@@ -10,7 +10,6 @@
     xmlns:styles="clr-namespace:AdelaideFuel.Maui.Styles"
     xmlns:viewModels="clr-namespace:AdelaideFuel.ViewModels;assembly=AdelaideFuel"
     xmlns:views="clr-namespace:AdelaideFuel.Maui.Views"
-    Title="{Binding Title}"
     x:DataType="viewModels:MapViewModel"
     x:TypeArguments="viewModels:MapViewModel"
     BackgroundColor="{DynamicResource {x:Static styles:Keys.PageBackgroundColor}}"
@@ -19,10 +18,8 @@
     <View.Resources>
         <ResourceDictionary>
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
-            <converters:PriceCategoryToColorConverter x:Key="priceCategoryToColorConverter" />
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
             <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
-            <converters:OpeningHourToStringConverter x:Key="openingHourToStringConverter" />
         </ResourceDictionary>
     </View.Resources>
 
