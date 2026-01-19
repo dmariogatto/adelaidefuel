@@ -14,6 +14,7 @@ namespace AdelaideFuel.Maui.Controls
         private readonly SkeletonView _adSkeleton;
 
         private View _mainView;
+        private bool _resumedRegistered = false;
 
         public AdContentView() : base()
         {
@@ -89,12 +90,24 @@ namespace AdelaideFuel.Maui.Controls
             }
         }
 
+        private void OnAppResumed(object sender, EventArgs e)
+        {
+            if (_adBannerView.Parent is not null)
+            {
+                _adBannerView.Load();
+            }
+        }
+
         private void AddBannerAd()
         {
             if (_adBannerView.Parent is null)
             {
                 this.Add(_adSkeleton, 0, 1);
                 this.Add(_adBannerView, 0, 1);
+            }
+            else if (DateTime.UtcNow - _adBannerView.AdLoadedDateUtc > TimeSpan.FromSeconds(60))
+            {
+                _adBannerView.Load();
             }
         }
 
@@ -104,6 +117,22 @@ namespace AdelaideFuel.Maui.Controls
             {
                 Children.Remove(_adSkeleton);
                 Children.Remove(_adBannerView);
+            }
+        }
+
+        protected override void OnHandlerChanged()
+        {
+            base.OnHandlerChanged();
+
+            if (Handler is not null && !_resumedRegistered)
+            {
+                (Application.Current as App)?.Resumed += OnAppResumed;
+                _resumedRegistered = true;
+            }
+            else if (_resumedRegistered)
+            {
+                (Application.Current as App)?.Resumed -= OnAppResumed;
+                _resumedRegistered = false;
             }
         }
     }
