@@ -195,10 +195,6 @@ public partial class App : Application
 
         try
         {
-            var subscriptionService = IoC.Resolve<ISubscriptionService>();
-            if (!subscriptionService.AdsEnabled)
-                return;
-
             var adConsentService = IoC.Resolve<IAdConsentService>();
             if (!adConsentService.ShouldRequest)
                 return;
