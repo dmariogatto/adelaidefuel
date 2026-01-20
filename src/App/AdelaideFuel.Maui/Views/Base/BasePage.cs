@@ -16,6 +16,8 @@ namespace AdelaideFuel.Maui.Views
             var vm = IoC.Resolve<T>();
             BindingContext = vm ?? throw new ArgumentNullException(typeof(T).Name);
 
+            this.SetBinding(TitleProperty, static (BaseViewModel i) => i.Title);
+
             ViewModel.OnCreate();
         }
 
