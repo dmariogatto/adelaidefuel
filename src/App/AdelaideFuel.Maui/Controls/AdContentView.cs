@@ -36,18 +36,28 @@ namespace AdelaideFuel.Maui.Controls
             RowDefinitions.Add(new RowDefinition(GridLength.Star));
             RowDefinitions.Add(_adRowDefinition);
 
+            var equalityConverter = new EqualityConverter();
+            var inverseEqualityConverter = new InverseEqualityConverter();
+
             _adBannerView.SetBinding(
                 IsVisibleProperty,
                 static (AdSmartBanner i) => i.AdStatus,
-                converter: new InverseEqualityConverter(),
+                converter: inverseEqualityConverter,
                 converterParameter: AdLoadStatus.Failed,
                 mode: BindingMode.OneWay,
                 source: _adBannerView);
             _adSkeleton.SetBinding(
                 IsVisibleProperty,
                 static (AdSmartBanner i) => i.AdStatus,
-                converter: new InverseEqualityConverter(),
+                converter: inverseEqualityConverter,
                 converterParameter: AdLoadStatus.Loaded,
+                mode: BindingMode.OneWay,
+                source: _adBannerView);
+            _adSkeleton.SetBinding(
+                SkeletonView.IsAnimatingProperty,
+                static (AdSmartBanner i) => i.AdStatus,
+                converter: equalityConverter,
+                converterParameter: AdLoadStatus.Loading,
                 mode: BindingMode.OneWay,
                 source: _adBannerView);
         }
