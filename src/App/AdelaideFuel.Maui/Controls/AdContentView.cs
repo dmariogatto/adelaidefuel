@@ -96,7 +96,7 @@ namespace AdelaideFuel.Maui.Controls
         }
 
         private void AdConsentStatusChanged(object sender, AdConsentStatusChangedEventArgs e)
-            => AddRemoveBannerAd();
+            => Dispatcher.Dispatch(AddRemoveBannerAd);
 
         private void AddRemoveBannerAd()
         {
