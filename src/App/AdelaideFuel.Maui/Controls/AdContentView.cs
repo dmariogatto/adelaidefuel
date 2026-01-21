@@ -15,7 +15,6 @@ namespace AdelaideFuel.Maui.Controls
         private readonly AdSmartBanner _adBannerView;
         private readonly SkeletonView _adSkeleton;
 
-        private View _mainView;
         private bool _resumedRegistered = false;
 
         public AdContentView() : base()
@@ -64,16 +63,16 @@ namespace AdelaideFuel.Maui.Controls
 
         public View Content
         {
-            get => _mainView;
+            get;
             set
             {
-                if (_mainView is not null)
-                    Children.Remove(_mainView);
+                if (field is not null)
+                    Children.Remove(field);
 
-                _mainView = value;
+                field = value;
 
-                if (_mainView is not null)
-                    this.Add(_mainView, 0, 0);
+                if (field is not null)
+                    this.Add(field, 0, 0);
             }
         }
 
@@ -151,7 +150,7 @@ namespace AdelaideFuel.Maui.Controls
             }
             else
             {
-                _adRowDefinition.Height = Math.Max(0, _adBannerView.AdSizeRequest.Height);
+                _adRowDefinition.Height = Math.Max(0, _adBannerView.HeightRequest = _adBannerView.AdSizeRequest.Height);
             }
         }
 
