@@ -67,22 +67,22 @@ jobs:
     steps:
 
     - name: Set XCode version
-      uses: maxim-lobanov/setup-xcode@v1
+      uses: maxim-lobanov/setup-xcode@v1.6.0
       with:
         xcode-version: ${{ inputs.xcode-version }}
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6.0.1
 
     - name: Import Distribution Certificate
-      uses: apple-actions/import-codesign-certs@v3
+      uses: Apple-Actions/import-codesign-certs@v6.0.0
       with: 
         p12-file-base64: ${{ secrets.p12-cert }}
         p12-password: ${{ secrets.p12-cert-password }}
 
     - name: Download Provisioning Profiles
       id: provisioning_app
-      uses: apple-actions/download-provisioning-profiles@v4
+      uses: Apple-Actions/download-provisioning-profiles@v5.0.0
       with: 
         bundle-id: ${{ inputs.package-name }}
         profile-type: 'IOS_APP_STORE'
@@ -116,7 +116,7 @@ jobs:
         '${{ secrets.settings-json }}'
 
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5.1.0
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
 
@@ -138,7 +138,7 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
 
     - name: Upload to TestFlight
-      uses: apple-actions/upload-testflight-build@v3
+      uses: Apple-Actions/upload-testflight-build@v4.0.0
       with:
         app-path: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-ios/ios-arm64/publish/${{ inputs.project-name }}.Maui.ipa
         issuer-id: ${{ secrets.appstore-issuer }}

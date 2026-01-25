@@ -15,7 +15,6 @@ namespace AdelaideFuel.Maui.Controls
         private readonly AdSmartBanner _adBannerView;
         private readonly SkeletonView _adSkeleton;
 
-        private View _mainView;
         private bool _resumedRegistered = false;
 
         public AdContentView() : base()
@@ -36,34 +35,44 @@ namespace AdelaideFuel.Maui.Controls
             RowDefinitions.Add(new RowDefinition(GridLength.Star));
             RowDefinitions.Add(_adRowDefinition);
 
+            var equalityConverter = new EqualityConverter();
+            var inverseEqualityConverter = new InverseEqualityConverter();
+
             _adBannerView.SetBinding(
                 IsVisibleProperty,
                 static (AdSmartBanner i) => i.AdStatus,
-                converter: new InverseEqualityConverter(),
+                converter: inverseEqualityConverter,
                 converterParameter: AdLoadStatus.Failed,
                 mode: BindingMode.OneWay,
                 source: _adBannerView);
             _adSkeleton.SetBinding(
                 IsVisibleProperty,
                 static (AdSmartBanner i) => i.AdStatus,
-                converter: new InverseEqualityConverter(),
+                converter: inverseEqualityConverter,
                 converterParameter: AdLoadStatus.Loaded,
+                mode: BindingMode.OneWay,
+                source: _adBannerView);
+            _adSkeleton.SetBinding(
+                SkeletonView.IsAnimatingProperty,
+                static (AdSmartBanner i) => i.AdStatus,
+                converter: equalityConverter,
+                converterParameter: AdLoadStatus.Loading,
                 mode: BindingMode.OneWay,
                 source: _adBannerView);
         }
 
         public View Content
         {
-            get => _mainView;
+            get;
             set
             {
-                if (_mainView is not null)
-                    Children.Remove(_mainView);
+                if (field is not null)
+                    Children.Remove(field);
 
-                _mainView = value;
+                field = value;
 
-                if (_mainView is not null)
-                    this.Add(_mainView, 0, 0);
+                if (field is not null)
+                    this.Add(field, 0, 0);
             }
         }
 
@@ -87,7 +96,7 @@ namespace AdelaideFuel.Maui.Controls
         }
 
         private void AdConsentStatusChanged(object sender, AdConsentStatusChangedEventArgs e)
-            => AddRemoveBannerAd();
+            => Dispatcher.Dispatch(AddRemoveBannerAd);
 
         private void AddRemoveBannerAd()
         {
@@ -141,7 +150,7 @@ namespace AdelaideFuel.Maui.Controls
             }
             else
             {
-                _adRowDefinition.Height = Math.Max(0, _adBannerView.AdSizeRequest.Height);
+                _adRowDefinition.Height = Math.Max(0, _adBannerView.HeightRequest = _adBannerView.AdSizeRequest.Height);
             }
         }
 
