@@ -16,6 +16,7 @@
         <OnPlatform.Platforms>
             <On Platform="Android" Value="#181818" />
             <On Platform="iOS" Value="#000000" />
+            <On Platform="Default" Value="#000000" />
         </OnPlatform.Platforms>
     </OnPlatform>
 
@@ -23,6 +24,7 @@
         <OnPlatform.Platforms>
             <On Platform="Android" Value="#FFFFFF" />
             <On Platform="iOS" Value="#FFFFFF" />
+            <On Platform="Default" Value="#FFFFFF" />
         </OnPlatform.Platforms>
     </OnPlatform>
 
