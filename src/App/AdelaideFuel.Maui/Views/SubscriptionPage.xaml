@@ -18,8 +18,8 @@
             <Thickness x:Key="DefaultMargin">12,0,12,0</Thickness>
 
             <Style x:Key="SubscriptionButton" TargetType="Button">
-                <Setter Property="HeightRequest" Value="{OnPlatform Android=38, iOS=36}" />
-                <Setter Property="CornerRadius" Value="{OnPlatform Android=24, iOS=18}" />
+                <Setter Property="HeightRequest" Value="{OnPlatform Android=38, iOS=36, Default=48}" />
+                <Setter Property="CornerRadius" Value="{OnPlatform Android=24, iOS=18, Default=24}" />
                 <Setter Property="Padding" Value="6,0,6,0" />
                 <Setter Property="Margin" Value="0,4,0,4" />
                 <Setter Property="HorizontalOptions" Value="Fill" />
@@ -218,7 +218,8 @@
                     Margin="{StaticResource DefaultMargin}"
                     Style="{DynamicResource LabelStyle}"
                     Text="{OnPlatform Android={local:Translate GoogleSubscriptionDisclaimer},
-                                      iOS={local:Translate AppleSubscriptionDisclaimer}}" />
+                                      iOS={local:Translate AppleSubscriptionDisclaimer},
+                                      Default='Insert generic disclaimer'}" />
 
                 <Button
                     Margin="{StaticResource DefaultMargin}"

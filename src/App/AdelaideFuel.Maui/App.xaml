@@ -158,12 +158,7 @@
             </Style>
 
             <Style x:Key="CardBorderStyle" TargetType="Border">
-                <Setter Property="Margin">
-                    <OnPlatform x:TypeArguments="Thickness">
-                        <On Platform="Android">6,4,6,4</On>
-                        <On Platform="iOS">6,6,6,0</On>
-                    </OnPlatform>
-                </Setter>
+                <Setter Property="Margin" Value="{OnPlatform Android='6,4,6,4', iOS='6,6,6,0', Default=6}" />
                 <Setter Property="Padding" Value="{StaticResource SmallThickness}" />
                 <Setter Property="Background" Value="{DynamicResource {x:Static styles:Keys.CardBackgroundColor}}" />
                 <Setter Property="Stroke" Value="{DynamicResource {x:Static styles:Keys.CardBorderColor}}" />
