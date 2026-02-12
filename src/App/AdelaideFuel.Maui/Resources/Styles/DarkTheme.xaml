@@ -12,22 +12,6 @@
     <!--  Orange  -->
     <Color x:Key="PrimaryAccentColor">#FF9500</Color>
 
-    <OnPlatform x:Key="NavigationBarColor" x:TypeArguments="Color">
-        <OnPlatform.Platforms>
-            <On Platform="Android" Value="#181818" />
-            <On Platform="iOS" Value="#000000" />
-            <On Platform="Default" Value="#000000" />
-        </OnPlatform.Platforms>
-    </OnPlatform>
-
-    <OnPlatform x:Key="NavigationBarTextColor" x:TypeArguments="Color">
-        <OnPlatform.Platforms>
-            <On Platform="Android" Value="#FFFFFF" />
-            <On Platform="iOS" Value="#FFFFFF" />
-            <On Platform="Default" Value="#FFFFFF" />
-        </OnPlatform.Platforms>
-    </OnPlatform>
-
     <!--  Dark Grey  -->
     <Color x:Key="UnselectedTabColor">#808080</Color>
 
