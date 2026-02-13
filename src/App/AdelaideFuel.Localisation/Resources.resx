@@ -480,4 +480,7 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="CrashingSubjectItem" xml:space="preserve">
     <value>Should I Fuel? - Crashing ({0})</value>
   </data>
+  <data name="AdInspector" xml:space="preserve">
+    <value>Ad Inspector</value>
+  </data>
 </root>
