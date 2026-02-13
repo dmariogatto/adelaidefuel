@@ -85,7 +85,7 @@
                     Tapped="BuildOnTapped"
                     ValueText="{Binding Build}" />
             </sv:Section>
-            <sv:Section Title="{local:Translate Development}" IsVisible="{Binding IsDevelopment}">
+            <sv:Section Title="{local:Translate Development}">
                 <sv:ButtonCell Title="{local:Translate AdInspector}" Tapped="OnAdInspectorClicked" />
                 <sv:SwitchCell Title="{local:Translate ShowRadiiOnMap}" On="{Binding ShowRadiiOnMap}" />
                 <sv:ButtonCell Title="{local:Translate GenerateTestCrash}" Command="{Binding GenerateTestCrashCommand}" />
