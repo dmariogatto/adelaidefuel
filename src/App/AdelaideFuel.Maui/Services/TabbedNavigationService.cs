@@ -57,13 +57,13 @@ namespace AdelaideFuel.Maui.Services
             {
                 var vmType = typeof(T);
 
-                var navigatedPage = default(IView);
-                var navFunc = default(Func<Task>);
+                var navigatedViewFunc = default(Func<IView>);
+                var navigationFunc = default(Func<Task>);
 
                 if (TabbedPage.GetIndexForViewModel(vmType) is var i and >= 0)
                 {
-                    navigatedPage = TabbedPage.GetTabForIndex(i);
-                    navFunc = () =>
+                    navigatedViewFunc = () => TabbedPage.GetTabForIndex(i);
+                    navigationFunc = () =>
                     {
                         TabbedPage.SelectedIndex = i;
                         return Task.CompletedTask;
@@ -71,26 +71,38 @@ namespace AdelaideFuel.Maui.Services
                 }
                 else
                 {
-                    navigatedPage = CreatePage<T>();
-                    navFunc = () => MainPage.PushAsync(navigatedPage as Page, animated);
+                    var navigatedPage = CreatePage<T>();
+                    navigatedViewFunc = () => navigatedPage;
+                    navigationFunc = () => MainPage.PushAsync(navigatedPage, animated);
                 }
 
-                if (navigatedPage is not null && parameters?.Any() == true)
+                bool setQueryProperties(IView navigatedView, IDictionary<string, string> parameters)
                 {
-                    var pageType = navigatedPage.GetType();
+                    if (navigatedView is null)
+                        return false;
+                    if (parameters is null || parameters.Count == 0)
+                        return true;
+
+                    var pageType = navigatedView.GetType();
                     var qProps = pageType.GetCustomAttributes(false).OfType<QueryPropertyAttribute>();
                     foreach (var qp in qProps)
                     {
                         if (parameters.TryGetValue(qp.QueryId, out var val) &&
-                            pageType.GetProperty(qp.Name) is PropertyInfo pi &&
-                            pi.CanWrite)
+                            pageType.GetProperty(qp.Name) is { CanWrite: true } pi)
                         {
-                            pi.SetValue(navigatedPage, val);
+                            pi.SetValue(navigatedView, val);
                         }
                     }
+
+                    return true;
                 }
 
-                await navFunc.Invoke();
+                var queryPropertiesSet = setQueryProperties(navigatedViewFunc(), parameters);
+
+                await navigationFunc();
+
+                if (!queryPropertiesSet)
+                    queryPropertiesSet = setQueryProperties(navigatedViewFunc(), parameters);
             }
             catch (Exception ex)
             {
