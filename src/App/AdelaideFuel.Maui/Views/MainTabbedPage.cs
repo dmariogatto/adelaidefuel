@@ -5,7 +5,15 @@ namespace AdelaideFuel.Maui.Views
 {
     public class MainTabbedPage : ContentPage, IBasePage
     {
-        private readonly List<View> _tabViews = new List<View>();
+        private static readonly IReadOnlyDictionary<Type, (string title, ImageSource icon)> Tabs =
+            new Dictionary<Type, (string title, ImageSource icon)>()
+            {
+                { typeof(PricesTab), (Localisation.Resources.Prices, App.Current.FindResource<string>(Styles.Keys.FuelImg)) },
+                { typeof(MapTab), (Localisation.Resources.Map, App.Current.FindResource<string>(Styles.Keys.MapImg)) },
+                { typeof(SettingsTab), (Localisation.Resources.Settings, App.Current.FindResource<string>(Styles.Keys.CogImg)) }
+            };
+
+        private readonly List<ILazyView> _tabViews = new List<ILazyView>();
         private readonly BottomTabControl _bottomTabs = new BottomTabControl();
 
         private int _previousSelectedIndex = -1;
@@ -14,9 +22,8 @@ namespace AdelaideFuel.Maui.Views
         {
             SafeAreaEdges = SafeAreaEdges.None;
 
-            _tabViews.Add(new PricesTab());
-            _tabViews.Add(new MapTab());
-            _tabViews.Add(new SettingsTab());
+            foreach (var i in Tabs.Keys)
+                _tabViews.Add(new LazyView(i));
 
             _bottomTabs.SetDynamicResource(BottomTabControl.BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
             _bottomTabs.SetDynamicResource(BottomTabControl.PrimaryColorProperty, Styles.Keys.PrimaryAccentColor);
@@ -30,13 +37,15 @@ namespace AdelaideFuel.Maui.Views
 
                 tab.SetBinding(
                     BottomTabItem.TextProperty,
-                    static (IBaseTabView i) => i.Title,
+                    static (ILazyView i) => (i.Content as IBaseTabView)?.Title,
                     BindingMode.OneWay,
+                    targetNullValue: Tabs[i.ContentType].title,
                     source: i);
                 tab.SetBinding(
                     BottomTabItem.IconSourceProperty,
-                    static (IBaseTabView i) => i.IconImageSource,
+                    static (ILazyView i) => (i.Content as IBaseTabView)?.IconImageSource,
                     BindingMode.OneWay,
+                    targetNullValue: Tabs[i.ContentType].icon,
                     source: i);
 
                 _bottomTabs.Children.Add(tab);
@@ -52,7 +61,7 @@ namespace AdelaideFuel.Maui.Views
 
                 if (_previousSelectedIndex >= 0 && _previousSelectedIndex < _tabViews.Count)
                 {
-                    (_tabViews[_previousSelectedIndex] as IBaseTabView)?.OnDisappearing();
+                    (_tabViews[_previousSelectedIndex]?.Content as IBaseTabView)?.OnDisappearing();
                     SelectedTab?.OnAppearing();
                 }
 
@@ -77,7 +86,7 @@ namespace AdelaideFuel.Maui.Views
             var titleContent = new ContentView() { SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.Container) };
             AutomationProperties.SetIsInAccessibleTree(titleContent, false);
 
-            foreach (var i in new[] { _tabViews.FirstIndexOf(i => i is MapTab) })
+            foreach (var i in new[] { _tabViews.FirstIndexOf(i => i.ContentType == typeof(MapTab)) })
             {
                 if (i < 0)
                     continue;
@@ -132,8 +141,8 @@ namespace AdelaideFuel.Maui.Views
 
         public IBaseTabView SelectedTab =>
             _bottomTabs.SelectedIndex >= 0 && _bottomTabs.SelectedIndex < _tabViews.Count
-            ? _tabViews[_bottomTabs.SelectedIndex] as IBaseTabView
-            : null;
+                ? _tabViews[_bottomTabs.SelectedIndex].Content as IBaseTabView
+                : null;
 
         public int SelectedIndex
         {
@@ -145,8 +154,21 @@ namespace AdelaideFuel.Maui.Views
         {
             for (var i = 0; i < _tabViews.Count; i++)
             {
-                if (_tabViews[i].BindingContext.GetType() == viewModelType)
+                if (_tabViews[i].Content?.BindingContext?.GetType() == viewModelType)
                     return i;
+
+                var type = _tabViews[i].ContentType?.BaseType;
+                while (type is not null && type != typeof(object))
+                {
+                    if (type.IsGenericType &&
+                        type.GetGenericTypeDefinition() == typeof(BaseTabView<>) &&
+                        type.GetGenericArguments()[0] == viewModelType)
+                    {
+                        return i;
+                    }
+
+                    type = type.BaseType;
+                }
             }
 
             return -1;
@@ -155,14 +177,14 @@ namespace AdelaideFuel.Maui.Views
         public IBaseTabView GetTabForIndex(int index)
         {
             if (index >= 0 && index < _tabViews.Count)
-                return _tabViews[index] as IBaseTabView;
+                return _tabViews[index].Content as IBaseTabView;
 
             return null;
         }
 
         public virtual void OnDestroy()
         {
-            foreach (var i in _tabViews.OfType<IBaseTabView>())
+            foreach (var i in _tabViews.Select(i => i.Content).OfType<IBaseTabView>())
                 i.OnDestroy();
         }
 

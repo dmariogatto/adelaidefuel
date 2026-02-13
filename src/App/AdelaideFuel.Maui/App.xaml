@@ -96,7 +96,6 @@
 
             <x:Double x:Key="DefaultSpacing">6</x:Double>
 
-            <Thickness x:Key="ListViewMargin">0,4,0,4</Thickness>
             <Thickness x:Key="ItemMargin">8,4,8,4</Thickness>
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
