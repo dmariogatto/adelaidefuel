@@ -132,7 +132,6 @@ jobs:
            -f ${{ inputs.dotnet-version-target }}-ios \
            -r ios-arm64 \
            -p:ArchiveOnBuild=true  \
-           -p:RestoreConfigFile=src/NuGet.config
            -p:SentryOrg=${{ secrets.sentry-org }} \
            -p:SentryProject=${{ secrets.sentry-project }}
       env:
