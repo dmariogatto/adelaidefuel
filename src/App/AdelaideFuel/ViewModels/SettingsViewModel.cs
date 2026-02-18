@@ -180,28 +180,43 @@ namespace AdelaideFuel.ViewModels
 
                 if (BuildTappedCount % 5 == 0)
                 {
-                    var logFilePath = Logger.LogFilePath();
-                    if (File.Exists(logFilePath))
-                    {
-                        var email = await DialogService.ConfirmAsync(
-                            "Email to developer, or copy to clipboard?",
-                            "Fuel Log File",
-                            "Email",
-                            "Copy");
+                    var options = new[] { Resources.ClearCache, Resources.ViewLog, };
 
-                        if (email)
+                    var result = await DialogService.ActionSheetAsync(
+                        null,
+                        Resources.Cancel,
+                        null,
+                        options);
+
+                    if (result == Resources.ClearCache)
+                    {
+                        _storeFactory.CacheEmptyAll();
+                    }
+                    else if (result == Resources.ViewLog)
+                    {
+                        var logFilePath = Logger.LogFilePath();
+                        if (File.Exists(logFilePath))
                         {
-                            var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
-                            message.Attachments = new List<EmailAttachment>()
+                            var email = await DialogService.ConfirmAsync(
+                                "Email to developer, or copy to clipboard?",
+                                "Fuel Log File",
+                                "Email",
+                                "Copy");
+
+                            if (email)
                             {
-                                new EmailAttachment(logFilePath, "text/plain")
-                            };
-                            await _email.ComposeAsync(message);
-                        }
-                        else
-                        {
-                            var logText = await Logger.GetLogAsync();
-                            await _clipboard.SetTextAsync(logText);
+                                var message = _email.GetFeedbackEmailMessage(_appInfo, _deviceInfo);
+                                message.Attachments = new List<EmailAttachment>()
+                                {
+                                    new EmailAttachment(logFilePath, "text/plain")
+                                };
+                                await _email.ComposeAsync(message);
+                            }
+                            else
+                            {
+                                var logText = await Logger.GetLogAsync();
+                                await _clipboard.SetTextAsync(logText);
+                            }
                         }
                     }
                 }
