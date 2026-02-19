@@ -2,7 +2,7 @@
 
 namespace AdelaideFuel.Functions.Models
 {
-    public class SendGridOptions
+    public class Smtp2GoOptions
     {
         public string ApiKey { get; set; }
         public string FromEmail { get; set; }

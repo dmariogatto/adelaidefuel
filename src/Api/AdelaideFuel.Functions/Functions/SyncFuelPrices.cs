@@ -34,7 +34,7 @@ namespace AdelaideFuel.Functions
 
         private readonly ICacheService _cacheService;
         private readonly IBlobService _blobService;
-        private readonly ISendGridService _sendGridService;
+        private readonly IEmailService _emailService;
 
         private readonly ILogger _logger;
 
@@ -48,7 +48,7 @@ namespace AdelaideFuel.Functions
             ITableRepository<SitePriceExceptionLogEntity> sitePriceExceptionLogRepository,
             ICacheService cacheService,
             IBlobService blobService,
-            ISendGridService sendGridService,
+            IEmailService emailService,
             ILoggerFactory loggerFactory)
         {
             _saFuelPricingApi = saFuelPricingApi;
@@ -62,7 +62,7 @@ namespace AdelaideFuel.Functions
 
             _cacheService = cacheService;
             _blobService = blobService;
-            _sendGridService = sendGridService;
+            _emailService = emailService;
 
             _logger = loggerFactory.CreateLogger<SyncFuelPrices>();
         }
@@ -311,7 +311,7 @@ namespace AdelaideFuel.Functions
             subject = $"{subject} - DEBUG";
 #endif
 
-            await _sendGridService.SendEmailAsync(subject, emailBuilder.ToString());
+            await _emailService.SendEmailAsync(subject, emailBuilder.ToString());
         }
 
         private static bool IsPriceException(double price, int fuelId)
