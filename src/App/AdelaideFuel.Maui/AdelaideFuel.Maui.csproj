@@ -80,7 +80,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.0.0" />
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.1.0" />
     <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.1.0" />
   </ItemGroup>
 
