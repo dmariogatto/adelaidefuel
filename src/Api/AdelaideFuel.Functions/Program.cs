@@ -57,12 +57,12 @@ var host = new HostBuilder()
                 BlobContainerName = services.GetService<IConfiguration>().GetValue<string>("BlobContainerName")
             });
 
-        services.AddOptions<SendGridOptions>()
-            .Configure<IConfiguration>((settings, config) => config.GetSection("SendGrid").Bind(settings));
+        services.AddOptions<Smtp2GoOptions>()
+            .Configure<IConfiguration>((settings, config) => config.GetSection("Smtp2Go").Bind(settings));
 
         services.AddSingleton<ICacheService, CacheService>();
         services.AddSingleton<IBlobService, BlobService>();
-        services.AddSingleton<ISendGridService, SendGridService>();
+        services.AddSingleton<IEmailService, Smtp2GoService>();
         services.AddSingleton<ITableRepository<BrandEntity>, TableRepository<BrandEntity>>();
         services.AddSingleton<ITableRepository<FuelEntity>, TableRepository<FuelEntity>>();
         services.AddSingleton<ITableRepository<GeographicRegionEntity>, TableRepository<GeographicRegionEntity>>();
