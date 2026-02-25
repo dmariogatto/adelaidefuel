@@ -28,6 +28,8 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Resources/Assets.xcassets/appicon.appiconset</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We use this identifier to provide more relevant ads and support free app features.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Your location is used to show your position on the map and determine your closest stations.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

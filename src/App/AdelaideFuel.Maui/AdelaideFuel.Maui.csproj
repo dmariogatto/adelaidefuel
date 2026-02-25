@@ -96,6 +96,7 @@
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
     <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.6" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.5" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.4" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.4" />
     <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->

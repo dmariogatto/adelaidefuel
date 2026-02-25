@@ -20,6 +20,7 @@ namespace AdelaideFuel.ViewModels
         private readonly IClipboard _clipboard;
 
         private readonly IStoreReview _storeReview;
+        private readonly ITrackingService _trackingService;
 
         private readonly IStoreFactory _storeFactory;
         private readonly IThemeService _themeService;
@@ -30,6 +31,7 @@ namespace AdelaideFuel.ViewModels
             IEmail email,
             IClipboard clipboard,
             IStoreReview storeReview,
+            ITrackingService trackingService,
             IStoreFactory storeFactory,
             IThemeService themeService,
             IBvmConstructor bvmConstructor) : base(bvmConstructor)
@@ -41,6 +43,7 @@ namespace AdelaideFuel.ViewModels
             _email = email;
             _clipboard = clipboard;
             _storeReview = storeReview;
+            _trackingService = trackingService;
 
             _storeFactory = storeFactory;
             _themeService = themeService;
@@ -180,7 +183,12 @@ namespace AdelaideFuel.ViewModels
 
                 if (BuildTappedCount % 5 == 0)
                 {
-                    var options = new[] { Resources.ClearCache, Resources.ViewLog, };
+                    var options = new[]
+                    {
+                        Resources.ClearCache,
+                        Resources.ViewAdvertisingIdentifier,
+                        Resources.ViewLog,
+                    };
 
                     var result = await DialogService.ActionSheetAsync(
                         null,
@@ -191,6 +199,26 @@ namespace AdelaideFuel.ViewModels
                     if (result == Resources.ClearCache)
                     {
                         _storeFactory.CacheEmptyAll();
+                    }
+                    else if (result == Resources.ViewAdvertisingIdentifier)
+                    {
+                        var id = await _trackingService.GetIdfaAsync();
+
+                        if (id != Guid.Empty)
+                        {
+                            await DialogService.AlertAsync(
+                                $"This device's advertising ID:\n\n{id}",
+                                Resources.ViewAdvertisingIdentifier,
+                                Resources.OK);
+                            await _clipboard.SetTextAsync(id.ToString());
+                        }
+                        else
+                        {
+                            await DialogService.AlertAsync(
+                                "Access to the advertising ID has been denied or restricted on this device.",
+                                Resources.ViewAdvertisingIdentifier,
+                                Resources.OK);
+                        }
                     }
                     else if (result == Resources.ViewLog)
                     {
