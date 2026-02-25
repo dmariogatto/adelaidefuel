@@ -752,5 +752,11 @@ namespace AdelaideFuel.Localisation {
                 return ResourceManager.GetString("AdInspector", resourceCulture);
             }
         }
+        
+        public static string ViewAdvertisingIdentifier {
+            get {
+                return ResourceManager.GetString("ViewAdvertisingIdentifier", resourceCulture);
+            }
+        }
     }
 }

@@ -80,7 +80,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-    <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.0.0" />
+    <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.1.0" />
     <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.1.0" />
   </ItemGroup>
 
@@ -88,7 +88,7 @@
   <ItemGroup Condition="$(TargetFramework.Contains('-ios')) And '$(Configuration)' == 'Release'">
     <!-- Meta Audience Network -->
     <PackageReference Include="Cats.Facebook.iOS.AudienceNetwork" Version="6.21.1" />
-    <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.0.2" />
+    <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.1" />
     <!-- Vungle/Liftoff -->
     <PackageReference Include="Cats.Vungle.iOS.Ads" Version="7.7.0" />
     <PackageReference Include="Cats.Google.iOS.VungleAdapter" Version="7.7.0" />
@@ -96,6 +96,7 @@
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
     <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.6" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.5" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.4" />
     <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.4" />
     <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
