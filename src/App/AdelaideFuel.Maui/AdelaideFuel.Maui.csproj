@@ -88,7 +88,7 @@
   <ItemGroup Condition="$(TargetFramework.Contains('-ios')) And '$(Configuration)' == 'Release'">
     <!-- Meta Audience Network -->
     <PackageReference Include="Cats.Facebook.iOS.AudienceNetwork" Version="6.21.1" />
-    <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.0.2" />
+    <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.1" />
     <!-- Vungle/Liftoff -->
     <PackageReference Include="Cats.Vungle.iOS.Ads" Version="7.7.0" />
     <PackageReference Include="Cats.Google.iOS.VungleAdapter" Version="7.7.0" />
