@@ -753,9 +753,21 @@ namespace AdelaideFuel.Localisation {
             }
         }
         
-        public static string ViewAdvertisingIdentifier {
+        public static string AdvertisingIdentifier {
             get {
-                return ResourceManager.GetString("ViewAdvertisingIdentifier", resourceCulture);
+                return ResourceManager.GetString("AdvertisingIdentifier", resourceCulture);
+            }
+        }
+        
+        public static string Email {
+            get {
+                return ResourceManager.GetString("Email", resourceCulture);
+            }
+        }
+        
+        public static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
             }
         }
     }
