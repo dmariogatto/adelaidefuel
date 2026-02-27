@@ -186,7 +186,7 @@ namespace AdelaideFuel.ViewModels
                     var options = new[]
                     {
                         Resources.ClearCache,
-                        Resources.ViewAdvertisingIdentifier,
+                        Resources.AdvertisingIdentifier,
                         Resources.ViewLog,
                     };
 
@@ -200,7 +200,7 @@ namespace AdelaideFuel.ViewModels
                     {
                         _storeFactory.CacheEmptyAll();
                     }
-                    else if (result == Resources.ViewAdvertisingIdentifier)
+                    else if (result == Resources.AdvertisingIdentifier)
                     {
                         var id = await _trackingService.GetIdfaAsync();
 
@@ -208,7 +208,7 @@ namespace AdelaideFuel.ViewModels
                         {
                             await DialogService.AlertAsync(
                                 $"This device's advertising ID:\n\n{id}",
-                                Resources.ViewAdvertisingIdentifier,
+                                Resources.AdvertisingIdentifier,
                                 Resources.OK);
                             await _clipboard.SetTextAsync(id.ToString());
                         }
@@ -216,7 +216,7 @@ namespace AdelaideFuel.ViewModels
                         {
                             await DialogService.AlertAsync(
                                 "Access to the advertising ID has been denied or restricted on this device.",
-                                Resources.ViewAdvertisingIdentifier,
+                                Resources.AdvertisingIdentifier,
                                 Resources.OK);
                         }
                     }
@@ -228,8 +228,8 @@ namespace AdelaideFuel.ViewModels
                             var email = await DialogService.ConfirmAsync(
                                 "Email to developer, or copy to clipboard?",
                                 "Fuel Log File",
-                                "Email",
-                                "Copy");
+                                Resources.Email,
+                                Resources.Copy);
 
                             if (email)
                             {

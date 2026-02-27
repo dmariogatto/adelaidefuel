@@ -483,7 +483,13 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="AdInspector" xml:space="preserve">
     <value>Ad Inspector</value>
   </data>
-  <data name="ViewAdvertisingIdentifier" xml:space="preserve">
-    <value>View Advertising Identifier</value>
+  <data name="AdvertisingIdentifier" xml:space="preserve">
+    <value>Advertising Identifier</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
   </data>
 </root>
