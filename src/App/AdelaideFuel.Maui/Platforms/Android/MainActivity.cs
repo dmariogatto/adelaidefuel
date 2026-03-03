@@ -31,10 +31,10 @@ public class MainActivity : MauiAppCompatActivity
 #if DEBUG
         var testDevices = new List<string>()
             {
-                Android.Gms.Ads.AdRequest.DeviceIdEmulator
+                Google.Android.Gms.Ads.AdRequest.DeviceIdEmulator
             };
 
-        Android.Gms.Ads.MobileAds.RequestConfiguration = new Android.Gms.Ads.RequestConfiguration.Builder()
+        Google.Android.Gms.Ads.MobileAds.RequestConfiguration = new Google.Android.Gms.Ads.RequestConfiguration.Builder()
             .SetTestDeviceIds(testDevices)
             .Build();
 #endif
