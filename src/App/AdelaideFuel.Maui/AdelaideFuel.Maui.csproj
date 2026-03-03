@@ -71,10 +71,9 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
-
     <PackageReference Include="AiForms.Maui.SettingsView" Version="9.0.9" />
     <PackageReference Include="BetterMaps.Maui" Version="3.1.1" />
-    <PackageReference Include="Cats.Maui.AdMob" Version="2.0.0-beta2" />
+    <PackageReference Include="Cats.Maui.AdMob" Version="3.0.0-beta1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
     <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
   </ItemGroup>
@@ -96,11 +95,11 @@
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
     <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.6" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.5" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Lite" Version="124.0.0.4" />
-    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="119.2.0.4" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.0.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0" />
     <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
-    <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.0.1" ExcludeAssets="all" />
+    <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.3" ExcludeAssets="all" />
     <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.0.1" ExcludeAssets="all" />
   </ItemGroup>
 

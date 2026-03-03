@@ -24,7 +24,7 @@ namespace AdelaideFuel.Maui.Views
         private void OnAdInspectorClicked(object sender, EventArgs e)
         {
 #if ANDROID
-            global::Android.Gms.Ads.MobileAds.OpenAdInspector(Platform.AppContext, new AdInspectorListener());
+            global::Google.Android.Gms.Ads.MobileAds.OpenAdInspector(Platform.AppContext, new AdInspectorListener());
 #elif IOS
             Cats.Google.MobileAds.MobileAds.SharedInstance.PresentAdInspectorFromViewController(
                 Platform.GetCurrentUIViewController(),
@@ -39,12 +39,12 @@ namespace AdelaideFuel.Maui.Views
     }
 
 #if ANDROID
-    public class AdInspectorListener : Java.Lang.Object, global::Android.Gms.Ads.IOnAdInspectorClosedListener
+    public class AdInspectorListener : Java.Lang.Object, global::Google.Android.Gms.Ads.IOnAdInspectorClosedListener
     {
         public AdInspectorListener(IntPtr handle, global::Android.Runtime.JniHandleOwnership transfer) : base(handle, transfer) { }
         public AdInspectorListener() { }
 
-        public void OnAdInspectorClosed(global::Android.Gms.Ads.AdInspectorError p0)
+        public void OnAdInspectorClosed(global::Google.Android.Gms.Ads.AdInspectorError p0)
         {
             if (!string.IsNullOrEmpty(p0?.Message))
                 System.Diagnostics.Debug.WriteLine(p0.Message);
