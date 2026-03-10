@@ -186,7 +186,7 @@ namespace AdelaideFuel.ViewModels
                     var options = new[]
                     {
                         Resources.ClearCache,
-                        Resources.AdvertisingIdentifier,
+                        // Resources.AdvertisingIdentifier,
                         Resources.ViewLog,
                     };
 

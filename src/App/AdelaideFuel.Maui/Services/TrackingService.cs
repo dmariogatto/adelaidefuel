@@ -15,6 +15,8 @@ public class TrackingService : ITrackingService
 {
     public async Task<Guid> GetIdfaAsync()
     {
+        return Guid.Empty;
+
         try
         {
 #if __IOS__
