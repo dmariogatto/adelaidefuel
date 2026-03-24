@@ -25,7 +25,6 @@ namespace AdelaideFuel.Maui.Views
             foreach (var i in Tabs.Keys)
                 _tabViews.Add(new LazyView(i));
 
-            _bottomTabs.SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.Container);
             _bottomTabs.SetDynamicResource(BottomTabControl.BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
             _bottomTabs.SetDynamicResource(BottomTabControl.PrimaryColorProperty, Styles.Keys.PrimaryAccentColor);
 
@@ -80,11 +79,11 @@ namespace AdelaideFuel.Maui.Views
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
                 ],
-                SafeAreaEdges = SafeAreaEdges.None,
+                SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.None, SafeAreaRegions.Default),
             };
             mainGrid.SetDynamicResource(BackgroundColorProperty, Styles.Keys.CardBackgroundColor);
 
-            var titleContent = new ContentView() { SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.None, SafeAreaRegions.Container, SafeAreaRegions.None, SafeAreaRegions.None) };
+            var titleContent = new ContentView() { SafeAreaEdges = new SafeAreaEdges(SafeAreaRegions.Container) };
             AutomationProperties.SetIsInAccessibleTree(titleContent, false);
 
             foreach (var i in new[] { _tabViews.FirstIndexOf(i => i.ContentType == typeof(MapTab)) })
