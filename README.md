@@ -21,4 +21,3 @@ The [maps package](https://www.nuget.org/packages/BetterMaps.Maui/) is based on 
 ### Platform
 
 - [Polly](https://github.com/App-vNext/Polly)
-- [StoreReviewPlugin](https://github.com/jamesmontemagno/StoreReviewPlugin)

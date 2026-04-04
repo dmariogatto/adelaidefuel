@@ -124,6 +124,19 @@ namespace AdelaideFuel.ViewModels
             }
         }
 
+        public int MaxPriceAgeDays
+        {
+            get => (int)AppPrefs.MaxPriceAge.TotalDays;
+            set
+            {
+                if ((int)AppPrefs.MaxPriceAge.TotalDays != value)
+                {
+                    AppPrefs.MaxPriceAge = TimeSpan.FromDays(value);
+                    OnPropertyChanged(nameof(MaxPriceAgeDays));
+                }
+            }
+        }
+
         public bool ShowRadiiOnMap
         {
             get => AppPrefs.ShowRadiiOnMap;

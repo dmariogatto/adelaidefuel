@@ -229,7 +229,17 @@ namespace AdelaideFuel.ViewModels
                 return false;
 
             var (prices, location, modifiedUtc) = await FuelService.GetFuelPricesByRadiusAsync(ct);
-            var priceLookup = prices?.ToDictionary(p => p.Key.Id, p => p.Items);
+            var utcNow = DateTime.UtcNow;
+            var maxPriceAge = AppPrefs.MaxPriceAge;
+            var priceLookup = prices
+                ?.ToDictionary(
+                    p => p.Key.Id,
+                    p =>
+                        maxPriceAge > TimeSpan.Zero
+                            ? p.Items
+                                .Where(i => (utcNow - i.ModifiedUtc) < maxPriceAge)
+                                .ToList()
+                            : p.Items);
 
             if (!ct.IsCancellationRequested)
             {

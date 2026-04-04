@@ -492,4 +492,22 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
   </data>
+  <data name="Days" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="MaxPriceAgeDaysTitle" xml:space="preserve">
+    <value>Ignore prices older than</value>
+  </data>
+  <data name="MaxPriceAgeDaysDescription" xml:space="preserve">
+    <value>Hidden from Prices tab, but still shown on the Map</value>
+  </data>
+  <data name="ItemDayAgo" xml:space="preserve">
+    <value>{0} day ago</value>
+  </data>
+  <data name="ItemDaysAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="WarningItemPriceLastUpdatedItem" xml:space="preserve">
+    <value>⚠️ {0} price last updated {1}</value>
+  </data>
 </root>

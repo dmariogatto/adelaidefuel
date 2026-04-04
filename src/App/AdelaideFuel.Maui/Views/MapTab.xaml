@@ -20,6 +20,7 @@
             <converters:KmToStringConverter x:Key="kmToStringConverter" />
             <converters:DateToLocalConverter x:Key="dateToLocalConverter" />
             <converters:OpeningHoursToStringConverter x:Key="openingHoursToStringConverter" />
+            <converters:DateTimeToFriendlyConverter x:Key="dateTimeToFriendlyConverter" />
         </ResourceDictionary>
     </View.Resources>
 
@@ -149,6 +150,20 @@
                             Text="{Binding SelectedSite.LastKnownDistanceKm, Converter={StaticResource kmToStringConverter}}"
                             VerticalTextAlignment="Center" />
                     </Grid>
+
+                    <Label
+                        Margin="54,8,0,0"
+                        FontFamily="{StaticResource ItalicFontFamily}"
+                        FontSize="{DynamicResource {x:Static styles:FontSizes.Micro}}"
+                        IsVisible="{Binding SelectedSite.MaxPriceAgeExpired, FallbackValue=False}"
+                        Style="{DynamicResource LabelTitleStyle}">
+                        <Label.Text>
+                            <MultiBinding StringFormat="{local:Translate WarningItemPriceLastUpdatedItem}">
+                                <Binding Path="Fuel.Name" />
+                                <Binding Converter="{StaticResource dateTimeToFriendlyConverter}" Path="SelectedSite.LastUpdatedUtc" />
+                            </MultiBinding>
+                        </Label.Text>
+                    </Label>
 
                     <BoxView
                         x:Name="BottomSheetDivider"

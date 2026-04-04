@@ -12,6 +12,7 @@ namespace AdelaideFuel.Services
         int DayCount { get; set; }
         bool ReviewRequested { get; set; }
 
+        TimeSpan MaxPriceAge { get; set; }
         bool ShowRadiiOnMap { get; set; }
     }
 }

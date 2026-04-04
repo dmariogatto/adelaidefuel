@@ -82,6 +82,29 @@ namespace AdelaideFuel.Services
             }
         }
 
+        public TimeSpan MaxPriceAge
+        {
+            get
+            {
+                if (!_preferences.ContainsKey(nameof(MaxPriceAge)))
+                    return TimeSpan.FromDays(12);
+
+                var ticks = _preferences.Get(nameof(MaxPriceAge), 0L);
+                return ticks < 0 ? TimeSpan.Zero : TimeSpan.FromTicks(ticks);
+
+            }
+            set
+            {
+                var newValue = value < TimeSpan.Zero ? TimeSpan.Zero : value;
+
+                if (MaxPriceAge != newValue)
+                {
+                    _preferences.Set(nameof(MaxPriceAge), newValue.Ticks);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool ShowRadiiOnMap
         {
 #if DEBUG
