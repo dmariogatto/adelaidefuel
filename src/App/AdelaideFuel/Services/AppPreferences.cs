@@ -91,7 +91,6 @@ namespace AdelaideFuel.Services
 
                 var ticks = _preferences.Get(nameof(MaxPriceAge), 0L);
                 return ticks < 0 ? TimeSpan.Zero : TimeSpan.FromTicks(ticks);
-
             }
             set
             {
