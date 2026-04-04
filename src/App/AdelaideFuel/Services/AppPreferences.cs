@@ -87,7 +87,7 @@ namespace AdelaideFuel.Services
             get
             {
                 if (!_preferences.ContainsKey(nameof(MaxPriceAge)))
-                    return TimeSpan.FromDays(10);
+                    return TimeSpan.FromDays(12);
 
                 var ticks = _preferences.Get(nameof(MaxPriceAge), 0L);
                 return ticks < 0 ? TimeSpan.Zero : TimeSpan.FromTicks(ticks);
