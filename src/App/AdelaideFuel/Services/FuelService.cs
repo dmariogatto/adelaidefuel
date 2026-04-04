@@ -18,8 +18,8 @@ namespace AdelaideFuel.Services
 {
     public class FuelService : BaseService, IFuelService
     {
-        private readonly static TimeSpan CacheExpireTimeSpan = TimeSpan.FromHours(12);
-        private readonly static TimeSpan CachePricesExpireTimeSpan = TimeSpan.FromMinutes(60);
+        private static readonly TimeSpan CacheExpireTimeSpan = TimeSpan.FromHours(12);
+        private static readonly TimeSpan CachePricesExpireTimeSpan = TimeSpan.FromMinutes(60);
 
         private readonly IReadOnlyList<int> _defaultRadii = [1, 3, 5, 10, 25, 50, int.MaxValue];
 
@@ -122,15 +122,15 @@ namespace AdelaideFuel.Services
             var brandIds = userBrandsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
             var fuelIds = userFuelsTask.Result.Where(i => i.IsActive).Select(i => i.Id).ToList();
 
-            var cacheKey = CacheKey(string.Join(',', brandIds.Concat(new[] { -1 }).Concat(fuelIds)), nameof(GetSitePricesAsync));
+            var cacheKey = CacheKey(string.Join(',', brandIds.Concat([-1]).Concat(fuelIds)), nameof(GetSitePricesAsync));
             var lastCheckCacheKey = CacheKey("last_check", nameof(GetSitePricesAsync));
 
             (IReadOnlyList<SiteFuelPrice> prices, DateTime modifiedUtc) result =
                 (Array.Empty<SiteFuelPrice>(), DateTime.MinValue);
 
-            async Task<bool> isOutOfDateAsync(string lastCheckCacheKey, DateTime modifiedUtc, CancellationToken ct)
+            async Task<bool> isOutOfDateAsync(string key, DateTime modifiedUtc, CancellationToken ct)
             {
-                if (MemoryCache.TryGetValue(lastCheckCacheKey, out DateTime lastCheck) &&
+                if (MemoryCache.TryGetValue(key, out DateTime lastCheck) &&
                     (_clock.UtcNow - lastCheck) < TimeSpan.FromMinutes(3))
                     return false;
 
@@ -140,7 +140,7 @@ namespace AdelaideFuel.Services
                 {
                     newModifiedUtc = _connectivity.NetworkAccess == NetworkAccess.Internet
                         ? await _retryPolicy.ExecuteAsync(
-                              (ct) => _fuelApi.GetSitePricesModifiedUtcAsync(Constants.ApiKeySitePrices, ct),
+                              t => _fuelApi.GetSitePricesModifiedUtcAsync(Constants.ApiKeySitePrices, t),
                               ct).ConfigureAwait(false)
                         : DateTime.MinValue;
                 }
@@ -152,7 +152,7 @@ namespace AdelaideFuel.Services
                 var hasChanged = newModifiedUtc > modifiedUtc;
 
                 if (!hasChanged)
-                    MemoryCache.SetAbsolute(lastCheckCacheKey, _clock.UtcNow, CachePricesExpireTimeSpan);
+                    MemoryCache.SetAbsolute(key, _clock.UtcNow, CachePricesExpireTimeSpan);
 
                 return hasChanged;
             }
@@ -178,7 +178,7 @@ namespace AdelaideFuel.Services
                     {
                         var sitesTask = GetSitesAsync(cancellationToken);
                         var pricesTask = _retryPolicy.ExecuteAsync(
-                            (ct) => _fuelApi.GetSitePricesAsync(Constants.ApiKeySitePrices, brandIds, fuelIds, ct),
+                            ct => _fuelApi.GetSitePricesAsync(Constants.ApiKeySitePrices, brandIds, fuelIds, ct),
                             cancellationToken);
 
                         await Task.WhenAll(sitesTask, pricesTask).ConfigureAwait(false);
@@ -230,8 +230,8 @@ namespace AdelaideFuel.Services
                     var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
                     if (status == PermissionStatus.Granted)
                     {
-                        location ??= await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
-                        location = await _geolocation.GetLocationAsync(
+                        location = await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
+                        location ??= await _geolocation.GetLocationAsync(
                             new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(6.5)), ct).ConfigureAwait(false);
                     }
                 }
@@ -297,7 +297,7 @@ namespace AdelaideFuel.Services
                     {
                         var fuel = userFuels[currentFuelId];
 
-                        currentGroup = new PriceItemByFuelGrouping(fuel, Array.Empty<SiteFuelPriceItem>());
+                        currentGroup = new PriceItemByFuelGrouping(fuel, []);
                         currentRadius = -1;
                         currentCheapest = double.MaxValue;
 
