@@ -102,6 +102,13 @@ namespace AdelaideFuel.Models
             set => SetProperty(ref _lastUpdatedUtc, value);
         }
 
+        private bool _maxPriceAgeExpired = false;
+        public bool MaxPriceAgeExpired
+        {
+            get => _maxPriceAgeExpired;
+            set => SetProperty(ref _maxPriceAgeExpired, value);
+        }
+
         #region IMapPin
         public string Label => Name;
         public string Description => SelectedFuelPrice is not null

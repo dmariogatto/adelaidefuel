@@ -770,5 +770,41 @@ namespace AdelaideFuel.Localisation {
                 return ResourceManager.GetString("Copy", resourceCulture);
             }
         }
+        
+        public static string Days {
+            get {
+                return ResourceManager.GetString("Days", resourceCulture);
+            }
+        }
+        
+        public static string MaxPriceAgeDaysTitle {
+            get {
+                return ResourceManager.GetString("MaxPriceAgeDaysTitle", resourceCulture);
+            }
+        }
+        
+        public static string MaxPriceAgeDaysDescription {
+            get {
+                return ResourceManager.GetString("MaxPriceAgeDaysDescription", resourceCulture);
+            }
+        }
+        
+        public static string ItemDayAgo {
+            get {
+                return ResourceManager.GetString("ItemDayAgo", resourceCulture);
+            }
+        }
+        
+        public static string ItemDaysAgo {
+            get {
+                return ResourceManager.GetString("ItemDaysAgo", resourceCulture);
+            }
+        }
+        
+        public static string WarningItemPriceLastUpdatedItem {
+            get {
+                return ResourceManager.GetString("WarningItemPriceLastUpdatedItem", resourceCulture);
+            }
+        }
     }
 }

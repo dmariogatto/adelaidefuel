@@ -37,6 +37,14 @@
                     Title="{local:Translate Brands}"
                     Command="{Binding GoToBrandsCommand}"
                     Description="{local:Translate BrandsDescription}" />
+                <sv:NumberPickerCell
+                    Title="{local:Translate MaxPriceAgeDaysTitle}"
+                    Description="{local:Translate MaxPriceAgeDaysDescription}"
+                    Max="21"
+                    Min="3"
+                    Number="{Binding MaxPriceAgeDays}"
+                    Unit="{local:Translate Days,
+                                           Transform=Lowercase}" />
                 <sv:CommandCell
                     Title="{local:Translate OpenAppSettings}"
                     Command="{Binding OpenAppSettingsCommand}"

@@ -249,8 +249,13 @@ namespace AdelaideFuel.ViewModels
                         var priceLookup = prices
                             .GroupBy(i => i.SiteId)
                             .ToDictionary(g => g.Key, g => g);
+                        var utcNow = DateTime.UtcNow;
+                        var maxPriceAge = AppPrefs.MaxPriceAge;
                         var fuelPrices = prices
-                            .Where(i => i.FuelId == fuel.Id && i.PriceInCents != Constants.OutOfStockPriceInCents)
+                            .Where(i =>
+                                i.FuelId == fuel.Id &&
+                                i.PriceInCents != Constants.OutOfStockPriceInCents &&
+                                (maxPriceAge <= TimeSpan.Zero || (utcNow - i.ModifiedUtc) < maxPriceAge))
                             .Select(i => i.PriceInCents)
                             .ToList();
 
@@ -315,7 +320,8 @@ namespace AdelaideFuel.ViewModels
                             {
                                 s.Prices.ReplaceRange(sitePrices);
                                 s.SelectedFuelPrice = s.Prices.FirstOrDefault(p => p.FuelId == Fuel.Id);
-                                s.LastUpdatedUtc = sitePrices.Max(p => p.ModifiedUtc);
+                                s.LastUpdatedUtc = s.SelectedFuelPrice?.ModifiedUtc ?? sitePrices.Max(p => p.ModifiedUtc);
+                                s.MaxPriceAgeExpired = maxPriceAge <= TimeSpan.Zero || (utcNow - s.LastUpdatedUtc) >= maxPriceAge;
                             }
                             else
                             {
