@@ -801,9 +801,9 @@ namespace AdelaideFuel.Localisation {
             }
         }
         
-        public static string WarningItemPriceLastUpdatedItem {
+        public static string WarningItemPriceUpdatedItem {
             get {
-                return ResourceManager.GetString("WarningItemPriceLastUpdatedItem", resourceCulture);
+                return ResourceManager.GetString("WarningItemPriceUpdatedItem", resourceCulture);
             }
         }
     }

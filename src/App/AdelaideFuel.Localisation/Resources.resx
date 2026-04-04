@@ -507,7 +507,7 @@ You can manage and cancel your subscriptions by going to your subscriptions in G
   <data name="ItemDaysAgo" xml:space="preserve">
     <value>{0} days ago</value>
   </data>
-  <data name="WarningItemPriceLastUpdatedItem" xml:space="preserve">
-    <value>⚠️ {0} price last updated {1}</value>
+  <data name="WarningItemPriceUpdatedItem" xml:space="preserve">
+    <value>⚠️ {0} price updated {1}</value>
   </data>
 </root>
