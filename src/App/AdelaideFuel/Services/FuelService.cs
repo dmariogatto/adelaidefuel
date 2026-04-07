@@ -240,9 +240,13 @@ namespace AdelaideFuel.Services
                         .Handle<Exception>(ex => ex is not FeatureNotEnabledException)
                         .OrResult(r => r is null)
                         .WaitAndRetryAsync(2, _ => TimeSpan.FromSeconds(1))
-                        .ExecuteAsync(async t => await _geolocation.GetLocationAsync(
-                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(6.5)), t
-                        ).ConfigureAwait(false), ct)
+                        .ExecuteAsync(async token =>
+                            {
+                                var request = new GeolocationRequest(
+                                    GeolocationAccuracy.Medium,
+                                    TimeSpan.FromSeconds(6.5));
+                                return await _geolocation.GetLocationAsync(request, token).ConfigureAwait(false);
+                            }, ct)
                         .ConfigureAwait(false);
                 }
                 catch (Exception ex)
