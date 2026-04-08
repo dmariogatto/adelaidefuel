@@ -158,7 +158,7 @@
                         IsVisible="{Binding SelectedSite.MaxPriceAgeExpired, FallbackValue=False}"
                         Style="{DynamicResource LabelTitleStyle}">
                         <Label.Text>
-                            <MultiBinding StringFormat="{local:Translate WarningItemPriceLastUpdatedItem}">
+                            <MultiBinding StringFormat="{local:Translate WarningItemPriceUpdatedItem}">
                                 <Binding Path="Fuel.Name" />
                                 <Binding Converter="{StaticResource dateTimeToFriendlyConverter}" Path="SelectedSite.LastUpdatedUtc" />
                             </MultiBinding>

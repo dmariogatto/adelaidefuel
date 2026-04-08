@@ -125,7 +125,7 @@ namespace AdelaideFuel.ViewModels
 
             try
             {
-                await FuelService.SyncAllAsync(default);
+                await FuelService.SyncAllAsync(CancellationToken.None);
 
                 await LoadGroupsAsync(ct);
                 await UpdatePricesAsync(ct);

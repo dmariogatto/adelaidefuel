@@ -223,24 +223,38 @@ namespace AdelaideFuel.Services
         {
             async Task<Location> getLocationAsync(CancellationToken ct)
             {
-                var location = default(Location);
-
                 try
                 {
                     var status = await _permissions.CheckStatusAsync<Permissions.LocationWhenInUse>().ConfigureAwait(false);
-                    if (status == PermissionStatus.Granted)
-                    {
-                        location = await _geolocation.GetLastKnownLocationAsync().ConfigureAwait(false);
-                        location ??= await _geolocation.GetLocationAsync(
-                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(6.5)), ct).ConfigureAwait(false);
-                    }
+                    if (status != PermissionStatus.Granted)
+                        return null;
+
+                    var lastLocation = await _geolocation
+                        .GetLastKnownLocationAsync()
+                        .ConfigureAwait(false);
+
+                    if (lastLocation is not null)
+                        return lastLocation;
+
+                    return await Policy<Location?>
+                        .Handle<Exception>(ex => ex is not FeatureNotEnabledException)
+                        .OrResult(r => r is null)
+                        .WaitAndRetryAsync(2, _ => TimeSpan.FromSeconds(1))
+                        .ExecuteAsync(async token =>
+                            {
+                                var request = new GeolocationRequest(
+                                    GeolocationAccuracy.Medium,
+                                    TimeSpan.FromSeconds(6.5));
+                                return await _geolocation.GetLocationAsync(request, token).ConfigureAwait(false);
+                            }, ct)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine(ex);
                 }
 
-                return location;
+                return null;
             }
 
             var locTask = getLocationAsync(cancellationToken);
@@ -293,10 +307,8 @@ namespace AdelaideFuel.Services
                 {
                     var currentFuelId = fpd.Price.FuelId;
 
-                    if (currentGroup?.Key?.Id != currentFuelId && userFuels.ContainsKey(currentFuelId))
+                    if (currentGroup?.Key?.Id != currentFuelId && userFuels.TryGetValue(currentFuelId, out var fuel))
                     {
-                        var fuel = userFuels[currentFuelId];
-
                         currentGroup = new PriceItemByFuelGrouping(fuel, []);
                         currentRadius = -1;
                         currentCheapest = double.MaxValue;
