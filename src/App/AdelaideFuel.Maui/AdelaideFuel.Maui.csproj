@@ -99,8 +99,8 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.1"/>
         <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.1"/>
         <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
-        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.4.1" ExcludeAssets="all"/>
-        <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.0.2" ExcludeAssets="all"/>
+        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.5" ExcludeAssets="all"/>
+        <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.1" ExcludeAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
