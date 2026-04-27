@@ -29,7 +29,7 @@ namespace AdelaideFuel.Models
             RadiusMetres == position.RadiusMetres &&
             Bearing == position.Bearing;
 
-        public override int GetHashCode() => (Latitude, Longitude).GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Latitude, Longitude);
         public static bool operator ==(Coords left, Coords right) => left.Equals(right);
         public static bool operator !=(Coords left, Coords right) => !(left == right);
     }
