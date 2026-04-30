@@ -2,7 +2,7 @@
 
 namespace AdelaideFuel.Models
 {
-    public struct MapPoint
+    public readonly struct MapPoint
     {
         public MapPoint(double x, double y)
         {
@@ -15,8 +15,8 @@ namespace AdelaideFuel.Models
 
         public override bool Equals(object obj) => obj is MapPoint point &&
             X == point.X &&
-            X == point.X;
-        public override int GetHashCode() => (X, X).GetHashCode();
+            Y == point.Y;
+        public override int GetHashCode() => HashCode.Combine(X, Y);
         public static bool operator ==(MapPoint left, MapPoint right) => left.Equals(right);
         public static bool operator !=(MapPoint left, MapPoint right) => !(left == right);
     }

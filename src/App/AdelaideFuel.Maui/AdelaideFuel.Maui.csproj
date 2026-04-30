@@ -28,24 +28,24 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#4CAF50" Condition="$(TargetFramework.Contains('-android'))"/>
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#4CAF50" Condition="$(TargetFramework.Contains('-android'))" />
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#4CAF50"/>
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#4CAF50" />
 
         <!-- Images -->
-        <MauiImage Include="Resources\Images\*"/>
+        <MauiImage Include="Resources\Images\*" />
 
         <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*"/>
+        <MauiFont Include="Resources\Fonts\*" />
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <MauiAsset Include="Platforms\iOS\Resources\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
-        <BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy"/>
+        <MauiAsset Include="Platforms\iOS\Resources\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-ios'))">
@@ -68,43 +68,43 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)"/>
-        <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)"/>
-        <PackageReference Include="AiForms.Maui.SettingsView" Version="9.0.12"/>
-        <PackageReference Include="BetterMaps.Maui" Version="3.1.1"/>
-        <PackageReference Include="Cats.Maui.AdMob" Version="3.0.0-beta1"/>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
+        <PackageReference Include="AiForms.Maui.SettingsView" Version="9.0.12" />
+        <PackageReference Include="BetterMaps.Maui" Version="3.1.1" />
+        <PackageReference Include="Cats.Maui.AdMob" Version="3.0.0-beta1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
-        <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2"/>
+        <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.2.0"/>
-        <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.1.0"/>
+        <PackageReference Include="Cats.Google.iOS.AdMob" Version="13.3.0" />
+        <PackageReference Include="Cats.Google.iOS.UserMessagingPlatform" Version="3.1.0" />
     </ItemGroup>
 
     <!-- AdMob Mediation Adapters -->
     <ItemGroup Condition="$(TargetFramework.Contains('-ios')) And '$(Configuration)' == 'Release' And '$(AdMobMediation)' == '1'">
         <!-- Meta Audience Network -->
-        <PackageReference Include="Cats.Facebook.iOS.AudienceNetwork" Version="6.21.1"/>
-        <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.1"/>
+        <PackageReference Include="Cats.Facebook.iOS.AudienceNetwork" Version="6.21.1" />
+        <PackageReference Include="Cats.Google.iOS.MetaAdapter" Version="6.21.1" />
         <!-- Vungle/Liftoff -->
-        <PackageReference Include="Cats.Vungle.iOS.Ads" Version="7.7.1"/>
-        <PackageReference Include="Cats.Google.iOS.VungleAdapter" Version="7.7.1"/>
+        <PackageReference Include="Cats.Vungle.iOS.Ads" Version="7.7.1" />
+        <PackageReference Include="Cats.Google.iOS.VungleAdapter" Version="7.7.1" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-        <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7"/>
-        <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.0.0.1"/>
-        <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.1"/>
-        <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.1"/>
+        <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.2.0" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.1" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.1" />
         <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
-        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.5" ExcludeAssets="all"/>
-        <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.1" ExcludeAssets="all"/>
+        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.10.6" ExcludeAssets="all" />
+        <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.1" ExcludeAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AdelaideFuel\AdelaideFuel.csproj"/>
+        <ProjectReference Include="..\AdelaideFuel\AdelaideFuel.csproj" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
@@ -124,7 +124,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true"/>
+        <RuntimeHostConfigurationOption Include="System.IO.DisableFileLocking" Value="true" />
     </ItemGroup>
 
     <Target Name="SelectStaticRegistrar" AfterTargets="SelectRegistrar">
@@ -140,12 +140,12 @@
             <_SwiftPlatform Condition="$(RuntimeIdentifier.StartsWith('ios-'))">iphoneos</_SwiftPlatform>
         </PropertyGroup>
         <ItemGroup>
-            <_CustomLinkFlags Include="-L"/>
-            <_CustomLinkFlags Include="/usr/lib/swift"/>
-            <_CustomLinkFlags Include="-L"/>
-            <_CustomLinkFlags Include="$(_SdkDevPath)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(_SwiftPlatform)"/>
-            <_CustomLinkFlags Include="-Wl,-rpath"/>
-            <_CustomLinkFlags Include="-Wl,/usr/lib/swift"/>
+            <_CustomLinkFlags Include="-L" />
+            <_CustomLinkFlags Include="/usr/lib/swift" />
+            <_CustomLinkFlags Include="-L" />
+            <_CustomLinkFlags Include="$(_SdkDevPath)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(_SwiftPlatform)" />
+            <_CustomLinkFlags Include="-Wl,-rpath" />
+            <_CustomLinkFlags Include="-Wl,/usr/lib/swift" />
         </ItemGroup>
     </Target>
 
