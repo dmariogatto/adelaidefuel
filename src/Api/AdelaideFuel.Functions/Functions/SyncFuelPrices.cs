@@ -19,8 +19,6 @@ namespace AdelaideFuel.Functions
     public class SyncFuelPrices
     {
         private const int OutOfStockPrice = 9999;
-
-        private readonly static MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         private readonly static TimeSpan CacheDuration = TimeSpan.FromMinutes(60);
 
         private readonly ISaFuelPricingApi _saFuelPricingApi;
