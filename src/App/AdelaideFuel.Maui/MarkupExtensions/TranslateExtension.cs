@@ -14,7 +14,6 @@ namespace AdelaideFuel.Maui
 
         private static readonly Lazy<ResourceManager> ResMgr = new Lazy<ResourceManager>(() =>
             new ResourceManager(ResourceId, typeof(Resources).GetTypeInfo().Assembly));
-        private static readonly Lazy<ILocalise> Localise = new Lazy<ILocalise>(() =>
         private static readonly Lazy<ILocalise> Localise = new Lazy<ILocalise>(IoC.Resolve<ILocalise>);
 
         private readonly CultureInfo _ci;
