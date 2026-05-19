@@ -5,8 +5,7 @@
     <OutputType>Exe</OutputType>
 	  <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
   <ItemGroup>
