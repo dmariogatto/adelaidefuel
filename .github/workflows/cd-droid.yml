@@ -130,12 +130,12 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry-auth-token }}
 
     - name: Upload Android Artifact to Play Console
-      uses: r0adkll/upload-google-play@v1.1.3
+      uses: r0adkll/upload-google-play@v1.1.5
       with:
         serviceAccountJsonPlainText: ${{ secrets.playstore-service-account }}
         packageName: ${{ inputs.package-name }}
         releaseFiles: ${{ github.workspace }}/${{ inputs.project-folder }}/bin/${{ inputs.build-config }}/${{ inputs.dotnet-version-target }}-android/${{ inputs.package-name }}-Signed.aab
-        track: beta
+        tracks: beta
         whatsNewDirectory: ./src/whatsnew
         changesNotSentForReview: false
 

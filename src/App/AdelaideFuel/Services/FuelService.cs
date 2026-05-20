@@ -236,7 +236,7 @@ namespace AdelaideFuel.Services
                     if (lastLocation is not null)
                         return lastLocation;
 
-                    return await Policy<Location?>
+                    return await Policy<Location>
                         .Handle<Exception>(ex => ex is not FeatureNotEnabledException)
                         .OrResult(r => r is null)
                         .WaitAndRetryAsync(2, _ => TimeSpan.FromSeconds(1))

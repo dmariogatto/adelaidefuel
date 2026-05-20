@@ -14,8 +14,7 @@ namespace AdelaideFuel.Maui
 
         private static readonly Lazy<ResourceManager> ResMgr = new Lazy<ResourceManager>(() =>
             new ResourceManager(ResourceId, typeof(Resources).GetTypeInfo().Assembly));
-        private static readonly Lazy<ILocalise> Localise = new Lazy<ILocalise>(() =>
-            IoC.Resolve<ILocalise>());
+        private static readonly Lazy<ILocalise> Localise = new Lazy<ILocalise>(IoC.Resolve<ILocalise>);
 
         private readonly CultureInfo _ci;
 
@@ -25,6 +24,7 @@ namespace AdelaideFuel.Maui
         }
 
         public string Text { get; set; }
+        public string StringFormat { get; set; }
 
         public TextTransform Transform { get; set; }
 
@@ -52,6 +52,11 @@ namespace AdelaideFuel.Maui
                 TextTransform.Lowercase => translation.ToLower(),
                 _ => translation
             };
+
+            if (!string.IsNullOrWhiteSpace(StringFormat))
+            {
+                translation = string.Format(StringFormat, translation);
+            }
 
             return translation;
         }
