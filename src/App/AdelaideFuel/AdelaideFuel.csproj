@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
-    <PackageReference Include="Cats.Build.Blacklist" Version="2.0.0">
+    <PackageReference Include="Cats.Build.Blacklist" Version="2.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
