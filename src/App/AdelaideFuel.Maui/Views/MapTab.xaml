@@ -40,6 +40,7 @@
                 CascadeInputTransparent="False"
                 HorizontalOptions="Center"
                 InputTransparent="True"
+                SafeAreaEdges="None,Container,None,None"
                 Spacing="{StaticResource SmallSpacing}">
                 <controls:FuelSelectionView
                     FuelsSource="{Binding Fuels}"
