@@ -21,6 +21,7 @@ namespace AdelaideFuel.Maui.Controls
 
         public FuelCategoriesView()
         {
+            SafeAreaEdges = SafeAreaEdges.None;
             HorizontalOptions = LayoutOptions.Center;
 
             ColumnSpacing = RowSpacing = 0;

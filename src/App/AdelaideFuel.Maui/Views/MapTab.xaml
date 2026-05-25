@@ -75,7 +75,10 @@
                 Padding="{StaticResource SmallThickness}"
                 IsVisible="{Binding InitialLoadComplete}"
                 PropertyChanged="BottomDrawerControlPropertyChanged">
-                <VerticalStackLayout SizeChanged="BottomSheetSizeChanged" VerticalOptions="Start">
+                <VerticalStackLayout
+                    SafeAreaEdges="None"
+                    SizeChanged="BottomSheetSizeChanged"
+                    VerticalOptions="Start">
                     <BoxView
                         x:Name="BottomDrawerHandle"
                         Margin="0,8,0,10"
@@ -172,12 +175,16 @@
                         HeightRequest="1"
                         Color="{DynamicResource {x:Static styles:Keys.PrimaryAccentColor}}" />
 
-                    <controls:PricesBoardView Padding="{StaticResource MediumLeftTopThickness}" SiteFuelPrices="{Binding SelectedSite.Prices}" />
+                    <controls:PricesBoardView
+                        Padding="{StaticResource MediumLeftTopThickness}"
+                        SafeAreaEdges="None"
+                        SiteFuelPrices="{Binding SelectedSite.Prices}" />
 
                     <Grid
                         Padding="{StaticResource MediumLeftThickness}"
                         ColumnDefinitions="*,*"
-                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}">
+                        IsVisible="{Binding SelectedSite, Converter={StaticResource IsNotNullConverter}}"
+                        SafeAreaEdges="None">
                         <Button
                             Padding="0,8,0,8"
                             Command="{Binding OpenUrlCommand}"
