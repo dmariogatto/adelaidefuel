@@ -95,11 +95,11 @@
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
         <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.2.0" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.3.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.1" />
         <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.1" />
         <!-- Exclude duplicate JVM packages to resolve D8 compilation conflicts with Android variants -->
-        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.11.1.1" ExcludeAssets="all" />
+        <PackageReference Include="Xamarin.AndroidX.Compose.Runtime.Annotation.Jvm" Version="1.11.2" ExcludeAssets="all" />
         <PackageReference Include="Xamarin.AndroidX.Datastore.Preferences.Core.Jvm" Version="1.2.1" ExcludeAssets="all" />
     </ItemGroup>
 
@@ -112,7 +112,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-        <PackageReference Include="Sentry.Maui" Version="6.5.0" />
+        <PackageReference Include="Sentry.Maui" Version="6.6.0" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
