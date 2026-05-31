@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 namespace AdelaideFuel.Maui.Controls
 {
-    public class PricesBoardView : StackLayout
+    public class PricesBoardView : VerticalStackLayout
     {
         public static readonly BindableProperty SiteFuelPricesProperty =
           BindableProperty.Create(
@@ -19,12 +19,14 @@ namespace AdelaideFuel.Maui.Controls
 
         public PricesBoardView()
         {
+            SafeAreaEdges = SafeAreaEdges.None;
             Spacing = App.Current.FindResource<double>(Styles.Keys.XSmallSpacing);
 
             _pricesGrid = new Grid()
             {
                 RowSpacing = 0,
-                ColumnSpacing = 0
+                ColumnSpacing = 0,
+                SafeAreaEdges = SafeAreaEdges.None,
             };
 
             _pricesGrid.ColumnDefinitions.Add(new ColumnDefinition());

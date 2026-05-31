@@ -5,23 +5,10 @@
       "routePrefix": "api/v1"
     }
   },
+  "telemetryMode": "OpenTelemetry",
   "logging": {
-    "applicationInsights": {
-      "samplingSettings": {
-        "isEnabled": true,
-        "initialSamplingPercentage": 0.0,
-        "minSamplingPercentage": 0.0,
-        "maxSamplingPercentage": 0.0,
-        "excludedTypes": "Event"
-      },
-      "enableLiveMetrics": false,
-      "enableDependencyTracking": false,
-      "enablePerformanceCountersCollection": false,
-      "httpAutoCollectionOptions": {
-        "enableHttpTriggerExtendedInfoCollection": false,
-        "enableW3CDistributedTracing": false,
-        "enableResponseHeaderInjection": false
-      }
+    "logLevel": {
+      "default": "Warning"
     }
   }
 }

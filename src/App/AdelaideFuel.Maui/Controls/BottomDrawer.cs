@@ -180,7 +180,7 @@ namespace AdelaideFuel.Maui.Controls
             {
                 case GestureStatus.Running:
                     _isDragging = true;
-                    var Y = (DeviceInfo.Current.Platform == DevicePlatform.Android ? this.TranslationY : _translationYStart) + e.TotalY;
+                    var Y = _translationYStart + e.TotalY;
                     // Translate and ensure we don't y + e.TotalY pan beyond the wrapped user interface element bounds.
                     var translateY = Math.Max(Math.Min(0, Y), -Math.Abs((Height * .25) - Height));
                     this.TranslationY = translateY;

@@ -4,7 +4,8 @@ using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Models;
 using AdelaideFuel.TableStore.Repositories;
-using Microsoft.Azure.Functions.Worker;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,8 +22,12 @@ var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
     {
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
+        services.AddOpenTelemetry()
+            .UseFunctionsWorkerDefaults()
+            .UseAzureMonitorExporter(options =>
+            {
+                options.EnableLiveMetrics = false;
+            });
 
         services.Configure<JsonOptions>(options =>
         {
