@@ -94,7 +94,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-        <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.7" />
+        <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.8" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.3.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.1" />
         <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.1" />
