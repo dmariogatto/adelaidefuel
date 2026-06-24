@@ -8,8 +8,8 @@ using UIKit;
 #if __ANDROID__
 using Android.Views;
 using AndroidX.Room.Util;
-using Xamarin.Google.Android.Play.Core.Review;
-using Xamarin.Google.Android.Play.Core.Review.Testing;
+using Google.Android.Play.Core.Review;
+using Google.Android.Play.Core.Review.Testing;
 #endif
 
 namespace AdelaideFuel.Maui.Services;
