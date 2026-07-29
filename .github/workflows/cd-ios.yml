@@ -72,17 +72,17 @@ jobs:
         xcode-version: ${{ inputs.xcode-version }}
 
     - name: Checkout
-      uses: actions/checkout@v6.0.1
+      uses: actions/checkout@v7.0.1
 
     - name: Import Distribution Certificate
-      uses: Apple-Actions/import-codesign-certs@v6.0.0
+      uses: Apple-Actions/import-codesign-certs@v7.0.0
       with: 
         p12-file-base64: ${{ secrets.p12-cert }}
         p12-password: ${{ secrets.p12-cert-password }}
 
     - name: Download Provisioning Profiles
       id: provisioning_app
-      uses: Apple-Actions/download-provisioning-profiles@v5.0.0
+      uses: Apple-Actions/download-provisioning-profiles@v6.1.0
       with: 
         bundle-id: ${{ inputs.package-name }}
         profile-type: 'IOS_APP_STORE'
