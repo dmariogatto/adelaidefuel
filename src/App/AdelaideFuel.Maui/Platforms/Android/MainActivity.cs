@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using AndroidX.Core.View;
 
 namespace AdelaideFuel.Maui;
 
@@ -24,6 +25,12 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+
+        if (Build.VERSION.SdkInt <= BuildVersionCodes.Q)
+        {
+            // edge-to-edge fix for 29 and below
+            WindowCompat.SetDecorFitsSystemWindows(Window, true);
+        }
 
         if (DeviceInfo.Current.Idiom == DeviceIdiom.Phone)
             RequestedOrientation = ScreenOrientation.UserPortrait;
