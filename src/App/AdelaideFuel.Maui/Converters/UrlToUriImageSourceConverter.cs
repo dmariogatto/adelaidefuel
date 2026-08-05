@@ -6,9 +6,12 @@ namespace AdelaideFuel.Maui.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is not string url)
+                return null;
+
             return new UriImageSource()
             {
-                Uri = new Uri((string)value),
+                Uri = new Uri(url),
                 CacheValidity = TimeSpan.FromDays(3),
                 CachingEnabled = true
             };
