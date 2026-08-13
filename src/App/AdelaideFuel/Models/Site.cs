@@ -36,7 +36,7 @@ namespace AdelaideFuel.Models
             }
         }
 
-        public IDictionary<DayOfWeek, OpeningHour> OpeningHours { get; }
+        public IReadOnlyDictionary<DayOfWeek, OpeningHour> OpeningHours { get; }
         public ObservableRangeCollection<SiteFuelPrice> Prices { get; }
 
         private int _id;

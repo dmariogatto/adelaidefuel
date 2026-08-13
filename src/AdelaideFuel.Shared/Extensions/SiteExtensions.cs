@@ -5,7 +5,7 @@ namespace AdelaideFuel.Shared
 {
     public static class SiteExtensions
     {
-        public static IDictionary<DayOfWeek, OpeningHour> GetOpeningHours(this SiteDto site)
+        public static IReadOnlyDictionary<DayOfWeek, OpeningHour> GetOpeningHours(this SiteDto site)
             => new Dictionary<DayOfWeek, OpeningHour>()
                 {
                     { DayOfWeek.Monday, new OpeningHour(DayOfWeek.Monday, site.MondayOpen, site.MondayClose) },

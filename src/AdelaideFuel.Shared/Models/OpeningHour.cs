@@ -2,10 +2,10 @@
 
 namespace AdelaideFuel.Shared
 {
-    public struct OpeningHour
+    public readonly struct OpeningHour
     {
-        private readonly static TimeSpan FullDay = TimeSpan.FromHours(24);
-        private readonly static TimeSpan EndOfDay = new TimeSpan(23, 59, 00);
+        private static readonly TimeSpan FullDay = TimeSpan.FromHours(24);
+        private static readonly TimeSpan EndOfDay = new TimeSpan(23, 59, 00);
 
         public OpeningHour(DayOfWeek day, string open, string close)
         {
