@@ -73,8 +73,8 @@ namespace AdelaideFuel.Functions
                     blobImgPath = Path.Combine(basePath, fileName);
                 }
 
-                using var stream = await _blobService.OpenReadAsync(blobImgPath, ct);
-                using var memoryStream = new MemoryStream();
+                await using var stream = await _blobService.OpenReadAsync(blobImgPath, ct);
+                await using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream, ct);
 
                 return new CachedFileContentResult(memoryStream.ToArray(), "image/png", TimeSpan.FromDays(5))
