@@ -658,7 +658,7 @@ namespace AdelaideFuel.Services
                     try
                     {
                         response = await _retryPolicy.ExecuteAsync(apiRequest, cancellationToken).ConfigureAwait(false);
-                        if (!cancellationToken.IsCancellationRequested && response is not null)
+                        if (response is not null)
                             diskCache.Upsert(cacheKey, response, diskCacheTime ?? CacheExpireTimeSpan);
                     }
                     catch (Exception ex)
