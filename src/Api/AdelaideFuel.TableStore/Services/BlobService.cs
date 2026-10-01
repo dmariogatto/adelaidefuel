@@ -1,5 +1,6 @@
-﻿using AdelaideFuel.Functions.Models;
+﻿using AdelaideFuel.TableStorage.Models;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AdelaideFuel.Functions.Services
+namespace AdelaideFuel.TableStore.Services
 {
     public class BlobService : IBlobService
     {
@@ -30,7 +31,15 @@ namespace AdelaideFuel.Functions.Services
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
 
-            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var options = new BlockBlobOpenWriteOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = "application/json"
+                }
+            };
+
+            using var stream = await blob.OpenWriteAsync(true, options, cancellationToken: cancellationToken).ConfigureAwait(false);
             await JsonSerializer.SerializeAsync(stream, data).ConfigureAwait(false);
         }
 
@@ -75,7 +84,15 @@ namespace AdelaideFuel.Functions.Services
             var container = await GetBlobContainerAsync(cancellationToken).ConfigureAwait(false);
             var blob = container.GetBlockBlobClient(localFilePath);
 
-            using var writer = new StreamWriter(await blob.OpenWriteAsync(true, cancellationToken: cancellationToken).ConfigureAwait(false));
+            var options = new BlockBlobOpenWriteOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = "text/plain"
+                }
+            };
+
+            using var writer = new StreamWriter(await blob.OpenWriteAsync(true, options, cancellationToken: cancellationToken).ConfigureAwait(false));
             await writer.WriteAsync(data).ConfigureAwait(false);
         }
 

@@ -1,9 +1,11 @@
 using AdelaideFuel.Api;
 using AdelaideFuel.Functions.Models;
 using AdelaideFuel.Functions.Services;
+using AdelaideFuel.TableStorage.Models;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Models;
 using AdelaideFuel.TableStore.Repositories;
+using AdelaideFuel.TableStore.Services;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.Configuration;

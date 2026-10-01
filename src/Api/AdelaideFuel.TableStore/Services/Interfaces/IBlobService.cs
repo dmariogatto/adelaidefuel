@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AdelaideFuel.Functions.Services
+namespace AdelaideFuel.TableStore.Services
 {
     public interface IBlobService
     {

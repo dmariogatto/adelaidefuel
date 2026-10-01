@@ -1,6 +1,6 @@
-using AdelaideFuel.Functions.Services;
 using AdelaideFuel.TableStore.Entities;
 using AdelaideFuel.TableStore.Repositories;
+using AdelaideFuel.TableStore.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AdelaideFuel.Functions.Models
+namespace AdelaideFuel.TableStorage.Models
 {
     public class BlobStorageOptions
     {
