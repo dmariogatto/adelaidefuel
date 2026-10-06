@@ -58,8 +58,15 @@ namespace AdelaideFuel.TableStore.Repositories
 
         public async Task<T> GetEntityAsync(string partitionKey, string rowKey, CancellationToken cancellationToken)
         {
-            var resp = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey).ConfigureAwait(false);
-            return resp.Value;
+            try
+            {
+                var response = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey, cancellationToken: cancellationToken).ConfigureAwait(false);
+                return response.Value;
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                return default;
+            }
         }
 
         public Task<IList<T>> GetEntitiesAsync(IList<(string partitionKey, string rowKey)> keys, CancellationToken cancellationToken)
