@@ -69,7 +69,7 @@ jobs:
     - name: Set XCode version
       uses: maxim-lobanov/setup-xcode@v1.7.0
       with:
-        xcode-version: '${{ inputs.xcode-version }}'
+        xcode-version: ${{ inputs.xcode-version }}
 
     - name: Checkout
       uses: actions/checkout@v7.0.1
