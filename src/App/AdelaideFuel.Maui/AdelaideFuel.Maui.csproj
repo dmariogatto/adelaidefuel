@@ -78,7 +78,7 @@
         <PackageReference Include="AiForms.Maui.SettingsView" Version="9.0.12" />
         <PackageReference Include="BetterMaps.Maui" Version="3.1.1" />
         <PackageReference Include="Cats.Maui.AdMob" Version="3.0.0-beta1" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.13" />
         <PackageReference Include="Sharpnado.CollectionView.Maui" Version="3.1.2" />
     </ItemGroup>
 
@@ -115,7 +115,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Sentry)' == '1'">
-        <PackageReference Include="Sentry.Maui" Version="6.12.0" />
+        <PackageReference Include="Sentry.Maui" Version="6.12.1" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(Sentry)' == '1'">
