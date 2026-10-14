@@ -64,7 +64,7 @@
         <AndroidLinkTool>r8</AndroidLinkTool>
         <AndroidTypeMapImplementation>trimmable</AndroidTypeMapImplementation>
         <PublishTrimmed>true</PublishTrimmed>
-        <AndroidR8ObfuscationMode>runtime-remapping</AndroidR8ObfuscationMode>
+        <AndroidR8ObfuscationMode>private-members</AndroidR8ObfuscationMode>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-android'))">
