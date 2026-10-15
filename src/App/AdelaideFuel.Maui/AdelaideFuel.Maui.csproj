@@ -61,10 +61,10 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
         <RuntimeIdentifiers>android-arm64;android-arm</RuntimeIdentifiers>
-        <AndroidLinkTool>r8</AndroidLinkTool>
+        <!--<AndroidLinkTool>r8</AndroidLinkTool>
         <AndroidTypeMapImplementation>trimmable</AndroidTypeMapImplementation>
         <PublishTrimmed>true</PublishTrimmed>
-        <!--<AndroidR8ObfuscationMode>runtime-remapping</AndroidR8ObfuscationMode>-->
+        <AndroidR8ObfuscationMode>runtime-remapping</AndroidR8ObfuscationMode>-->
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-android'))">
