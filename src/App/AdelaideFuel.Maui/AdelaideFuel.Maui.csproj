@@ -61,10 +61,10 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
         <RuntimeIdentifiers>android-arm64;android-arm</RuntimeIdentifiers>
-        <!--<AndroidLinkTool>r8</AndroidLinkTool>
+        <AndroidLinkTool>r8</AndroidLinkTool>
         <AndroidTypeMapImplementation>trimmable</AndroidTypeMapImplementation>
         <PublishTrimmed>true</PublishTrimmed>
-        <AndroidR8ObfuscationMode>runtime-remapping</AndroidR8ObfuscationMode>-->
+        <AndroidR8ObfuscationMode>private-members</AndroidR8ObfuscationMode>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug' And $(TargetFramework.Contains('-android'))">
@@ -104,6 +104,7 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.5.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.3" />
         <PackageReference Include="Xamarin.GooglePlayServices.Maps" Version="120.0.0.3" />
+        <ProguardConfiguration Include="Platforms\Android\proguard.cfg" />
     </ItemGroup>
 
     <ItemGroup>
