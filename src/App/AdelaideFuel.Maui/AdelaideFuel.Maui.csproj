@@ -98,8 +98,8 @@
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-        <PackageReference Include="Xamarin.AndroidX.Fragment" Version="1.9.0" />
-        <PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.9.0" />
+        <PackageReference Include="Xamarin.AndroidX.Fragment" Version="1.9.1" />
+        <PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.9.1" />
         <PackageReference Include="Xamarin.Google.Android.Play.Review" Version="2.0.2.10" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads" Version="125.5.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.3.0.3" />
